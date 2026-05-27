@@ -16,26 +16,28 @@ struct triplet{
 
 class DebugInfo{
     Token tok;//the '!' token for error reporting
-    Token file_name;
-    Token line;
-    Token column;
+    Token file_name;//A string literal
+    Token line;//A number literal
+    Token column;//A number literal
     public:
     DebugInfo(Token tok, Token file_name, Token line, Token column);
 
     Token get_file_name() const;
     Token get_line() const;
     Token get_column() const;
+
     Token get_token() const;
     std::string to_string() const;
 };
 using DebugInfoPtr = std::shared_ptr<DebugInfo>;
 
 class Attribute{
+    //#[name(arg1, arg2, ... )] or #[name(kwarg1=value1, kwarg2=value2, ...)] 
     Token tok;//The # token for error reporting
     Token name;
     //The args are supposed to be const literal anyways
     std::vector<Token> args;
-    std::vector<std::pair<Token,Token>> kwargs;
+    std::vector<std::pair<Token,Token>> kwargs;//Expects constant literal tokens as values and constant identtifier token as keys
     public:
     Attribute(Token tok, Token name, std::vector<Token> args, std::vector<std::pair<Token,Token>> kwargs);
 
@@ -78,6 +80,8 @@ class NamedTypeExpr : public TypeExpr{
     std::vector<AttributePtr> attributes;
     public:
     NamedTypeExpr(Token name, std::vector<AttributePtr> attributes);
+
+    Token get_name() const;
 
     TypeExprKind get_kind() const override;
     Token get_token() const override;
@@ -147,10 +151,12 @@ class StructTypeExpr : public TypeExpr{
     std::vector<AttributePtr> attributes;
 
     std::vector<TypeExprPtr> fields;
+    bool packed = false;
     public:
-    StructTypeExpr(Token tok, std::vector<TypeExprPtr> fields, std::vector<AttributePtr> attributes);
+    StructTypeExpr(Token tok, std::vector<TypeExprPtr> fields, bool packed, std::vector<AttributePtr> attributes);
 
     std::vector<TypeExprPtr> get_fields() const;
+    bool is_packed() const;
 
     TypeExprKind get_kind() const override;
     Token get_token() const override;
@@ -212,18 +218,22 @@ class NamedLiteralExpr : public LiteralExpr{
     std::string to_string() const override;
 };
 class StringLiteralExpr : public LiteralExpr{
-    Token tok;//the string literal token for error reporting
+    Token value;//the string literal token for error reporting
     public:
-    StringLiteralExpr(Token tok);
+    StringLiteralExpr(Token value);
+
+    Token get_value() const;
 
     LiteralKind get_kind() const override;
     Token get_token() const override;
     std::string to_string() const override;
 };
 class NumLiteralExpr : public LiteralExpr{
-    Token tok;//the number literal token for error reporting
+    Token value;//the number literal token for error reporting
     public:
-    NumLiteralExpr(Token tok);
+    NumLiteralExpr(Token value);
+
+    Token get_value() const;
 
     LiteralKind get_kind() const override;
     Token get_token() const override;
@@ -257,7 +267,7 @@ class SIMDLiteralExpr : public LiteralExpr{
 };
 
 class StructLiteralExpr : public LiteralExpr{
-    //{field1:value1, field2:value2, ... }
+    //{value1, value2, ... }
     Token tok;//the '{' token for error reporting
     std::vector<LiteralExprPtr> fields;
     public:
@@ -276,8 +286,8 @@ enum class ExprKind:std::uint8_t{
 };
 
 class Expr{
-    LiteralExprPtr literal;
-    TypeExprPtr type;
+    LiteralExprPtr literal = nullptr;//null if it is not a literal expression
+    TypeExprPtr type = nullptr;//null if it is not a type expression
     public:
     Expr(LiteralExprPtr literal);
     Expr(TypeExprPtr type);
@@ -298,12 +308,11 @@ class InstructionStmt{
             std::vector<std::pair<ExprPtr,TypeExprPtr>> operands;
             /*
             If you want to do ``a=1.2`` then do ``a = .copy(f32:1.2)`` and done. This keeps the parser simpler and language uniform
-            In case u are wondering why I cant check if the token after ``=`` is instruction. If not then no need of ``.copy``
-            Well the reason is that here instructions are also values so...
+            In case u are wondering why I cant check if the token after ``=`` is instruction. Because if I check then no need of ``.copy``
             I mean technically I can check but no need to overcomplicate
             */
             std::vector<AttributePtr> attributes;
-            DebugInfoPtr debug_info; //COmes after attributes
+            DebugInfoPtr debug_info = nullptr; //COmes after attributes
         public:
             InstructionCall(Token tok, std::vector<std::pair<ExprPtr,TypeExprPtr>> operands, std::vector<AttributePtr> attributes, DebugInfoPtr debug_info);
 
@@ -315,17 +324,15 @@ class InstructionStmt{
         };
     private:
     //let type:$name #[attr1] #[attr2]= ...
-    Token tok;//the 'let' token for error reporting
+    Token tok;//the 'let'/instruction token for error reporting
     std::optional<triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> name;//Empty if we dont assign the InstructionCall statement to a variable
 
     std::optional<InstructionCall> value;//Empty if it is just a declaration without initialization. Do let type:type = .copy(type:<4 x i32>) if u want type def
     public:
-    InstructionStmt(Token tok, std::optional<std::pair<Token, TypeExprPtr>> name, TypeExprPtr type, std::optional<std::pair<TypeExprPtr,InstructionCall>> value);
+    InstructionStmt(Token tok, std::optional<triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> name, std::optional<InstructionCall> value);
 
-    std::optional<std::pair<Token, TypeExprPtr>> get_name() const;
-    std::optional<std::pair<TypeExprPtr,InstructionCall>> get_value() const;
-    std::optional<AttributePtr> get_attribute() const;
-    
+    std::optional<triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> get_name() const;
+    std::optional<InstructionCall> get_value() const;
     Token get_token() const;
     std::string to_string() const;
 };  
@@ -362,7 +369,7 @@ class Function {
     std::vector<triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> params;
     bool varargs;//whether the function has a ... varargs at the end.
     TypeExprPtr return_type;
-    DebugInfoPtr debug_info;
+    DebugInfoPtr debug_info = nullptr;
     std::optional<std::vector<LabelPtr>> body;//Empty if it is just a function declaration without a body
 
     public:
@@ -376,7 +383,6 @@ class Function {
     TypeExprPtr get_return_type() const;
     DebugInfoPtr get_debug_info() const;
     std::optional<std::vector<LabelPtr>> get_body() const;
-
     Token get_token() const;
     std::string to_string() const;
 };
@@ -402,7 +408,6 @@ class GlobalItem{
     FunctionPtr get_function() const;
     AttributePtr get_attribute() const;
     InstructionStmtPtr get_global_var() const;
-
     GlobalItemKind get_kind() const;
     std::string to_string() const;
 };
@@ -413,7 +418,6 @@ class Program{
     Program(std::vector<GlobalItem> items);
 
     std::vector<GlobalItem> get_items() const;
-
     std::string to_string() const;
 };
 }

@@ -28,7 +28,7 @@ std::string DebugInfo::to_string() const{
 }
 
 
-Attribute::Attribute(Token tok, Token name, std::vector<Token> args, std::vector<std::pair<Token,Token>> kwargs){
+Attribute::Attribute(Token tok, Token name, std::vector<std::pair<ExprPtr,TypeExprPtr>> args, std::vector<triplet<Token,ExprPtr,TypeExprPtr>> kwargs){
     this->tok = tok;
     this->name = name;
     this->args = args;
@@ -38,10 +38,10 @@ Attribute::Attribute(Token tok, Token name, std::vector<Token> args, std::vector
 Token Attribute::get_name() const{
     return this->name;
 }
-std::vector<Token> Attribute::get_args() const{
+std::vector<std::pair<ExprPtr,TypeExprPtr>> Attribute::get_args() const{
     return this->args;
 }
-std::vector<std::pair<Token,Token>> Attribute::get_kwargs() const{
+std::vector<triplet<Token,ExprPtr,TypeExprPtr>> Attribute::get_kwargs() const{
     return this->kwargs;
 }
 
@@ -52,13 +52,13 @@ std::string Attribute::to_string() const{
     std::string res = "#["+this->name.value;
     res += "(";
     for(size_t i=0;i<this->args.size();i++){
-        res += this->args[i].value;
-        if(i!=this->args.size()-1) { 
+        res += this->args[i].second->to_string()+":"+this->args[i].first->to_string();
+        if(i!=this->args.size()-1 || this->kwargs.size()>0) { 
             res += ", ";
         }
     }
     for(size_t i=0;i<this->kwargs.size();i++){
-        res += this->kwargs[i].first.value+"="+this->kwargs[i].second.value;
+        res += this->kwargs[i].first.value+"="+this->kwargs[i].third->to_string()+":"+this->kwargs[i].second->to_string();
         if(i!=this->kwargs.size()-1) {
             res += ", ";
         }
@@ -84,7 +84,7 @@ Expr::Expr(TypeExprPtr type){
 }
 
 ExprKind Expr::get_kind() const{
-    if(literal!=nullptr) {
+    if(this->literal!=nullptr) {
         return ExprKind::LiteralExpr;
     } 
     else {
@@ -92,17 +92,17 @@ ExprKind Expr::get_kind() const{
     }
 }
 LiteralExprPtr Expr::get_literal() const{
-    return literal;
+    return this->literal;
 }
 TypeExprPtr Expr::get_type() const{
-    return type;
+    return this->type;
 }
 std::string Expr::to_string() const{
-    if(literal!=nullptr) {
-        return literal->to_string();
+    if(this->literal!=nullptr) {
+        return this->literal->to_string();
     } 
     else {
-        return type->to_string();
+        return this->type->to_string();
     }
 }
 
@@ -115,31 +115,31 @@ InstructionStmt::InstructionCall::InstructionCall(Token tok, std::vector<std::pa
 }
 
 Token InstructionStmt::InstructionCall::get_token() const{
-    return tok;
+    return this->tok;
 }
 std::vector<std::pair<ExprPtr,TypeExprPtr>> InstructionStmt::InstructionCall::get_operands() const{
-    return operands;
+    return this->operands;
 }
 std::vector<AttributePtr> InstructionStmt::InstructionCall::get_attributes() const{
-    return attributes;
+    return this->attributes;
 }
 DebugInfoPtr InstructionStmt::InstructionCall::get_debug_info() const{
-    return debug_info;
+    return this->debug_info;
 }
 std::string InstructionStmt::InstructionCall::to_string() const{
-    std::string res = tok.value+"(";
-    for(size_t i=0;i<operands.size();i++){
-        res += operands[i].first->to_string()+":"+operands[i].second->to_string();
-        if(i!=operands.size()-1) {
+    std::string res = this->tok.value+"(";
+    for(size_t i=0;i<this->operands.size();i++){
+        res += this->operands[i].second->to_string()+":"+this->operands[i].first->to_string();
+        if(i!=this->operands.size()-1) {
             res += ", ";
         }
     }
     res += ")";
-    for(const auto& attr: attributes){
+    for(const auto& attr: this->attributes){
         res += " "+attr->to_string();
     }
-    if(debug_info!=nullptr) {
-        res += " ! "+debug_info->to_string();
+    if(this->debug_info!=nullptr) {
+        res += " ! "+this->debug_info->to_string();
     }
     return res;
 }
@@ -153,27 +153,27 @@ InstructionStmt::InstructionStmt(Token tok, std::optional<triplet<Token, std::ve
 }
 
 std::optional<triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> InstructionStmt::get_name() const{
-    return name;
+    return this->name;
 }
 std::optional<InstructionStmt::InstructionCall> InstructionStmt::get_value() const{
-    return value;
+    return this->value;
 }
 Token InstructionStmt::get_token() const{
-    return tok;
+    return this->tok;
 }
 std::string InstructionStmt::to_string() const{
     std::string res;
-    if(name.has_value()) {
-        res = "let " + name->third->to_string() + ":" + name->first.value;
-        for(const auto& attr: name->second){
+    if(this->name.has_value()) {
+        res = "let " + this->name.value().third->to_string() + ":" + this->name.value().first.value;
+        for(const auto& attr: this->name.value().second){
             res += " "+attr->to_string();
         }
-        if(value.has_value()) {
+        if(this->value.has_value()) {
             res += " = ";
         }
     }
     if(value.has_value()) {
-        res += value->to_string();
+        res += this->value->to_string();
     }
     return res;
 }
@@ -186,15 +186,15 @@ Label::Label(Token name, std::vector<InstructionStmtPtr> statements){
 }
 
 Token Label::get_name() const{
-    return name;
+    return this->name;
 }
 std::vector<InstructionStmtPtr> Label::get_statements() const{
-    return statements;
+    return this->statements;
 }
 
 std::string Label::to_string() const{
-    std::string res = "\t" + name.value + "{\n";
-    for(const auto& stmt: statements){
+    std::string res = "\t" + this->name.value + "{\n";
+    for(const auto& stmt: this->statements){
         res += "\t\t" + stmt->to_string() + ";\n";
     }
     res += "\t}";
@@ -203,7 +203,7 @@ std::string Label::to_string() const{
 
 
 Function::Function(Token tok, Token name, std::vector<AttributePtr> attributes, std::vector<triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> params, 
-                   bool varargs, TypeExprPtr return_type, DebugInfoPtr debug_info, std::optional<std::vector<LabelPtr>> body){
+                   bool varargs, TypeExprPtr return_type, DebugInfoPtr debug_info, std::vector<LabelPtr> body){
     this->tok = tok;
     this->name = name;
     this->attributes = attributes;
@@ -215,50 +215,56 @@ Function::Function(Token tok, Token name, std::vector<AttributePtr> attributes, 
 }
 
 Token Function::get_name() const{
-    return name;
+    return this->name;
 }
 std::vector<AttributePtr> Function::get_attributes() const{
-    return attributes;
+    return this->attributes;
 }
 std::vector<triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> Function::get_params() const{
-    return params;
+    return this->params;
 }
 TypeExprPtr Function::get_return_type() const{
-    return return_type;
+    return this->return_type;
 }
 DebugInfoPtr Function::get_debug_info() const{
-    return debug_info;
+    return this->debug_info;
 }
-std::optional<std::vector<LabelPtr>> Function::get_body() const{
-    return body;
+std::vector<LabelPtr> Function::get_body() const{
+    return this->body;
 }
 Token Function::get_token() const{
-    return tok;
+    return this->tok;
 }
 std::string Function::to_string() const{
     std::string res = "fn";
 
-    for(const auto& attr: attributes){
+    for(const auto& attr: this->attributes){
         res += " "+attr->to_string();
     }
-    res += " "+name.value+"(";
-    for(size_t i=0;i<params.size();i++){
-        res += params[i].third->to_string() + ":" + params[i].first.value;
-        for(const auto& attr: params[i].second){
+    res += " "+this->name.value+"(";
+    for(size_t i=0;i<this->params.size();i++){
+        res += "let " + this->params[i].third->to_string() + ":" + this->params[i].first.value;
+        for(const auto& attr: this->params[i].second){
             res += " "+attr->to_string();
         }
-        if(i!=params.size()-1) {
+        if(i!=this->params.size()-1) {
             res += ", ";
         }
     }
-    res += ")";
-    res += " -> "+return_type->to_string();
-    if(debug_info!=nullptr) {
-        res += " ! "+debug_info->to_string();
+    if(this->varargs) {
+        if(!this->params.empty()) {
+            res += ", ";
+        }
+        res += "...";
     }
-    if(body.has_value()) {
+    res += ")";
+    res += " -> "+this->return_type->to_string();
+    if(this->debug_info!=nullptr) {
+        res += " ! "+this->debug_info->to_string();
+    }
+    if(this->body.size() > 0) {
         res += " {\n";
-        for(const auto& label: body.value()){
+        for(const auto& label: this->body){
             res += label->to_string()+"\n";
         }
         res += "}";
@@ -303,10 +309,10 @@ InstructionStmtPtr GlobalItem::get_global_var() const{
 }
 
 GlobalItemKind GlobalItem::get_kind() const{
-    if(function != nullptr){
+    if(this->function != nullptr){
         return GlobalItemKind::FunctionKind;
     }
-    if(attribute != nullptr){
+    if(this->attribute != nullptr){
         return GlobalItemKind::GlobalAttributeKind;
     }
     return GlobalItemKind::GlobalVarKind;
@@ -314,25 +320,25 @@ GlobalItemKind GlobalItem::get_kind() const{
 std::string GlobalItem::to_string() const{
     switch(get_kind()){
         case GlobalItemKind::FunctionKind:
-            return function->to_string();
+            return this->function->to_string();
         case GlobalItemKind::GlobalAttributeKind:
-            return attribute->to_string();
+            return this->attribute->to_string() + ";";
         case GlobalItemKind::GlobalVarKind:
-            return global_var->to_string();
+            return this->global_var->to_string() + ";";
     }
 }
 
-Program::Program(std::vector<GlobalItem> items){
+Program::Program(std::vector<GlobalItemPtr> items){
     this->items = items;
 }
 
-std::vector<GlobalItem> Program::get_items() const{
-    return items;
+std::vector<GlobalItemPtr> Program::get_items() const{
+    return this->items;
 }
 std::string Program::to_string() const{
     std::string res;
-    for(const auto& item: items){
-        res += item.to_string() + "\n";
+    for(const auto& item: this->items){
+        res += item->to_string() + "\n";
     }
     return res;
 }

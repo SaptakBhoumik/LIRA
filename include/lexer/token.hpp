@@ -15,7 +15,7 @@ enum class TokenType {
     global_identifier, // $name
     local_identifier, // %name
     label_identifier, // @name
-    instruction_identifier, // %name
+    instruction_identifier, // .name
     buildin_identifier, // name
     
     // Brackets
@@ -25,8 +25,8 @@ enum class TokenType {
     rbracket,         // ]
     lbrace,           // {
     rbrace,           // }
-    langle,           // <
-    rangle,           // >
+    langel,           // <
+    rangel,           // >
 
     // Others
     bang,             // !   (debug info)
@@ -36,6 +36,7 @@ enum class TokenType {
     arrow,            // -> (function return type annotation)
     comma,            // ,
     ellipsis,         // ...
+    colon,            // :
 
     //Keywords
     //Note if `name` is a keyword then also u can use it as a variable name by prefixing it with $ or % or @ or . (e.g. $fn, %fn, @fn, .fn are all valid identifiers even though fn is a keyword)
@@ -60,4 +61,6 @@ struct Token {
 std::string to_string(const Token& tok);
 
 std::ostream& operator<<(std::ostream& os, const Token& tok);
+
+bool is_identifier(TokenType type);
 } // namespace LIRA

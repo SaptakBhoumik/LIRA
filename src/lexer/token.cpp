@@ -24,8 +24,8 @@ std::string to_string(TokenType type) {
         case TokenType::rbracket: return "]";
         case TokenType::lbrace: return "{";
         case TokenType::rbrace: return "}";
-        case TokenType::langle: return "<";
-        case TokenType::rangle: return ">";
+        case TokenType::langel: return "<";
+        case TokenType::rangel: return ">";
 
         case TokenType::bang: return "!";
         case TokenType::assign: return "=";
@@ -34,6 +34,7 @@ std::string to_string(TokenType type) {
         case TokenType::arrow: return "->";
         case TokenType::comma: return ",";
         case TokenType::ellipsis: return "...";
+        case TokenType::colon: return ":";
 
         case TokenType::kw_fn: return "fn";
         case TokenType::kw_let: return "let";
@@ -49,5 +50,13 @@ std::string to_string(const Token& tok){
 std::ostream& operator<<(std::ostream& os, const Token& tok){
     os << to_string(tok);
     return os;
+}
+
+bool is_identifier(TokenType type){
+    return type == TokenType::global_identifier || 
+           type == TokenType::local_identifier || 
+           type == TokenType::label_identifier || 
+           type == TokenType::instruction_identifier || 
+           type == TokenType::buildin_identifier;
 }
 }

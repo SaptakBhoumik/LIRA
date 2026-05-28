@@ -99,6 +99,10 @@ void Lexer::lex() {
     while (true) {
         switch (this->curr_char) {
             // ---- string literals ----
+            case '/':{
+                this->lex_slash();
+                break;
+            }
             case '"':
             case '\'': {
                 this->flush_keyword();
@@ -165,19 +169,19 @@ void Lexer::lex() {
 
             case '<': {
                 this->flush_keyword();
-                this->angle_depth++;
-                this->push_current(TokenType::langle);
+                this->angel_depth++;
+                this->push_current(TokenType::langel);
                 break;
             }
             case '>': {
                 this->flush_keyword();
-                if (this->angle_depth == 0) {
+                if (this->angel_depth == 0) {
                     this->report_error("'>' without matching '<'");
                 } 
                 else {
-                    this->angle_depth--;
+                    this->angel_depth--;
                 }
-                this->push_current(TokenType::rangle);
+                this->push_current(TokenType::rangel);
                 break;
             }
             
@@ -197,6 +201,10 @@ void Lexer::lex() {
                     this->flush_keyword();
                     this->advance();
                     this->push("->", TokenType::arrow, this->curr_index - 1, this->curr_index + 1);
+                    break;
+                }
+                else{
+                    this->curr_keyword += this->curr_char;
                     break;
                 }
             }
@@ -223,7 +231,16 @@ void Lexer::lex() {
                     this->push("...", TokenType::ellipsis, this->curr_index - 2, this->curr_index + 1);
                     break;
                 }
-            }       
+                else{
+                    this->curr_keyword += this->curr_char;
+                    break;
+                }
+            } 
+            case ':' : {
+                this->flush_keyword();
+                this->push_current(TokenType::colon);
+                break;
+            }      
 
             // ---- whitespace (LIRA is not indentation-sensitive) ----
             case ' ':
@@ -248,7 +265,7 @@ void Lexer::lex() {
             }
             case ';': {
                 this->flush_keyword();
-                if(this->result.empty()) {
+                if(!this->result.empty()) {
                     if(this->result.back().type == TokenType::semicolon) {
                         this->result.pop_back();//We want the last semicolon to be the one we just encountered, not some random one from before. 
                     }
@@ -282,17 +299,17 @@ void Lexer::finalize() {
     if (this->brace_depth != 0){
         this->report_error("Unclosed '{'", "expected a matching '}'");
     }
-    if (this->angle_depth != 0){
+    if (this->angel_depth != 0){
         this->report_error("Unclosed '<'", "expected a matching '>'");
     }
     // Let display_all handle printing + exit(1) if there are errors.
     display_all(this->diagnostics);
 
-    if (!this->result.empty()) {
-        if(this->result.back().type != TokenType::semicolon) {
-            this->push(";", TokenType::semicolon,this->curr_index, this->curr_index + 1);
-        }
-    }
+    // if (!this->result.empty()) {
+    //     if(this->result.back().type != TokenType::semicolon) {
+    //         this->push(";", TokenType::semicolon,this->curr_index, this->curr_index + 1);
+    //     }
+    // }
 
     this->push("<eof>", TokenType::eof,this->curr_index, this->curr_index + 1);
 }
@@ -347,6 +364,51 @@ void Lexer::lex_string() {
     }
     else{
         this->push(str, TokenType::string, start, this->curr_index);
+    }
+}
+
+void Lexer::lex_slash() {
+    const size_t start = this->curr_index;
+
+    if (this->peek() == '/') {
+        this->flush_keyword();
+        // Line comment: consume everything up to (but not including) the newline.
+        // The newline itself will be processed normally on the next iteration.
+        this->advance();  // consume second '/'
+        while (this->peek() != '\n' && this->peek() != '\r' && this->peek() != '\0') {
+            if (!this->advance()) {
+                return;
+            }
+        }
+        return;  // no token emitted
+    }
+
+    else if (this->peek() == '*') {
+        this->flush_keyword();
+        // Block comment
+        this->advance();  // consume '*'
+        while (true) {
+            if (!this->advance()) {
+                this->report_error("Unexpected end of file: unterminated block comment");
+                return;
+            }
+            if (this->curr_char == '\n') {
+                this->handle_newline_tracking();
+            } 
+            else if (this->curr_char == '\r') {
+                if (this->peek() == '\n') { 
+                    this->advance();
+                }
+                this->handle_newline_tracking();
+            } 
+            else if (this->curr_char == '*' && this->peek() == '/') {
+                this->advance();  // consume '/'
+                return;
+            }
+        }
+    }
+    else {
+        this->curr_keyword += this->curr_char; 
     }
 }
 } // namespace LIRA

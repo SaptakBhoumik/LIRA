@@ -27,7 +27,7 @@ class Lexer {
     size_t paren_depth = 0;
     size_t bracket_depth = 0;
     size_t brace_depth = 0;
-    size_t angle_depth = 0;
+    size_t angel_depth = 0;
 
     // ---- core loop ----
     void lex();
@@ -59,6 +59,7 @@ class Lexer {
 
     // ---- sub-lexers ----
     void lex_string();
+    void lex_slash();
 
 public:
     Lexer(const std::string& source, const std::string& filename);

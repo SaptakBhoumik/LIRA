@@ -31,20 +31,24 @@ class DebugInfo{
 };
 using DebugInfoPtr = std::shared_ptr<DebugInfo>;
 
+class Expr;
+using ExprPtr = std::shared_ptr<Expr>;
+class TypeExpr;
+using TypeExprPtr = std::shared_ptr<TypeExpr>;
+
 class Attribute{
-    //#[name(arg1, arg2, ... )] or #[name(kwarg1=value1, kwarg2=value2, ...)] 
+    //#[name(type:arg1, type:arg2, ... )] or #[name(kwarg1=type:value1, kwarg2=type:value2, ...)] 
     Token tok;//The # token for error reporting
     Token name;
     //The args are supposed to be const literal anyways
-    std::vector<Token> args;
-    std::vector<std::pair<Token,Token>> kwargs;//Expects constant literal tokens as values and constant identtifier token as keys
+    std::vector<std::pair<ExprPtr,TypeExprPtr>> args;
+    std::vector<triplet<Token,ExprPtr,TypeExprPtr>> kwargs;//Expects constant literal tokens as values and constant identtifier token as keys
     public:
-    Attribute(Token tok, Token name, std::vector<Token> args, std::vector<std::pair<Token,Token>> kwargs);
+    Attribute(Token tok, Token name, std::vector<std::pair<ExprPtr,TypeExprPtr>> args, std::vector<triplet<Token,ExprPtr,TypeExprPtr>> kwargs);
 
     Token get_name() const;
-    std::vector<Token> get_args() const;
-    std::vector<std::pair<Token,Token>> get_kwargs() const;
-
+    std::vector<std::pair<ExprPtr,TypeExprPtr>> get_args() const;
+    std::vector<triplet<Token,ExprPtr,TypeExprPtr>> get_kwargs() const;
     Token get_token() const;
     std::string to_string() const;
 };
@@ -90,7 +94,7 @@ class NamedTypeExpr : public TypeExpr{
 };
 
 class ArrayTypeExpr : public TypeExpr{
-    //[size x type] #[attributes]
+    //[type,size] #[attributes]
     Token tok;//the '[' token for error reporting
     std::vector<AttributePtr> attributes;
     
@@ -109,7 +113,7 @@ class ArrayTypeExpr : public TypeExpr{
 };
 
 class SIMDTypeExpr : public TypeExpr{
-    // <size x type> #[attributes]
+    // <type,size> #[attributes]
     Token tok;//the '[' token for error reporting
     std::vector<AttributePtr> attributes;
     
@@ -206,7 +210,7 @@ class LiteralExpr{
 using LiteralExprPtr = std::shared_ptr<LiteralExpr>;
 
 class NamedLiteralExpr : public LiteralExpr{
-    //name #[attributes]
+    //name 
     Token name;
     public:
     NamedLiteralExpr(Token name);
@@ -370,11 +374,12 @@ class Function {
     bool varargs;//whether the function has a ... varargs at the end.
     TypeExprPtr return_type;
     DebugInfoPtr debug_info = nullptr;
-    std::optional<std::vector<LabelPtr>> body;//Empty if it is just a function declaration without a body
+    std::vector<LabelPtr> body;//Empty if it is just a function declaration without a body. A function declaration with body must have atleast one label
+                               //The first label is the entry point
 
     public:
     Function(Token tok, Token name, std::vector<AttributePtr> attributes, std::vector<triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> params, 
-             bool varargs, TypeExprPtr return_type, DebugInfoPtr debug_info, std::optional<std::vector<LabelPtr>> body);
+             bool varargs, TypeExprPtr return_type, DebugInfoPtr debug_info, std::vector<LabelPtr> body);
 
     Token get_name() const;
     std::vector<AttributePtr> get_attributes() const;
@@ -382,7 +387,7 @@ class Function {
     bool has_varargs() const;
     TypeExprPtr get_return_type() const;
     DebugInfoPtr get_debug_info() const;
-    std::optional<std::vector<LabelPtr>> get_body() const;
+    std::vector<LabelPtr> get_body() const;
     Token get_token() const;
     std::string to_string() const;
 };
@@ -412,12 +417,15 @@ class GlobalItem{
     std::string to_string() const;
 };
 
+using GlobalItemPtr = std::shared_ptr<GlobalItem>;
 class Program{
-    std::vector<GlobalItem> items;
+    std::vector<GlobalItemPtr> items;
     public:
-    Program(std::vector<GlobalItem> items);
+    Program(std::vector<GlobalItemPtr> items);
 
-    std::vector<GlobalItem> get_items() const;
+    std::vector<GlobalItemPtr> get_items() const;
     std::string to_string() const;
 };
+
+using ProgramPtr = std::shared_ptr<Program>;
 }

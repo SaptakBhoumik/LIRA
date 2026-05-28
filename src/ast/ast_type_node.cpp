@@ -52,7 +52,7 @@ std::vector<AttributePtr> ArrayTypeExpr::get_attributes() const{
     return this->attributes;
 }
 std::string ArrayTypeExpr::to_string() const{
-    std::string res = "([" + this->size.value + " x " + this->base_type->to_string() + "]";
+    std::string res = "([" + this->base_type->to_string() + "," + this->size.value + "]";
     for(const auto& attr: this->attributes){
         res += " "+attr->to_string();
     }
@@ -112,7 +112,7 @@ std::vector<AttributePtr> PtrTypeExpr::get_attributes() const{
     return this->attributes;
 }
 std::string PtrTypeExpr::to_string() const{
-    std::string res = "(*" + this->base_type->to_string() + "]";
+    std::string res = "(*" + this->base_type->to_string();
     for(const auto& attr: this->attributes){
         res += " "+attr->to_string();
     }

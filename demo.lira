@@ -49,7 +49,7 @@ fn #[extern] $printf(let *i8 #[nonull]:%fmt, ...) -> i32;
 fn #[nounwind] $node_new(let i32:%val) -> *$Node ! "list.c":30:1 {
     @entry {
         // $Node is 8 bytes (ptr) + 4 bytes (i32) = 12 bytes
-        let *i8:%raw = .call(fn(i64)->ptr:$malloc, i64:12) ! "list.c":32:18;
+        let *i8:%raw = .call(fn(i64)->*i8:$malloc, i64:12) ! "list.c":32:18;
 
         // If malloc returned null, go to @fail, otherwise @init
         let i1:%is_null = .i_eq(*i8:%raw, *i8:null) ! "list.c":33:5;

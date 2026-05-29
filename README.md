@@ -78,3 +78,9 @@ After running ``./LIRA.elf <path_to_lira_file>`` it will print out the LIRA file
 # Contributing note
 
 Note:-Not accepting contributions at the moment. I will be accepting contributions in the future when the project is more stable and has more features. For now, I only made it public to keep myself accountable 
+
+
+# Contact 
+
+- 💌 Reach me at: `saptakbhoumik.acad@gmail.com`
+- 📢 Follow me on [X](https://x.com/saptakbhoumik)

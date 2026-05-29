@@ -91,35 +91,6 @@ std::string SIMDTypeExpr::to_string() const{
     return res+")";
 }
 
-
-PtrTypeExpr::PtrTypeExpr(Token tok, TypeExprPtr base_type, std::vector<AttributePtr> attributes){
-    this->tok = tok;
-    this->base_type = base_type;
-    this->attributes = attributes;
-}
-
-TypeExprPtr PtrTypeExpr::get_base_type() const{
-    return this->base_type;
-}
-
-TypeExprKind PtrTypeExpr::get_kind() const{
-    return TypeExprKind::PtrTypeExpr;
-}
-Token PtrTypeExpr::get_token() const{
-    return this->tok;
-}
-std::vector<AttributePtr> PtrTypeExpr::get_attributes() const{
-    return this->attributes;
-}
-std::string PtrTypeExpr::to_string() const{
-    std::string res = "(*" + this->base_type->to_string();
-    for(const auto& attr: this->attributes){
-        res += " "+attr->to_string();
-    }
-    return res+")";
-}
-
-
 StructTypeExpr::StructTypeExpr(Token tok, std::vector<TypeExprPtr> fields, bool packed, std::vector<AttributePtr> attributes){
     this->tok = tok;
     this->fields = fields;
@@ -217,5 +188,27 @@ std::string FuncTypeExpr::to_string() const{
         res += " "+attr->to_string();
     }
     return res+")";
+}
+
+
+AnyTypeExpr::AnyTypeExpr(TypeExprPtr original_type){
+    this->original_type = original_type;
+}
+
+TypeExprPtr AnyTypeExpr::get_original_type() const{
+    return this->original_type;
+}
+
+TypeExprKind AnyTypeExpr::get_kind() const{
+    return TypeExprKind::AnyTypeExpr;
+}
+Token AnyTypeExpr::get_token() const{
+    return this->original_type->get_token();
+}
+std::vector<AttributePtr> AnyTypeExpr::get_attributes() const{
+    return this->original_type->get_attributes();
+}
+std::string AnyTypeExpr::to_string() const{
+    return "(AnyTypeExpr " + this->original_type->to_string() + ")";
 }
 }

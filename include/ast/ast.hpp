@@ -59,9 +59,11 @@ enum class TypeExprKind:std::uint8_t{
     NamedTypeExpr, // Stuff like i8,i32,%name,$name
     ArrayTypeExpr,
     SIMDTypeExpr,
-    PtrTypeExpr,
     StructTypeExpr,
     FuncTypeExpr,
+    AnyTypeExpr //For internal use. This is used in places where we want to allow any type expression. 
+                //Used when there is type error and we want to avoid spamming the error messages with follow up errors caused by the first error due to dependent types
+                //Described in https://claude.ai/share/d6bf9b6d-1a2b-4d4b-bd82-7ad6bd3ba813
 };
 class TypeExpr{
     public:
@@ -74,10 +76,6 @@ class TypeExpr{
 };
 
 using TypeExprPtr = std::shared_ptr<TypeExpr>;
-//TODO:Make sure to support ``(`` and ``)`` for grouping in type expressions. Although thing to be noted is that these parentheses are just for grouping 
-// and dont actually become part of the type expression tree. So for example ``(i32)`` is just a NamedTypeExpr with name i32 and not some new ParenTypeExpr or 
-// something. This is similar to how in arithmetic expressions ``(1 + 2)`` is just a BinaryExpr with operator + and left operand 1 and right operand 2 and not
-// some new ParenExpr or something. This makes the parser simpler and also makes the AST simpler without unnecessary nodes while allowing you to represent complex stuff
 class NamedTypeExpr : public TypeExpr{
     //name #[attributes]
     Token name;
@@ -131,23 +129,6 @@ class SIMDTypeExpr : public TypeExpr{
     std::string to_string() const override;
 };
 
-class PtrTypeExpr : public TypeExpr{
-    //*type #[attributes]
-    //While parsing makse sure it dont become *(type #[attributes])
-    Token tok;//the '*' token for error reporting
-    std::vector<AttributePtr> attributes;
-    
-    TypeExprPtr base_type;
-    public:
-    PtrTypeExpr(Token tok, TypeExprPtr base_type, std::vector<AttributePtr> attributes);
-
-    TypeExprPtr get_base_type() const;
-
-    TypeExprKind get_kind() const override;
-    Token get_token() const override;
-    std::vector<AttributePtr> get_attributes() const override;
-    std::string to_string() const override;
-};
 
 class StructTypeExpr : public TypeExpr{
     //{field1:type, field2:type, ... } #[attributes]
@@ -189,7 +170,22 @@ class FuncTypeExpr : public TypeExpr{
     std::string to_string() const override;
 };
 
+class AnyTypeExpr : public TypeExpr{
+    //Satisfies every type constrants
+    //For internal use. This is used in places where we want to allow any type expression. 
+    //Used when there is type error and we want to avoid spamming the error messages with follow up errors caused by the first error due to dependent types
+    //Described in https://claude.ai/share/d6bf9b6d-1a2b-4d4b-bd82-7ad6bd3ba813
+    TypeExprPtr original_type;//The original type expression that we wanted to use before we encountered the error and had to fall back to using AnyTypeExpr to avoid spamming follow up errors. 
+    public:
+    AnyTypeExpr(TypeExprPtr original_type);
 
+    TypeExprPtr get_original_type() const;
+
+    TypeExprKind get_kind() const override;
+    Token get_token() const override;
+    std::vector<AttributePtr> get_attributes() const override;
+    std::string to_string() const override;
+};
 enum class LiteralKind:std::uint8_t{
     NamedLiteralExpr, // Stuff like name,%name,$name
     StringLiteralExpr,
@@ -311,8 +307,8 @@ class InstructionStmt{
             Token tok;//the instruction identifier token for error reporting+For identifying the instruction being called
             std::vector<std::pair<ExprPtr,TypeExprPtr>> operands;
             /*
-            If you want to do ``a=1.2`` then do ``a = .copy(f32:1.2)`` and done. This keeps the parser simpler and language uniform
-            In case u are wondering why I cant check if the token after ``=`` is instruction. Because if I check then no need of ``.copy``
+            If you want to do ``a=1.2`` then do ``a = .assign_value(f32:1.2)`` and done. This keeps the parser simpler and language uniform
+            In case u are wondering why I cant check if the token after ``=`` is instruction. Because if I check then no need of ``.assign_value``
             I mean technically I can check but no need to overcomplicate
             */
             std::vector<AttributePtr> attributes;
@@ -331,7 +327,7 @@ class InstructionStmt{
     Token tok;//the 'let'/instruction token for error reporting
     std::optional<triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> name;//Empty if we dont assign the InstructionCall statement to a variable
 
-    std::optional<InstructionCall> value;//Empty if it is just a declaration without initialization. Do let type:type = .copy(type:<4 x i32>) if u want type def
+    std::optional<InstructionCall> value;//Empty if it is just a declaration without initialization. Do let type:type = .assign_value(type:<4 x i32>) if u want type def
     public:
     InstructionStmt(Token tok, std::optional<triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> name, std::optional<InstructionCall> value);
 

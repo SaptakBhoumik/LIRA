@@ -16,7 +16,7 @@ std::string to_string(TokenType type) {
         case TokenType::local_identifier: return "<local identifier>";
         case TokenType::label_identifier: return "<label identifier>";
         case TokenType::instruction_identifier: return "<instruction identifier>";
-        case TokenType::buildin_identifier: return "<buildin identifier>";
+        case TokenType::builtin_identifier: return "<buildin identifier>";
 
         case TokenType::lparen: return "(";
         case TokenType::rparen: return ")";
@@ -29,7 +29,6 @@ std::string to_string(TokenType type) {
 
         case TokenType::bang: return "!";
         case TokenType::assign: return "=";
-        case TokenType::star: return "*";
         case TokenType::hash: return "#";
         case TokenType::arrow: return "->";
         case TokenType::comma: return ",";
@@ -57,6 +56,6 @@ bool is_identifier(TokenType type){
            type == TokenType::local_identifier || 
            type == TokenType::label_identifier || 
            type == TokenType::instruction_identifier || 
-           type == TokenType::buildin_identifier;
+           type == TokenType::builtin_identifier;
 }
 }

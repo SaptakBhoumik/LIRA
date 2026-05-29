@@ -208,11 +208,6 @@ void Lexer::lex() {
                     break;
                 }
             }
-            case '*' : {
-                this->flush_keyword();
-                this->push_current(TokenType::star);
-                break;
-            }
             case '#' : {
                 this->flush_keyword();
                 this->push_current(TokenType::hash);

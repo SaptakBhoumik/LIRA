@@ -19,32 +19,33 @@ Well there is the full form but also thought it was a cute name so.... I think i
 
 # Code example
 
+Note:This is the rough syntax but things are changing fast so even if the syntax is same, the instructions and semantics might be different. I will update the code example as the syntax and semantics stabilizes.
+
 ```llvm
-#[module(triple=*i8:"x86_64-unknown-linux-gnu")];
-#[module(source=*i8:"demo.c")];
+#[module(triple=str:"x86_64-unknown-linux-gnu")];
+#[module(source=str:"demo.c")];
 
-let *i8:$fmt #[linkage(linkage_type:private)] #[const] = .copy(*i8:"result = %d\n\0");
+let str:$fmt #[linkage(str:"private")] #[const] = .assign_value(str:"result = %d\n\0");
 
-fn #[extern] $malloc(let i64:%size) -> *i8;
-fn #[extern] $free(let *i8:%ptr) -> void;
-fn #[extern] $printf(let *i8 #[nonull]:%fmt, ...) -> i32;
+fn #[extern] $malloc(let i64:%size) -> ptr;
+fn #[extern] $free(let ptr:%ptr) -> void;
+fn #[extern] $printf(let ptr #[nonull]:%fmt, ...) -> i32;
 
 fn #[nounwind] $main() -> i32 ! "demo.c":10:1 {
     @entry {
-        let *i8:%raw = .call(fn(i64)->*i8:$malloc, i64:4) ! "demo.c":11:5;
-        let i1:%is_null = .i_eq(*i8:%raw, *i8:null);
+        let ptr:%slot = .call(fn(i64)->str:$malloc, i64:4) ! "demo.c":11:5;
+        let i1:%is_null = .i_eq(ptr:%slot, ptr:null);
         .br(i1:%is_null, label:@fail, label:@ok);
     }
     @fail {
         .ret(i32:-1);
     }
     @ok {
-        let *i32:%slot = .bitcast(*i8:%raw, type:*i32) ! "demo.c":17:5;
-        .store(i32:21, *i32:%slot) #[align(i8:4)];
-        let i32:%v = .load(*i32:%slot) #[align(i8:4)];
-        let i32:%r = .add(i32:%v, i32:%v) #[nsw];
-        .call(fn(*i8, i32)->i32:$printf, *i8:$fmt, i32:%r) ! "demo.c":21:5;
-        .call(fn(*i8)->void:$free, *i8:%raw);
+        .store(i32:21, ptr:%slot) #[align(i8:4)];
+        let i32:%v = .load(ptr:%slot) #[align(i8:4)];
+        let i32:%r = .add(ptr:%v, i32:%v) #[nsw];
+        .call(fn(ptr, i32)->i32:$printf, ptr:$fmt, i32:%r) ! "demo.c":21:5;
+        .call(fn(ptr)->void:$free, ptr:%slot);
         .ret(i32:0);
     }
 }

@@ -7,7 +7,7 @@ LiteralExprPtr Parser::parse_literal_expr(){
         case TokenType::local_identifier:
         case TokenType::label_identifier:
         case TokenType::instruction_identifier:
-        case TokenType::buildin_identifier:{
+        case TokenType::builtin_identifier:{
             return parse_named_literal_expr();
         }
         case TokenType::raw_string:

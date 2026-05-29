@@ -6,79 +6,80 @@
 
 // i_ne, i_eq is integer equality and inequality respectively
 // f_ne, f_eq is floating-point equality and inequality respectively
-
-#[module(triple=*i8:"x86_64-unknown-linux-gnu")];
-#[module(source=*i8:"list.c")];
+// str is a special type that automatically does [i8,size]. No null terminator unless you add one yourself. Then the null terminator is added to the size
+#[module(triple=str:"x86_64-unknown-linux-gnu")];
+#[module(source=str:"list.c")];
 
 // -- Type Aliases ---------------------------------------------
 
 // Singly-linked list node.
 // Field 0: pointer to next node (null = end of list)
 // Field 1: integer payload
-let type:$Node = .copy(type:{*$Node, i32});
+let type:$Node = .assign_type(type:{ptr, i32});
+let type:$Node_packed = .assign_type(type:<{ptr, i32}>);
 
 // Return type of $list_find.
 // Field 0: i1  — 1 if a match was found, 0 otherwise
 // Field 1: i32 — the matched value (undefined when field 0 is 0)
-let type:$FindResult = .copy(type:{i1, i32});
+let type:$FindResult = .assign_type(type:{i1, i32});
 
 // -- Globals ---------------------------------------------------
 
 // Total $Node allocations over the lifetime of the program.
 // Written only by $node_new, never directly from outside.
-let i32:$alloc_count #[linkage(linkage_type:internal)] = .copy(i32:0) #[align(i8:4)];
+let i32*:$alloc_count #[linkage(str:"internal")] = .global(i32:0) #[align(i8:4)];
 
 // Read-only format strings for printf. The \0 is the null terminator.
-let *i8:$fmt_sum #[linkage(linkage_type:private)] #[const] = .copy(*i8:"sum = %d\n\0");
-let *i8:$fmt_found #[linkage(linkage_type:private)] #[const] = .copy(*i8:"found = %d\n\0");
-let *i8:$fmt_missing #[linkage(linkage_type:private)] #[const] = .copy(*i8:"missing\n\0");
+let ptr:$fmt_sum #[linkage(str:"private")] #[const] = .global(str:"sum = %d\n\0");
+let ptr:$fmt_found #[linkage(str:"private")] #[const] = .global(str:"found = %d\n\0");
+let ptr:$fmt_missing #[linkage(str:"private")] #[const] = .global(str:"missing\n\0");
 
 // -- External Declarations -------------------------------------
 
-fn #[extern] $malloc(let i64:%size) -> *i8;
-fn #[extern] $free(let *i8:%ptr) -> void;
+fn #[extern] $malloc(let i64:%size) -> ptr;
+fn #[extern] $free(let ptr:%ptr) -> void;
 
 // printf is varargs; #[nonull] marks the format pointer as never null
-fn #[extern] $printf(let *i8 #[nonull]:%fmt, ...) -> i32;
+fn #[extern] $printf(let ptr #[nonull]:%fmt, ...) -> i32;
 
 // -- $node_new -------------------------------------------------
 // Allocates one $Node on the heap and initialises it.
 // Returns the new node pointer, or null if malloc fails.
 // Side-effect: increments $alloc_count on success.
 
-fn #[nounwind] $node_new(let i32:%val) -> *$Node ! "list.c":30:1 {
+fn #[nounwind] $node_new(let i32:%val) -> ptr ! "list.c":30:1 {
     @entry {
         // $Node is 8 bytes (ptr) + 4 bytes (i32) = 12 bytes
-        let *i8:%raw = .call(fn(i64)->*i8:$malloc, i64:12) ! "list.c":32:18;
+        let ptr:%raw = .call(fn(i64)->ptr:$malloc, i64:12) ! "list.c":32:18;
 
         // If malloc returned null, go to @fail, otherwise @init
-        let i1:%is_null = .i_eq(*i8:%raw, *i8:null) ! "list.c":33:5;
+        let i1:%is_null = .i_eq(ptr:%raw, ptr:null) ! "list.c":33:5;
         .br(i1:%is_null, label:@fail, label:@init) ! "list.c":33:3;
     }
 
     @fail {
-        .ret(*$Node:null) ! "list.c":37:9;
+        .ret(ptr:null) ! "list.c":37:9;
     }
 
     @init {
         // Reinterpret the raw i8 pointer as a typed $Node pointer
-        let *$Node:%node = .bitcast(*i8:%raw, type:*$Node) ! "list.c":41:5;
+        let ptr:%node = .alloca(ptr:%raw) ! "list.c":41:5;
 
         // node->next (field 0) = null
-        let **$Node:%next_slot = .gep(*$Node:%node, i64:0, i32:0) #[inbounds] ! "list.c":44:5;
-        .store(*$Node:null, **$Node:%next_slot) #[align(i8:8)] ! "list.c":44:5;
+        let ptr:%next_slot = .gep(ptr:%node, type:$Node, i64:0, i64:0) #[inbounds] ! "list.c":44:5;
+        .store(ptr:null, ptr:%next_slot) #[align(i8:8)] ! "list.c":44:5;
 
         // node->value (field 1) = %val
-        let *i32:%val_slot = .gep(*$Node:%node, i64:0, i32:1) #[inbounds] ! "list.c":47:5;
-        .store(i32:%val, *i32:%val_slot) #[align(i8:4)] ! "list.c":47:5;
+        let ptr:%val_slot = .gep(ptr:%node, type:$Node, i64:0, i64:1) #[inbounds] ! "list.c":47:5;
+        .store(i32:%val, ptr:%val_slot) #[align(i8:4)] ! "list.c":47:5;
 
         // Atomically-safe bump of the global counter is overkill here;
         // a plain load-add-store is fine for this single-threaded example
-        let i32:%old = .load(*i32:$alloc_count) #[align(i8:4)] ! "list.c":51:5;
+        let i32:%old = .load(ptr:$alloc_count) #[align(i8:4)] ! "list.c":51:5;
         let i32:%new = .add(i32:%old, i32:1) #[nsw] ! "list.c":51:5;
-        .store(i32:%new, *i32:$alloc_count) #[align(i8:4)] ! "list.c":51:5;
+        .store(i32:%new, ptr:$alloc_count) #[align(i8:4)] ! "list.c":51:5;
 
-        .ret(*$Node:%node) ! "list.c":54:9;
+        .ret(ptr:%node) ! "list.c":54:9;
     }
 }
 
@@ -86,10 +87,10 @@ fn #[nounwind] $node_new(let i32:%val) -> *$Node ! "list.c":30:1 {
 // Sets %a->next = %b.
 // Both pointers must be non-null.
 
-fn #[nounwind] $node_link(let *$Node:%a, let *$Node:%b) -> void ! "list.c":62:1 {
+fn #[nounwind] $node_link(let ptr:%a, let ptr:%b) -> void ! "list.c":62:1 {
     @entry {
-        let **$Node:%slot = .gep(*$Node:%a, i64:0, i32:0) #[inbounds] ! "list.c":63:5;
-        .store(*$Node:%b, **$Node:%slot) #[align(i8:8)] ! "list.c":63:5;
+        let ptr:%slot = .gep(ptr:%a, type:$Node, i64:0, i64:0) #[inbounds] ! "list.c":63:5;
+        .store(ptr:%b, ptr:%slot) #[align(i8:8)] ! "list.c":63:5;
         .ret() ! "list.c":64:5;
     }
 }
@@ -99,7 +100,7 @@ fn #[nounwind] $node_link(let *$Node:%a, let *$Node:%b) -> void ! "list.c":62:1 
 // Returns the sum of every node's value field.
 // Returns 0 for an empty list (null head).
 
-fn #[nounwind] $list_sum(let *$Node:%head) -> i32 ! "list.c":74:1 {
+fn #[nounwind] $list_sum(let ptr:%head) -> i32 ! "list.c":74:1 {
     @entry {
         // Jump straight into the loop header; phi will pick up %head
         .br(label:@loop_head);
@@ -108,23 +109,23 @@ fn #[nounwind] $list_sum(let *$Node:%head) -> i32 ! "list.c":74:1 {
     // Loop header — two phi nodes track the current node and the
     // running total. On the first iteration both come from @entry.
     @loop_head {
-        let *$Node:%cur = .phi([*Node,2]:[%head,%cur_next], [label,2]:[@entry, @loop_body]);//If we were coming from @entry, current node is %head; if from @loop_body, it's %cur_next
+        let ptr:%cur = .phi([ptr,2]:[%head,%cur_next], [label,2]:[@entry, @loop_body]);//If we were coming from @entry, current node is %head; if from @loop_body, it's %cur_next
         let i32:%acc = .phi([i32,2]:[0,%acc_next], [label,2]:[@entry, @loop_body]);
 
         // Null current node means we have reached the end
-        let i1:%done = .i_eq(*$Node:%cur, *$Node:null);
+        let i1:%done = .i_eq(ptr:%cur, ptr:null);
         .br(i1:%done, label:@loop_exit, label:@loop_body);
     }
 
     @loop_body {
         // Read the value field of the current node (field index 1)
-        let *i32:%vslot = .gep(*$Node:%cur, i64:0, i32:1) #[inbounds];
-        let i32:%v = .load(*i32:%vslot) #[align(i8:4)];
+        let ptr:%vslot = .gep(ptr:%cur, type:$Node, i64:0, i64:1) #[inbounds];
+        let i32:%v = .load(ptr:%vslot) #[align(i8:4)];
         let i32:%acc_next = .add(i32:%acc, i32:%v) #[nsw];
 
         // Advance: read the next-pointer field (field index 0)
-        let **$Node:%nslot = .gep(*$Node:%cur, i64:0, i32:0) #[inbounds];
-        let *$Node:%cur_next = .load(**$Node:%nslot) #[align(i8:8)];
+        let ptr:%nslot = .gep(ptr:%cur, type:$Node, i64:0, i64:0) #[inbounds];
+        let ptr:%cur_next = .load(ptr:%nslot) #[align(i8:8)];
         .br(label:@loop_head);
     }
 
@@ -138,7 +139,7 @@ fn #[nounwind] $list_sum(let *$Node:%head) -> i32 ! "list.c":74:1 {
 // Returns $FindResult { 1, value } on hit, { 0, 0 } on miss.
 
 fn #[nounwind] $list_find(
-    let *$Node:%head,
+    let ptr:%head,
     let i32:%target
 ) -> $FindResult ! "list.c":110:1 {
     @entry {
@@ -146,33 +147,33 @@ fn #[nounwind] $list_find(
     }
 
     @loop_head {
-        let *$Node:%cur = .phi([*Node,2]:[%head,%cur_next], [label,2]:[@entry, @advance]);
+        let ptr:%cur = .phi([ptr,2]:[%head,%cur_next], [label,2]:[@entry, @advance]);
 
         // Reached the end without a match
-        let i1:%at_end = .i_eq(*$Node:%cur, *$Node:null);
+        let i1:%at_end = .i_eq(ptr:%cur, ptr:null);
         .br(i1:%at_end, label:@not_found, label:@compare);
     }
 
     @compare {
         // Load the current node's value and test it against %target
-        let *i32:%vslot = .gep(*$Node:%cur, i64:0, i32:1) #[inbounds];
-        let i32:%v      = .load(*i32:%vslot) #[align(i8:4)];
-        let i1:%hit     = .i_eq(i32:%v, i32:%target);
+        let ptr:%vslot = .gep(ptr:%cur, type:$Node, i64:0, i64:1) #[inbounds];
+        let i32:%v = .load(ptr:%vslot) #[align(i8:4)];
+        let i1:%hit = .i_eq(i32:%v, i32:%target);
         .br(i1:%hit, label:@found, label:@advance);
     }
 
     @advance {
         // Move to the next node and continue
-        let **$Node:%nslot   = .gep(*$Node:%cur, i64:0, i32:0) #[inbounds];
-        let *$Node:%cur_next = .load(**$Node:%nslot) #[align(i8:8)];
+        let ptr:%nslot   = .gep(ptr:%cur, type:$Node, i64:0, i64:0) #[inbounds];
+        let ptr:%cur_next = .load(ptr:%nslot) #[align(i8:8)];
         .br(label:@loop_head);
     }
 
     @found {
         // Re-load the matched value — %cur is valid here because
         // @found is only reachable from @compare while %cur is non-null
-        let *i32:%vslot  = .gep(*$Node:%cur, i64:0, i32:1) #[inbounds];
-        let i32:%matched = .load(*i32:%vslot) #[align(i8:4)];
+        let ptr:%vslot  = .gep(ptr:%cur, type:$Node, i64:0, i64:1) #[inbounds];
+        let i32:%matched = .load(ptr:%vslot) #[align(i8:4)];
 
         // Build result struct by inserting fields into a zero-initialised base
         let $FindResult:%r0 = .insertvalue($FindResult:zeroinit, i1:true, i32:0);
@@ -193,15 +194,18 @@ fn #[nounwind] $list_find(
 
 fn $main() -> i32 ! "list.c":162:1 {
     @entry {
+        let ptr:%__fmt_sum = .gep(ptr:$fmt_sum, type:str, i64:0, i64:0) ! "list.c":163:5;
+        let ptr:%__fmt_found = .gep(ptr:$fmt_found, type:str, i64:0, i64:0) ! "list.c":164:5;
+        let ptr:%__fmt_missing = .gep(ptr:$fmt_missing, type:str, i64:0, i64:0) ! "list.c":165:5;
         // Allocate three nodes
-        let *$Node:%n1 = .call(fn(i32)->*$Node:$node_new, i32:10) ! "list.c":164:5;
-        let *$Node:%n2 = .call(fn(i32)->*$Node:$node_new, i32:20) ! "list.c":165:5;
-        let *$Node:%n3 = .call(fn(i32)->*$Node:$node_new, i32:30) ! "list.c":166:5;
+        let ptr:%n1 = .call(fn(i32)->ptr:$node_new, i32:10) ! "list.c":164:5;
+        let ptr:%n2 = .call(fn(i32)->ptr:$node_new, i32:20) ! "list.c":165:5;
+        let ptr:%n3 = .call(fn(i32)->ptr:$node_new, i32:30) ! "list.c":166:5;
 
         // Verify that none of the allocations failed
-        let i1:%ok1  = .i_ne(*$Node:%n1, *$Node:null);
-        let i1:%ok2  = .i_ne(*$Node:%n2, *$Node:null);
-        let i1:%ok3  = .i_ne(*$Node:%n3, *$Node:null);
+        let i1:%ok1  = .i_ne(ptr:%n1, ptr:null);
+        let i1:%ok2  = .i_ne(ptr:%n2, ptr:null);
+        let i1:%ok3  = .i_ne(ptr:%n3, ptr:null);
         let i1:%ok12 = .and(i1:%ok1, i1:%ok2);
         let i1:%all  = .and(i1:%ok12, i1:%ok3);
         .br(i1:%all, label:@build, label:@oom) ! "list.c":168:3;
@@ -214,15 +218,15 @@ fn $main() -> i32 ! "list.c":162:1 {
 
     @build {
         // Link nodes into  n1 -> n2 -> n3 -> null
-        .call(fn(*$Node, *$Node)->void:$node_link, *$Node:%n1, *$Node:%n2) ! "list.c":175:5;
-        .call(fn(*$Node, *$Node)->void:$node_link, *$Node:%n2, *$Node:%n3) ! "list.c":176:5;
+        .call(fn(ptr, ptr)->void:$node_link, ptr:%n1, ptr:%n2) ! "list.c":175:5;
+        .call(fn(ptr, ptr)->void:$node_link, ptr:%n2, ptr:%n3) ! "list.c":176:5;
 
         // Compute and print the sum (10 + 20 + 30 = 60)
-        let i32:%sum = .call(fn(*$Node)->i32:$list_sum, *$Node:%n1) ! "list.c":179:5;
-        .call(fn(*i8, i32)->i32:$printf, *i8:$fmt_sum, i32:%sum) ! "list.c":180:5;
+        let i32:%sum = .call(fn(ptr)->i32:$list_sum, ptr:%n1) ! "list.c":179:5;
+        .call(fn(ptr, ...)->i32:$printf, ptr:%__fmt_sum, i32:%sum) ! "list.c":180:5;
 
         // Search for the value 20; will succeed
-        let $FindResult:%res = .call(fn(*$Node, i32)->$FindResult:$list_find, *$Node:%n1, i32:20) ! "list.c":183:5;
+        let $FindResult:%res = .call(fn(ptr, i32)->$FindResult:$list_find, ptr:%n1, i32:20) ! "list.c":183:5;
 
         // Extract the found flag (field 0) and branch on it
         let i1:%found = .extractvalue($FindResult:%res, i32:0);
@@ -232,23 +236,19 @@ fn $main() -> i32 ! "list.c":162:1 {
     @print_found {
         // Extract the matched value (field 1) and print it
         let i32:%val = .extractvalue($FindResult:%res, i32:1);
-        .call(fn(*i8, i32)->i32:$printf, *i8:$fmt_found, i32:%val) ! "list.c":190:5;
+        .call(fn(ptr, ...)->i32:$printf, ptr:%__fmt_found, i32:%val) ! "list.c":190:5;
         .br(label:@cleanup);
     }
 
     @print_missing {
-        .call(fn(*i8, i32)->i32:$printf, *i8:$fmt_missing) ! "list.c":194:5;
+        .call(fn(ptr, ...)->i32:$printf, ptr:%__fmt_missing) ! "list.c":194:5;
         .br(label:@cleanup);
     }
 
     @cleanup {
-        // Cast each node pointer back to *i8 for $free
-        let *i8:%r1 = .bitcast(*$Node:%n1, type:*i8);
-        let *i8:%r2 = .bitcast(*$Node:%n2, type:*i8);
-        let *i8:%r3 = .bitcast(*$Node:%n3, type:*i8);
-        .call(fn(*i8)->void:$free, *i8:%r1) ! "list.c":201:5;
-        .call(fn(*i8)->void:$free, *i8:%r2) ! "list.c":202:5;
-        .call(fn(*i8)->void:$free, *i8:%r3) ! "list.c":203:5;
+        .call(fn(ptr)->void:$free, ptr:%n1) ! "list.c":201:5;
+        .call(fn(ptr)->void:$free, ptr:%n2) ! "list.c":202:5;
+        .call(fn(ptr)->void:$free, ptr:%n3) ! "list.c":203:5;
         .ret(i32:0) ! "list.c":204:5;
     }
 }

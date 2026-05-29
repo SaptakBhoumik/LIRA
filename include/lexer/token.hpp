@@ -16,7 +16,7 @@ enum class TokenType {
     local_identifier, // %name
     label_identifier, // @name
     instruction_identifier, // .name
-    buildin_identifier, // name
+    builtin_identifier, // name
     
     // Brackets
     lparen,           // (
@@ -31,7 +31,6 @@ enum class TokenType {
     // Others
     bang,             // !   (debug info)
     assign,           // =
-    star,             // *
     hash,             // #
     arrow,            // -> (function return type annotation)
     comma,            // ,
@@ -63,4 +62,18 @@ std::string to_string(const Token& tok);
 std::ostream& operator<<(std::ostream& os, const Token& tok);
 
 bool is_identifier(TokenType type);
+
+struct TokenValueEqual {
+    inline bool operator()(const Token& a, const Token& b) const {
+        return a.value == b.value;
+    }
+};
+
+// Hash
+struct TokenValueHash {
+    inline std::size_t operator()(const Token& obj) const {
+        return std::hash<std::string>{}(obj.value);
+    }
+};
+
 } // namespace LIRA

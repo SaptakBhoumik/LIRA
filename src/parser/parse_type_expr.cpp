@@ -1,3 +1,4 @@
+#include "lexer/token.hpp"
 #include "parser/parser.hpp"
 #include <iostream>
 
@@ -6,7 +7,7 @@ TypeExprPtr Parser::parse_type_expr(bool has_attribute){
     switch (this->curr_tok.type){
         case TokenType::global_identifier:
         case TokenType::local_identifier:
-        case TokenType::buildin_identifier:{
+        case TokenType::builtin_identifier:{
             return parse_named_type_expr(has_attribute);
         }
         case TokenType::lparen:{
@@ -18,11 +19,11 @@ TypeExprPtr Parser::parse_type_expr(bool has_attribute){
         case TokenType::lbracket:{
             return parse_array_type_expr(has_attribute);
         }
-        case TokenType::langel:{    
+        case TokenType::langel:{   
+            if(peek().type == TokenType::lbrace){
+                return parse_struct_type_expr(has_attribute);
+            }
             return parse_simd_type_expr(has_attribute);
-        }
-        case TokenType::star:{
-            return parse_ptr_type_expr(has_attribute);
         }
         case TokenType::lbrace:{
             return parse_struct_type_expr(has_attribute);
@@ -75,21 +76,15 @@ TypeExprPtr Parser::parse_simd_type_expr(bool has_attribute){
     }
     return std::make_shared<SIMDTypeExpr>(tok, base_type, size, attributes);
 }
-TypeExprPtr Parser::parse_ptr_type_expr(bool has_attribute){
-    Token tok = this->curr_tok;//the * token
-    advance();//After the * token
-    TypeExprPtr base_type = parse_type_expr(true);
-    std::vector<AttributePtr> attributes;
-    if(has_attribute && peek().type == TokenType::hash){
-        advance();//On the # token
-        attributes = parse_attributes();
-    }
-    return std::make_shared<PtrTypeExpr>(tok, base_type, attributes);
-}
 TypeExprPtr Parser::parse_struct_type_expr(bool has_attribute){
-    // {type1, type2, ...} #[attributes]
-    Token tok = this->curr_tok;//the { token
+    bool is_packed = false;
+    Token tok = this->curr_tok;//the { or < token
     std::vector<TypeExprPtr> fields;
+    if (this->curr_tok.type == TokenType::langel) {
+        is_packed = true;
+        advance();//After the < token
+    }
+    // {type1, type2, ...} #[attributes]
     while(peek().type != TokenType::rbrace){
         advance();//After the { token or the , token
         fields.push_back(parse_type_expr(true));
@@ -101,12 +96,15 @@ TypeExprPtr Parser::parse_struct_type_expr(bool has_attribute){
         }
     }
     expect(TokenType::rbrace, "Expected '}' after struct type fields in struct type expression");
+    if(is_packed){
+        expect(TokenType::rangel, "Expected '>' after packed struct type fields in struct type expression");
+    }
     std::vector<AttributePtr> attributes;
     if(has_attribute && peek().type == TokenType::hash){
         advance();//On the # token
         attributes = parse_attributes();
     }
-    return std::make_shared<StructTypeExpr>(tok, fields, false, attributes);
+    return std::make_shared<StructTypeExpr>(tok, fields, is_packed, attributes);
 }
 TypeExprPtr Parser::parse_func_type_expr(bool has_attribute){
     // fn(type1, type2, ... ) -> return_type #[attributes]

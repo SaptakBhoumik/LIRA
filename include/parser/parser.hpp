@@ -21,7 +21,6 @@ class Parser {
     TypeExprPtr parse_named_type_expr(bool has_attribute);
     TypeExprPtr parse_array_type_expr(bool has_attribute);
     TypeExprPtr parse_simd_type_expr(bool has_attribute);
-    TypeExprPtr parse_ptr_type_expr(bool has_attribute);
     TypeExprPtr parse_struct_type_expr(bool has_attribute);
     TypeExprPtr parse_func_type_expr(bool has_attribute);
 

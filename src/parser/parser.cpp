@@ -58,7 +58,7 @@ std::pair<ExprPtr,TypeExprPtr> Parser::parse_type_expr_pair(){
 AttributePtr Parser::parse_attribute(){
     Token tok = this->curr_tok;//the # token
     expect(TokenType::lbracket, "Expected '[' after '#' for attribute");
-    expect(TokenType::buildin_identifier, "Expected a buildin identifier after '#' for attribute name");
+    expect(TokenType::builtin_identifier, "Expected a buildin identifier after '#' for attribute name");
     Token name = this->curr_tok;
     std::vector<std::pair<ExprPtr,TypeExprPtr>> args;
     std::vector<triplet<Token,ExprPtr,TypeExprPtr>> kwargs;
@@ -66,7 +66,7 @@ AttributePtr Parser::parse_attribute(){
         advance();//on '('
         while(peek().type != TokenType::rparen){
             advance();//After `,` or after '(' for the first arg
-            if(this->curr_tok.type == TokenType::buildin_identifier && this->peek().type == TokenType::assign){
+            if(this->curr_tok.type == TokenType::builtin_identifier && this->peek().type == TokenType::assign){
                 //kwarg
                 Token kwarg_name = this->curr_tok;
                 advance();

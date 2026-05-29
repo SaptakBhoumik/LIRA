@@ -84,7 +84,7 @@ TokenType Lexer::get_identifier_type(const std::string& s){
         return TokenType::instruction_identifier;
     }
     else {
-        return TokenType::buildin_identifier;
+        return TokenType::builtin_identifier;
     }
 }
 } // namespace LIRA

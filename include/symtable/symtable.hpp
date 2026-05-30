@@ -47,5 +47,8 @@ class VarSymTable {
 
 using VarSymTablePtr = std::shared_ptr<VarSymTable>;
 
+//TODO:Finish it
 TypeExprPtr reduce_type_expr(TypeExprPtr type, TypeSymTablePtr symtable);//Recursively reduce a type expression by resolving typedefs until we get a non-typedef type expression. If we encounter a non-typedef type that is not built in then we error out.
+LiteralExprPtr reduce_type_expr(LiteralExprPtr literal, TypeSymTablePtr symtable);//Recursively reduce the literal by resolving typedefs until we get a non-typedef type expression. If we encounter a non-typedef type that is not built in then we error out.
+ExprPtr reduce_type_expr(ExprPtr expr, TypeSymTablePtr symtable);//Recursively reduce the expression by resolving typedefs until we get a non-typedef type expression. If we encounter a non-typedef type that is not built in then we error out.
 }

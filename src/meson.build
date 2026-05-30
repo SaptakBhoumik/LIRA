@@ -21,8 +21,13 @@ parser_src = [
     'parser/utils.cpp',
 ]
 
+symtable_src = [
+    'symtable/symtable.cpp',
+    'symtable/type_reducer.cpp'
+]
 include = include_directories('../include/')
 error = static_library('error', sources: error_src, include_directories: include)
 lexer = static_library('lexer', sources: lexer_src, include_directories: include)
 ast = static_library('ast', sources: ast_src, include_directories: include)
 parser = static_library('parser', sources: parser_src, include_directories: include)
+symtable = static_library('symtable', sources: symtable_src, include_directories: include)

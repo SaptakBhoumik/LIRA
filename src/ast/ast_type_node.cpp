@@ -191,6 +191,38 @@ std::string FuncTypeExpr::to_string() const{
 }
 
 
+LabelTypeExpr::LabelTypeExpr(Token tok, std::vector<TypeExprPtr> params, std::vector<AttributePtr> attributes){
+    this->tok = tok;
+    this->params = params;
+    this->attributes = attributes;
+}
+
+std::vector<TypeExprPtr> LabelTypeExpr::get_params() const{
+    return this->params;
+}
+
+std::vector<AttributePtr> LabelTypeExpr::get_attributes() const{
+    return this->attributes;
+}
+
+TypeExprKind LabelTypeExpr::get_kind() const{
+    return TypeExprKind::LabelTypeExpr;
+}
+Token LabelTypeExpr::get_token() const{
+    return this->tok;
+}
+std::string LabelTypeExpr::to_string() const{
+    std::string res = "(label(";
+    for(size_t i=0;i<this->params.size();i++){
+        res += this->params[i]->to_string();
+        if(i!=this->params.size()-1) {
+            res += ", ";
+        }
+    }
+    res += "))";
+    return res;
+}
+
 AnyTypeExpr::AnyTypeExpr(TypeExprPtr original_type){
     this->original_type = original_type;
 }

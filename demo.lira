@@ -48,7 +48,7 @@ fn #[extern] $printf(let ptr #[nonull]:%fmt, ...) -> i32;
 // Side-effect: increments $alloc_count on success.
 
 fn #[nounwind] $node_new(let i32:%val) -> ptr ! "list.c":30:1 {
-    @entry {
+    label @entry {
         // $Node is 8 bytes (ptr) + 4 bytes (i32) = 12 bytes
         let ptr:%raw = .call(fn(i64)->ptr:$malloc, i64:12) ! "list.c":32:18;
 
@@ -57,11 +57,11 @@ fn #[nounwind] $node_new(let i32:%val) -> ptr ! "list.c":30:1 {
         .br(i1:%is_null, label:@fail, label:@init) ! "list.c":33:3;
     }
 
-    @fail {
+    label @fail {
         .ret(ptr:null) ! "list.c":37:9;
     }
 
-    @init {
+    label @init {
         // Reinterpret the raw i8 pointer as a typed $Node pointer
         let ptr:%node = .alloca(ptr:%raw) ! "list.c":41:5;
 
@@ -88,7 +88,7 @@ fn #[nounwind] $node_new(let i32:%val) -> ptr ! "list.c":30:1 {
 // Both pointers must be non-null.
 
 fn #[nounwind] $node_link(let ptr:%a, let ptr:%b) -> void ! "list.c":62:1 {
-    @entry {
+    label @entry {
         let ptr:%slot = .gep(ptr:%a, type:$Node, i64:0, i64:0) #[inbounds] ! "list.c":63:5;
         .store(ptr:%b, ptr:%slot) #[align(i8:8)] ! "list.c":63:5;
         .ret() ! "list.c":64:5;
@@ -101,14 +101,14 @@ fn #[nounwind] $node_link(let ptr:%a, let ptr:%b) -> void ! "list.c":62:1 {
 // Returns 0 for an empty list (null head).
 
 fn #[nounwind] $list_sum(let ptr:%head) -> i32 ! "list.c":74:1 {
-    @entry {
+    label @entry {
         // Jump straight into the loop header; phi will pick up %head
         .br(label:@loop_head);
     }
 
     // Loop header — two phi nodes track the current node and the
     // running total. On the first iteration both come from @entry.
-    @loop_head {
+    label @loop_head {
         let ptr:%cur = .phi([ptr,2]:[%head,%cur_next], [label,2]:[@entry, @loop_body]);//If we were coming from @entry, current node is %head; if from @loop_body, it's %cur_next
         let i32:%acc = .phi([i32,2]:[0,%acc_next], [label,2]:[@entry, @loop_body]);
 
@@ -117,7 +117,7 @@ fn #[nounwind] $list_sum(let ptr:%head) -> i32 ! "list.c":74:1 {
         .br(i1:%done, label:@loop_exit, label:@loop_body);
     }
 
-    @loop_body {
+    label @loop_body {
         // Read the value field of the current node (field index 1)
         let ptr:%vslot = .gep(ptr:%cur, type:$Node, i64:0, i64:1) #[inbounds];
         let i32:%v = .load(ptr:%vslot) #[align(i8:4)];
@@ -129,7 +129,7 @@ fn #[nounwind] $list_sum(let ptr:%head) -> i32 ! "list.c":74:1 {
         .br(label:@loop_head);
     }
 
-    @loop_exit {
+    label @loop_exit {
         .ret(i32:%acc);
     }
 }
@@ -142,11 +142,11 @@ fn #[nounwind] $list_find(
     let ptr:%head,
     let i32:%target
 ) -> $FindResult ! "list.c":110:1 {
-    @entry {
+    label @entry {
         .br(label:@loop_head);
     }
 
-    @loop_head {
+    label @loop_head {
         let ptr:%cur = .phi([ptr,2]:[%head,%cur_next], [label,2]:[@entry, @advance]);
 
         // Reached the end without a match
@@ -154,7 +154,7 @@ fn #[nounwind] $list_find(
         .br(i1:%at_end, label:@not_found, label:@compare);
     }
 
-    @compare {
+    label @compare {
         // Load the current node's value and test it against %target
         let ptr:%vslot = .gep(ptr:%cur, type:$Node, i64:0, i64:1) #[inbounds];
         let i32:%v = .load(ptr:%vslot) #[align(i8:4)];
@@ -162,14 +162,14 @@ fn #[nounwind] $list_find(
         .br(i1:%hit, label:@found, label:@advance);
     }
 
-    @advance {
+    label @advance {
         // Move to the next node and continue
         let ptr:%nslot   = .gep(ptr:%cur, type:$Node, i64:0, i64:0) #[inbounds];
         let ptr:%cur_next = .load(ptr:%nslot) #[align(i8:8)];
         .br(label:@loop_head);
     }
 
-    @found {
+    label @found {
         // Re-load the matched value — %cur is valid here because
         // @found is only reachable from @compare while %cur is non-null
         let ptr:%vslot  = .gep(ptr:%cur, type:$Node, i64:0, i64:1) #[inbounds];
@@ -181,7 +181,7 @@ fn #[nounwind] $list_find(
         .ret($FindResult:%r1);
     }
 
-    @not_found {
+    label @not_found {
         // zeroinit gives {false, 0} which is exactly what we want
         .ret($FindResult:zeroinit);
     }
@@ -193,7 +193,7 @@ fn #[nounwind] $list_find(
 // Frees all nodes before returning.
 
 fn $main() -> i32 ! "list.c":162:1 {
-    @entry {
+    label @entry {
         let ptr:%__fmt_sum = .gep(ptr:$fmt_sum, type:str, i64:0, i64:0) ! "list.c":163:5;
         let ptr:%__fmt_found = .gep(ptr:$fmt_found, type:str, i64:0, i64:0) ! "list.c":164:5;
         let ptr:%__fmt_missing = .gep(ptr:$fmt_missing, type:str, i64:0, i64:0) ! "list.c":165:5;
@@ -211,12 +211,12 @@ fn $main() -> i32 ! "list.c":162:1 {
         .br(i1:%all, label:@build, label:@oom) ! "list.c":168:3;
     }
 
-    @oom {
+    label @oom {
         // At least one allocation failed; return error code
         .ret(i32:-1);
     }
 
-    @build {
+    label @build {
         // Link nodes into  n1 -> n2 -> n3 -> null
         .call(fn(ptr, ptr)->void:$node_link, ptr:%n1, ptr:%n2) ! "list.c":175:5;
         .call(fn(ptr, ptr)->void:$node_link, ptr:%n2, ptr:%n3) ! "list.c":176:5;
@@ -233,22 +233,40 @@ fn $main() -> i32 ! "list.c":162:1 {
         .br(i1:%found, label:@print_found, label:@print_missing);
     }
 
-    @print_found {
+    label @print_found {
         // Extract the matched value (field 1) and print it
         let i32:%val = .extractvalue($FindResult:%res, i32:1);
         .call(fn(ptr, ...)->i32:$printf, ptr:%__fmt_found, i32:%val) ! "list.c":190:5;
         .br(label:@cleanup);
     }
 
-    @print_missing {
+    label @print_missing {
         .call(fn(ptr, ...)->i32:$printf, ptr:%__fmt_missing) ! "list.c":194:5;
         .br(label:@cleanup);
     }
 
-    @cleanup {
+    label @cleanup {
         .call(fn(ptr)->void:$free, ptr:%n1) ! "list.c":201:5;
         .call(fn(ptr)->void:$free, ptr:%n2) ! "list.c":202:5;
         .call(fn(ptr)->void:$free, ptr:%n3) ! "list.c":203:5;
         .ret(i32:0) ! "list.c":204:5;
+    }
+}
+
+
+fn $_new_block_syntax_()->void{
+    //I will remove the old phi syntax. This is the new syntax for conditional branches and loops
+    label @start{
+        .br(i1:%cond, label:@if.true, label:@if.false)
+    }
+    label @if.true{
+        .jump(label(i32):@merge,i32:42)
+    }
+
+    label @if.false{
+        .jump(label(i32):@merge,i32:0)
+    }
+    label @merge(let i32:%x){
+        .use(i32:%x)
     }
 }

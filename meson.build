@@ -15,5 +15,5 @@ executable(
     'LIRA.elf',
     sources: cpp_src, 
     include_directories: include,
-    link_with: [error, lexer, ast, parser]
+    link_with: [error, lexer, ast, parser, symtable]
 )

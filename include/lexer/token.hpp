@@ -41,6 +41,7 @@ enum class TokenType {
     //Note if `name` is a keyword then also u can use it as a variable name by prefixing it with $ or % or @ or . (e.g. $fn, %fn, @fn, .fn are all valid identifiers even though fn is a keyword)
     kw_fn,          // 'fn' keyword (for fn definitions)
     kw_let,          // 'let' keyword (for let declarations)
+    kw_label,        // 'label' keyword (for label definitions)
 
     semicolon,
 };

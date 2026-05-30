@@ -171,12 +171,36 @@ InstructionStmtPtr Parser::parse_instruction_stmt(bool is_global){
 }
 
 LabelPtr Parser::parse_label(){
-    if(this->curr_tok.type != TokenType::label_identifier){
-        error(this->curr_tok, "Expected a label identifier");
-    }
+    Token tok = this->curr_tok;//the label token
+    expect(TokenType::label_identifier, "Expected a label identifier after 'label'");
     Token name = this->curr_tok;
-    expect(TokenType::lbrace, "Expected '{' after label identifier");
+    std::vector<triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> params;
+    if(peek().type == TokenType::lparen){
+        advance();//on the '(' token
+        while(peek().type != TokenType::rparen){
+            expect(TokenType::kw_let, "Expected 'let' for label parameter declaration");//After `,` or after '(' for the first parameter
+            advance();
+            TypeExprPtr type = parse_type_expr(true);
+            expect(TokenType::colon, "Expected ':' after type in label parameter");
+            expect(TokenType::local_identifier, "Expected a local identifier for label parameter name");
+            Token param_name = this->curr_tok;
+            std::vector<AttributePtr> param_attributes;
+            if(peek().type == TokenType::hash){
+                advance();//advance on the '#' token to the first attribute
+                param_attributes = parse_attributes();
+            }
+            params.push_back({param_name, param_attributes, type});
+            if(peek().type == TokenType::comma){
+                advance();//advance on the ',' token to the next parameter
+            }
+            else if(peek().type != TokenType::rparen){
+                error(this->peek(), "Expected ',' or ')' after label parameter");
+            }
+        }
+        expect(TokenType::rparen, "Expected ')' after label parameters");
+    }
     std::vector<InstructionStmtPtr> statements;
+    expect(TokenType::lbrace, "Expected '{' after label identifier");
     while(peek().type != TokenType::rbrace){
         advance();//advance to the next instruction or label
         statements.push_back(parse_instruction_stmt(false));
@@ -188,15 +212,15 @@ LabelPtr Parser::parse_label(){
         }
     }
     expect(TokenType::rbrace, "Expected '}' after label statements");
-    return std::make_shared<Label>(name, statements);
+    return std::make_shared<Label>(tok, name, statements, params);
 }
 
 std::vector<LabelPtr> Parser::parse_labels(){
     std::vector<LabelPtr> labels;
-    while(this->curr_tok.type == TokenType::label_identifier){
+    while(this->curr_tok.type == TokenType::kw_label){
         labels.push_back(parse_label());
         advance_on_semicolon();
-        if(peek().type == TokenType::label_identifier){
+        if(peek().type == TokenType::kw_label){
             advance();//advance to the next label
         }
     }
@@ -255,7 +279,7 @@ FunctionPtr Parser::parse_function(){
     if(peek().type == TokenType::lbrace){
         advance();//on the '{' token for function body
         advance_on_semicolon();
-        expect(TokenType::label_identifier, "Expected a label identifier for the first label in function body");
+        expect(TokenType::kw_label, "Expected a label identifier for the first label in function body");
         body = parse_labels();
         expect(TokenType::rbrace, "Expected '}' after function body");
     }

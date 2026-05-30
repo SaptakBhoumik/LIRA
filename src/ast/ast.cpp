@@ -180,20 +180,38 @@ std::string InstructionStmt::to_string() const{
 
 
 
-Label::Label(Token name, std::vector<InstructionStmtPtr> statements){
+Label::Label(Token tok, Token name, std::vector<InstructionStmtPtr> statements, std::vector<triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> params){
+    this->tok = tok;
     this->name = name;
     this->statements = statements;
+    this->params = params;
 }
 
 Token Label::get_name() const{
     return this->name;
 }
+Token Label::get_token() const{
+    return this->tok;
+}
 std::vector<InstructionStmtPtr> Label::get_statements() const{
     return this->statements;
 }
+std::vector<triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> Label::get_params() const{
+    return this->params;
+}
 
 std::string Label::to_string() const{
-    std::string res = "\t" + this->name.value + "{\n";
+    std::string res = "\tlabel " + this->name.value + "(";
+    for(size_t i=0;i<this->params.size();i++){
+        res += "let " + this->params[i].third->to_string()+":"+this->params[i].first.value;
+        for(const auto& attr: this->params[i].second){
+            res += " "+attr->to_string();
+        }
+        if(i!=this->params.size()-1) {
+            res += ", ";
+        }
+    }
+    res += "){\n";
     for(const auto& stmt: this->statements){
         res += "\t\t" + stmt->to_string() + ";\n";
     }

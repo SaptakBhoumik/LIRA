@@ -23,6 +23,7 @@ class Parser {
     TypeExprPtr parse_simd_type_expr(bool has_attribute);
     TypeExprPtr parse_struct_type_expr(bool has_attribute);
     TypeExprPtr parse_func_type_expr(bool has_attribute);
+    TypeExprPtr parse_label_type_expr(bool has_attribute);
 
     // Parse literal expressions
     LiteralExprPtr parse_literal_expr();

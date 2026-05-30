@@ -31,6 +31,9 @@ TypeExprPtr Parser::parse_type_expr(bool has_attribute){
         case TokenType::kw_fn:{
             return parse_func_type_expr(has_attribute);
         }
+        case TokenType::kw_label:{
+            return parse_label_type_expr(has_attribute);
+        }
         default:{
             std::cout << "Unexpected token type: " << this->curr_tok << std::endl;
             error(this->curr_tok, "Expected a type expression");
@@ -136,5 +139,29 @@ TypeExprPtr Parser::parse_func_type_expr(bool has_attribute){
         attributes = parse_attributes();
     }
     return std::make_shared<FuncTypeExpr>(tok, param_types, varargs, return_type, attributes);
+}
+TypeExprPtr Parser::parse_label_type_expr(bool has_attribute){
+    Token tok = this->curr_tok;//the label token
+    std::vector<TypeExprPtr> params;
+    if(peek().type == TokenType::lparen){
+        advance();//on the '(' token
+        while(peek().type != TokenType::rparen){
+            advance();//After the ( token or the , token
+            params.push_back(parse_type_expr(true));
+            if(peek().type == TokenType::comma){
+                advance();//On the , token
+            }
+            else if(peek().type != TokenType::rparen){
+                error(peek(), "Expected ',' or ')' after label type parameter in label type expression");
+            }
+        }
+        expect(TokenType::rparen, "Expected ')' after label type parameters in label type expression");
+    }
+    std::vector<AttributePtr> attributes;
+    if(has_attribute && peek().type == TokenType::hash){
+        advance();//On the # token
+        attributes = parse_attributes();
+    }
+    return std::make_shared<LabelTypeExpr>(tok, params, attributes);
 }
 }

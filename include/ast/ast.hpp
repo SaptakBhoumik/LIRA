@@ -61,6 +61,7 @@ enum class TypeExprKind:std::uint8_t{
     SIMDTypeExpr,
     StructTypeExpr,
     FuncTypeExpr,
+    LabelTypeExpr,
     AnyTypeExpr //For internal use. This is used in places where we want to allow any type expression. 
                 //Used when there is type error and we want to avoid spamming the error messages with follow up errors caused by the first error due to dependent types
                 //Described in https://claude.ai/share/d6bf9b6d-1a2b-4d4b-bd82-7ad6bd3ba813
@@ -71,6 +72,12 @@ class TypeExpr{
     virtual Token get_token() const = 0;
     virtual std::vector<AttributePtr> get_attributes() const = 0;
     virtual std::string to_string() const = 0;
+    //TODO:Implement the following
+    //virtual bool contains_metatype() const = 0;//If the base type is of type 'type'. We need this to make sure people dont do something like {type,type} 
+                                               //or fn(type)->type which are not valid type expressions 
+                                               //Only NamedTypeExpr can contain the metatype. 
+                                               //We first reduce the types(Because people can typedef) then we check this condition and give error if it is violated
+                                               //
 
     virtual ~TypeExpr() = default;
 };
@@ -163,6 +170,22 @@ class FuncTypeExpr : public TypeExpr{
     std::vector<TypeExprPtr> get_param_types() const;
     bool has_varargs() const;
     TypeExprPtr get_return_type() const;
+
+    TypeExprKind get_kind() const override;
+    Token get_token() const override;
+    std::vector<AttributePtr> get_attributes() const override;
+    std::string to_string() const override;
+};
+
+class LabelTypeExpr : public TypeExpr{
+    //label(type, type, ... )
+    Token tok;//the 'label' token for error reporting
+    std::vector<AttributePtr> attributes;//Label type has no attribute but we still store it for giving error messages during type checking
+    std::vector<TypeExprPtr> params;
+    public:
+    LabelTypeExpr(Token tok, std::vector<TypeExprPtr> params, std::vector<AttributePtr> attributes);
+
+    std::vector<TypeExprPtr> get_params() const;
 
     TypeExprKind get_kind() const override;
     Token get_token() const override;
@@ -345,13 +368,17 @@ class Label {
         ...
     }
     */
+    Token tok;//The 'label' token for error reporting
     Token name;//The ``@name`` token for error reporting and identifying the label. Note that the value of this token includes the @ prefix (e.g. @loop)
+    std::vector<triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> params;
     std::vector<InstructionStmtPtr> statements;
     public:
-    Label(Token name, std::vector<InstructionStmtPtr> statements);
+    Label(Token tok, Token name, std::vector<InstructionStmtPtr> statements, std::vector<triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> params);
 
     Token get_name() const;
+    Token get_token() const;
     std::vector<InstructionStmtPtr> get_statements() const;
+    std::vector<triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> get_params() const;
     std::string to_string() const;
 };
 

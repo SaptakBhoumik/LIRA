@@ -67,6 +67,7 @@ void Lexer::flush_keyword() {
     static const std::unordered_map<std::string, TokenType> keywords = {
         {"fn", TokenType::kw_fn},
         {"let", TokenType::kw_let},
+        {"label", TokenType::kw_label},
     };
 
     TokenType type;
@@ -363,8 +364,6 @@ void Lexer::lex_string() {
 }
 
 void Lexer::lex_slash() {
-    const size_t start = this->curr_index;
-
     if (this->peek() == '/') {
         this->flush_keyword();
         // Line comment: consume everything up to (but not including) the newline.

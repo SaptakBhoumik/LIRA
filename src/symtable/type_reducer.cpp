@@ -6,6 +6,7 @@
 
 namespace LIRA {
 TypeExprPtr reduce_type_expr(TypeExprPtr type, TypeSymTablePtr symtable){
+    //TODO:What if the attribute contains type expression?We have to reduce them also
     switch(type->get_kind()){
         case TypeExprKind::NamedTypeExpr:{
             auto named_type = std::dynamic_pointer_cast<NamedTypeExpr>(type);

@@ -82,7 +82,7 @@ bool TypeSymTable::is_builtin(Token type) const {
     ppc_fp128:- ppc_f128
     */
     static std::unordered_set<std::string> builtin_types = {"f16","bf16","f32","f64", "f80","f128","ppc_f128",
-                                                            "void","label","ptr","str","type"};
+                                                            "void","ptr","str","type"};
     return builtin_types.find(type.value) != builtin_types.end();
 }
 bool TypeSymTable::contains(Token name) const {

@@ -32,15 +32,15 @@ fn #[extern] $free(let ptr:%ptr) -> void;
 fn #[extern] $printf(let ptr #[nonull]:%fmt, ...) -> i32;
 
 fn #[nounwind] $main() -> i32 ! "demo.c":10:1 {
-    @entry {
+    label @entry {
         let ptr:%slot = .call(fn(i64)->str:$malloc, i64:4) ! "demo.c":11:5;
         let i1:%is_null = .i_eq(ptr:%slot, ptr:null);
         .br(i1:%is_null, label:@fail, label:@ok);
     }
-    @fail {
+    label @fail {
         .ret(i32:-1);
     }
-    @ok {
+    label @ok {
         .store(i32:21, ptr:%slot) #[align(i8:4)];
         let i32:%v = .load(ptr:%slot) #[align(i8:4)];
         let i32:%r = .add(ptr:%v, i32:%v) #[nsw];

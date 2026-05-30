@@ -37,6 +37,7 @@ std::string to_string(TokenType type) {
 
         case TokenType::kw_fn: return "fn";
         case TokenType::kw_let: return "let";
+        case TokenType::kw_label: return "label";
 
         case TokenType::semicolon: return ";";
     }

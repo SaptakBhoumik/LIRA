@@ -12,6 +12,22 @@ TypeExprPtr reduce_type_expr(TypeExprPtr type, TypeSymTablePtr symtable){
             auto named_type = std::dynamic_pointer_cast<NamedTypeExpr>(type);
             return symtable->lookup(named_type->get_name());//symtable stores reduced type expressions so we dont need to recursively reduce here 
         }
+        case TypeExprKind::IntTypeExpr:
+        case TypeExprKind::FloatTypeExpr:
+        case TypeExprKind::VoidTypeExpr:
+        case TypeExprKind::PtrTypeExpr:
+        case TypeExprKind::MetaTypeExpr:{
+            return type;//These types are already reduced and dont contain any named types inside them so we can just return them
+        }
+        case TypeExprKind::LabelTypeExpr:{
+            auto label_type = std::dynamic_pointer_cast<LabelTypeExpr>(type);
+            std::vector<TypeExprPtr> reduced_param_types;
+            const auto& param_types = label_type->get_params();
+            for(const auto& param_type : param_types) {
+                reduced_param_types.push_back(reduce_type_expr(param_type, symtable));
+            }
+            return std::make_shared<LabelTypeExpr>(label_type->get_token(), reduced_param_types, label_type->get_attributes());
+        }
         case TypeExprKind::ArrayTypeExpr:{
             auto array_type = std::dynamic_pointer_cast<ArrayTypeExpr>(type);
             auto reduced_base_type = reduce_type_expr(array_type->get_base_type(), symtable);

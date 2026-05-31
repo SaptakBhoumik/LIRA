@@ -15,8 +15,6 @@ class TypeSymTable {
     void insert(Token name, TypeExprPtr type);//Expects u to run reduce_type_expr on the type before inserting it into the table. 
     TypeExprPtr lookup(TypeExprPtr name);//If it is a built in type then return it. If not found then error. Dont exit if error. Just add to errors. Return an AnyTypeExpr in case of error to avoid spamming follow up errors.
     TypeExprPtr lookup(Token name);//If it is a built in type then return it. If not found then error. Dont exit if error. Just add to errors. Return an AnyTypeExpr in case of error to avoid spamming follow up errors.
-    bool is_builtin(TypeExprPtr type) const;//Check if the type is a built in type
-    bool is_builtin(Token type) const;//Check if the type is a built in type
     bool contains(Token name) const;//Check if the type is in the table (either built in or user defined)
 
     std::vector<Diagnostic> get_errors() const;

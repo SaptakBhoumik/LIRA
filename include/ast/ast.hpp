@@ -56,7 +56,12 @@ class Attribute{
 using AttributePtr = std::shared_ptr<Attribute>;
 
 enum class TypeExprKind:std::uint8_t{
-    NamedTypeExpr, // Stuff like i8,i32,%name,$name
+    NamedTypeExpr, // Stuff like %name,$name
+    IntTypeExpr,
+    FloatTypeExpr,
+    VoidTypeExpr,
+    PtrTypeExpr,    
+    MetaTypeExpr,
     ArrayTypeExpr,
     SIMDTypeExpr,
     StructTypeExpr,
@@ -94,6 +99,80 @@ class NamedTypeExpr : public TypeExpr{
 
     TypeExprKind get_kind() const override;
     Token get_token() const override;
+    std::vector<AttributePtr> get_attributes() const override;
+    std::string to_string() const override;
+};
+
+class IntTypeExpr : public TypeExpr{
+    //iN #[attributes]
+    Token tok;//the iN token for error reporting
+    std::size_t bits;//The N in iN
+    std::vector<AttributePtr> attributes;
+    public:
+    IntTypeExpr(Token tok,std::size_t bits, std::vector<AttributePtr> attributes);
+
+    std::size_t get_bits() const;
+
+    Token get_token() const override;
+    TypeExprKind get_kind() const override;
+    std::vector<AttributePtr> get_attributes() const override;
+    std::string to_string() const override;
+};
+
+class FloatTypeExpr : public TypeExpr{
+    //fN #[attributes]
+    Token tok;//the fN token for error reporting
+    bool brain_float;//If bf16
+    std::size_t bits;//The N in fN
+    std::vector<AttributePtr> attributes;
+    public:
+    FloatTypeExpr(Token tok,std::size_t bits,bool brain_float, std::vector<AttributePtr> attributes);
+
+    std::size_t get_bits() const;
+    bool is_brain_float() const;
+
+    Token get_token() const override;
+    TypeExprKind get_kind() const override;
+    std::vector<AttributePtr> get_attributes() const override;
+    std::string to_string() const override;
+};
+
+class VoidTypeExpr : public TypeExpr{
+    //void #[attributes]
+    Token tok;//the void token for error reporting
+    std::vector<AttributePtr> attributes;
+    public:
+    VoidTypeExpr(Token tok, std::vector<AttributePtr> attributes);
+
+    Token get_token() const override;
+    TypeExprKind get_kind() const override;
+    std::vector<AttributePtr> get_attributes() const override;
+    std::string to_string() const override;
+};
+
+class PtrTypeExpr : public TypeExpr{
+    //ptr #[attributes]
+    Token tok;//the 'ptr' token for error reporting
+    std::vector<AttributePtr> attributes;
+    public:
+    PtrTypeExpr(Token tok, std::vector<AttributePtr> attributes);
+
+
+    Token get_token() const override;
+    TypeExprKind get_kind() const override;
+    std::vector<AttributePtr> get_attributes() const override;
+    std::string to_string() const override;
+};
+
+class MetaTypeExpr : public TypeExpr{
+    //type #[attributes]
+    Token tok;//the 'type' token for error reporting
+    std::vector<AttributePtr> attributes;
+    public:
+    MetaTypeExpr(Token tok, std::vector<AttributePtr> attributes);
+
+    Token get_token() const override;
+    TypeExprKind get_kind() const override;
     std::vector<AttributePtr> get_attributes() const override;
     std::string to_string() const override;
 };

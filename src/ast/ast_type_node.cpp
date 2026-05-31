@@ -20,11 +20,155 @@ std::vector<AttributePtr> NamedTypeExpr::get_attributes() const{
     return this->attributes;
 }
 std::string NamedTypeExpr::to_string() const{
-    std::string res = "(" + this->name.value;
+    std::string res = this->name.value;
     for(const auto& attr: this->attributes){
         res += " "+attr->to_string();
     }
-    return res + ")";
+    if(!this->attributes.empty()) {
+        res = "("+res+")";
+    }
+    return res;
+}
+
+
+IntTypeExpr::IntTypeExpr(Token tok,std::size_t bits, std::vector<AttributePtr> attributes){
+    this->tok = tok;
+    this->bits = bits;
+    this->attributes = attributes;
+}
+
+std::size_t IntTypeExpr::get_bits() const{
+    return this->bits;
+}
+
+TypeExprKind IntTypeExpr::get_kind() const{
+    return TypeExprKind::IntTypeExpr;
+}
+Token IntTypeExpr::get_token() const{
+    return this->tok;
+}
+std::vector<AttributePtr> IntTypeExpr::get_attributes() const{
+    return this->attributes;
+}
+std::string IntTypeExpr::to_string() const{
+    std::string res = this->tok.value;
+    for(const auto& attr: this->attributes){
+        res += " "+attr->to_string();
+    }
+    if(!this->attributes.empty()) {
+        res = "("+res+")";
+    }
+    return res;
+}
+
+
+FloatTypeExpr::FloatTypeExpr(Token tok,std::size_t bits,bool brain_float, std::vector<AttributePtr> attributes){
+    this->tok = tok;
+    this->bits = bits;
+    this->brain_float = brain_float;
+    this->attributes = attributes;
+}
+std::size_t FloatTypeExpr::get_bits() const{
+    return this->bits;
+}
+bool FloatTypeExpr::is_brain_float() const{
+    return this->brain_float;
+}
+TypeExprKind FloatTypeExpr::get_kind() const{
+    return TypeExprKind::FloatTypeExpr;
+}
+Token FloatTypeExpr::get_token() const{
+    return this->tok;
+}
+std::vector<AttributePtr> FloatTypeExpr::get_attributes() const{
+    return this->attributes;
+}
+std::string FloatTypeExpr::to_string() const{
+    std::string res = this->tok.value;
+    for(const auto& attr: this->attributes){
+        res += " "+attr->to_string();
+    }
+    if(!this->attributes.empty()) {
+        res = "("+res+")";
+    }
+    return res;
+}
+
+
+VoidTypeExpr::VoidTypeExpr(Token tok, std::vector<AttributePtr> attributes){
+    this->tok = tok;
+    this->attributes = attributes;
+}
+
+TypeExprKind VoidTypeExpr::get_kind() const{
+    return TypeExprKind::VoidTypeExpr;
+}
+Token VoidTypeExpr::get_token() const{
+    return this->tok;
+}
+std::vector<AttributePtr> VoidTypeExpr::get_attributes() const{
+    return this->attributes;
+}
+std::string VoidTypeExpr::to_string() const{
+    std::string res = "void";
+    for(const auto& attr: this->attributes){
+        res += " "+attr->to_string();
+    }
+    if(!this->attributes.empty()) {
+        res = "("+res+")";
+    }
+    return res;
+}
+
+
+PtrTypeExpr::PtrTypeExpr(Token tok, std::vector<AttributePtr> attributes){
+    this->tok = tok;
+    this->attributes = attributes;
+}
+TypeExprKind PtrTypeExpr::get_kind() const{
+    return TypeExprKind::PtrTypeExpr;
+}
+Token PtrTypeExpr::get_token() const{
+    return this->tok;
+}
+std::vector<AttributePtr> PtrTypeExpr::get_attributes() const{
+    return this->attributes;
+}
+std::string PtrTypeExpr::to_string() const{
+    std::string res = "ptr";
+    for(const auto& attr: this->attributes){
+        res += " "+attr->to_string();
+    }
+    if(!this->attributes.empty()) {
+        res = "("+res+")";
+    }
+    return res;
+}
+
+
+MetaTypeExpr::MetaTypeExpr(Token tok, std::vector<AttributePtr> attributes){
+    this->tok = tok;
+    this->attributes = attributes;
+}
+
+TypeExprKind MetaTypeExpr::get_kind() const{
+    return TypeExprKind::MetaTypeExpr;
+}
+Token MetaTypeExpr::get_token() const{
+    return this->tok;
+}
+std::vector<AttributePtr> MetaTypeExpr::get_attributes() const{
+    return this->attributes;
+}
+std::string MetaTypeExpr::to_string() const{
+    std::string res = "type";
+    for(const auto& attr: this->attributes){
+        res += " "+attr->to_string();
+    }
+    if(!this->attributes.empty()) {
+        res = "("+res+")";
+    }
+    return res;
 }
 
 
@@ -52,11 +196,14 @@ std::vector<AttributePtr> ArrayTypeExpr::get_attributes() const{
     return this->attributes;
 }
 std::string ArrayTypeExpr::to_string() const{
-    std::string res = "([" + this->base_type->to_string() + "," + this->size.value + "]";
+    std::string res = "[" + this->base_type->to_string() + "," + this->size.value + "]";
     for(const auto& attr: this->attributes){
         res += " "+attr->to_string();
     }
-    return res+")";
+    if(!this->attributes.empty()) {
+        res = "("+res+")";
+    }
+    return res;
 }
 
 
@@ -84,11 +231,14 @@ std::vector<AttributePtr> SIMDTypeExpr::get_attributes() const{
     return this->attributes;
 }
 std::string SIMDTypeExpr::to_string() const{
-    std::string res = "(<" + this->size.value + " x " + this->base_type->to_string() + ">";
+    std::string res = "<" + this->size.value + " x " + this->base_type->to_string() + ">";
     for(const auto& attr: this->attributes){
         res += " "+attr->to_string();
     }
-    return res+")";
+    if(!this->attributes.empty()) {
+        res = "("+res+")";
+    }
+    return res;
 }
 
 StructTypeExpr::StructTypeExpr(Token tok, std::vector<TypeExprPtr> fields, bool packed, std::vector<AttributePtr> attributes){
@@ -118,10 +268,10 @@ std::vector<AttributePtr> StructTypeExpr::get_attributes() const{
 std::string StructTypeExpr::to_string() const{
     std::string res;
     if(this->packed) {
-        res = "(<{";
+        res = "<{";
     } 
     else {
-        res = "({"; 
+        res = "{"; 
     }
     for(size_t i=0;i<this->fields.size();i++){
         res += this->fields[i]->to_string();
@@ -138,7 +288,10 @@ std::string StructTypeExpr::to_string() const{
     for(const auto& attr: this->attributes){
         res += " "+attr->to_string();
     }
-    return res+")";
+    if(!this->attributes.empty()) {
+        res = "("+res+")";
+    }
+    return res;
 }
 
 
@@ -170,7 +323,7 @@ std::vector<AttributePtr> FuncTypeExpr::get_attributes() const{
     return this->attributes;
 }
 std::string FuncTypeExpr::to_string() const{
-    std::string res = "(fn(";
+    std::string res = "fn(";
     for(size_t i=0;i<this->param_types.size();i++){
         res += this->param_types[i]->to_string();
         if(i!=this->param_types.size()-1) {
@@ -187,7 +340,10 @@ std::string FuncTypeExpr::to_string() const{
     for(const auto& attr: this->attributes){
         res += " "+attr->to_string();
     }
-    return res+")";
+    if(!this->attributes.empty()) {
+        res = "("+res+")";
+    }
+    return res;
 }
 
 
@@ -212,14 +368,20 @@ Token LabelTypeExpr::get_token() const{
     return this->tok;
 }
 std::string LabelTypeExpr::to_string() const{
-    std::string res = "(label(";
+    std::string res = "label(";
     for(size_t i=0;i<this->params.size();i++){
         res += this->params[i]->to_string();
         if(i!=this->params.size()-1) {
             res += ", ";
         }
     }
-    res += "))";
+    res += ")";
+    for(const auto& attr: this->attributes){
+        res += " "+attr->to_string();
+    }
+    if(!this->attributes.empty()) {
+        res = "("+res+")";
+    }
     return res;
 }
 

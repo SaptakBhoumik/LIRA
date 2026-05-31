@@ -26,9 +26,6 @@ void TypeSymTable::insert(Token name, TypeExprPtr type) {
     this->table[name] = type;
 }
 TypeExprPtr TypeSymTable::lookup(TypeExprPtr name) {
-    if(is_builtin(name)) {
-        return name;
-    }
     if(name->get_kind() == TypeExprKind::NamedTypeExpr) {
         auto named_type = std::dynamic_pointer_cast<NamedTypeExpr>(name);
         return lookup(named_type->get_name());
@@ -39,9 +36,6 @@ TypeExprPtr TypeSymTable::lookup(TypeExprPtr name) {
     }
 }
 TypeExprPtr TypeSymTable::lookup(Token name) {
-    if(is_builtin(name)) {
-        return std::make_shared<NamedTypeExpr>(name, std::vector<AttributePtr>{});
-    }
     auto it = this->table.find(name);
     if(it == this->table.end()) {
         error(name, "Undefined type error", "The type '"+name.value+"' is not defined");
@@ -49,44 +43,8 @@ TypeExprPtr TypeSymTable::lookup(Token name) {
     }
     return it->second;
 }
-bool TypeSymTable::is_builtin(TypeExprPtr type) const {
-    if(type->get_kind() != TypeExprKind::NamedTypeExpr) {
-        return false;
-    }
-    auto named_type = std::dynamic_pointer_cast<NamedTypeExpr>(type);
-    return is_builtin(named_type->get_name());
-}
-bool TypeSymTable::is_builtin(Token type) const {
-    if(type.type != TokenType::builtin_identifier) {
-        return false;
-    }
-    if(type.value[0] == 'i') {//We support iN just like llvm
-        //Remove the i and see if rest is a power of 2
-        std::string num_str = type.value.substr(1);
-        try {
-            std::size_t num = std::stoull(num_str);
-            return (num & (num - 1)) == 0 && num > 0;//Check if num is a power of 2
-        }
-        catch(...) {
-            return false;
-        }
-    }
-
-    /*
-    half:- f16
-    bfloat16:- bf16
-    float:- f32
-    double:- f64
-    x86_fp80:- f80
-    fp128:- f128
-    ppc_fp128:- ppc_f128
-    */
-    static std::unordered_set<std::string> builtin_types = {"f16","bf16","f32","f64", "f80","f128","ppc_f128",
-                                                            "void","ptr","str","type"};
-    return builtin_types.find(type.value) != builtin_types.end();
-}
 bool TypeSymTable::contains(Token name) const {
-    return is_builtin(name) || this->table.find(name) != this->table.end();
+    return this->table.find(name) != this->table.end();
 }
 
 std::vector<Diagnostic> TypeSymTable::get_errors() const{

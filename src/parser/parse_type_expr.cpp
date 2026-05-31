@@ -1,5 +1,6 @@
 #include "lexer/token.hpp"
 #include "parser/parser.hpp"
+#include <algorithm>
 #include <iostream>
 
 namespace LIRA{
@@ -47,6 +48,37 @@ TypeExprPtr Parser::parse_named_type_expr(bool has_attribute){
         advance();//On the # token
         attributes = parse_attributes();
     }
+    if(name.value == "void"){
+        return std::make_shared<VoidTypeExpr>(name, attributes);
+    }
+    else if(name.value == "ptr"){
+        return std::make_shared<PtrTypeExpr>(name, attributes);
+    }
+    else if(name.value == "type"){
+        return std::make_shared<MetaTypeExpr>(name, attributes);
+    }
+    else if(name.value == "f16" || name.value == "bf16" || name.value == "f32" || name.value == "f64" || name.value == "f80" || name.value == "f128"){
+        bool is_brain_float = name.value == "bf16";
+        std::size_t bits = 0;
+        if(name.value[0] == 'f') {
+            bits = std::stoull(name.value.substr(1));
+        }
+        else{
+            //Happens only for bf16
+            bits = 16;
+        }
+        return std::make_shared<FloatTypeExpr>(name, bits, is_brain_float, attributes);
+    }
+    else if(name.value[0] == 'i'){
+        //Check if the rest is a number
+        if(name.value.length() < 2 || !std::all_of(name.value.begin() + 1, name.value.end(), ::isdigit)){
+            //Not a valid integer type, treat it as a named type
+            return std::make_shared<NamedTypeExpr>(name, attributes);
+        }
+        std::size_t bits = std::stoull(name.value.substr(1));
+        return std::make_shared<IntTypeExpr>(name, bits, attributes);
+    }
+    
     return std::make_shared<NamedTypeExpr>(name, attributes);
 }
 TypeExprPtr Parser::parse_array_type_expr(bool has_attribute){

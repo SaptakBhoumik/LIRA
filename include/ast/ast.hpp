@@ -6,6 +6,7 @@
 #include <memory>
 #include <optional>
 namespace LIRA {
+namespace IR{
 template<typename T1, typename T2, typename T3>
 struct triplet{
     T1 first;
@@ -530,4 +531,5 @@ class Program{
 };
 
 using ProgramPtr = std::shared_ptr<Program>;
+}
 }

@@ -1,6 +1,7 @@
 #include "parser/parser.hpp"
 
 namespace LIRA {
+namespace IR {
 LiteralExprPtr Parser::parse_literal_expr(){
     switch (this->curr_tok.type){
         case TokenType::global_identifier:
@@ -87,5 +88,6 @@ LiteralExprPtr Parser::parse_struct_literal_expr(){
     }
     expect(TokenType::rbrace, "Expected '}' after struct literal elements in struct literal expression");
     return std::make_shared<StructLiteralExpr>(tok, elements);
+}
 }
 }

@@ -3,6 +3,7 @@
 #include <vector>
 
 namespace LIRA {
+namespace Utils {
 // ANSI colour codes - Should work on most modern terminals. If not then not my headache lol
 namespace colour {
     inline constexpr const char* reset = "\033[0m";
@@ -50,5 +51,5 @@ void display_all(const std::vector<Diagnostic>& diags);
 Diagnostic make_error(const Location& loc,const std::string& message,const std::string& sub_message = "",const std::string& code = "");
 Diagnostic make_warning(const Location& loc,const std::string& message,const std::string& sub_message = "");
 Diagnostic make_note(const Location& loc,const std::string& message);
-
+}
 } // namespace LIRA

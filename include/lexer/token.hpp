@@ -3,6 +3,7 @@
 #include <string>
 
 namespace LIRA {
+namespace IR {
 enum class TokenType {
     eof,
 
@@ -76,5 +77,5 @@ struct TokenValueHash {
         return std::hash<std::string>{}(obj.value);
     }
 };
-
+}
 } // namespace LIRA

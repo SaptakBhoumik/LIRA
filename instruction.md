@@ -51,7 +51,7 @@
 
 ## SIMD other instructions
 
-- `` let <T, M>:%output_var = .shufflevector(<T, N2>:%input1, <T, N3>:%input2, <iN, M>:%mask)`` :- Shuffles the elements of 2 vectors according to a mask.
+- `` let <T, M>:%output_var = .shufflevector(<T, N2>:%input1, <T, N3>:%input2, <i16, M>:%mask)`` :- Shuffles the elements of 2 vectors according to a mask. Mask is compile time not run time
 
 ## Comparison instructions
 

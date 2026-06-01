@@ -1,6 +1,7 @@
 #include "lexer/token.hpp"
 
 namespace LIRA {
+namespace IR {
 std::string to_string(TokenType type) {
     //Dont use map. Use switch case because in case u forget to add a case the compiler will warn u even before u run the code, 
     //whereas with a map it will just return an empty string/throw error and u might not notice the bug until runtime
@@ -58,5 +59,6 @@ bool is_identifier(TokenType type){
            type == TokenType::label_identifier || 
            type == TokenType::instruction_identifier || 
            type == TokenType::builtin_identifier;
+}
 }
 }

@@ -24,13 +24,13 @@ int main(int argc, char* argv[]) {
     buffer << file.rdbuf();
     std::string source_code = buffer.str();
 
-    auto lexer = LIRA::Lexer(source_code, filename);
+    auto lexer = LIRA::IR::Lexer(source_code, filename);
     auto tokens = lexer.get_tokens();
     for(const auto& token : tokens){
         std::cout << to_string(token) << std::endl;
     }
 
-    auto parser = LIRA::Parser(tokens, filename);
+    auto parser = LIRA::IR::Parser(tokens, filename);
     auto ast = parser.parse();
     std::cout << ast->to_string() << std::endl;
     return 0;

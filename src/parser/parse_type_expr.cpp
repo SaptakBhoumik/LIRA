@@ -4,6 +4,7 @@
 #include <iostream>
 
 namespace LIRA{
+namespace IR{
 TypeExprPtr Parser::parse_type_expr(bool has_attribute){
     switch (this->curr_tok.type){
         case TokenType::global_identifier:
@@ -195,5 +196,6 @@ TypeExprPtr Parser::parse_label_type_expr(bool has_attribute){
         attributes = parse_attributes();
     }
     return std::make_shared<LabelTypeExpr>(tok, params, attributes);
+}
 }
 }

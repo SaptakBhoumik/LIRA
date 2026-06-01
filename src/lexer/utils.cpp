@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <cctype>
 namespace LIRA {
+namespace IR {
 bool Lexer::advance() {
     if (this->curr_index < this->input.size() - 1) {
         this->curr_index++;
@@ -86,5 +87,6 @@ TokenType Lexer::get_identifier_type(const std::string& s){
     else {
         return TokenType::builtin_identifier;
     }
+}
 }
 } // namespace LIRA

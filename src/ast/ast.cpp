@@ -1,6 +1,7 @@
 #include "ast/ast.hpp"
 
 namespace LIRA {
+namespace IR {
 DebugInfo::DebugInfo(Token tok, Token file_name, Token line, Token column){
     this->tok = tok;
     this->file_name = file_name;
@@ -359,5 +360,6 @@ std::string Program::to_string() const{
         res += item->to_string() + "\n";
     }
     return res;
+}
 }
 }

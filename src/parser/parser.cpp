@@ -4,6 +4,7 @@
 #include <iostream>
 
 namespace LIRA {
+namespace IR {
 Parser::Parser(const std::vector<Token>& toks, const std::string& filename){
     this->toks = toks;
     this->filename = filename;
@@ -308,5 +309,6 @@ GlobalItemPtr Parser::parse_global_item(){
         error(this->curr_tok, "Expected a function, global variable declaration or global attribute declaration");
     }
     return item;
+}
 }
 }

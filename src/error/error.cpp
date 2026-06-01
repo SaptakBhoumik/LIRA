@@ -5,6 +5,7 @@
 #include <string>
 
 namespace LIRA {
+namespace Utils {
 static const char* level_colour(DiagLevel level) {
     switch (level) {
         case DiagLevel::error:{
@@ -131,5 +132,5 @@ Diagnostic make_warning(const Location& loc,const std::string& message,const std
 Diagnostic make_note(const Location& loc, const std::string& message) {
     return Diagnostic{loc, message, "", "", DiagLevel::note};
 }
-
+}
 } // namespace LIRA

@@ -3,6 +3,7 @@
 #include <map>
 
 namespace LIRA {
+namespace IR{ 
 class Parser {
     std::size_t curr_index = 0;
     Token curr_tok;
@@ -49,4 +50,5 @@ class Parser {
     Parser(const std::vector<Token>& toks, const std::string& filename);
     ProgramPtr parse();
 };
+}
 }

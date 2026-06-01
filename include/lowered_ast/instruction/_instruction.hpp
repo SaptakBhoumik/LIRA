@@ -1,6 +1,7 @@
 #pragma once
 #include "ast/ast.hpp"
 namespace LIRA {
+namespace MIR{
 enum class InstType:std::int16_t{
     //TODO:Decide in future how I want to create the instruction. Do I have BinaryInst,... or just FloatADD,IntAdd.....
 };
@@ -12,11 +13,11 @@ class Inst {
     public:
     virtual ~Inst() = default;
 
-    virtual std::optional<std::pair<DestinationVar,TypeExprPtr>> get_destination() const;//For faster access if needed
-    virtual InstType get_type() const = 0;
-    virtual InstructionStmtPtr get_instruction_stmt() const = 0;//For error reporting
+    virtual std::optional<std::pair<DestinationVar,IR::TypeExprPtr>> get_destination() const;//For faster access if needed
+    virtual InstType get_inst_type() const = 0;
+    virtual IR::InstructionStmtPtr get_instruction_stmt() const = 0;//For error reporting
     virtual std::string to_string() const = 0;
-    DebugInfoPtr get_debug_info() const;//Return get_instruction_stmt()->get_value()->get_debug_info() if get_value() is not empty else nullptr.
+    virtual IR::DebugInfoPtr get_debug_info() const final;//Return get_instruction_stmt()->get_value()->get_debug_info() if get_value() is not empty else nullptr.
 };
 
 using InstPtr = std::shared_ptr<Inst>;
@@ -30,4 +31,5 @@ struct FastMathAttr {
     bool afns = false;
     bool reassoc = false;
 };
+}
 }

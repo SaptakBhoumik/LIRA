@@ -6,6 +6,7 @@
 #include <vector>
 
 namespace LIRA {
+namespace IR {
 using TokenList = std::vector<Token>;
 class Lexer {
     // ---- stored data ----
@@ -13,7 +14,7 @@ class Lexer {
     std::string input;
     std::string filename;
     std::vector<std::string> source_lines;
-    std::vector<Diagnostic> diagnostics;   // collected errors/warnings
+    std::vector<Utils::Diagnostic> diagnostics;   // collected errors/warnings
 
     // ---- cursor state ----
     size_t curr_index = 0;
@@ -43,7 +44,7 @@ class Lexer {
     static TokenType get_identifier_type(const std::string& s);
 
     // Build a Location from the current cursor position
-    Location here() const;
+    Utils::Location here() const;
 
     void flush_keyword();
     void push(const std::string& value, TokenType type, size_t start, size_t end);
@@ -51,7 +52,7 @@ class Lexer {
     void handle_newline_tracking();
 
     // Record a diagnostic (does not stop lexing immediately)
-    void report(DiagLevel level,const std::string& message,const std::string& sub_message = "",const std::string& code = "");
+    void report(Utils::DiagLevel level,const std::string& message,const std::string& sub_message = "",const std::string& code = "");
 
     void report_error(const std::string& msg, const std::string& sub = "");
     void report_warning(const std::string& msg, const std::string& sub = "");
@@ -68,7 +69,7 @@ public:
     bool has_errors()  const;
 
     // Expose collected diagnostics so other compiler stages can merge them
-    const std::vector<Diagnostic>& get_diagnostics() const;
+    const std::vector<Utils::Diagnostic>& get_diagnostics() const;
 };
-
+}
 } // namespace LIRA

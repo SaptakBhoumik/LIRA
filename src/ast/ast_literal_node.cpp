@@ -2,6 +2,7 @@
 #include "lexer/token.hpp"
 
 namespace LIRA {
+namespace IR {
 NamedLiteralExpr::NamedLiteralExpr(Token name){
     this->name = name;
 }
@@ -137,5 +138,6 @@ std::string StructLiteralExpr::to_string() const{
         }
     }
     return res+"}";
+}
 }
 }

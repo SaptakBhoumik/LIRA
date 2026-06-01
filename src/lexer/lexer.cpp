@@ -7,6 +7,7 @@
 #include <unordered_map>
 
 namespace LIRA {
+namespace IR {
 Lexer::Lexer(const std::string& source, const std::string& filename): input(source), filename(filename){
     if (this->input.empty()) {
         this->result.push_back(Token{0, "", "<eof>", 0, 0, 1, TokenType::eof});
@@ -404,5 +405,6 @@ void Lexer::lex_slash() {
     else {
         this->curr_keyword += this->curr_char; 
     }
+}
 }
 } // namespace LIRA

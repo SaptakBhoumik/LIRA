@@ -4,6 +4,7 @@
 #include <iostream>
 
 namespace LIRA {
+namespace IR {
 void Parser::advance() {
     this->curr_index++;
     if (this->curr_index < this->toks.size()) {
@@ -38,8 +39,8 @@ void Parser::expect(TokenType expected_type, std::string msg,std::string submsg,
 
 [[noreturn]] void Parser::error(Token tok, std::string msg,std::string submsg,std::string ecode) {
     //display error
-    Location loc{tok.line, tok.col, this->filename, tok.source_line};
-    Diagnostic err = {loc,
+    Utils::Location loc{tok.line, tok.col, this->filename, tok.source_line};
+    Utils::Diagnostic err = {loc,
                    std::string(msg),
                    submsg,
                    ecode,
@@ -47,5 +48,6 @@ void Parser::expect(TokenType expected_type, std::string msg,std::string submsg,
 
     display(err);
     exit(1);
+}
 }
 }

@@ -1,6 +1,7 @@
 #include "ast/ast.hpp"
 
 namespace LIRA {
+namespace IR {
 NamedTypeExpr::NamedTypeExpr(Token name, std::vector<AttributePtr> attributes){
     this->name = name;
     this->attributes = attributes;
@@ -404,5 +405,6 @@ std::vector<AttributePtr> AnyTypeExpr::get_attributes() const{
 }
 std::string AnyTypeExpr::to_string() const{
     return "(AnyTypeExpr " + this->original_type->to_string() + ")";
+}
 }
 }

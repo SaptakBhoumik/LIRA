@@ -2,311 +2,261 @@
 #include "ast/ast.hpp"
 #include "_instruction.hpp"
 namespace LIRA {
+namespace MIR {
 // --------------------------- Arithmatic Binary operations ---------------------------
 class ArithmeticBinaryInst:public Inst {
     protected:
-    InstructionStmtPtr instruction_stmt;
+    IR::InstructionStmtPtr instruction_stmt;
 
     std::optional<DestinationVar> destination;//The destination variable token for identifying the output variable
-    LiteralExprPtr lhs;
-    LiteralExprPtr rhs;
-    TypeExprPtr type;//Reduced type. 
+    IR::LiteralExprPtr lhs;
+    IR::LiteralExprPtr rhs;
+    IR::TypeExprPtr type;//Reduced type. 
     public:
-    ArithmeticBinaryInst(InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, LiteralExprPtr lhs, LiteralExprPtr rhs, TypeExprPtr type);
+    ArithmeticBinaryInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type);
 
     virtual ~ArithmeticBinaryInst() = default;
 
-    TypeExprPtr get_operand_type() const;
-    LiteralExprPtr get_lhs() const;
-    LiteralExprPtr get_rhs() const;
+    virtual IR::TypeExprPtr get_operand_type() const final;
+    virtual IR::LiteralExprPtr get_lhs() const final;
+    virtual IR::LiteralExprPtr get_rhs() const final;
 
-    std::optional<std::pair<DestinationVar,TypeExprPtr>> get_destination() const override;
-    InstructionStmtPtr get_instruction_stmt() const override;
+    virtual std::optional<std::pair<DestinationVar,IR::TypeExprPtr>> get_destination() const override final;
+    virtual InstType get_inst_type() const override final;
+    virtual IR::InstructionStmtPtr get_instruction_stmt() const override final;
 };
 
 // ---------------------------- Integer binary operations ---------------------------
-class IntAddInst:public ArithmeticBinaryInst {
+class IntArithmeticBinaryInst:public ArithmeticBinaryInst {
     bool nuw;//Whether it has the nsw or nuw attribute. 
     bool nsw;//Whether it has the nsw or nuw attribute. 
+    bool unsigned_;//Whether it is unsigned operation or not
+    bool exact;//Whether it has the exact attribute
+    //Few instructions dont have all these attributes. For that we return false and in typechecker we make sure unsupported attributes are not used
     public:
-    IntAddInst(InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, LiteralExprPtr lhs, LiteralExprPtr rhs, TypeExprPtr type, 
+    IntArithmeticBinaryInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+                            bool nuw, bool nsw, bool unsigned_, bool exact);
+
+    virtual bool is_nuw() const final;
+    virtual bool is_nsw() const final;
+    virtual bool is_unsigned() const final;
+    virtual bool is_exact() const final;
+
+    virtual std::shared_ptr<IR::IntTypeExpr> get_casted_operand_type() const final;//Returns the operand type casted to IntTypeExpr. Just a helper function to make life easier
+    virtual std::size_t get_bit_width() const final;//Returns the bit width of the operand type. Just a helper function to make life easier
+};
+
+class IntAddInst:public IntArithmeticBinaryInst {
+    public:
+    IntAddInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type, 
                 bool nuw, bool nsw);
 
-    bool is_nuw() const;
-    bool is_nsw() const;
-    std::shared_ptr<IntTypeExpr> get_casted_operand_type() const;//Returns the operand type casted to IntTypeExpr. Just a helper function to make life easier
-
-    InstType get_type() const override;
     std::string to_string() const override;
 };
 
 
-class IntSubInst:public ArithmeticBinaryInst {
-    bool nuw;//Whether it has the nsw or nuw attribute. 
-    bool nsw;//Whether it has the nsw or nuw attribute. 
+class IntSubInst:public IntArithmeticBinaryInst {
     public:
-    IntSubInst(InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, LiteralExprPtr lhs, LiteralExprPtr rhs, TypeExprPtr type, 
+    IntSubInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type, 
                 bool nuw, bool nsw);
 
-    bool is_nuw() const;
-    bool is_nsw() const;
-    std::shared_ptr<IntTypeExpr> get_casted_operand_type() const;//Returns the operand type casted to IntTypeExpr. Just a helper function to make life easier
-
-    InstType get_type() const override;
     std::string to_string() const override;
 };
 
 
-class IntMulInst:public ArithmeticBinaryInst {
-    bool nuw;//Whether it has the nsw or nuw attribute. 
-    bool nsw;//Whether it has the nsw or nuw attribute. 
+class IntMulInst:public IntArithmeticBinaryInst {
     public:
-    IntMulInst(InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, LiteralExprPtr lhs, LiteralExprPtr rhs, TypeExprPtr type, 
+    IntMulInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type, 
                 bool nuw, bool nsw);
 
-    bool is_nuw() const;
-    bool is_nsw() const;
-    std::shared_ptr<IntTypeExpr> get_casted_operand_type() const;//Returns the operand type casted to IntTypeExpr. Just a helper function to make life easier
-
-    InstType get_type() const override;
     std::string to_string() const override;
 };
 
-class IntDivInst:public ArithmeticBinaryInst {
-    bool unsigned_;//Whether it is unsigned division or not.
-    bool exact;//Whether it has the exact attribute.
+class IntDivInst:public IntArithmeticBinaryInst {
     public:
-    IntDivInst(InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, LiteralExprPtr lhs, LiteralExprPtr rhs, TypeExprPtr type, 
+    IntDivInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type, 
                 bool unsigned_, bool exact);
 
-    bool is_unsigned() const;
-    bool is_exact() const;
-    std::shared_ptr<IntTypeExpr> get_casted_operand_type() const;//Returns the operand type casted to IntTypeExpr. Just a helper function to make life easier
-
-    InstType get_type() const override;
     std::string to_string() const override;
 };
 
-class IntRemInst:public ArithmeticBinaryInst {
-    bool unsigned_;//Whether it is unsigned remainder or not.
+class IntRemInst:public IntArithmeticBinaryInst {
     public:
-    IntRemInst(InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, LiteralExprPtr lhs, LiteralExprPtr rhs, TypeExprPtr type, 
+    IntRemInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type, 
                 bool unsigned_);
 
-    bool is_unsigned() const;
-    std::shared_ptr<IntTypeExpr> get_casted_operand_type() const;//Returns the operand type casted to IntTypeExpr. Just a helper function to make life easier
-
-    InstType get_type() const override;
     std::string to_string() const override;
 };
 
 // ----------------------------- Vector integer binary operations ---------------------------
-class VecIntAddInst:public ArithmeticBinaryInst {
+class VecIntArithmeticBinaryInst:public ArithmeticBinaryInst {
     bool nuw;//Whether it has the nsw or nuw attribute. 
     bool nsw;//Whether it has the nsw or nuw attribute. 
+    bool unsigned_;//Whether it is unsigned operation or not
+    bool exact;//Whether it has the exact attribute
+    //Few instructions dont have all these attributes. For that we return false and in typechecker we make sure unsupported attributes are not used
     public:
-    VecIntAddInst(InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, LiteralExprPtr lhs, LiteralExprPtr rhs, TypeExprPtr type, 
+    VecIntArithmeticBinaryInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+                                bool nuw, bool nsw, bool unsigned_, bool exact);
+
+    virtual bool is_nuw() const final;
+    virtual bool is_nsw() const final;
+    virtual bool is_unsigned() const final;
+    virtual bool is_exact() const final;
+
+    virtual std::shared_ptr<IR::SIMDTypeExpr> get_casted_operand_type() const final;//Returns the operand type casted to SIMDTypeExpr. Just a helper function to make life easier
+    virtual std::size_t get_basetype_width() const final;//Returns the bit width of the operand basetype. Just a helper function to make life easier
+    virtual std::size_t get_num_elements() const final;//Returns the number of elements in the vector. Just a helper function to make life easier
+};
+
+class VecIntAddInst:public VecIntArithmeticBinaryInst {
+    public:
+    VecIntAddInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type, 
                 bool nuw, bool nsw);
 
-    bool is_nuw() const;
-    bool is_nsw() const;
-    std::shared_ptr<SIMDTypeExpr> get_casted_operand_type() const;//Returns the operand type casted to SIMDTypeExpr. Just a helper function to make life easier
-
-    InstType get_type() const override;
     std::string to_string() const override;
 };
 
 
-class VecIntSubInst:public ArithmeticBinaryInst {
-    bool nuw;//Whether it has the nsw or nuw attribute. 
-    bool nsw;//Whether it has the nsw or nuw attribute. 
+class VecIntSubInst:public VecIntArithmeticBinaryInst {
     public:
-    VecIntSubInst(InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, LiteralExprPtr lhs, LiteralExprPtr rhs, TypeExprPtr type, 
+    VecIntSubInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type, 
                 bool nuw, bool nsw);
 
-    bool is_nuw() const;
-    bool is_nsw() const;
-   std::shared_ptr<SIMDTypeExpr> get_casted_operand_type() const;//Returns the operand type casted to SIMDTypeExpr. Just a helper function to make life easier
-
-    InstType get_type() const override;
     std::string to_string() const override;
 };
 
 
-class VecIntMulInst:public ArithmeticBinaryInst {
-    bool nuw;//Whether it has the nsw or nuw attribute. 
-    bool nsw;//Whether it has the nsw or nuw attribute. 
+class VecIntMulInst:public VecIntArithmeticBinaryInst {
     public:
-    VecIntMulInst(InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, LiteralExprPtr lhs, LiteralExprPtr rhs, TypeExprPtr type, 
+    VecIntMulInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type, 
                 bool nuw, bool nsw);
 
-    bool is_nuw() const;
-    bool is_nsw() const;
-    std::shared_ptr<SIMDTypeExpr> get_casted_operand_type() const;//Returns the operand type casted to SIMDTypeExpr. Just a helper function to make life easier
-
-    InstType get_type() const override;
     std::string to_string() const override;
 };
 
-class VecIntDivInst:public ArithmeticBinaryInst {
-    bool unsigned_;//Whether it is unsigned division or not.
-    bool exact;//Whether it has the exact attribute.
+class VecIntDivInst:public VecIntArithmeticBinaryInst {
     public:
-    VecIntDivInst(InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, LiteralExprPtr lhs, LiteralExprPtr rhs, TypeExprPtr type, 
+    VecIntDivInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type, 
                 bool unsigned_, bool exact);
 
-    bool is_unsigned() const;
-    bool is_exact() const;
-    std::shared_ptr<SIMDTypeExpr> get_casted_operand_type() const;//Returns the operand type casted to SIMDTypeExpr. Just a helper function to make life easier
-
-    InstType get_type() const override;
     std::string to_string() const override;
 };
 
-class VecIntRemInst:public ArithmeticBinaryInst {
-    bool unsigned_;//Whether it is unsigned remainder or not.
+class VecIntRemInst:public VecIntArithmeticBinaryInst {
     public:
-    VecIntRemInst(InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, LiteralExprPtr lhs, LiteralExprPtr rhs, TypeExprPtr type, 
+    VecIntRemInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type, 
                 bool unsigned_);
 
-    bool is_unsigned() const;
-    std::shared_ptr<SIMDTypeExpr> get_casted_operand_type() const;//Returns the operand type casted to SIMDTypeExpr. Just a helper function to make life easier
-
-    InstType get_type() const override;
     std::string to_string() const override;
 };
 
 
 // ---------------------------- Float binary operations ---------------------------
-class FloatAddInst:public ArithmeticBinaryInst {
+class FloatArithmeticBinaryInst:public ArithmeticBinaryInst {
     FastMathAttr fast_math_attr;
     public:
-    FloatAddInst(InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, LiteralExprPtr lhs, LiteralExprPtr rhs, TypeExprPtr type, 
+    FloatArithmeticBinaryInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+                                FastMathAttr fast_math_attr);
+
+    virtual FastMathAttr get_fast_math_attr() const final;
+
+    virtual std::shared_ptr<IR::FloatTypeExpr> get_casted_operand_type() const final;//Returns the operand type casted to SIMDTypeExpr. Just a helper function to make life easier
+    virtual std::size_t get_bit_width() const final;//Returns the bit width of the operand type. Just a helper function to make life easier
+};
+class FloatAddInst:public FloatArithmeticBinaryInst {
+    public:
+    FloatAddInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type, 
                 FastMathAttr fast_math_attr);
 
-    FastMathAttr get_fast_math_attr() const;
-    std::shared_ptr<FloatTypeExpr> get_casted_operand_type() const;//Returns the operand type casted to FloatTypeExpr. Just a helper function to make life easier
-
-    InstType get_type() const override;
     std::string to_string() const override;
 };
 
-class FloatSubInst:public ArithmeticBinaryInst {
-    FastMathAttr fast_math_attr;
+class FloatSubInst:public FloatArithmeticBinaryInst {
     public:
-    FloatSubInst(InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, LiteralExprPtr lhs, LiteralExprPtr rhs, TypeExprPtr type, 
+    FloatSubInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type, 
                 FastMathAttr fast_math_attr);
 
-    FastMathAttr get_fast_math_attr() const;
-    std::shared_ptr<FloatTypeExpr> get_casted_operand_type() const;//Returns the operand type casted to FloatTypeExpr. Just a helper function to make life easier
-
-    InstType get_type() const override;
     std::string to_string() const override;
 };
 
-class FloatMulInst:public ArithmeticBinaryInst {
-    FastMathAttr fast_math_attr;
+class FloatMulInst:public FloatArithmeticBinaryInst {
     public:
-    FloatMulInst(InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, LiteralExprPtr lhs, LiteralExprPtr rhs, TypeExprPtr type, 
+    FloatMulInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type, 
                 FastMathAttr fast_math_attr);
 
-    FastMathAttr get_fast_math_attr() const;
-    std::shared_ptr<FloatTypeExpr> get_casted_operand_type() const;//Returns the operand type casted to FloatTypeExpr. Just a helper function to make life easier
-
-    InstType get_type() const override;
     std::string to_string() const override;
 };
 
-class FloatDivInst:public ArithmeticBinaryInst {
-    FastMathAttr fast_math_attr;
+class FloatDivInst:public FloatArithmeticBinaryInst {
     public:
-    FloatDivInst(InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, LiteralExprPtr lhs, LiteralExprPtr rhs, TypeExprPtr type, 
+    FloatDivInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type, 
                 FastMathAttr fast_math_attr);
 
-    FastMathAttr get_fast_math_attr() const;
-    std::shared_ptr<FloatTypeExpr> get_casted_operand_type() const;//Returns the operand type casted to FloatTypeExpr. Just a helper function to make life easier
-
-    InstType get_type() const override;
     std::string to_string() const override;
 };
 
-class FloatRemInst:public ArithmeticBinaryInst {
-    FastMathAttr fast_math_attr;
+class FloatRemInst:public FloatArithmeticBinaryInst {
     public:
-    FloatRemInst(InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, LiteralExprPtr lhs, LiteralExprPtr rhs, TypeExprPtr type, 
+    FloatRemInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type, 
                 FastMathAttr fast_math_attr);
 
-    FastMathAttr get_fast_math_attr() const;
-    std::shared_ptr<FloatTypeExpr> get_casted_operand_type() const;//Returns the operand type casted to FloatTypeExpr. Just a helper function to make life easier
-
-    InstType get_type() const override;
     std::string to_string() const override;
 };
 
 
 // ---------------------------- Vector Float binary operations ---------------------------
-class VecFloatAddInst:public ArithmeticBinaryInst {
+class VecFloatArithmeticBinaryInst:public ArithmeticBinaryInst {
     FastMathAttr fast_math_attr;
     public:
-    VecFloatAddInst(InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, LiteralExprPtr lhs, LiteralExprPtr rhs, TypeExprPtr type, 
+    VecFloatArithmeticBinaryInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+                                FastMathAttr fast_math_attr);
+
+    virtual FastMathAttr get_fast_math_attr() const final;
+
+    virtual std::shared_ptr<IR::SIMDTypeExpr> get_casted_operand_type() const final;//Returns the operand type casted to SIMDTypeExpr. Just a helper function to make life easier
+    virtual std::shared_ptr<IR::FloatTypeExpr> get_basetype() const final;//We dont return width of base type because it can be f16,bf16 and so on. Width alone not enough
+    virtual std::size_t get_num_elements() const final;//Returns the number of elements in the vector. Just a helper function to make life easier
+};
+
+class VecFloatAddInst:public VecFloatArithmeticBinaryInst {
+    public:
+    VecFloatAddInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type, 
                     FastMathAttr fast_math_attr);
 
-    FastMathAttr get_fast_math_attr() const;
-    std::shared_ptr<SIMDTypeExpr> get_casted_operand_type() const;//Returns the operand type casted to SIMDTypeExpr. Just a helper function to make life easier
-
-    InstType get_type() const override;
     std::string to_string() const override;
 };
 
-class VecFloatSubInst:public ArithmeticBinaryInst {
-    FastMathAttr fast_math_attr;
+class VecFloatSubInst:public VecFloatArithmeticBinaryInst {
     public:
-    VecFloatSubInst(InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, LiteralExprPtr lhs, LiteralExprPtr rhs, TypeExprPtr type, 
+    VecFloatSubInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type, 
                     FastMathAttr fast_math_attr);
 
-    FastMathAttr get_fast_math_attr() const;
-    std::shared_ptr<SIMDTypeExpr> get_casted_operand_type() const;//Returns the operand type casted to SIMDTypeExpr. Just a helper function to make life easier
-
-    InstType get_type() const override;
     std::string to_string() const override;
 };
 
-class VecFloatMulInst:public ArithmeticBinaryInst {
-    FastMathAttr fast_math_attr;
+class VecFloatMulInst:public VecFloatArithmeticBinaryInst {
     public:
-    VecFloatMulInst(InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, LiteralExprPtr lhs, LiteralExprPtr rhs, TypeExprPtr type, 
+    VecFloatMulInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type, 
                     FastMathAttr fast_math_attr);
 
-    FastMathAttr get_fast_math_attr() const;
-    std::shared_ptr<SIMDTypeExpr> get_casted_operand_type() const;//Returns the operand type casted to SIMDTypeExpr. Just a helper function to make life easier
-
-    InstType get_type() const override;
     std::string to_string() const override;
 };
 
-class VecFloatDivInst:public ArithmeticBinaryInst {
-    FastMathAttr fast_math_attr;
+class VecFloatDivInst:public VecFloatArithmeticBinaryInst {
     public:
-    VecFloatDivInst(InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, LiteralExprPtr lhs, LiteralExprPtr rhs, TypeExprPtr type, 
+    VecFloatDivInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type, 
                     FastMathAttr fast_math_attr);
 
-    FastMathAttr get_fast_math_attr() const;
-    std::shared_ptr<SIMDTypeExpr> get_casted_operand_type() const;//Returns the operand type casted to SIMDTypeExpr. Just a helper function to make life easier
-
-    InstType get_type() const override;
     std::string to_string() const override;
 };
 
-class VecFloatRemInst:public ArithmeticBinaryInst {
-    FastMathAttr fast_math_attr;
+class VecFloatRemInst:public VecFloatArithmeticBinaryInst {
     public:
-    VecFloatRemInst(InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, LiteralExprPtr lhs, LiteralExprPtr rhs, TypeExprPtr type, 
+    VecFloatRemInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type, 
                     FastMathAttr fast_math_attr);
 
-    FastMathAttr get_fast_math_attr() const;
-    std::shared_ptr<SIMDTypeExpr> get_casted_operand_type() const;//Returns the operand type casted to SIMDTypeExpr. Just a helper function to make life easier
-
-    InstType get_type() const override;
     std::string to_string() const override;
 };
+}
 }

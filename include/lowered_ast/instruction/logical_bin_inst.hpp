@@ -13,13 +13,23 @@ class LogicalBinaryInst:public Inst {
     IR::LiteralExprPtr rhs;
     IR::TypeExprPtr type;//Reduced type. 
     public:
+    enum class OpType:std::uint32_t{
+        AND = 1 << 6,
+        OR = 1 << 7,
+        XOR = 1 << 8,
+        SHL = 1 << 9,
+        LSHL = 1 << 10,
+        ASHL = 1 << 11
+    };
     LogicalBinaryInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type);
 
     virtual ~LogicalBinaryInst() = default;
 
+    virtual InstOperandTypeVarient get_operand_type_varient() const final;//Can be calculated easily from ``type``. Just a helper function
     virtual IR::TypeExprPtr get_operand_type() const final;
     virtual IR::LiteralExprPtr get_lhs() const final;
     virtual IR::LiteralExprPtr get_rhs() const final;
+    virtual OpType get_op_type() const = 0;//Whether it is and,or,xor,shl,lshr,ashl.
 
     virtual std::optional<std::pair<DestinationVar,IR::TypeExprPtr>> get_destination() const override final;//Will figure out the type of destination on it's own. <i1,M> if ``type``
                                                                                           //is vector and i1 if it is scalar
@@ -59,6 +69,7 @@ class IntORInst:public IntLogicalBinaryInst {
     IntORInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type, 
               bool disjoint);
 
+    OpType get_op_type() const override final;
     std::string to_string() const override;
 };
 
@@ -66,6 +77,7 @@ class IntXORInst:public IntLogicalBinaryInst {
     public:
     IntXORInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type);
 
+    OpType get_op_type() const override final;
     std::string to_string() const override;
 };
 
@@ -74,6 +86,7 @@ class IntSHLInst:public IntLogicalBinaryInst {
     IntSHLInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                 bool nuw, bool nsw);
 
+    OpType get_op_type() const override final;
     std::string to_string() const override;
 };
 
@@ -82,6 +95,7 @@ class IntLSHRInst:public IntLogicalBinaryInst {
     IntLSHRInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                 bool exact);
 
+    OpType get_op_type() const override final;
     std::string to_string() const override;
 };
 
@@ -90,6 +104,7 @@ class IntASHRInst:public IntLogicalBinaryInst {
     IntASHRInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                 bool exact);
 
+    OpType get_op_type() const override final;
     std::string to_string() const override;
 };
 
@@ -120,6 +135,7 @@ class VecIntANDInst:public VecIntLogicalBinaryInst {
     public:
     VecIntANDInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type);
 
+    OpType get_op_type() const override final;
     std::string to_string() const override;
 };
 
@@ -130,6 +146,7 @@ class VecIntORInst:public VecIntLogicalBinaryInst {
     VecIntORInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type, 
               bool disjoint);
 
+    OpType get_op_type() const override final;
     std::string to_string() const override;
 };
 
@@ -137,6 +154,7 @@ class VecIntXORInst:public VecIntLogicalBinaryInst {
     public:
     VecIntXORInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type);
 
+    OpType get_op_type() const override final;
     std::string to_string() const override;
 };
 
@@ -145,6 +163,7 @@ class VecIntSHLInst:public VecIntLogicalBinaryInst {
     VecIntSHLInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                    bool nuw, bool nsw);
 
+    OpType get_op_type() const override final;
     std::string to_string() const override;
 };
 
@@ -153,6 +172,7 @@ class VecIntLSHRInst:public VecIntLogicalBinaryInst {
     VecIntLSHRInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                 bool exact);
 
+    OpType get_op_type() const override final;
     std::string to_string() const override;
 };
 
@@ -161,6 +181,7 @@ class VecIntASHRInst:public VecIntLogicalBinaryInst {
     VecIntASHRInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                     bool exact);
 
+    OpType get_op_type() const override final;
     std::string to_string() const override;
 };
 }

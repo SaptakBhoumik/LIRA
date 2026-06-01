@@ -59,7 +59,7 @@
 
     If ``T0`` is float/brain float then it can have the fast math attribute like ``#[fast]`` or ``#[nnan]`` or ``#[ninf]`` or ``#[nsz]`` or ``#[arcp]`` or ``#[contract]`` or ``#[afn]`` or ``#[reassoc]`` or any combination of these. It can also have the attribute ``#[unordered]`` to indicate that if any of the input is NaN then the result is true. By default it is ordered comparison where if any of the input is NaN then the result is false.
 
-- `` let T1:%output_var = .ne(T:%input_var1, T:%input_var2)`` :- Compares 2 values for inequality. T can be any type of form ``T0`` or ``<T0,M>`` where T0 is some float/brain float/integer/ptr. The output is of type i1/<i1,M> based on if input type is vector or not
+- `` let T1:%output_var = .neq(T:%input_var1, T:%input_var2)`` :- Compares 2 values for inequality. T can be any type of form ``T0`` or ``<T0,M>`` where T0 is some float/brain float/integer/ptr. The output is of type i1/<i1,M> based on if input type is vector or not
 
     If ``T0`` is float/brain float then it can have the fast math attribute like ``#[fast]`` or ``#[nnan]`` or ``#[ninf]`` or ``#[nsz]`` or ``#[arcp]`` or ``#[contract]`` or ``#[afn]`` or ``#[reassoc]`` or any combination of these. It can also have the attribute ``#[unordered]`` to indicate that if any of the input is NaN then the result is true. By default it is ordered comparison where if any of the input is NaN then the result is false.
 

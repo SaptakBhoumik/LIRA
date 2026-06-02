@@ -117,7 +117,7 @@
     It relies on the type T2 to determine the kind of extension and how the value is extended. So no need to seperately specify the type of output/output bitwidth in the .ext instruction. The type of output variable is enough to determine the type of extension and how the value is extended.
 
     If the base type is integer then it can have the attribute ``#[unsigned]`` to indicate that it is zero extension. By default it is sign extension. If you have
-    ``#[unsigned]`` then it is equivalent to zext of llvm. You can also have the attribute ``#[nsb]`` to indicate the same thing as nneg on llvm. ``#[nsb]`` is only valid when you also have ``#[unsigned]``. If you have both ``#[unsigned]`` and ``#[nsb]`` then it is zero extension with the additional assumption that the value's sign bit is 0(Gives a tighter range. Like for i8 the usual range is 0 to 255 but with #[nsb] the range is 0 to 127).
+    ``#[unsigned]`` then it is equivalent to zext of llvm. You can also have the attribute ``#[nsb]``(stands for no signed bits) to indicate the same thing as nneg on llvm. ``#[nsb]`` is only valid when you also have ``#[unsigned]``. If you have both ``#[unsigned]`` and ``#[nsb]`` then it is zero extension with the additional assumption that the value's sign bit is 0(Gives a tighter range. Like for i8 the usual range is 0 to 255 but with #[nsb] the range is 0 to 127).
 
 
 - `` let T2:%output_var = .float_to_int(T1:%input_var)`` :- Converts a float/brain float/vector of float of type T1 to an integer/vector of integer pf type T2. 
@@ -133,8 +133,10 @@
     It can have the attribute ``#[unsigned]`` to indicate that it is unsigned conversion(The int is unsigned). By default it is signed conversion.
 
 - `` let T2:%output_var = .ptr_to_int(T1:%input_var)`` :- Converts a pointer/vector of pointer of type T1 to an integer/vector of i64 of type T2. Yes the int must be of type i64 or vector of i64(Because only supporting 64 bit systems). Use .trunc after ptr_to_int if you want to convert to a smaller integer type.
+Unlikely but in future if we support other bit system like 32 bit then we have to modify the type constraint of T2 a bit
 
 - `` let T2:%output_var = .int_to_ptr(T1:%input_var)`` :- Converts an integer/vector of i64 of type T1 to a pointer/vector of pointer of type T2. Yes the int must be of type i64 or vector of i64(Because only supporting 64 bit systems). Use .ext before int_to_ptr if you want to convert from a smaller integer type.
+Unlikely but in future if we support other bit system like 32 bit then we have to modify the type constraint of T1 a bit
 
 - `` let T2:%output_var = .bitcast(T1:%input_var)`` :- Bitcast from T1 to T2. T1 and T2 must be of the same bitwidth and can be any type as long as same bit width. It just reinterprets the bits of the value of T1 as a value of type T2. So it does not change the bits of the value, it just changes how the bits are interpreted. You cant bitcast between i64 and ptr
     

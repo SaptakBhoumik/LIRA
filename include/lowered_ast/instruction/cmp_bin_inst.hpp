@@ -33,6 +33,7 @@ class CmpBinaryInst:public Inst {
     virtual IR::LiteralExprPtr get_lhs() const final;
     virtual IR::LiteralExprPtr get_rhs() const final;
     virtual OpType get_op_type() const = 0;//Whether it is eq,neq,lt,gt,le,ge,either_nan or neither_nan.
+    //Dont implement bitwidth helper here because for vector it is not that helpful
 
     virtual std::optional<std::pair<DestinationVar,IR::TypeExprPtr>> get_destination() const override final;//Will figure out the type of destination on it's own. <i1,M> if ``type``
                                                                                           //is vector and i1 if it is scalar
@@ -181,7 +182,8 @@ class VecIntGeInst:public VecIntCmpBinaryInst {
 // ---------------------------Int Comparison Binary operations ---------------------------
 class PtrCmpBinaryInst:public CmpBinaryInst {
     public:
-    PtrCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type);
+    //We already know the in type. No need to get the type again because it is always ptr
+    PtrCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
 
     virtual std::size_t get_bit_width() const final;//Returns the bit width of the operand type. We only support x86_64 so returns 64. I made this function just in case we support more arch in future
                                                     //Just a helper function to make life easier. 
@@ -189,7 +191,7 @@ class PtrCmpBinaryInst:public CmpBinaryInst {
 
 class PtrEqInst:public PtrCmpBinaryInst {
     public:
-    PtrEqInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type);
+    PtrEqInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -197,7 +199,7 @@ class PtrEqInst:public PtrCmpBinaryInst {
 
 class PtrNeqInst:public PtrCmpBinaryInst {
     public:
-    PtrNeqInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type);
+    PtrNeqInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -205,7 +207,7 @@ class PtrNeqInst:public PtrCmpBinaryInst {
 
 class PtrLtInst:public PtrCmpBinaryInst {
     public:
-    PtrLtInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type);
+    PtrLtInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -213,7 +215,7 @@ class PtrLtInst:public PtrCmpBinaryInst {
 
 class PtrGtInst:public PtrCmpBinaryInst {
     public:
-    PtrGtInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type);
+    PtrGtInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -222,7 +224,7 @@ class PtrGtInst:public PtrCmpBinaryInst {
 
 class PtrLeInst:public PtrCmpBinaryInst {
     public:
-    PtrLeInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type);
+    PtrLeInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -231,7 +233,7 @@ class PtrLeInst:public PtrCmpBinaryInst {
 
 class PtrGeInst:public PtrCmpBinaryInst {
     public:
-    PtrGeInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type);
+    PtrGeInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -249,6 +251,7 @@ class VecPtrCmpBinaryInst:public CmpBinaryInst {
 };
 
 class VecPtrEqInst:public VecPtrCmpBinaryInst {
+    //Here we take in the type because we need to know the number of element in vec. We could have just taken the number of element instead of the full type but this works
     public:
     VecPtrEqInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type);
 

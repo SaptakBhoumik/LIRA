@@ -2,23 +2,4 @@ Memory
 Debug/Intrinsic
 
 
-ret
-br
-switch
-indirectbr
-invoke
-callbr
-resume
-catchswitch
-catchret
-cleanupret
-unreachable
-
-phi
-select
-freeze
-call
-va_arg
-landingpad
-catchpad
-cleanuppad
+(xchg, add, sub, and, nand, or, xor, max, min, umax, umin, fadd, fsub, fmax, fmin)

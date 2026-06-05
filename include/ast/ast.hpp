@@ -2,6 +2,7 @@
 #include "lexer/token.hpp"
 #include "lexer/lexer.hpp"
 #include "error/error.hpp"
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <optional>
@@ -296,6 +297,9 @@ enum class LiteralKind:std::uint8_t{
     ArrayLiteralExpr,
     SIMDLiteralExpr,
     StructLiteralExpr,
+    NULLLiteralExpr,
+    ZeroInitLiteralExpr,
+    PoisonLiteralExpr,
 };
 class LiteralExpr{
     public:
@@ -380,6 +384,39 @@ class StructLiteralExpr : public LiteralExpr{
 
     LiteralKind get_kind() const override;
     Token get_token() const override;
+    std::string to_string() const override;
+};
+
+class NULLLiteralExpr : public LiteralExpr{
+    //null
+    Token tok;//the 'null' token for error reporting
+    public:
+    NULLLiteralExpr(Token tok);
+
+    Token get_token() const override;
+    LiteralKind get_kind() const override;
+    std::string to_string() const override;
+};
+
+class ZeroInitLiteralExpr : public LiteralExpr{
+    //zeroinitializer
+    Token tok;//the 'zeroinitializer' token for error reporting
+    public:
+    ZeroInitLiteralExpr(Token tok);
+
+    Token get_token() const override;
+    LiteralKind get_kind() const override;
+    std::string to_string() const override;
+};
+
+class PoisonLiteralExpr : public LiteralExpr{
+    //poison
+    Token tok;//the 'poison' token for error reporting
+    public:
+    PoisonLiteralExpr(Token tok);
+
+    Token get_token() const override;
+    LiteralKind get_kind() const override;
     std::string to_string() const override;
 };
 

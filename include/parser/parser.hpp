@@ -34,6 +34,9 @@ class Parser {
     LiteralExprPtr parse_array_literal_expr();
     LiteralExprPtr parse_simd_literal_expr();
     LiteralExprPtr parse_struct_literal_expr();
+    LiteralExprPtr parse_null_literal_expr();
+    LiteralExprPtr parse_zeroinit_literal_expr();
+    LiteralExprPtr parse_poison_literal_expr();
 
     // Parse attributes
     DebugInfoPtr parse_debug_info();//On ! token. 

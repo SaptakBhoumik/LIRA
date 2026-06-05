@@ -18,6 +18,15 @@ LiteralExprPtr Parser::parse_literal_expr(){
         case TokenType::number:{
             return parse_num_literal_expr();
         }
+        case TokenType::kw_null:{
+            return parse_null_literal_expr();
+        }
+        case TokenType::kw_zeroinitializer:{
+            return parse_zeroinit_literal_expr();
+        }
+        case TokenType::kw_poison:{
+            return parse_poison_literal_expr();
+        }
         case TokenType::lbracket:{
             return parse_array_literal_expr();
         }
@@ -40,6 +49,16 @@ LiteralExprPtr Parser::parse_string_literal_expr(){
 }
 LiteralExprPtr Parser::parse_num_literal_expr(){
     return std::make_shared<NumLiteralExpr>(this->curr_tok);
+}
+
+LiteralExprPtr Parser::parse_null_literal_expr(){
+    return std::make_shared<NULLLiteralExpr>(this->curr_tok);
+}
+LiteralExprPtr Parser::parse_zeroinit_literal_expr(){
+    return std::make_shared<ZeroInitLiteralExpr>(this->curr_tok);
+}
+LiteralExprPtr Parser::parse_poison_literal_expr(){
+    return std::make_shared<PoisonLiteralExpr>(this->curr_tok);
 }
 LiteralExprPtr Parser::parse_array_literal_expr(){
     Token tok = this->curr_tok;//the [ token
@@ -89,5 +108,6 @@ LiteralExprPtr Parser::parse_struct_literal_expr(){
     expect(TokenType::rbrace, "Expected '}' after struct literal elements in struct literal expression");
     return std::make_shared<StructLiteralExpr>(tok, elements);
 }
+
 }
 }

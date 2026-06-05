@@ -139,5 +139,50 @@ std::string StructLiteralExpr::to_string() const{
     }
     return res+"}";
 }
+
+
+NULLLiteralExpr::NULLLiteralExpr(Token tok){
+    this->tok = tok;
+}
+
+Token NULLLiteralExpr::get_token() const{
+    return this->tok;
+}
+LiteralKind NULLLiteralExpr::get_kind() const{
+    return LiteralKind::NULLLiteralExpr;
+}
+std::string NULLLiteralExpr::to_string() const{
+    return "null";
+}
+
+
+ZeroInitLiteralExpr::ZeroInitLiteralExpr(Token tok){
+    this->tok = tok;
+}
+
+Token ZeroInitLiteralExpr::get_token() const{
+    return this->tok;
+}
+LiteralKind ZeroInitLiteralExpr::get_kind() const{
+    return LiteralKind::ZeroInitLiteralExpr;
+}
+std::string ZeroInitLiteralExpr::to_string() const{
+    return "zeroinitializer";
+}
+
+
+PoisonLiteralExpr::PoisonLiteralExpr(Token tok){
+    this->tok = tok;
+}
+
+Token PoisonLiteralExpr::get_token() const{
+    return this->tok;
+}
+LiteralKind PoisonLiteralExpr::get_kind() const{
+    return LiteralKind::PoisonLiteralExpr;
+}
+std::string PoisonLiteralExpr::to_string() const{
+    return "poison";
+}
 }
 }

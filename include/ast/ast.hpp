@@ -189,7 +189,7 @@ class ArrayTypeExpr : public TypeExpr{
     public:
     ArrayTypeExpr(Token tok, TypeExprPtr base_type, Token size, std::vector<AttributePtr> attributes);
 
-    TypeExprPtr get_base_type() const;
+    TypeExprPtr get_basetype() const;
     Token get_size() const;
     
     TypeExprKind get_kind() const override;
@@ -208,7 +208,7 @@ class SIMDTypeExpr : public TypeExpr{
     public:
     SIMDTypeExpr(Token tok, TypeExprPtr base_type, Token size, std::vector<AttributePtr> attributes);
 
-    TypeExprPtr get_base_type() const;
+    TypeExprPtr get_basetype() const;
     Token get_size() const;
 
     TypeExprKind get_kind() const override;

@@ -96,7 +96,7 @@ inline std::optional<InstOperandTypeVarient> get_type_varient_from_type(const IR
         case IR::TypeExprKind::SIMDTypeExpr:{
                 auto simd_type = std::dynamic_pointer_cast<IR::SIMDTypeExpr>(type);
                 if(simd_type == nullptr) return std::nullopt;
-                auto element_type = simd_type->get_base_type();
+                auto element_type = simd_type->get_basetype();
                 switch(element_type->get_kind()){
                     case IR::TypeExprKind::IntTypeExpr:{
                         return InstOperandTypeVarient::VecInt;
@@ -128,6 +128,15 @@ constexpr std::uint32_t operator|(InstOperandTypeVarient a, E b) {
 enum class SyncScope:std::uint32_t{
     SingleThread = 1 << 0,
     Global = 1 << 1
+};
+
+enum class AtomicOrdering:std::uint32_t{
+    UNORDERED = 1 << 0,
+    MONOTONIC = 1 << 1,
+    ACQUIRE = 1 << 2,
+    RELEASE = 1 << 3,
+    ACQUIRE_RELEASE = 1 << 4, // acq_rel
+    SEQUENTIALLY_CONSISTENT = 1 << 5 // seq_cst
 };
 }
 }

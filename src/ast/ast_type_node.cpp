@@ -180,7 +180,7 @@ ArrayTypeExpr::ArrayTypeExpr(Token tok, TypeExprPtr base_type, Token size, std::
     this->attributes = attributes;
 }
 
-TypeExprPtr ArrayTypeExpr::get_base_type() const{
+TypeExprPtr ArrayTypeExpr::get_basetype() const{
     return this->base_type;
 }
 Token ArrayTypeExpr::get_size() const{
@@ -215,7 +215,7 @@ SIMDTypeExpr::SIMDTypeExpr(Token tok, TypeExprPtr base_type, Token size, std::ve
     this->attributes = attributes;
 }
 
-TypeExprPtr SIMDTypeExpr::get_base_type() const{
+TypeExprPtr SIMDTypeExpr::get_basetype() const{
     return this->base_type;
 }
 Token SIMDTypeExpr::get_size() const{

@@ -31,12 +31,12 @@ class UnaryInst:public Inst {
 };
 
 // --------------------------- Scalar Unary operations ---------------------------
-class RegularUnaryInst:public UnaryInst{
+class ScalarUnaryInst:public UnaryInst{
     // When the instruction doesnt act lane wise
     FastMathAttr fast_math_attr;//Only for floating point
     // Few instructions dont have all these attributes. For that we return false and in typechecker we make sure unsupported attributes are not used.
     public:
-    RegularUnaryInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value, IR::TypeExprPtr type, FastMathAttr fast_math_attr);
+    ScalarUnaryInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value, IR::TypeExprPtr type, FastMathAttr fast_math_attr);
 
     virtual FastMathAttr get_fast_math_attr() const final;
     virtual bool is_brain_float() const final;//Whether the operand type is brain float or not. Just a helper function to make life easier. False for integer
@@ -44,7 +44,7 @@ class RegularUnaryInst:public UnaryInst{
     virtual std::size_t get_type_bit_width() const final;//Returns the bit width of the in type. Calculated automatically
 };
 
-class IntNegInst:public RegularUnaryInst{
+class IntNegInst:public ScalarUnaryInst{
     public:
     IntNegInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value, IR::TypeExprPtr type);
 
@@ -54,7 +54,7 @@ class IntNegInst:public RegularUnaryInst{
     std::string to_string() const override;
 };
 
-class FloatNegInst:public RegularUnaryInst{
+class FloatNegInst:public ScalarUnaryInst{
     public:
     FloatNegInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value, IR::TypeExprPtr type, FastMathAttr fast_math_attr);
 
@@ -64,7 +64,7 @@ class FloatNegInst:public RegularUnaryInst{
     std::string to_string() const override;
 };
 
-class IntNotInst:public RegularUnaryInst{
+class IntNotInst:public ScalarUnaryInst{
     public:
     IntNotInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value, IR::TypeExprPtr type);
 

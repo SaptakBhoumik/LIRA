@@ -40,7 +40,7 @@ class ConversionInst:public Inst {
 };
 
 // --------------------------- Scalar conversion operations ---------------------------
-class RegularConversionInst:public ConversionInst{
+class ScalarConversionInst:public ConversionInst{
     // When the instruction doesnt act lane wise
     bool nuw;
     bool nsw;
@@ -48,7 +48,7 @@ class RegularConversionInst:public ConversionInst{
     bool unsigned_;
     // Few instructions dont have all these attributes. For that we return false and in typechecker we make sure unsupported attributes are not used.
     public:
-    RegularConversionInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
+    ScalarConversionInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
                          IR::TypeExprPtr out_type, bool nuw, bool nsw, bool nsb, bool unsigned_);
 
     virtual bool is_nuw() const final;
@@ -60,7 +60,7 @@ class RegularConversionInst:public ConversionInst{
     virtual std::size_t get_out_type_bit_width() const final;//Returns the bit width of the out type. Calculated automatically
 };
 
-class IntTruncInst:public RegularConversionInst{
+class IntTruncInst:public ScalarConversionInst{
     bool nuw;
     bool nsw;
     public:
@@ -76,7 +76,7 @@ class IntTruncInst:public RegularConversionInst{
     std::string to_string() const override;
 };
 
-class FloatTruncInst:public RegularConversionInst{
+class FloatTruncInst:public ScalarConversionInst{
     public:
     FloatTruncInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
                     IR::TypeExprPtr out_type);
@@ -92,7 +92,7 @@ class FloatTruncInst:public RegularConversionInst{
     std::string to_string() const override;
 };
 
-class IntExtInst:public RegularConversionInst{
+class IntExtInst:public ScalarConversionInst{
     bool nsb;
     bool unsigned_;
     public:
@@ -106,7 +106,7 @@ class IntExtInst:public RegularConversionInst{
     std::string to_string() const override;
 };
 
-class FloatExtInst:public RegularConversionInst{
+class FloatExtInst:public ScalarConversionInst{
     public:
     FloatExtInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
                     IR::TypeExprPtr out_type);
@@ -120,7 +120,7 @@ class FloatExtInst:public RegularConversionInst{
     std::string to_string() const override;
 };
 
-class FloatToIntInst:public RegularConversionInst{
+class FloatToIntInst:public ScalarConversionInst{
     bool unsigned_;
     public:
     FloatToIntInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
@@ -134,7 +134,7 @@ class FloatToIntInst:public RegularConversionInst{
     std::string to_string() const override;
 };
 
-class IntToFloatInst:public RegularConversionInst{
+class IntToFloatInst:public ScalarConversionInst{
     bool unsigned_;
     public:
     IntToFloatInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
@@ -148,7 +148,7 @@ class IntToFloatInst:public RegularConversionInst{
     std::string to_string() const override;
 };
 
-class PtrToIntInst:public RegularConversionInst{
+class PtrToIntInst:public ScalarConversionInst{
     public:
     //We already know the in type(ptr) and out type(i64). No need to store again
     PtrToIntInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value);
@@ -157,7 +157,7 @@ class PtrToIntInst:public RegularConversionInst{
     std::string to_string() const override;
 };
 
-class IntToPtrInst:public RegularConversionInst{
+class IntToPtrInst:public ScalarConversionInst{
     public:
     //We already know the in type(i64) and out type(ptr). No need to store again
     IntToPtrInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value);
@@ -166,7 +166,7 @@ class IntToPtrInst:public RegularConversionInst{
     std::string to_string() const override;
 };
 
-class BitCastInst:public RegularConversionInst{
+class BitCastInst:public ScalarConversionInst{
     public:
     //We already know the in type and out type have same bit width. No need to store again
     BitCastInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, IR::TypeExprPtr out_type);

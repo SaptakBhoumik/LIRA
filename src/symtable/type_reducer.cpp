@@ -31,12 +31,12 @@ IR::TypeExprPtr reduce_type_expr(IR::TypeExprPtr type, TypeSymTablePtr symtable)
         }
         case IR::TypeExprKind::ArrayTypeExpr:{
             auto array_type = std::dynamic_pointer_cast<IR::ArrayTypeExpr>(type);
-            auto reduced_base_type = reduce_type_expr(array_type->get_base_type(), symtable);
+            auto reduced_base_type = reduce_type_expr(array_type->get_basetype(), symtable);
             return std::make_shared<IR::ArrayTypeExpr>(array_type->get_token(), reduced_base_type, array_type->get_size(), array_type->get_attributes());
         }
         case IR::TypeExprKind::SIMDTypeExpr:{
             auto simd_type = std::dynamic_pointer_cast<IR::SIMDTypeExpr>(type);
-            auto reduced_base_type = reduce_type_expr(simd_type->get_base_type(), symtable);
+            auto reduced_base_type = reduce_type_expr(simd_type->get_basetype(), symtable);
             return std::make_shared<IR::SIMDTypeExpr>(simd_type->get_token(), reduced_base_type, simd_type->get_size(), simd_type->get_attributes());
         }
         case IR::TypeExprKind::StructTypeExpr:{

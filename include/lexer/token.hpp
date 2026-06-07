@@ -17,6 +17,7 @@ enum class TokenType {
     local_identifier, // %name
     label_identifier, // @name
     instruction_identifier, // .name
+    scope_identifier, // ^name
     builtin_identifier, // name
     
     // Brackets
@@ -43,6 +44,7 @@ enum class TokenType {
     kw_fn,          // 'fn' keyword (for fn definitions)
     kw_let,          // 'let' keyword (for let declarations)
     kw_label,        // 'label' keyword (for label definitions)
+    kw_scope,        // 'scope' keyword (for scope definition)
     kw_null,         // 'null' keyword (for null pointer constant)
     kw_zeroinitializer, // 'zeroinitializer' keyword (for zero initializer constant)
     kw_poison,       // 'poison' keyword (for poison value constant)

@@ -138,5 +138,13 @@ enum class AtomicOrdering:std::uint32_t{
     ACQUIRE_RELEASE = 1 << 4, // acq_rel
     SEQUENTIALLY_CONSISTENT = 1 << 5 // seq_cst
 };
+
+enum class CallingConv:std::uint32_t{
+    CCC = 1 << 0,
+    FASTCC = 1 << 1,
+    COLDCC = 1 << 2,
+    TAILCC = 1 << 3,
+};
+
 }
 }

@@ -171,6 +171,101 @@ InstructionStmtPtr Parser::parse_instruction_stmt(bool is_global){
     return std::make_shared<InstructionStmt>(tok, name, value);
 }
 
+ScopePtr Parser::parse_scope(){
+    Token tok = this->curr_tok;//the 'scope' token
+    expect(TokenType::scope_identifier, "Expected a scope identifier after 'scope'");
+    Token scope_var_name = this->curr_tok;
+    expect(TokenType::assign, "Expected '=' after scope variable name");
+    expect(TokenType::builtin_identifier, "Expected a identifier for scope type");
+    ScopeType scope_type;
+    if(this->curr_tok.value == "function"){
+        scope_type = ScopeType::FunctionScope;
+    }
+    else if(this->curr_tok.value == "block"){
+        scope_type = ScopeType::BlockScope;
+    }
+    else if(this->curr_tok.value == "inline"){
+        scope_type = ScopeType::InlineScope;
+    }
+    else{
+        error(this->curr_tok, "Expected 'function', 'block' or 'inline' for scope type");
+    }
+    std::optional<Token> scope_name = std::nullopt;
+    std::optional<Token> parent_scope_name;
+    std::optional<triplet<Token,Token,Token>> scope_loc;
+    std::optional<triplet<Token,Token,Token>> callsite_loc;
+    if(peek().type == TokenType::lparen){
+        advance();//on the '(' token
+        while(peek().type != TokenType::rparen){
+            advance();
+            if(this->curr_tok.value == "scope_name"){
+                if(scope_name.has_value()){
+                    error(this->curr_tok, "Duplicate 'scope_name' in scope definition");
+                }
+                expect(TokenType::assign, "Expected '=' after 'scope_name' in scope definition");
+                advance();
+                if(this->curr_tok.type != TokenType::string && this->curr_tok.type != TokenType::raw_string){
+                    error(this->curr_tok, "Expected a string literal for scope name in scope_name");
+                }
+                scope_name = this->curr_tok;
+            }
+            else if(this->curr_tok.value == "parent_scope"){
+                if(parent_scope_name.has_value()){
+                    error(this->curr_tok, "Duplicate 'parent_scope' in scope definition");
+                }
+                expect(TokenType::assign, "Expected '=' after 'parent_scope' in scope definition");
+                expect(TokenType::scope_identifier, "Expected a scope identifier for parent scope name");
+                parent_scope_name = this->curr_tok;
+            }
+            else if(this->curr_tok.value == "scope_loc"){
+                if(scope_loc.has_value()){
+                    error(this->curr_tok, "Duplicate 'scope_loc' in scope definition");
+                }
+                expect(TokenType::assign, "Expected '=' after 'scope_loc' in scope definition");
+                advance();
+                Token file_name = this->curr_tok;
+                if(file_name.type != TokenType::string && file_name.type != TokenType::raw_string){
+                    error(this->curr_tok, "Expected a string literal for file name in scope_loc");
+                }
+                expect(TokenType::colon, "Expected ':' after file name in scope_loc");
+                expect(TokenType::number, "Expected a number literal for line number in scope_loc");
+                Token line = this->curr_tok;
+                expect(TokenType::colon, "Expected ':' after line number in scope_loc");
+                expect(TokenType::number, "Expected a number literal for column number in scope_loc");
+                scope_loc = triplet(file_name, line, this->curr_tok);
+            }
+            else if(this->curr_tok.value == "callsite_loc"){
+                if(callsite_loc.has_value()){
+                    error(this->curr_tok, "Duplicate 'callsite_loc' in scope definition");
+                }
+                expect(TokenType::assign, "Expected '=' after 'callsite_loc' in scope definition");
+                advance();
+                Token file_name = this->curr_tok;
+                if(file_name.type != TokenType::string && file_name.type != TokenType::raw_string){
+                    error(this->curr_tok, "Expected a string literal for file name in callsite_loc");
+                }
+                expect(TokenType::colon, "Expected ':' after file name in callsite_loc");
+                expect(TokenType::number, "Expected a number literal for line number in callsite_loc");
+                Token line = this->curr_tok;
+                expect(TokenType::colon, "Expected ':' after line number in callsite_loc");
+                expect(TokenType::number, "Expected a number literal for column number in callsite_loc");
+                callsite_loc = triplet(file_name, line, this->curr_tok);
+            }
+            else{
+                error(this->curr_tok, "Unexpected keyword in scope definition. Expected 'scope_name', 'parent_scope', 'scope_loc' or 'callsite_loc'");
+            }
+
+            if(peek().type == TokenType::comma){
+                advance();//advance on the ',' token to the next parameter
+            }
+            else if(peek().type != TokenType::rparen){
+                error(this->peek(), "Expected ',' or ')' after scope parameter");
+            }
+        }
+        expect(TokenType::rparen, "Expected you to close the '('");
+    }
+    return std::make_shared<Scope>(tok, scope_type, scope_name, scope_var_name, parent_scope_name, scope_loc, callsite_loc);
+}
 LabelPtr Parser::parse_label(){
     Token tok = this->curr_tok;//the label token
     expect(TokenType::label_identifier, "Expected a label identifier after 'label'");
@@ -228,6 +323,17 @@ std::vector<LabelPtr> Parser::parse_labels(){
     return labels;
 }
 
+std::vector<ScopePtr> Parser::parse_scopes(){
+    std::vector<ScopePtr> scopes;
+    while(this->curr_tok.type == TokenType::kw_scope){
+        scopes.push_back(parse_scope());
+        expect(TokenType::semicolon, "Expected ';' after scope declaration");
+        if(peek().type == TokenType::kw_scope){
+            advance();//advance to the next scope
+        }
+    }
+    return scopes;
+}
 FunctionPtr Parser::parse_function(){
     Token tok = this->curr_tok;
     std::vector<AttributePtr> attributes;
@@ -276,15 +382,21 @@ FunctionPtr Parser::parse_function(){
         advance();//on the '!' token for debug info
         debug_info = parse_debug_info();
     }
+    std::vector<ScopePtr> scopes;
     std::vector<LabelPtr> body;
     if(peek().type == TokenType::lbrace){
         advance();//on the '{' token for function body
         advance_on_semicolon();
+        if(peek().type == TokenType::kw_scope){
+            advance();//advance to the first scope
+            scopes = parse_scopes();
+            advance_on_semicolon();
+        }
         expect(TokenType::kw_label, "Expected a label identifier for the first label in function body");
         body = parse_labels();
         expect(TokenType::rbrace, "Expected '}' after function body");
     }
-    return std::make_shared<Function>(tok, name, attributes, params, varargs, return_type, debug_info, body);
+    return std::make_shared<Function>(tok, name, attributes, params, varargs, return_type, debug_info, scopes, body);
 }
 
 GlobalItemPtr Parser::parse_global_item(){

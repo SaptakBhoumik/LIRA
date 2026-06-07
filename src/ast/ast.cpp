@@ -221,8 +221,73 @@ std::string Label::to_string() const{
 }
 
 
+Scope::Scope(Token tok, ScopeType scope_type, std::optional<Token> scope_name, Token scope_var_name, std::optional<Token> parent_scope_name, 
+            std::optional<triplet<Token,Token,Token>> scope_loc, std::optional<triplet<Token,Token,Token>> callsite_loc){
+    this->tok = tok;
+    this->scope_type = scope_type;
+    this->scope_name = scope_name;
+    this->scope_var_name = scope_var_name;
+    this->parent_scope_name = parent_scope_name;
+    this->scope_loc = scope_loc;
+    this->callsite_loc = callsite_loc;
+}
+
+ScopeType Scope::get_scope_type() const{
+    return this->scope_type;
+}
+std::optional<Token> Scope::get_scope_name() const{
+    return this->scope_name;
+}
+Token Scope::get_scope_var_name() const{
+    return this->scope_var_name;
+}
+std::optional<Token> Scope::get_parent_scope_name() const{
+    return this->parent_scope_name;
+}
+std::optional<triplet<Token,Token,Token>> Scope::get_scope_loc() const{
+    return this->scope_loc;
+}
+std::optional<triplet<Token,Token,Token>> Scope::get_callsite_loc() const{
+    return this->callsite_loc;
+}
+Token Scope::get_token() const{
+    return this->tok;
+}
+std::string Scope::to_string() const{
+    std::string res = "\tscope ";
+    res += this->scope_var_name.value + " = ";
+    if(this->scope_type == ScopeType::FunctionScope) {
+        res += "function(";
+    } 
+    else if(this->scope_type == ScopeType::BlockScope) {
+        res += "block(";
+    }
+    else if(this->scope_type == ScopeType::InlineScope) {
+        res += "inline(";
+    }
+    if(this->scope_name.has_value()) {
+        res += "scope_name = \"" + this->scope_name.value().value + "\", ";
+    }
+    if(this->parent_scope_name.has_value()) {
+        res += "parent_scope = " + this->parent_scope_name.value().value + ", ";
+    }
+    if(this->scope_loc.has_value()) {
+        res += "scope_loc = \"" + this->scope_loc.value().first.value + "\":" + this->scope_loc.value().second.value + ":" + this->scope_loc.value().third.value  + ", ";
+    }
+    if(this->callsite_loc.has_value()) {
+        res += "callsite_loc = \"" + this->callsite_loc.value().first.value + "\":" + this->callsite_loc.value().second.value + ":" + this->callsite_loc.value().third.value  + ", ";
+    }
+    //Remove the last ", " if it exists
+    if(res.size() >= 2 && res.substr(res.size() - 2) == ", ") {
+        res = res.substr(0, res.size() - 2);
+    }
+    res += ");";
+    return res;
+}
+
+
 Function::Function(Token tok, Token name, std::vector<AttributePtr> attributes, std::vector<triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> params, 
-                   bool varargs, TypeExprPtr return_type, DebugInfoPtr debug_info, std::vector<LabelPtr> body){
+                   bool varargs, TypeExprPtr return_type, DebugInfoPtr debug_info, std::vector<ScopePtr> scopes, std::vector<LabelPtr> body){
     this->tok = tok;
     this->name = name;
     this->attributes = attributes;
@@ -230,6 +295,7 @@ Function::Function(Token tok, Token name, std::vector<AttributePtr> attributes, 
     this->varargs = varargs;
     this->return_type = return_type;
     this->debug_info = debug_info;
+    this->scopes = scopes;  
     this->body = body;
 }
 
@@ -247,6 +313,9 @@ TypeExprPtr Function::get_return_type() const{
 }
 DebugInfoPtr Function::get_debug_info() const{
     return this->debug_info;
+}
+std::vector<ScopePtr> Function::get_scopes() const{
+    return this->scopes;
 }
 std::vector<LabelPtr> Function::get_body() const{
     return this->body;
@@ -283,6 +352,9 @@ std::string Function::to_string() const{
     }
     if(this->body.size() > 0) {
         res += " {\n";
+        for(const auto& scope: this->scopes){
+            res += scope->to_string() + "\n";
+        }
         for(const auto& label: this->body){
             res += label->to_string()+"\n";
         }

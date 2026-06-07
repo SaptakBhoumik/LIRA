@@ -17,6 +17,7 @@ std::string to_string(TokenType type) {
         case TokenType::local_identifier: return "<local identifier>";
         case TokenType::label_identifier: return "<label identifier>";
         case TokenType::instruction_identifier: return "<instruction identifier>";
+        case TokenType::scope_identifier: return "<scope identifier>";
         case TokenType::builtin_identifier: return "<buildin identifier>";
 
         case TokenType::lparen: return "(";
@@ -39,6 +40,7 @@ std::string to_string(TokenType type) {
         case TokenType::kw_fn: return "fn";
         case TokenType::kw_let: return "let";
         case TokenType::kw_label: return "label";
+        case TokenType::kw_scope: return "scope";
         case TokenType::kw_null: return "null";
         case TokenType::kw_zeroinitializer: return "zeroinitializer";
         case TokenType::kw_poison: return "poison";
@@ -61,6 +63,7 @@ bool is_identifier(TokenType type){
            type == TokenType::local_identifier || 
            type == TokenType::label_identifier || 
            type == TokenType::instruction_identifier || 
+           type == TokenType::scope_identifier || 
            type == TokenType::builtin_identifier;
 }
 }

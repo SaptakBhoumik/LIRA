@@ -84,6 +84,9 @@ TokenType Lexer::get_identifier_type(const std::string& s){
     else if(s[0] == '.'){
         return TokenType::instruction_identifier;
     }
+    else if(s[0] == '^'){
+        return TokenType::scope_identifier;
+    }
     else {
         return TokenType::builtin_identifier;
     }

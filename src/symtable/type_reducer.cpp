@@ -58,6 +58,9 @@ IR::TypeExprPtr reduce_type_expr(IR::TypeExprPtr type, TypeSymTablePtr symtable)
             auto reduced_return_type = reduce_type_expr(func_type->get_return_type(), symtable);
             return std::make_shared<IR::FuncTypeExpr>(func_type->get_token(), reduced_param_types, func_type->has_varargs(), reduced_return_type, func_type->get_attributes());
         }
+        case IR::TypeExprKind::ScopeTypeExpr:{
+            return type;//Scope type expression is already reduced and doesnt contain any named types inside it so we can just return it
+        }
         case IR::TypeExprKind::AnyTypeExpr:{
             return type;
         }

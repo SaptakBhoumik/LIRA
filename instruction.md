@@ -230,7 +230,7 @@ Seperate category cuz this instruction is big and complex enough to deserve its 
     ```
     When you call name() you dont know which function ptr it will return so you cant specify the attributes at the function definition. So you have to specify the attributes at the call site. This is one of the main reasons why we allow it here.
 
-    The above rule also applies to byval, byref, inalloca(<ty>), preallocated(<ty>), sret, zeroext, inreg and signext. Just remember for byval and other similar argument you have ``#[byref(type:T, i64:arg_index0,....)]``. If defination is given then attribute specified at call site must match with defination if defination is available. If not we assume that the function can take any attribute for that argument and we just follow whatever is specified at the call site.
+    The above rule also applies to byval, byref, inalloca(<ty>), preallocated(<ty>), sret, zeroext, inreg and signext. Just remember for byval and other similar argument you have ``#[byref(type:T0, i64:arg_index0,type:T1, i64:arg_index1,....)]``. If defination is given then attribute specified at call site must match with defination if defination is available. If not we assume that the function can take any attribute for that argument and we just follow whatever is specified at the call site.
 
     Unlike llvm, there are a limited number of calling convention  mainly because we only support x86_64. So we have the following calling conventions: ccc, fastcc, coldcc and tailcc. You can specify the calling convention like ``#[cc(str:calling_convention)]`` where calling_convention is one of the calling conventions mentioned before. If not specified then it is the default calling convention which is ccc. 
 

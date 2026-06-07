@@ -45,7 +45,9 @@ class Parser {
     std::vector<AttributePtr> parse_attributes();//On # token. Multiple attributes can follow afterwards. We keep parsing until we dont see a # token anymore
     InstructionStmtPtr parse_instruction_stmt(bool is_global);//On 'let' token or instruction token
     LabelPtr parse_label();//On label identifier token
+    ScopePtr parse_scope();
     std::vector<LabelPtr> parse_labels();
+    std::vector<ScopePtr> parse_scopes();
     FunctionPtr parse_function();//On 'fn' token
     GlobalItemPtr parse_global_item();
 

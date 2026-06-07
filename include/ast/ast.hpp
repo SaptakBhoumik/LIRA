@@ -69,6 +69,7 @@ enum class TypeExprKind:std::uint8_t{
     StructTypeExpr,
     FuncTypeExpr,
     LabelTypeExpr,
+    ScopeTypeExpr,
     AnyTypeExpr //For internal use. This is used in places where we want to allow any type expression. 
                 //Used when there is type error and we want to avoid spamming the error messages with follow up errors caused by the first error due to dependent types
                 //Described in https://claude.ai/share/d6bf9b6d-1a2b-4d4b-bd82-7ad6bd3ba813
@@ -267,6 +268,18 @@ class LabelTypeExpr : public TypeExpr{
     LabelTypeExpr(Token tok, std::vector<TypeExprPtr> params, std::vector<AttributePtr> attributes);
 
     std::vector<TypeExprPtr> get_params() const;
+
+    TypeExprKind get_kind() const override;
+    Token get_token() const override;
+    std::vector<AttributePtr> get_attributes() const override;
+    std::string to_string() const override;
+};
+
+class ScopeTypeExpr : public TypeExpr{
+    //scope
+    Token tok;//the 'scope' token for error reporting
+    public:
+    ScopeTypeExpr(Token tok);
 
     TypeExprKind get_kind() const override;
     Token get_token() const override;
@@ -501,6 +514,36 @@ class Label {
 
 using LabelPtr = std::shared_ptr<Label>;
 
+enum class ScopeType:std::uint8_t{
+    FunctionScope,
+    BlockScope,
+    InlineScope
+};
+class Scope {
+    Token tok;//The 'scope' token for error reporting
+
+    ScopeType scope_type;
+    std::optional<Token> scope_name;
+    Token scope_var_name;//The variable that stores the scope.
+    std::optional<Token> parent_scope_name;//Empty if it is a function scope.
+    std::optional<triplet<Token,Token,Token>> scope_loc;// <'main.c', '10', '5'> for error reporting. Empty if not available
+    std::optional<triplet<Token,Token,Token>> callsite_loc;// Only for InlineScope. Else std::nullopt
+    public:
+    Scope(Token tok, ScopeType scope_type, std::optional<Token> scope_name, Token scope_var_name, std::optional<Token> parent_scope_name, 
+            std::optional<triplet<Token,Token,Token>> scope_loc, std::optional<triplet<Token,Token,Token>> callsite_loc);
+
+    ScopeType get_scope_type() const;
+    std::optional<Token> get_scope_name() const;
+    Token get_scope_var_name() const;
+    std::optional<Token> get_parent_scope_name() const;
+    std::optional<triplet<Token,Token,Token>> get_scope_loc() const;
+    std::optional<triplet<Token,Token,Token>> get_callsite_loc() const;
+    Token get_token() const;
+    std::string to_string() const;
+};
+
+using ScopePtr = std::shared_ptr<Scope>;
+// class 
 class Function {
     /*
     fn #[attr1] #[attr2] name(let type:param1,let type #[attr_of_type]:param2 #[attr_of_param2], ...) -> return_type ! 'main.c':10:5 {
@@ -514,12 +557,13 @@ class Function {
     bool varargs;//whether the function has a ... varargs at the end.
     TypeExprPtr return_type;
     DebugInfoPtr debug_info = nullptr;
+    std::vector<ScopePtr> scopes;
     std::vector<LabelPtr> body;//Empty if it is just a function declaration without a body. A function declaration with body must have atleast one label
                                //The first label is the entry point
 
     public:
     Function(Token tok, Token name, std::vector<AttributePtr> attributes, std::vector<triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> params, 
-             bool varargs, TypeExprPtr return_type, DebugInfoPtr debug_info, std::vector<LabelPtr> body);
+             bool varargs, TypeExprPtr return_type, DebugInfoPtr debug_info, std::vector<ScopePtr> scopes, std::vector<LabelPtr> body);
 
     Token get_name() const;
     std::vector<AttributePtr> get_attributes() const;
@@ -527,6 +571,7 @@ class Function {
     bool has_varargs() const;
     TypeExprPtr get_return_type() const;
     DebugInfoPtr get_debug_info() const;
+    std::vector<ScopePtr> get_scopes() const;
     std::vector<LabelPtr> get_body() const;
     Token get_token() const;
     std::string to_string() const;

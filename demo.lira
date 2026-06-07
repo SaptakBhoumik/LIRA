@@ -255,6 +255,14 @@ fn $main() -> i32 ! "list.c":162:1 {
 
 
 fn $_new_block_syntax_()->void{
+    scope ^s0 = function(scope_name = "foo");
+    scope ^s0 = function(scope_name = "foo", scope_loc = "foo.c":10:4);
+    scope ^s1 = block();
+    scope ^s1 = block(parent_scope = ^s0);
+    scope ^s1 = block(parent_scope = ^s0, scope_loc = "foo.c":15:4);
+    scope ^s2 = inline();
+    scope ^s2 = inline(scope_name = "bar", parent_scope = ^s0);
+    scope ^s2 = inline(scope_name = "bar", parent_scope = ^s1, scope_loc = "bar.c":5:2, callsite_loc = "foo.c":20:4);
     //I will remove the old phi syntax. This is the new syntax for conditional branches and loops
     label @start{
         .br(i1:%cond, label:@if.true, label:@if.false)

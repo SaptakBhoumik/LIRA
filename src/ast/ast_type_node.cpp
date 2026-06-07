@@ -386,6 +386,25 @@ std::string LabelTypeExpr::to_string() const{
     return res;
 }
 
+
+ScopeTypeExpr::ScopeTypeExpr(Token tok){
+    this->tok = tok;
+}
+
+TypeExprKind ScopeTypeExpr::get_kind() const{
+    return TypeExprKind::ScopeTypeExpr;
+}
+Token ScopeTypeExpr::get_token() const{
+    return this->tok;
+}
+std::vector<AttributePtr> ScopeTypeExpr::get_attributes() const{
+    return {};
+}
+std::string ScopeTypeExpr::to_string() const{
+    return "scope";
+}
+
+
 AnyTypeExpr::AnyTypeExpr(TypeExprPtr original_type){
     this->original_type = original_type;
 }

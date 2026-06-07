@@ -12,6 +12,9 @@ TypeExprPtr Parser::parse_type_expr(bool has_attribute){
         case TokenType::builtin_identifier:{
             return parse_named_type_expr(has_attribute);
         }
+        case TokenType::kw_scope:{
+            return std::make_shared<ScopeTypeExpr>(this->curr_tok);
+        }
         case TokenType::lparen:{
             advance();//After '(' 
             TypeExprPtr stmt = parse_type_expr(true);

@@ -1,29 +1,64 @@
 #pragma once
 #include "ast/ast.hpp"
 #include <sys/cdefs.h>
+#include "mir/destregister.hpp"
 namespace LIRA {
 namespace MIR{
 enum class InstType:std::int16_t{
     ArithmeticBinaryInst,
-    CmpBinaryInst,
+
     LogicalBinaryInst,
 
+    CmpBinaryInst,
+
+    ConversionInst,
+
+    UnaryInst,
+
+    LocalInst,
+    AllocaInst,
+    LoadInst,//Even the atomic varient returns this as type. We use the is_atomic method to know if atomic or not
+    StoreInst,//Even the atomic varient returns this as type. We use the is_atomic method to know if atomic or not
+    GetAddressInst,
+    PtrOffsetInst,
     ExtractElementInst,
     InsertElementInst,
+    FenceInst,
+    CmpXchgInst,
+
+    AtomicRMWInst,
+
+    RetInst,
+    UnreachableInst,
+    JmpInst,
+    ConditionalJmpInst,
+    SwitchInst,
+    IndirectJmpInst,
+
+    CallInst,
+
+    ScalarSelectInst,
+    LanewiseSelectInst,
+    FreezeInst,
+    VaargInst,
+    PtrMaskInst,
     ShuffleVectorInst,
-    //TODO:FInish it
 };
-class DestinationVar{};//TODO:Implement it to store the attribute in a structured manner(Like the token name and the attributes in a strutured way)
 // I am going to define the instruction set of LIRA. A lot of the instructions are lot lowered. Like .add is lowered to .fadd, .iadd, .vadd and so on. It is done
 // to make my life easier in the codegen phase. Although it is possible to merge a few of these instructions but I want to keep them separate because I think it will be better
 // Although I admit I may be wrong and it may be better to merge some of these instructions but I will keep them separate for now 
 class Inst {
+    protected:
+    LocalDestRegisterPtr destination;
+    IR::InstructionStmtPtr instruction_stmt;
     public:
+    Inst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination);
+    
     virtual ~Inst() = default;
 
-    virtual std::optional<std::pair<DestinationVar,IR::TypeExprPtr>> get_destination() const;//For faster access if needed
+    virtual LocalDestRegisterPtr get_destination() const final;//For faster access if needed. Return nullptr if no destination
     virtual InstType get_inst_type() const = 0;
-    virtual IR::InstructionStmtPtr get_instruction_stmt() const = 0;//For error reporting
+    virtual IR::InstructionStmtPtr get_instruction_stmt() const final;//For error reporting
     virtual std::string to_string() const = 0;
     virtual IR::DebugInfoPtr get_debug_info() const final;//Return get_instruction_stmt()->get_value()->get_debug_info() if get_value() is not empty else nullptr.
 };

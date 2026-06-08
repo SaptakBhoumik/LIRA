@@ -6,9 +6,6 @@ namespace MIR {
 // --------------------------- Conversion operations ---------------------------
 class ConversionInst:public Inst {
     protected:
-    IR::InstructionStmtPtr instruction_stmt;
-
-    std::optional<DestinationVar> destination;//The destination variable token for identifying the output variable
     IR::LiteralExprPtr value;
     IR::TypeExprPtr in_type;//Reduced in type. 
     IR::TypeExprPtr out_type;//Reduced out type. 
@@ -22,7 +19,7 @@ class ConversionInst:public Inst {
         INT_TO_PTR = 1 << 11,
         BITCAST = 1 << 12
     };
-    ConversionInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, IR::TypeExprPtr out_type);
+    ConversionInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, IR::TypeExprPtr out_type);
 
     virtual ~ConversionInst() = default;
 
@@ -34,9 +31,7 @@ class ConversionInst:public Inst {
     virtual IR::LiteralExprPtr get_value() const final;
     virtual OpType get_op_type() const = 0;//Whether it is trunc,ext,float_to_int,int_to_float etc.
 
-    virtual std::optional<std::pair<DestinationVar,IR::TypeExprPtr>> get_destination() const override final;
     virtual InstType get_inst_type() const override final;
-    virtual IR::InstructionStmtPtr get_instruction_stmt() const override final;
 };
 
 // --------------------------- Scalar conversion operations ---------------------------
@@ -48,7 +43,7 @@ class ScalarConversionInst:public ConversionInst{
     bool unsigned_;
     // Few instructions dont have all these attributes. For that we return false and in typechecker we make sure unsupported attributes are not used.
     public:
-    ScalarConversionInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
+    ScalarConversionInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
                          IR::TypeExprPtr out_type, bool nuw, bool nsw, bool nsb, bool unsigned_);
 
     virtual bool is_nuw() const final;
@@ -64,7 +59,7 @@ class IntTruncInst:public ScalarConversionInst{
     bool nuw;
     bool nsw;
     public:
-    IntTruncInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
+    IntTruncInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
                  IR::TypeExprPtr out_type, bool nuw, bool nsw);
 
     //I can implement casted integer type helper here but I doubt it will be useful because we can get the width from get_in_type_bit_width and get_out_type_bit_width anyways
@@ -78,7 +73,7 @@ class IntTruncInst:public ScalarConversionInst{
 
 class FloatTruncInst:public ScalarConversionInst{
     public:
-    FloatTruncInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
+    FloatTruncInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
                     IR::TypeExprPtr out_type);
 
     //I can implement casted integer type helper here but I doubt it will be useful because we can get the width from get_in_type_bit_width and get_out_type_bit_width anyways
@@ -96,7 +91,7 @@ class IntExtInst:public ScalarConversionInst{
     bool nsb;
     bool unsigned_;
     public:
-    IntExtInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
+    IntExtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
               IR::TypeExprPtr out_type, bool nsb, bool unsigned_);
 
     std::shared_ptr<IR::IntTypeExpr> get_casted_in_type() const;
@@ -108,7 +103,7 @@ class IntExtInst:public ScalarConversionInst{
 
 class FloatExtInst:public ScalarConversionInst{
     public:
-    FloatExtInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
+    FloatExtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
                     IR::TypeExprPtr out_type);
 
     std::shared_ptr<IR::FloatTypeExpr> get_casted_in_type() const;
@@ -123,7 +118,7 @@ class FloatExtInst:public ScalarConversionInst{
 class FloatToIntInst:public ScalarConversionInst{
     bool unsigned_;
     public:
-    FloatToIntInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
+    FloatToIntInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
                     IR::TypeExprPtr out_type, bool unsigned_);
 
     std::shared_ptr<IR::FloatTypeExpr> get_casted_in_type() const;
@@ -137,7 +132,7 @@ class FloatToIntInst:public ScalarConversionInst{
 class IntToFloatInst:public ScalarConversionInst{
     bool unsigned_;
     public:
-    IntToFloatInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
+    IntToFloatInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
                     IR::TypeExprPtr out_type, bool unsigned_);
 
     std::shared_ptr<IR::IntTypeExpr> get_casted_in_type() const;
@@ -151,7 +146,7 @@ class IntToFloatInst:public ScalarConversionInst{
 class PtrToIntInst:public ScalarConversionInst{
     public:
     //We already know the in type(ptr) and out type(i64). No need to store again
-    PtrToIntInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value);
+    PtrToIntInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -160,7 +155,7 @@ class PtrToIntInst:public ScalarConversionInst{
 class IntToPtrInst:public ScalarConversionInst{
     public:
     //We already know the in type(i64) and out type(ptr). No need to store again
-    IntToPtrInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value);
+    IntToPtrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -169,7 +164,7 @@ class IntToPtrInst:public ScalarConversionInst{
 class BitCastInst:public ScalarConversionInst{
     public:
     //We already know the in type and out type have same bit width. No need to store again
-    BitCastInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, IR::TypeExprPtr out_type);
+    BitCastInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, IR::TypeExprPtr out_type);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -179,6 +174,7 @@ class BitCastInst:public ScalarConversionInst{
 
 // --------------------------- Vector conversion operations ---------------------------
 class LaneWiseConversionInst:public ConversionInst{
+    protected:
     // When the instruction act lanewise
     bool nuw;
     bool nsw;
@@ -186,7 +182,7 @@ class LaneWiseConversionInst:public ConversionInst{
     bool unsigned_;
     // Few instructions dont have all these attributes. For that we return false and in typechecker we make sure unsupported attributes are not used.
     public:
-    LaneWiseConversionInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
+    LaneWiseConversionInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
                            IR::TypeExprPtr out_type, bool nuw, bool nsw, bool nsb, bool unsigned_);
 
     virtual bool is_nuw() const final;
@@ -202,10 +198,8 @@ class LaneWiseConversionInst:public ConversionInst{
 };
 
 class LaneWiseIntTruncInst:public LaneWiseConversionInst{
-    bool nuw;
-    bool nsw;
     public:
-    LaneWiseIntTruncInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
+    LaneWiseIntTruncInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
                         IR::TypeExprPtr out_type, bool nuw, bool nsw);
 
 
@@ -215,7 +209,7 @@ class LaneWiseIntTruncInst:public LaneWiseConversionInst{
 
 class LaneWiseFloatTruncInst:public LaneWiseConversionInst{
     public:
-    LaneWiseFloatTruncInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
+    LaneWiseFloatTruncInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
                         IR::TypeExprPtr out_type);
 
     bool is_in_bf16() const;//Whether the in type is bf16 or not. Just a helper function to make life easier
@@ -226,10 +220,8 @@ class LaneWiseFloatTruncInst:public LaneWiseConversionInst{
 };
 
 class LaneWiseIntExtInst:public LaneWiseConversionInst{
-    bool nsb;
-    bool unsigned_;
     public:
-    LaneWiseIntExtInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
+    LaneWiseIntExtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
                     IR::TypeExprPtr out_type, bool nsb, bool unsigned_);
 
     OpType get_op_type() const override final;
@@ -238,7 +230,7 @@ class LaneWiseIntExtInst:public LaneWiseConversionInst{
 
 class LaneWiseFloatExtInst:public LaneWiseConversionInst{
     public:
-    LaneWiseFloatExtInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
+    LaneWiseFloatExtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
                     IR::TypeExprPtr out_type);
 
     bool is_in_bf16() const;
@@ -249,9 +241,8 @@ class LaneWiseFloatExtInst:public LaneWiseConversionInst{
 };
 
 class LaneWiseFloatToIntInst:public LaneWiseConversionInst{
-    bool unsigned_;
     public:
-    LaneWiseFloatToIntInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
+    LaneWiseFloatToIntInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
                         IR::TypeExprPtr out_type, bool unsigned_);
 
     bool is_in_bf16() const;
@@ -261,9 +252,8 @@ class LaneWiseFloatToIntInst:public LaneWiseConversionInst{
 };
 
 class LaneWiseIntToFloatInst:public LaneWiseConversionInst{
-    bool unsigned_;
     public:
-    LaneWiseIntToFloatInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
+    LaneWiseIntToFloatInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
                         IR::TypeExprPtr out_type, bool unsigned_);
 
     bool is_out_bf16() const;
@@ -276,7 +266,7 @@ class LaneWisePtrToIntInst:public LaneWiseConversionInst{
     public:
     //We already know the in type(<ptr,N>) and out type(<i64,N>). But we need to know N. That is why we take the type here
     //Why not just the number? No partiqular reason. It works. Thought it will make the code cleaner(It doesnt. It is the same either way)
-    LaneWisePtrToIntInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
+    LaneWisePtrToIntInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
                         IR::TypeExprPtr out_type);
 
     OpType get_op_type() const override final;
@@ -287,7 +277,7 @@ class LaneWiseIntToPtrInst:public LaneWiseConversionInst{
     public:
     //We already know the in type(<i64,N>) and out type(<ptr,N>). But we need to know N. That is why we take the type here
     //Why not just the number? No partiqular reason. It works. Thought it will make the code cleaner(It doesnt. It is the same either way)
-    LaneWiseIntToPtrInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
+    LaneWiseIntToPtrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
                         IR::TypeExprPtr out_type);
 
     OpType get_op_type() const override final;

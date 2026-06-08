@@ -70,9 +70,6 @@ enum class TypeExprKind:std::uint8_t{
     FuncTypeExpr,
     LabelTypeExpr,
     ScopeTypeExpr,
-    AnyTypeExpr //For internal use. This is used in places where we want to allow any type expression. 
-                //Used when there is type error and we want to avoid spamming the error messages with follow up errors caused by the first error due to dependent types
-                //Described in https://claude.ai/share/d6bf9b6d-1a2b-4d4b-bd82-7ad6bd3ba813
 };
 class TypeExpr{
     public:
@@ -287,22 +284,22 @@ class ScopeTypeExpr : public TypeExpr{
     std::string to_string() const override;
 };
 
-class AnyTypeExpr : public TypeExpr{
-    //Satisfies every type constrants
-    //For internal use. This is used in places where we want to allow any type expression. 
-    //Used when there is type error and we want to avoid spamming the error messages with follow up errors caused by the first error due to dependent types
-    //Described in https://claude.ai/share/d6bf9b6d-1a2b-4d4b-bd82-7ad6bd3ba813
-    TypeExprPtr original_type;//The original type expression that we wanted to use before we encountered the error and had to fall back to using AnyTypeExpr to avoid spamming follow up errors. 
-    public:
-    AnyTypeExpr(TypeExprPtr original_type);
+// class AnyTypeExpr : public TypeExpr{
+//     //Satisfies every type constrants
+//     //For internal use. This is used in places where we want to allow any type expression. 
+//     //Used when there is type error and we want to avoid spamming the error messages with follow up errors caused by the first error due to dependent types
+//     //Described in https://claude.ai/share/d6bf9b6d-1a2b-4d4b-bd82-7ad6bd3ba813
+//     TypeExprPtr original_type;//The original type expression that we wanted to use before we encountered the error and had to fall back to using AnyTypeExpr to avoid spamming follow up errors. 
+//     public:
+//     AnyTypeExpr(TypeExprPtr original_type);
 
-    TypeExprPtr get_original_type() const;
+//     TypeExprPtr get_original_type() const;
 
-    TypeExprKind get_kind() const override;
-    Token get_token() const override;
-    std::vector<AttributePtr> get_attributes() const override;
-    std::string to_string() const override;
-};
+//     TypeExprKind get_kind() const override;
+//     Token get_token() const override;
+//     std::vector<AttributePtr> get_attributes() const override;
+//     std::string to_string() const override;
+// };
 enum class LiteralKind:std::uint8_t{
     NamedLiteralExpr, // Stuff like name,%name,$name
     StringLiteralExpr,
@@ -446,6 +443,7 @@ class Expr{
     Expr(TypeExprPtr type);
 
     ExprKind get_kind() const;
+    Token get_token() const;
     LiteralExprPtr get_literal() const;
     TypeExprPtr get_type() const;
     std::string to_string() const;

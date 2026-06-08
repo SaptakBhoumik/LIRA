@@ -1,0 +1,77 @@
+#include "semantic_analysis/semantic_analysis.hpp"
+
+namespace LIRA {
+namespace Pass {
+bool is_arithmetic_bin_inst(std::string inst_name){
+    return inst_name == ".add" || inst_name == ".sub" || inst_name == ".mul" || inst_name == ".div" || inst_name == ".rem";
+}
+bool is_bitwise_bin_inst(std::string inst_name){
+    return inst_name == ".and" || inst_name == ".or" || inst_name == ".xor" || inst_name == ".shl" || inst_name == ".lshr" || inst_name == ".ashr";
+}
+bool is_cmp_bin_inst(std::string inst_name){
+    return inst_name == ".eq" || inst_name == ".ne" || inst_name == ".gt" || inst_name == ".ge" || inst_name == ".lt" || inst_name == ".le" 
+            || inst_name == ".either_nan" || inst_name == ".neither_nan";
+}
+bool is_conv_inst(std::string inst_name){
+    return inst_name == ".trunc" || inst_name == ".ext" || inst_name == ".float_to_int" || inst_name == ".int_to_float" || inst_name == ".ptr_to_int" 
+            || inst_name == ".int_to_ptr" || inst_name == ".bitcast";
+}
+bool is_unary_inst(std::string inst_name){
+    return inst_name == ".neg" || inst_name == ".not";
+}
+bool is_mem_inst(std::string inst_name){
+    return inst_name == ".local" || inst_name == ".alloca" || inst_name == ".load" || inst_name == ".store" || inst_name == ".getaddress" || inst_name == ".ptroffset"
+            || inst_name == ".extractelement" || inst_name == ".insertelement" || inst_name == ".fence" || inst_name == ".cmpxchg";
+}
+bool is_atomicrmw_inst(std::string inst_name){
+    return inst_name == ".atomic_xchg" || inst_name == ".atomic_fetchadd" || inst_name == ".atomic_fetchsub" || inst_name == ".atomic_fetchand" 
+            || inst_name == ".atomic_fetchnand" || inst_name == ".atomic_fetchor" || inst_name == ".atomic_fetchxor" || inst_name == ".atomic_fetchmin" 
+            || inst_name == ".atomic_fetchmax" || inst_name == ".atomic_uinc_wrap" || inst_name == ".atomic_idec_wrap";
+}
+bool is_terminator_inst(std::string inst_name){
+    return inst_name == ".ret" || inst_name == ".unreachable" || inst_name == ".br" || inst_name == ".switch" || inst_name == ".indirectbr";
+}
+bool is_call_inst(std::string inst_name){
+    return inst_name == ".call";
+}
+bool is_other_inst(std::string inst_name){
+    return inst_name == ".select" || inst_name == ".freeze" || inst_name == ".va_arg" || inst_name == ".ptrmask" || inst_name == ".shufflevector" ;
+}
+MIR::InstPtr SemanticAnalyzer::analyze_instruction(IR::InstructionStmtPtr inst_stmt){
+    IR::Token inst_name = inst_stmt->get_value()->get_token();
+    if(is_arithmetic_bin_inst(inst_name.value)){
+        return analyze_arithmetic_bin_inst(inst_name,inst_stmt);
+    }
+    else if(is_bitwise_bin_inst(inst_name.value)){
+        return analyze_bitwise_bin_inst(inst_name,inst_stmt);
+    }
+    else if(is_cmp_bin_inst(inst_name.value)){
+        return analyze_cmp_bin_inst(inst_name,inst_stmt);
+    }
+    else if(is_conv_inst(inst_name.value)){
+        return analyze_conv_inst(inst_name,inst_stmt);
+    }
+    else if(is_unary_inst(inst_name.value)){
+        return analyze_unary_inst(inst_name,inst_stmt);
+    }
+    else if(is_mem_inst(inst_name.value)){
+        return analyze_mem_inst(inst_name,inst_stmt);
+    }
+    else if(is_atomicrmw_inst(inst_name.value)){
+        return analyze_atomicrmw_inst(inst_name,inst_stmt);
+    }
+    else if(is_terminator_inst(inst_name.value)){
+        return analyze_terminator_inst(inst_name,inst_stmt);
+    }
+    else if(is_call_inst(inst_name.value)){
+        return analyze_call_inst(inst_name,inst_stmt);
+    }
+    else if(is_other_inst(inst_name.value)){
+        return analyze_other_inst(inst_name,inst_stmt);
+    }
+    else{
+        error(inst_stmt->get_value()->get_token(),"Unknown instruction: " + inst_name.value);
+    }
+}
+}
+}

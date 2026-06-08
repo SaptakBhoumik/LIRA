@@ -6,9 +6,7 @@ namespace MIR {
 // --------------------------- Unary operations ---------------------------
 class UnaryInst:public Inst {
     protected:
-    IR::InstructionStmtPtr instruction_stmt;
-
-    std::optional<DestinationVar> destination;//The destination variable token for identifying the output variable
+    LocalDestRegisterPtr destination;//The destination variable token for identifying the output variable
     IR::LiteralExprPtr value;
     IR::TypeExprPtr type;//Reduced in type. 
     public:
@@ -16,7 +14,7 @@ class UnaryInst:public Inst {
         NEG = 1 << 6,
         NOT = 1 << 7,
     };
-    UnaryInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value, IR::TypeExprPtr type);
+    UnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr type);
 
     virtual ~UnaryInst() = default;
 
@@ -25,18 +23,17 @@ class UnaryInst:public Inst {
     virtual IR::LiteralExprPtr get_value() const final;
     virtual OpType get_op_type() const = 0;//Whether it is neg or not etc.
 
-    virtual std::optional<std::pair<DestinationVar,IR::TypeExprPtr>> get_destination() const override final;
     virtual InstType get_inst_type() const override final;
-    virtual IR::InstructionStmtPtr get_instruction_stmt() const override final;
 };
 
 // --------------------------- Scalar Unary operations ---------------------------
 class ScalarUnaryInst:public UnaryInst{
+    protected:
     // When the instruction doesnt act lane wise
     FastMathAttr fast_math_attr;//Only for floating point
     // Few instructions dont have all these attributes. For that we return false and in typechecker we make sure unsupported attributes are not used.
     public:
-    ScalarUnaryInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value, IR::TypeExprPtr type, FastMathAttr fast_math_attr);
+    ScalarUnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr type, FastMathAttr fast_math_attr);
 
     virtual FastMathAttr get_fast_math_attr() const final;
     virtual bool is_brain_float() const final;//Whether the operand type is brain float or not. Just a helper function to make life easier. False for integer
@@ -46,7 +43,7 @@ class ScalarUnaryInst:public UnaryInst{
 
 class IntNegInst:public ScalarUnaryInst{
     public:
-    IntNegInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value, IR::TypeExprPtr type);
+    IntNegInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr type);
 
     std::shared_ptr<IR::IntTypeExpr> get_casted_type() const;//Returns the type casted to IntTypeExpr. Just a helper function to make life easier
 
@@ -56,7 +53,7 @@ class IntNegInst:public ScalarUnaryInst{
 
 class FloatNegInst:public ScalarUnaryInst{
     public:
-    FloatNegInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value, IR::TypeExprPtr type, FastMathAttr fast_math_attr);
+    FloatNegInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr type, FastMathAttr fast_math_attr);
 
     std::shared_ptr<IR::FloatTypeExpr> get_casted_type() const;//Returns the type casted to FloatTypeExpr. Just a helper function to make life easier
 
@@ -66,7 +63,7 @@ class FloatNegInst:public ScalarUnaryInst{
 
 class IntNotInst:public ScalarUnaryInst{
     public:
-    IntNotInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value, IR::TypeExprPtr type);
+    IntNotInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr type);
 
     std::shared_ptr<IR::IntTypeExpr> get_casted_type() const;//Returns the type casted to IntTypeExpr. Just a helper function to make life easier
 
@@ -77,11 +74,12 @@ class IntNotInst:public ScalarUnaryInst{
 
 // --------------------------- Vector Unary operations ---------------------------
 class LaneWiseUnaryInst:public UnaryInst{
+    protected:
     // When the instruction doesnt act lane wise
     FastMathAttr fast_math_attr;//Only for floating point
     // Few instructions dont have all these attributes. For that we return false and in typechecker we make sure unsupported attributes are not used.
     public:
-    LaneWiseUnaryInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value, IR::TypeExprPtr type, FastMathAttr fast_math_attr);
+    LaneWiseUnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr type, FastMathAttr fast_math_attr);
 
     virtual FastMathAttr get_fast_math_attr() const final;
     virtual bool is_brain_float() const final;//Whether the operand base type is brain float or not. Just a helper function to make life easier. False for integer
@@ -93,7 +91,7 @@ class LaneWiseUnaryInst:public UnaryInst{
 
 class LaneWiseIntNegInst:public LaneWiseUnaryInst{
     public:
-    LaneWiseIntNegInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value, IR::TypeExprPtr type);
+    LaneWiseIntNegInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr type);
 
     std::shared_ptr<IR::IntTypeExpr> get_casted_basetype() const;//Returns the base type casted to IntTypeExpr. Just a helper function to make life easier
 
@@ -103,7 +101,7 @@ class LaneWiseIntNegInst:public LaneWiseUnaryInst{
 
 class LaneWiseFloatNegInst:public LaneWiseUnaryInst{
     public:
-    LaneWiseFloatNegInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value, IR::TypeExprPtr type, FastMathAttr fast_math_attr);
+    LaneWiseFloatNegInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr type, FastMathAttr fast_math_attr);
 
     std::shared_ptr<IR::FloatTypeExpr> get_casted_basetype() const;//Returns the base type casted to FloatTypeExpr. Just a helper function to make life easier
 
@@ -113,7 +111,7 @@ class LaneWiseFloatNegInst:public LaneWiseUnaryInst{
 
 class LaneWiseIntNotInst:public LaneWiseUnaryInst{
     public:
-    LaneWiseIntNotInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr value, IR::TypeExprPtr type);
+    LaneWiseIntNotInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr type);
 
     std::shared_ptr<IR::IntTypeExpr> get_casted_basetype() const;//Returns the base type casted to IntTypeExpr. Just a helper function to make life easier
 

@@ -61,9 +61,9 @@ IR::TypeExprPtr reduce_type_expr(IR::TypeExprPtr type, TypeSymTablePtr symtable)
         case IR::TypeExprKind::ScopeTypeExpr:{
             return type;//Scope type expression is already reduced and doesnt contain any named types inside it so we can just return it
         }
-        case IR::TypeExprKind::AnyTypeExpr:{
-            return type;
-        }
+        // case IR::TypeExprKind::AnyTypeExpr:{
+        //     return type;
+        // }
     }
 }
 }

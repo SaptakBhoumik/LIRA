@@ -92,6 +92,14 @@ ExprKind Expr::get_kind() const{
         return ExprKind::TypeExpr;
     }
 }
+Token Expr::get_token() const{
+    if(this->literal!=nullptr) {
+        return this->literal->get_token();
+    } 
+    else {
+        return this->type->get_token();
+    }
+}
 LiteralExprPtr Expr::get_literal() const{
     return this->literal;
 }

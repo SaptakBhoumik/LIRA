@@ -6,9 +6,6 @@ namespace MIR {
 // ---------------------------Comparison Binary operations ---------------------------
 class CmpBinaryInst:public Inst {
     protected:
-    IR::InstructionStmtPtr instruction_stmt;
-
-    std::optional<DestinationVar> destination;//The destination variable token for identifying the output variable
     IR::LiteralExprPtr lhs;
     IR::LiteralExprPtr rhs;
     IR::TypeExprPtr type;//Reduced type. 
@@ -24,7 +21,7 @@ class CmpBinaryInst:public Inst {
         EITHER_NAN = 1 << 13
     };
 
-    CmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type);
+    CmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type);
 
     virtual ~CmpBinaryInst() = default;
 
@@ -35,18 +32,16 @@ class CmpBinaryInst:public Inst {
     virtual OpType get_op_type() const = 0;//Whether it is eq,neq,lt,gt,le,ge,either_nan or neither_nan.
     //Dont implement bitwidth helper here because for vector it is not that helpful
 
-    virtual std::optional<std::pair<DestinationVar,IR::TypeExprPtr>> get_destination() const override final;//Will figure out the type of destination on it's own. <i1,M> if ``type``
-                                                                                          //is vector and i1 if it is scalar
     virtual InstType get_inst_type() const override final;
-    virtual IR::InstructionStmtPtr get_instruction_stmt() const override final;
 };
 
 // ---------------------------Int Comparison Binary operations ---------------------------
 class IntCmpBinaryInst:public CmpBinaryInst {
+    protected:
     bool unsigned_;//Whether it is unsigned comparison or not. Ignored for eq and neq instructions
     //Few instructions dont have all these attributes. For that we return false and in typechecker we make sure unsupported attributes are not used.
     public:
-    IntCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+    IntCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                      bool unsigned_);
 
     virtual bool is_unsigned() const final;
@@ -57,7 +52,7 @@ class IntCmpBinaryInst:public CmpBinaryInst {
 
 class IntEqInst:public IntCmpBinaryInst {
     public:
-    IntEqInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type);
+    IntEqInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -65,7 +60,7 @@ class IntEqInst:public IntCmpBinaryInst {
 
 class IntNeqInst:public IntCmpBinaryInst {
     public:
-    IntNeqInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type);
+    IntNeqInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -73,7 +68,7 @@ class IntNeqInst:public IntCmpBinaryInst {
 
 class IntLtInst:public IntCmpBinaryInst {
     public:
-    IntLtInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+    IntLtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
               bool unsigned_);
 
     OpType get_op_type() const override final;
@@ -82,7 +77,7 @@ class IntLtInst:public IntCmpBinaryInst {
 
 class IntGtInst:public IntCmpBinaryInst {
     public:
-    IntGtInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+    IntGtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
               bool unsigned_);
 
     OpType get_op_type() const override final;
@@ -92,7 +87,7 @@ class IntGtInst:public IntCmpBinaryInst {
 
 class IntLeInst:public IntCmpBinaryInst {
     public:
-    IntLeInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+    IntLeInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
               bool unsigned_);
 
     OpType get_op_type() const override final;
@@ -102,7 +97,7 @@ class IntLeInst:public IntCmpBinaryInst {
 
 class IntGeInst:public IntCmpBinaryInst {
     public:
-    IntGeInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+    IntGeInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
               bool unsigned_);
 
     OpType get_op_type() const override final;
@@ -111,10 +106,11 @@ class IntGeInst:public IntCmpBinaryInst {
 
 // ---------------------------Vector integer Comparison Binary operations ---------------------------
 class VecIntCmpBinaryInst:public CmpBinaryInst {
+    protected:
     bool unsigned_;//Whether it is unsigned comparison or not. Ignored for eq and neq instructions
     //Few instructions dont have all these attributes. For that we return false and in typechecker we make sure unsupported attributes are not used.
     public:
-    VecIntCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+    VecIntCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                          bool unsigned_);
 
     virtual bool is_unsigned() const final;
@@ -126,7 +122,7 @@ class VecIntCmpBinaryInst:public CmpBinaryInst {
 
 class VecIntEqInst:public VecIntCmpBinaryInst {
     public:
-    VecIntEqInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type);
+    VecIntEqInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -134,7 +130,7 @@ class VecIntEqInst:public VecIntCmpBinaryInst {
 
 class VecIntNeqInst:public VecIntCmpBinaryInst {
     public:
-    VecIntNeqInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type);
+    VecIntNeqInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -142,7 +138,7 @@ class VecIntNeqInst:public VecIntCmpBinaryInst {
 
 class VecIntLtInst:public VecIntCmpBinaryInst {
     public:
-    VecIntLtInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+    VecIntLtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
               bool unsigned_);
 
     OpType get_op_type() const override final;
@@ -151,7 +147,7 @@ class VecIntLtInst:public VecIntCmpBinaryInst {
 
 class VecIntGtInst:public VecIntCmpBinaryInst {
     public:
-    VecIntGtInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+    VecIntGtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
               bool unsigned_);
 
     OpType get_op_type() const override final;
@@ -161,7 +157,7 @@ class VecIntGtInst:public VecIntCmpBinaryInst {
 
 class VecIntLeInst:public VecIntCmpBinaryInst {
     public:
-    VecIntLeInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+    VecIntLeInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
               bool unsigned_);
 
     OpType get_op_type() const override final;
@@ -171,7 +167,7 @@ class VecIntLeInst:public VecIntCmpBinaryInst {
 
 class VecIntGeInst:public VecIntCmpBinaryInst {
     public:
-    VecIntGeInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+    VecIntGeInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
               bool unsigned_);
 
     OpType get_op_type() const override final;
@@ -183,7 +179,7 @@ class VecIntGeInst:public VecIntCmpBinaryInst {
 class PtrCmpBinaryInst:public CmpBinaryInst {
     public:
     //We already know the in type. No need to get the type again because it is always ptr
-    PtrCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
+    PtrCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
 
     virtual std::size_t get_bit_width() const final;//Returns the bit width of the operand type. We only support x86_64 so returns 64. I made this function just in case we support more arch in future
                                                     //Just a helper function to make life easier. 
@@ -191,7 +187,7 @@ class PtrCmpBinaryInst:public CmpBinaryInst {
 
 class PtrEqInst:public PtrCmpBinaryInst {
     public:
-    PtrEqInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
+    PtrEqInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -199,7 +195,7 @@ class PtrEqInst:public PtrCmpBinaryInst {
 
 class PtrNeqInst:public PtrCmpBinaryInst {
     public:
-    PtrNeqInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
+    PtrNeqInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -207,7 +203,7 @@ class PtrNeqInst:public PtrCmpBinaryInst {
 
 class PtrLtInst:public PtrCmpBinaryInst {
     public:
-    PtrLtInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
+    PtrLtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -215,7 +211,7 @@ class PtrLtInst:public PtrCmpBinaryInst {
 
 class PtrGtInst:public PtrCmpBinaryInst {
     public:
-    PtrGtInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
+    PtrGtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -224,7 +220,7 @@ class PtrGtInst:public PtrCmpBinaryInst {
 
 class PtrLeInst:public PtrCmpBinaryInst {
     public:
-    PtrLeInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
+    PtrLeInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -233,7 +229,7 @@ class PtrLeInst:public PtrCmpBinaryInst {
 
 class PtrGeInst:public PtrCmpBinaryInst {
     public:
-    PtrGeInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
+    PtrGeInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -242,7 +238,7 @@ class PtrGeInst:public PtrCmpBinaryInst {
 // ---------------------------Vector integer Comparison Binary operations ---------------------------
 class VecPtrCmpBinaryInst:public CmpBinaryInst {
     public:
-    VecPtrCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type);
+    VecPtrCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type);
 
     virtual bool is_unsigned() const final;
 
@@ -253,7 +249,7 @@ class VecPtrCmpBinaryInst:public CmpBinaryInst {
 class VecPtrEqInst:public VecPtrCmpBinaryInst {
     //Here we take in the type because we need to know the number of element in vec. We could have just taken the number of element instead of the full type but this works
     public:
-    VecPtrEqInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type);
+    VecPtrEqInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -261,7 +257,7 @@ class VecPtrEqInst:public VecPtrCmpBinaryInst {
 
 class VecPtrNeqInst:public VecPtrCmpBinaryInst {
     public:
-    VecPtrNeqInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type);
+    VecPtrNeqInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -269,7 +265,7 @@ class VecPtrNeqInst:public VecPtrCmpBinaryInst {
 
 class VecPtrLtInst:public VecPtrCmpBinaryInst {
     public:
-    VecPtrLtInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type);
+    VecPtrLtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -277,7 +273,7 @@ class VecPtrLtInst:public VecPtrCmpBinaryInst {
 
 class VecPtrGtInst:public VecPtrCmpBinaryInst {
     public:
-    VecPtrGtInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type);
+    VecPtrGtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -285,7 +281,7 @@ class VecPtrGtInst:public VecPtrCmpBinaryInst {
 
 class VecPtrLeInst:public VecPtrCmpBinaryInst {
     public:
-    VecPtrLeInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type);
+    VecPtrLeInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -293,17 +289,18 @@ class VecPtrLeInst:public VecPtrCmpBinaryInst {
 
 class VecPtrGeInst:public VecPtrCmpBinaryInst {
     public:
-    VecPtrGeInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type);
+    VecPtrGeInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
 };
 // ---------------------------Float Comparison Binary operations ---------------------------
 class FloatCmpBinaryInst:public CmpBinaryInst {
+    protected:
     FastMathAttr fast_math_attr;
     bool unordered;//Ignored for either_nan and neither_nan. Says if the op is ordered or unordered
     public:
-    FloatCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+    FloatCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                                 FastMathAttr fast_math_attr, bool unordered);
 
     virtual FastMathAttr get_fast_math_attr() const final;
@@ -315,7 +312,7 @@ class FloatCmpBinaryInst:public CmpBinaryInst {
 
 class FloatEqInst:public FloatCmpBinaryInst {
     public:
-    FloatEqInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+    FloatEqInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                 FastMathAttr fast_math_attr, bool unordered);
 
     OpType get_op_type() const override final;
@@ -324,7 +321,7 @@ class FloatEqInst:public FloatCmpBinaryInst {
 
 class FloatNeqInst:public FloatCmpBinaryInst {
     public:
-    FloatNeqInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+    FloatNeqInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                 FastMathAttr fast_math_attr, bool unordered);
 
     OpType get_op_type() const override final;
@@ -333,7 +330,7 @@ class FloatNeqInst:public FloatCmpBinaryInst {
 
 class FloatLtInst:public FloatCmpBinaryInst {
     public:
-    FloatLtInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+    FloatLtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                 FastMathAttr fast_math_attr, bool unordered);
 
     OpType get_op_type() const override final;
@@ -342,7 +339,7 @@ class FloatLtInst:public FloatCmpBinaryInst {
 
 class FloatGtInst:public FloatCmpBinaryInst {
     public:
-    FloatGtInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+    FloatGtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                 FastMathAttr fast_math_attr, bool unordered);
 
     OpType get_op_type() const override final;
@@ -351,7 +348,7 @@ class FloatGtInst:public FloatCmpBinaryInst {
 
 class FloatLeInst:public FloatCmpBinaryInst {
     public:
-    FloatLeInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+    FloatLeInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                 FastMathAttr fast_math_attr, bool unordered);
 
     OpType get_op_type() const override final;
@@ -360,7 +357,7 @@ class FloatLeInst:public FloatCmpBinaryInst {
 
 class FloatGeInst:public FloatCmpBinaryInst {
     public:
-    FloatGeInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+    FloatGeInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                 FastMathAttr fast_math_attr, bool unordered);
 
     OpType get_op_type() const override final;
@@ -369,7 +366,7 @@ class FloatGeInst:public FloatCmpBinaryInst {
 
 class EitherNaNInst:public FloatCmpBinaryInst {
     public:
-    EitherNaNInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+    EitherNaNInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                 FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override final;
@@ -378,7 +375,7 @@ class EitherNaNInst:public FloatCmpBinaryInst {
 
 class NeitherNaNInst:public FloatCmpBinaryInst {
     public:
-    NeitherNaNInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+    NeitherNaNInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                 FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override final;
@@ -388,10 +385,11 @@ class NeitherNaNInst:public FloatCmpBinaryInst {
 
 // --------------------------- Vector Float Comparison Binary operations ---------------------------
 class VecFloatCmpBinaryInst:public CmpBinaryInst {
+    protected:
     FastMathAttr fast_math_attr;
     bool unordered;//Ignored for either_nan and neither_nan. Says if the op is ordered or unordered
     public:
-    VecFloatCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+    VecFloatCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                                 FastMathAttr fast_math_attr, bool unordered);
 
     virtual FastMathAttr get_fast_math_attr() const final;
@@ -404,7 +402,7 @@ class VecFloatCmpBinaryInst:public CmpBinaryInst {
 
 class VecFloatEqInst:public VecFloatCmpBinaryInst {
     public:
-    VecFloatEqInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+    VecFloatEqInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                     FastMathAttr fast_math_attr, bool unordered);
 
     OpType get_op_type() const override final;
@@ -413,7 +411,7 @@ class VecFloatEqInst:public VecFloatCmpBinaryInst {
 
 class VecFloatNeqInst:public VecFloatCmpBinaryInst {
     public:
-    VecFloatNeqInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+    VecFloatNeqInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                     FastMathAttr fast_math_attr, bool unordered);
 
     OpType get_op_type() const override final;
@@ -422,7 +420,7 @@ class VecFloatNeqInst:public VecFloatCmpBinaryInst {
 
 class VecFloatLtInst:public VecFloatCmpBinaryInst {
     public:
-    VecFloatLtInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+    VecFloatLtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                 FastMathAttr fast_math_attr, bool unordered);
 
     OpType get_op_type() const override final;
@@ -431,7 +429,7 @@ class VecFloatLtInst:public VecFloatCmpBinaryInst {
 
 class VecFloatGtInst:public VecFloatCmpBinaryInst {
     public:
-    VecFloatGtInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+    VecFloatGtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                     FastMathAttr fast_math_attr, bool unordered);
 
     OpType get_op_type() const override final;
@@ -440,7 +438,7 @@ class VecFloatGtInst:public VecFloatCmpBinaryInst {
 
 class VecFloatLeInst:public VecFloatCmpBinaryInst {
     public:
-    VecFloatLeInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+    VecFloatLeInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                     FastMathAttr fast_math_attr, bool unordered);
 
     OpType get_op_type() const override final;
@@ -449,7 +447,7 @@ class VecFloatLeInst:public VecFloatCmpBinaryInst {
 
 class VecFloatGeInst:public VecFloatCmpBinaryInst {
     public:
-    VecFloatGeInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+    VecFloatGeInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                    FastMathAttr fast_math_attr, bool unordered);
 
     OpType get_op_type() const override final;
@@ -458,7 +456,7 @@ class VecFloatGeInst:public VecFloatCmpBinaryInst {
 
 class VecEitherNaNInst:public VecFloatCmpBinaryInst {
     public:
-    VecEitherNaNInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+    VecEitherNaNInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                      FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override final;
@@ -467,7 +465,7 @@ class VecEitherNaNInst:public VecFloatCmpBinaryInst {
 
 class VecNeitherNaNInst:public VecFloatCmpBinaryInst {
     public:
-    VecNeitherNaNInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+    VecNeitherNaNInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                       FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override final;

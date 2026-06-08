@@ -5,9 +5,7 @@ namespace LIRA {
 namespace MIR {
 // --------------------------- Atomic read write modify operations ---------------------------
 class AtomicRMWInst:public Inst {
-    IR::InstructionStmtPtr instruction_stmt;
-    std::optional<DestinationVar> destination;//The destination variable token for identifying the output variable
-
+    protected:
     std::size_t alignment;//The alignment of the memory access in bytes
     bool volatile_;//Whether the memory access is volatile or not
     SyncScope syncscope;//The synchronization scope of the atomic operation. It can be "singlethread" or "global"
@@ -30,7 +28,7 @@ class AtomicRMWInst:public Inst {
         UINC_WRAP = 1 << 15,
         IDEC_WRAP = 1 << 16
     };
-    AtomicRMWInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+    AtomicRMWInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                   IR::TypeExprPtr type, std::size_t alignment, bool volatile_, SyncScope syncscope, AtomicOrdering ordering);
 
     virtual ~AtomicRMWInst() = default;
@@ -45,16 +43,14 @@ class AtomicRMWInst:public Inst {
     virtual AtomicOrdering get_ordering() const final;
     virtual OpType get_op_type() const = 0;//Whether it is xchg,add,sub,and,nand,or,xor,max,min,umax or umin etc.
 
-    virtual std::optional<std::pair<DestinationVar,IR::TypeExprPtr>> get_destination() const override final;
     virtual InstType get_inst_type() const override final;
-    virtual IR::InstructionStmtPtr get_instruction_stmt() const override final;
 };
 
 // --------------------------- Integer Atomic read modify operations ---------------------------
 class IntAtomicRMWInst:public AtomicRMWInst {
     bool signed_;//Whether the integer type is signed or not. Just a helper function to make life easier. False for unsigned integer. Ignored for instruction that dont care
     public:
-    IntAtomicRMWInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+    IntAtomicRMWInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                      IR::TypeExprPtr type, std::size_t alignment, bool volatile_, SyncScope syncscope, AtomicOrdering ordering, bool signed_);
 
     std::shared_ptr<IR::IntTypeExpr> get_casted_type() const;//Returns the type casted to IntTypeExpr. Just a helper function to make life easier
@@ -64,7 +60,7 @@ class IntAtomicRMWInst:public AtomicRMWInst {
 
 class IntAtomicXchgInst:public IntAtomicRMWInst {
     public:
-    IntAtomicXchgInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+    IntAtomicXchgInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                 IR::TypeExprPtr type, std::size_t alignment, bool volatile_, SyncScope syncscope, AtomicOrdering ordering);
 
     OpType get_op_type() const override final;
@@ -73,7 +69,7 @@ class IntAtomicXchgInst:public IntAtomicRMWInst {
 
 class IntAtomicFetchAddInst:public IntAtomicRMWInst {
     public:
-    IntAtomicFetchAddInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+    IntAtomicFetchAddInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     IR::TypeExprPtr type, std::size_t alignment, bool volatile_, SyncScope syncscope, AtomicOrdering ordering);
 
     OpType get_op_type() const override final;
@@ -82,7 +78,7 @@ class IntAtomicFetchAddInst:public IntAtomicRMWInst {
 
 class IntAtomicFetchSubInst:public IntAtomicRMWInst {
     public:
-    IntAtomicFetchSubInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+    IntAtomicFetchSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     IR::TypeExprPtr type, std::size_t alignment, bool volatile_, SyncScope syncscope, AtomicOrdering ordering);
 
     OpType get_op_type() const override final;
@@ -91,7 +87,7 @@ class IntAtomicFetchSubInst:public IntAtomicRMWInst {
 
 class IntAtomicFetchAndInst:public IntAtomicRMWInst {
     public:
-    IntAtomicFetchAndInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+    IntAtomicFetchAndInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     IR::TypeExprPtr type, std::size_t alignment, bool volatile_, SyncScope syncscope, AtomicOrdering ordering);
 
     OpType get_op_type() const override final;
@@ -100,7 +96,7 @@ class IntAtomicFetchAndInst:public IntAtomicRMWInst {
 
 class IntAtomicFetchNandInst:public IntAtomicRMWInst {
     public:
-    IntAtomicFetchNandInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+    IntAtomicFetchNandInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                      IR::TypeExprPtr type, std::size_t alignment, bool volatile_, SyncScope syncscope, AtomicOrdering ordering);
 
     OpType get_op_type() const override final;
@@ -109,7 +105,7 @@ class IntAtomicFetchNandInst:public IntAtomicRMWInst {
 
 class IntAtomicFetchOrInst:public IntAtomicRMWInst {
     public:
-    IntAtomicFetchOrInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+    IntAtomicFetchOrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                    IR::TypeExprPtr type, std::size_t alignment, bool volatile_, SyncScope syncscope, AtomicOrdering ordering);
 
     OpType get_op_type() const override final;
@@ -118,7 +114,7 @@ class IntAtomicFetchOrInst:public IntAtomicRMWInst {
 
 class IntAtomicFetchXorInst:public IntAtomicRMWInst {
     public:
-    IntAtomicFetchXorInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+    IntAtomicFetchXorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     IR::TypeExprPtr type, std::size_t alignment, bool volatile_, SyncScope syncscope, AtomicOrdering ordering);
 
     OpType get_op_type() const override final;
@@ -127,7 +123,7 @@ class IntAtomicFetchXorInst:public IntAtomicRMWInst {
 
 class IntAtomicFetchMaxInst:public IntAtomicRMWInst {
     public:
-    IntAtomicFetchMaxInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+    IntAtomicFetchMaxInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     IR::TypeExprPtr type, std::size_t alignment, bool volatile_, SyncScope syncscope, AtomicOrdering ordering, bool signed_);
 
     OpType get_op_type() const override final;
@@ -136,7 +132,7 @@ class IntAtomicFetchMaxInst:public IntAtomicRMWInst {
 
 class IntAtomicFetchMinInst:public IntAtomicRMWInst {
     public:
-    IntAtomicFetchMinInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+    IntAtomicFetchMinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     IR::TypeExprPtr type, std::size_t alignment, bool volatile_, SyncScope syncscope, AtomicOrdering ordering, bool signed_);
 
     OpType get_op_type() const override final;
@@ -145,7 +141,7 @@ class IntAtomicFetchMinInst:public IntAtomicRMWInst {
 
 class IntAtomicUincWrapInst:public IntAtomicRMWInst {
     public:
-    IntAtomicUincWrapInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+    IntAtomicUincWrapInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     IR::TypeExprPtr type, std::size_t alignment, bool volatile_, SyncScope syncscope, AtomicOrdering ordering);
 
     OpType get_op_type() const override final;
@@ -154,7 +150,7 @@ class IntAtomicUincWrapInst:public IntAtomicRMWInst {
 
 class IntAtomicIdecWrapInst:public IntAtomicRMWInst {
     public:
-    IntAtomicIdecWrapInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+    IntAtomicIdecWrapInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     IR::TypeExprPtr type, std::size_t alignment, bool volatile_, SyncScope syncscope, AtomicOrdering ordering);
 
     OpType get_op_type() const override final;
@@ -164,7 +160,7 @@ class IntAtomicIdecWrapInst:public IntAtomicRMWInst {
 // --------------------------- Float Atomic read modify operations ---------------------------
 class FloatAtomicRMWInst:public AtomicRMWInst {
     public:
-    FloatAtomicRMWInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+    FloatAtomicRMWInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                         IR::TypeExprPtr type, std::size_t alignment, bool volatile_, SyncScope syncscope, AtomicOrdering ordering);
 
     std::shared_ptr<IR::FloatTypeExpr> get_casted_type() const;//Returns the type casted to FloatTypeExpr. Just a helper function to make life easier
@@ -174,7 +170,7 @@ class FloatAtomicRMWInst:public AtomicRMWInst {
 
 class FloatAtomicXchgInst:public FloatAtomicRMWInst {
     public:
-    FloatAtomicXchgInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+    FloatAtomicXchgInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                   IR::TypeExprPtr type, std::size_t alignment, bool volatile_, SyncScope syncscope, AtomicOrdering ordering);
 
     OpType get_op_type() const override final;
@@ -183,7 +179,7 @@ class FloatAtomicXchgInst:public FloatAtomicRMWInst {
 
 class FloatAtomicFetchAddInst:public FloatAtomicRMWInst {
     public:
-    FloatAtomicFetchAddInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+    FloatAtomicFetchAddInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                       IR::TypeExprPtr type, std::size_t alignment, bool volatile_, SyncScope syncscope, AtomicOrdering ordering);
 
     OpType get_op_type() const override final;
@@ -192,7 +188,7 @@ class FloatAtomicFetchAddInst:public FloatAtomicRMWInst {
 
 class FloatAtomicFetchSubInst:public FloatAtomicRMWInst {
     public:
-    FloatAtomicFetchSubInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+    FloatAtomicFetchSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                       IR::TypeExprPtr type, std::size_t alignment, bool volatile_, SyncScope syncscope, AtomicOrdering ordering);
 
     OpType get_op_type() const override final;
@@ -201,7 +197,7 @@ class FloatAtomicFetchSubInst:public FloatAtomicRMWInst {
 
 class FloatAtomicFetchMaxInst:public FloatAtomicRMWInst {
     public:
-    FloatAtomicFetchMaxInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+    FloatAtomicFetchMaxInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                       IR::TypeExprPtr type, std::size_t alignment, bool volatile_, SyncScope syncscope, AtomicOrdering ordering);
 
     OpType get_op_type() const override final;
@@ -210,7 +206,7 @@ class FloatAtomicFetchMaxInst:public FloatAtomicRMWInst {
 
 class FloatAtomicFetchMinInst:public FloatAtomicRMWInst {
     public:
-    FloatAtomicFetchMinInst(IR::InstructionStmtPtr instruction_stmt, std::optional<DestinationVar> destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+    FloatAtomicFetchMinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                       IR::TypeExprPtr type, std::size_t alignment, bool volatile_, SyncScope syncscope, AtomicOrdering ordering);
 
     OpType get_op_type() const override final;

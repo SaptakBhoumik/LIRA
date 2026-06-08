@@ -91,7 +91,7 @@
 
     It can have the fast math attribute like ``#[fast]`` or ``#[nnan]`` or ``#[ninf]`` or ``#[nsz]`` or ``#[arcp]`` or ``#[contract]`` or ``#[afn]`` or ``#[reassoc]`` or any combination of these. 
 
-
+ 
 ## Conversion instructions
 
 - `` let T2:%output_var = .trunc(T1:%input_var)`` :- Truncates a float/brain float/integer/vector of float/brain float/integer from T1 to a smaller float/brain float/integer type/vector of float/brain float/integer T2. Note base type of T1 must be integer if base type of T2 is integer and base type of T1 must be float/brain float if base type of T2 is float/brain float. Also error if bitwidth of base type of T1 is <= than  bitwidth of base type of T2. Both T1 and T2 must be vector or both must be non vector. No mixing allowed.
@@ -148,9 +148,9 @@ Unlikely but in future if we support other bit system like 32 bit then we have t
 
 - ``.store(T:%value, ptr:%ptr)`` :- Stores a value to memory. It has the attribute ``#[align(i8:N)]`` to specify the alignment of the store and by default it is 16. The alignment must be a power of 2 and it is in bytes. By default the alignment is 16 byte. It also has the attribute ``#[volatile]`` to indicate that the store is volatile. It has the attribute ``#[nontemporal]`` to indicate that the store is non temporal. It also has the attribute ``#[nonull]`` and ``#[nopoison]``. It has the attribute ``#dereferenceable(i64:N)`` to indicate that the pointer is dereferenceable for N bytes. It also has the attribute ``#[atomic(str:ordering)]`` to indicate that the load is atomic with the specified ordering. The ordering can be one of the following: ``acquire``, ``monotonic``, ``unordered`` and ``seq_cst``. If the attribute is not present then it is not an atomic load. If atomic it can also have the attribute ``#[syncscope("singlethreaded")]`` to indicate that the atomic load is only synchronized with other atomic operations in the same thread. By default it is synchronized with atomic operations in all threads i.e "global". We supporting only x86_64 so only these 2 we can have. Note:-If atomic then we require an explicit alignment
 
-- ``let ptr:%output_var = .getaddress(T:%var, iN:%offset)`` :- Gets &var + offset. The type of output variable must be a pointer type. The type of var can be any type. The offset is in bytes. Note:-var is a variable and not a literal/expression. It has the attribute ``#[signed]`` to indicate that the offset is signed. By default it is unsigned. It also has ``#[nsw]`` or ``#[nuw]`` or both to indicate that the offset does not cause signed or unsigned overflow. Also has the attribute ``#[inbounds]`` . We dont have blockaddress instruction like llvm. Just use this 
+- ``let ptr:%output_var = .getaddress(T:%var, iN:%offset)`` :- Gets &var + offset. The type of output variable must be a pointer type. The type of var can be any type. The offset is in bytes. Note:-var is a variable and not a literal/expression. It has the attribute ``#[unsigned]`` to indicate that the offset is unsigned. By default it is signed. It also has ``#[nsw]`` or ``#[nuw]`` or both to indicate that the offset does not cause signed or unsigned overflow. Also has the attribute ``#[inbounds]`` . We dont have blockaddress instruction like llvm. Just use this 
 
-- ``let ptr:%output_var = .ptroffset(ptr:%input_var, T:%offset)`` :- Gets input_var + offset. The type of output variable must be a pointer type. The input variable must be a pointer type. The offset can be any integer type. The offset is in bytes. It has the attribute ``#[signed]`` to indicate that the offset is signed. By default it is unsigned. It also has ``#[nsw]`` or ``#[nuw]`` or both to indicate that the offset does not cause signed or unsigned overflow.  Also has the attribute ``#[inbounds]`` 
+- ``let ptr:%output_var = .ptroffset(ptr:%input_var, T:%offset)`` :- Gets input_var + offset. The type of output variable must be a pointer type. The input variable must be a pointer type. The offset can be any integer type. The offset is in bytes. It has the attribute ``#[unsigned]`` to indicate that the offset is unsigned. By default it is signed. It also has ``#[nsw]`` or ``#[nuw]`` or both to indicate that the offset does not cause signed or unsigned overflow.  Also has the attribute ``#[inbounds]`` 
 
 - `` let T3:%output_var = .extractelement(T1:%input, T2:%index)`` :- Extracts an element from a vector/array/struct. ``T1`` is a vector/array/struct. The index type ``T2`` must be some integer of type ``iN``. ``T3`` is the type of the extracted element. For struct, the index must be a integer literal. But for array and vector it can be literal or variable. It can have the attribute ``#[inbounds]`` for array and vector but not for struct cuz struct index is always in bounds.
 
@@ -230,14 +230,19 @@ Seperate category cuz this instruction is big and complex enough to deserve its 
     ```
     When you call name() you dont know which function ptr it will return so you cant specify the attributes at the function definition. So you have to specify the attributes at the call site. This is one of the main reasons why we allow it here.
 
-    The above rule also applies to byval, byref, inalloca(<ty>), preallocated(<ty>), sret, zeroext, inreg and signext. Just remember for byval and other similar argument you have ``#[byref(type:T0, i64:arg_index0,type:T1, i64:arg_index1,....)]``. If defination is given then attribute specified at call site must match with defination if defination is available. If not we assume that the function can take any attribute for that argument and we just follow whatever is specified at the call site.
+    The above rule also applies to byval, byref, inalloca(<ty>), preallocated(<ty>), sret, zeroext and signext. Just remember for byval and other similar argument you have ``#[byref(type:T0, i64:arg_index0,type:T1, i64:arg_index1,....)]``. If defination is given then attribute specified at call site must match with defination if defination is available. If not we assume that the function can take any attribute for that argument and we just follow whatever is specified at the call site.
 
     Unlike llvm, there are a limited number of calling convention  mainly because we only support x86_64. So we have the following calling conventions: ccc, fastcc, coldcc and tailcc. You can specify the calling convention like ``#[cc(str:calling_convention)]`` where calling_convention is one of the calling conventions mentioned before. If not specified then it is the default calling convention which is ccc. 
 
+    We can set the extension of the return value can be set by applyiny the attribute ``#[return_extension(str:extension_type)]`` to the call instruction where extension_type can be either "zero" or "sign" or "no". 
+
     ``let T:%output_var #[noalias] = .call(T:%func, T1:%arg1, T2:%arg2...)``
-    You can do this if you want to mark the return value as noalias. This is allowed because you cant mark noalias on the function return type. zeroext,signext,noext,inreg,nonnull,dereferenceable(<bytes>),nopoison,align(<alignment>),nnan,ninf can also be applied like this to the returned value. In MIR, the DestinationVar should store these attributes
+    You can do this if you want to mark the return value as noalias. This is allowed because you cant mark noalias on the function return type. nonnull,dereferenceable(<bytes>),nopoison,align(<alignment>),nnan,ninf can also be applied like this to the returned value. In MIR, the LocalDestRegister should store these attributes. Note these attribute are not unique to call instruction
 
     Reference :- https://claude.ai/share/47c8d0b7-d632-462a-b757-a8f81499862c
+
+
+- ``.call(T:%func, T1:%arg1, T2:%arg2...)`` :- Same as above but for functions that return void.
 
 ## Other instructions
 
@@ -246,8 +251,6 @@ Seperate category cuz this instruction is big and complex enough to deserve its 
 - ``let T:%output_var = .freeze(T:%input_var)`` :- Freezes the value of input_var. It is used to prevent certain optimizations that can lead to undefined behavior. It can be used when you have some value that is undef or poison and you want to use it in a way that does not cause undefined behavior. By freezing it, you are telling the compiler that the value can be any value of the type and it should not make any assumptions about it. So it can be used to safely use undef or poison values without causing undefined behavior.
 
 - ``let T:%output_var = .va_arg(ptr:%input_var)`` :- Used to access the variable arguments in a function that takes variable arguments. The input_var is of type ptr and T is the type of the variable argument that we want to access
-
-- ``.call(T:%func, T1:%arg1, T2:%arg2...)`` :- Same as above but for functions that return void.
 
 - ``let T:%output_var = .ptrmask(T:%input_var,T1:%mask)`` :- Masks a pointer with a mask. T is a ptr or vector of ptr. Mask is an integer or vector of integer. If T1 is vector then T must also be a vector of same size
 

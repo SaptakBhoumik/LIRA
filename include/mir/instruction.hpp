@@ -1,5 +1,6 @@
 #include "instruction/_instruction.hpp"
 #include "instruction/arithmetic_bin_inst.hpp"
+#include "instruction/logical_bin_inst.hpp"
 #include "instruction/cmp_bin_inst.hpp"
 #include "instruction/conv_inst.hpp"
 #include "instruction/unary_inst.hpp"

@@ -403,27 +403,5 @@ std::vector<AttributePtr> ScopeTypeExpr::get_attributes() const{
 std::string ScopeTypeExpr::to_string() const{
     return "scope";
 }
-
-
-AnyTypeExpr::AnyTypeExpr(TypeExprPtr original_type){
-    this->original_type = original_type;
-}
-
-TypeExprPtr AnyTypeExpr::get_original_type() const{
-    return this->original_type;
-}
-
-TypeExprKind AnyTypeExpr::get_kind() const{
-    return TypeExprKind::AnyTypeExpr;
-}
-Token AnyTypeExpr::get_token() const{
-    return this->original_type->get_token();
-}
-std::vector<AttributePtr> AnyTypeExpr::get_attributes() const{
-    return this->original_type->get_attributes();
-}
-std::string AnyTypeExpr::to_string() const{
-    return "(AnyTypeExpr " + this->original_type->to_string() + ")";
-}
 }
 }

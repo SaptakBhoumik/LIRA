@@ -6,14 +6,15 @@
 
 namespace LIRA {
 namespace Utils {
-void TypeSymTable::error(IR::Token tok, std::string msg,std::string submsg,std::string ecode){
+[[noreturn]] void TypeSymTable::error(IR::Token tok, std::string msg,std::string submsg,std::string ecode) const{
     Location loc{tok.line, tok.col, this->filename, tok.source_line};
     Diagnostic err = {loc,
                    std::string(msg),
                    submsg,
                    ecode,
         };
-    this->errors.push_back(err);
+    display(err);
+    exit(1);
 }
 TypeSymTable::TypeSymTable(std::string filename){
     this->filename = filename;
@@ -21,12 +22,12 @@ TypeSymTable::TypeSymTable(std::string filename){
 void TypeSymTable::insert(IR::Token name, IR::TypeExprPtr type) {
     if(contains(name)) {
         error(name, "Type redefinition error", "The type '"+name.value+"' is already defined");
-        this->table[name] = std::make_shared<IR::AnyTypeExpr>(type);
-        return;
+        // this->table[name] = std::make_shared<IR::AnyTypeExpr>(type);
+        // return;
     }
     this->table[name] = type;
 }
-IR::TypeExprPtr TypeSymTable::lookup(IR::TypeExprPtr name) {
+IR::TypeExprPtr TypeSymTable::lookup(IR::TypeExprPtr name) const {
     if(name->get_kind() == IR::TypeExprKind::NamedTypeExpr) {
         auto named_type = std::dynamic_pointer_cast<IR::NamedTypeExpr>(name);
         return lookup(named_type->get_name());
@@ -36,25 +37,16 @@ IR::TypeExprPtr TypeSymTable::lookup(IR::TypeExprPtr name) {
         exit(1);
     }
 }
-IR::TypeExprPtr TypeSymTable::lookup(IR::Token name) {
+IR::TypeExprPtr TypeSymTable::lookup(IR::Token name) const {
     auto it = this->table.find(name);
     if(it == this->table.end()) {
         error(name, "Undefined type error", "The type '"+name.value+"' is not defined");
-        return std::make_shared<IR::AnyTypeExpr>(std::make_shared<IR::NamedTypeExpr>(name, std::vector<IR::AttributePtr>{}));//Return an AnyTypeExpr to avoid spamming follow up errors
+        // return std::make_shared<IR::AnyTypeExpr>(std::make_shared<IR::NamedTypeExpr>(name, std::vector<IR::AttributePtr>{}));//Return an AnyTypeExpr to avoid spamming follow up errors
     }
     return it->second;
 }
 bool TypeSymTable::contains(IR::Token name) const {
     return this->table.find(name) != this->table.end();
-}
-
-std::vector<Diagnostic> TypeSymTable::get_errors() const{
-    return this->errors;
-}
-void TypeSymTable::show_errors() const{
-    for(const auto& error : this->errors) {
-        display(error);
-    }
 }
 
 void TypeSymTable::clear_local_type() {
@@ -68,15 +60,15 @@ void TypeSymTable::clear_local_type() {
 }
 
 
-
-void VarSymTable::error(IR::Token tok, std::string msg,std::string submsg,std::string ecode){
+void VarSymTable::error(IR::Token tok, std::string msg,std::string submsg,std::string ecode) const {
     Location loc{tok.line, tok.col, this->filename, tok.source_line};
     Diagnostic err = {loc,
                    std::string(msg),
                    submsg,
                    ecode,
         };
-    this->errors.push_back(err);
+    display(err);
+    exit(1);
 }
 VarSymTable::VarSymTable(std::string filename){
     this->filename = filename;
@@ -84,12 +76,12 @@ VarSymTable::VarSymTable(std::string filename){
 void VarSymTable::insert(IR::Token name, IR::TypeExprPtr type) {
     if(exists(name)) {
         error(name, "Variable redefinition error", "The variable '"+name.value+"' is already defined in this scope");
-        this->table[name] = std::make_shared<IR::AnyTypeExpr>(type);
-        return;
+        // this->table[name] = std::make_shared<IR::AnyTypeExpr>(type);
+        // return;
     }
     this->table[name] = type;
 }
-IR::TypeExprPtr VarSymTable::lookup(IR::ExprPtr name){
+IR::TypeExprPtr VarSymTable::lookup(IR::ExprPtr name) const {
     if(name->get_kind() == IR::ExprKind::LiteralExpr) {
         auto named_lit = name->get_literal();
         if(named_lit->get_kind() != IR::LiteralKind::NamedLiteralExpr) {
@@ -109,7 +101,7 @@ IR::TypeExprPtr VarSymTable::lookup(IR::ExprPtr name){
         return lookup(named_type_casted->get_name());
     }
 }
-IR::TypeExprPtr VarSymTable::lookup(IR::Token name) {
+IR::TypeExprPtr VarSymTable::lookup(IR::Token name) const {
     //TODO:What if builtin name? Decide later how to handle that
     if(name.type == IR::TokenType::builtin_identifier) {
         return nullptr;
@@ -117,8 +109,8 @@ IR::TypeExprPtr VarSymTable::lookup(IR::Token name) {
     auto it = this->table.find(name);
     if(it == this->table.end()) {
         error(name, "Undefined variable error", "The variable '"+name.value+"' is not defined in this scope");
-        name.value = "type of "+name.value;
-        return std::make_shared<IR::AnyTypeExpr>(std::make_shared<IR::NamedTypeExpr>(name, std::vector<IR::AttributePtr>{}));
+        // name.value = "type of "+name.value;
+        // return std::make_shared<IR::AnyTypeExpr>(std::make_shared<IR::NamedTypeExpr>(name, std::vector<IR::AttributePtr>{}));
     }
     return it->second;
 }
@@ -149,14 +141,6 @@ bool VarSymTable::exists(IR::Token name) const{
     return this->table.find(name) != this->table.end();
 }
 
-std::vector<Diagnostic> VarSymTable::get_errors() const{
-    return this->errors;
-}
-void VarSymTable::show_errors() const{//Dont exit
-    for(const auto& err : this->errors) {
-        display(err);
-    }
-}
 void VarSymTable::clear_local_vars() {
     std::unordered_map<IR::Token, IR::TypeExprPtr, IR::TokenValueHash, IR::TokenValueEqual> new_table = {};
     for(const auto& pair : this->table) {

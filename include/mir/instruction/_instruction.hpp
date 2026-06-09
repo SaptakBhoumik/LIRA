@@ -7,7 +7,7 @@ namespace MIR{
 enum class InstType:std::int16_t{
     ArithmeticBinaryInst,
 
-    LogicalBinaryInst,
+    BitwiseBinaryInst,
 
     CmpBinaryInst,
 
@@ -73,9 +73,11 @@ struct FastMathAttr {
     bool contract = false;
     bool afns = false;
     bool reassoc = false;
+
+    std::string to_string() const;
 };
 
-enum class InstOperandTypeVarient:std::uint32_t{
+enum class InstOperandTypeVarient:std::uint64_t{
     // A lot of operands are divided into int,float,ptr,vector etc based on the type they operate on. Not every instruction show this property but a lot do. It is for them
     Int = 1 << 0,
     Float = 1 << 1,
@@ -155,17 +157,17 @@ inline std::optional<InstOperandTypeVarient> get_type_varient_from_type(const IR
 
 template<typename E>
     requires (std::is_enum_v<E> && (!std::is_same_v<E, InstOperandTypeVarient>))
-constexpr std::uint32_t operator|(InstOperandTypeVarient a, E b) {
-    return static_cast<std::uint32_t>(a) | static_cast<std::uint32_t>(b);
+constexpr std::uint64_t operator|(InstOperandTypeVarient a, E b) {
+    return static_cast<std::uint64_t>(a) | static_cast<std::uint64_t>(b);
 }
 
 
-enum class SyncScope:std::uint32_t{
+enum class SyncScope:std::uint64_t{
     SingleThread = 1 << 0,
     Global = 1 << 1
 };
 
-enum class AtomicOrdering:std::uint32_t{
+enum class AtomicOrdering:std::uint64_t{
     UNORDERED = 1 << 0,
     MONOTONIC = 1 << 1,
     ACQUIRE = 1 << 2,
@@ -174,7 +176,7 @@ enum class AtomicOrdering:std::uint32_t{
     SEQUENTIALLY_CONSISTENT = 1 << 5 // seq_cst
 };
 
-enum class CallingConv:std::uint32_t{
+enum class CallingConv:std::uint64_t{
     CCC = 1 << 0,
     FASTCC = 1 << 1,
     COLDCC = 1 << 2,

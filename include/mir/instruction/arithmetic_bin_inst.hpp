@@ -48,7 +48,7 @@ class IntArithmeticBinaryInst:public ArithmeticBinaryInst {
     virtual std::shared_ptr<IR::IntTypeExpr> get_casted_operand_type() const final;//Returns the operand type casted to IntTypeExpr. Just a helper function to make life easier
     virtual std::size_t get_bit_width() const final;//Returns the bit width of the operand type. Just a helper function to make life easier
     
-    virtual InstOperandTypeVarient get_operand_type_varient() const final;
+    virtual InstOperandTypeVarient get_operand_type_varient() const override final;
 };
 
 class IntAddInst:public IntArithmeticBinaryInst {
@@ -114,12 +114,12 @@ class VecIntArithmeticBinaryInst:public ArithmeticBinaryInst {
     virtual bool is_nsw() const final;
     virtual bool is_unsigned() const final;
     virtual bool is_exact() const final;
-
+ 
     virtual std::shared_ptr<IR::SIMDTypeExpr> get_casted_operand_type() const final;//Returns the operand type casted to SIMDTypeExpr. Just a helper function to make life easier
     virtual std::size_t get_basetype_width() const final;//Returns the bit width of the operand basetype. Just a helper function to make life easier
     virtual std::size_t get_num_elements() const final;//Returns the number of elements in the vector. Just a helper function to make life easier
 
-    virtual InstOperandTypeVarient get_operand_type_varient() const final;
+    virtual InstOperandTypeVarient get_operand_type_varient() const override final;
 };
 
 class VecIntAddInst:public VecIntArithmeticBinaryInst {
@@ -182,8 +182,9 @@ class FloatArithmeticBinaryInst:public ArithmeticBinaryInst {
 
     virtual std::shared_ptr<IR::FloatTypeExpr> get_casted_operand_type() const final;//Returns the operand type casted to SIMDTypeExpr. Just a helper function to make life easier
     virtual std::size_t get_bit_width() const final;//Returns the bit width of the operand type. Just a helper function to make life easier
+    virtual bool is_brain_float() const final;
 
-    virtual InstOperandTypeVarient get_operand_type_varient() const final;
+    virtual InstOperandTypeVarient get_operand_type_varient() const override final;
 };
 class FloatAddInst:public FloatArithmeticBinaryInst {
     public:
@@ -244,8 +245,8 @@ class VecFloatArithmeticBinaryInst:public ArithmeticBinaryInst {
     virtual std::shared_ptr<IR::SIMDTypeExpr> get_casted_operand_type() const final;//Returns the operand type casted to SIMDTypeExpr. Just a helper function to make life easier
     virtual std::shared_ptr<IR::FloatTypeExpr> get_basetype() const final;//We dont return width of base type because it can be f16,bf16 and so on. Width alone not enough
     virtual std::size_t get_num_elements() const final;//Returns the number of elements in the vector. Just a helper function to make life easier
-
-    virtual InstOperandTypeVarient get_operand_type_varient() const final;
+    
+    virtual InstOperandTypeVarient get_operand_type_varient() const override final;
 };
 
 class VecFloatAddInst:public VecFloatArithmeticBinaryInst {

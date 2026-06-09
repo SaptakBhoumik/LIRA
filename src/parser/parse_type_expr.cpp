@@ -91,7 +91,13 @@ TypeExprPtr Parser::parse_array_type_expr(bool has_attribute){
     TypeExprPtr base_type = parse_type_expr(true);
     expect(TokenType::comma, "Expected ',' after base type in array type expression");
     expect(TokenType::number, "Expected array size after '[' in array type expression");
-    Token size = this->curr_tok;
+    std::size_t size;
+    try{
+        size = std::stoull(this->curr_tok.value);
+    }
+    catch(const std::exception& e){
+        error(this->curr_tok, "Invalid array size in array type expression", "Expected a positive integer");
+    }
     expect(TokenType::rbracket, "Expected ']' after array size in array type expression");
     std::vector<AttributePtr> attributes;
     if(has_attribute && peek().type == TokenType::hash){
@@ -106,7 +112,13 @@ TypeExprPtr Parser::parse_simd_type_expr(bool has_attribute){
     TypeExprPtr base_type = parse_type_expr(true);
     expect(TokenType::comma, "Expected ',' after base type in SIMD type expression");
     expect(TokenType::number, "Expected SIMD size after '<' in SIMD type expression");
-    Token size = this->curr_tok;
+    std::size_t size;
+    try{
+        size = std::stoull(this->curr_tok.value);
+    }
+    catch(const std::exception& e){
+        error(this->curr_tok, "Invalid SIMD size in SIMD type expression", "Expected a positive integer");
+    }
     expect(TokenType::rangel, "Expected '>' after SIMD size in SIMD type expression");
     std::vector<AttributePtr> attributes;
     if(has_attribute && peek().type == TokenType::hash){

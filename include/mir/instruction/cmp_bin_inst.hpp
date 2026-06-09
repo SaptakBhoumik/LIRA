@@ -364,18 +364,18 @@ class FloatGeInst:public FloatCmpBinaryInst {
     std::string to_string() const override;
 };
 
-class EitherNaNInst:public FloatCmpBinaryInst {
+class FloatEitherNanInst:public FloatCmpBinaryInst {
     public:
-    EitherNaNInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+    FloatEitherNanInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                 FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
 };
 
-class NeitherNaNInst:public FloatCmpBinaryInst {
+class FloatNeitherNanInst:public FloatCmpBinaryInst {
     public:
-    NeitherNaNInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+    FloatNeitherNanInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                 FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override final;
@@ -454,18 +454,18 @@ class VecFloatGeInst:public VecFloatCmpBinaryInst {
     std::string to_string() const override;
 };
 
-class VecEitherNaNInst:public VecFloatCmpBinaryInst {
+class VecFloatEitherNanInst:public VecFloatCmpBinaryInst {
     public:
-    VecEitherNaNInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+    VecFloatEitherNanInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                      FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
 };
 
-class VecNeitherNaNInst:public VecFloatCmpBinaryInst {
+class VecFloatNeitherNanInst:public VecFloatCmpBinaryInst {
     public:
-    VecNeitherNaNInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+    VecFloatNeitherNanInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                       FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override final;

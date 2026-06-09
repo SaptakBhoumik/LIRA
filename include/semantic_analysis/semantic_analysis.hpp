@@ -11,11 +11,11 @@ class SemanticAnalyzer {
     IR::ProgramPtr program;
 
     //Utils.
+    //type_eq,type_compatible,add_global_type all expect reduced types. So the caller should call get_reduced_type before calling these functions.
     bool type_eq(IR::TypeExprPtr t1, IR::TypeExprPtr t2) const;//Check if two types are equal. This is a recursive function that checks if the two types are equal
-    bool type_compatible(IR::TypeExprPtr type, IR::ExprPtr literal) const;//Check if a type is compatible with a literal. This is used to check if a literal can be assigned to a variable of a certain type.
+    bool type_compatible(IR::TypeExprPtr type, IR::ExprPtr literal) const;//Check if a reduced type is compatible with a literal. This is used to check if a literal can be assigned to a variable of a certain type.
     //Throws error if name is already defined in the current scope.
     void add_local_sym(IR::Token name, IR::TypeExprPtr type);
-    void add_local_type(IR::Token name, IR::TypeExprPtr type);
     void add_local_temp_block_sym(IR::Token name, IR::TypeExprPtr type);//Temporary block variable only defined in the current block
     void add_global_sym(IR::Token name, IR::TypeExprPtr type);
     void add_global_type(IR::Token name, IR::TypeExprPtr type);
@@ -26,7 +26,7 @@ class SemanticAnalyzer {
                                                                                                                                                    // True if flag found. Else false. Assumes the flag attribute has no argument. IF it has error then error
 
     IR::TypeExprPtr get_sym_reduced_type(IR::Token name) const;//Get the reduced type of symbol.
-    IR::TypeExprPtr get_reduced_type(IR::TypeExprPtr type) const;//Get the reduced type of a type expression.
+    IR::TypeExprPtr get_reduced_type(IR::TypeExprPtr type) const;//Get the reduced type of a type expression. Throws error if unsupported attribute is found or if type defination is wrong
     //TODO:Other things
 
     //Instruction analysis. NOTE: The analyze_instruction function analyzes instruction within a label so cant handle stuff like .global and .assign_type which are global 
@@ -45,7 +45,38 @@ class SemanticAnalyzer {
                                       IR::InstructionStmtPtr inst_stmt);
 
     MIR::InstPtr analyze_bitwise_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
+    MIR::InstPtr analyze_and_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::InstOperandTypeVarient type_varient, 
+                                      IR::InstructionStmtPtr inst_stmt);
+    MIR::InstPtr analyze_or_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::InstOperandTypeVarient type_varient, 
+                                      IR::InstructionStmtPtr inst_stmt);
+    MIR::InstPtr analyze_xor_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::InstOperandTypeVarient type_varient, 
+                                      IR::InstructionStmtPtr inst_stmt);
+    MIR::InstPtr analyze_shl_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::InstOperandTypeVarient type_varient,
+                                      IR::InstructionStmtPtr inst_stmt);
+    MIR::InstPtr analyze_lshr_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::InstOperandTypeVarient type_varient,
+                                      IR::InstructionStmtPtr inst_stmt);
+    MIR::InstPtr analyze_ashr_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::InstOperandTypeVarient type_varient,
+                                      IR::InstructionStmtPtr inst_stmt);
+
+
     MIR::InstPtr analyze_cmp_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
+    MIR::InstPtr analyze_eq_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+                                     IR::TypeExprPtr type, MIR::InstOperandTypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);
+    MIR::InstPtr analyze_neq_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                                      IR::TypeExprPtr type, MIR::InstOperandTypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);
+    MIR::InstPtr analyze_gt_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                                      IR::TypeExprPtr type, MIR::InstOperandTypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);
+    MIR::InstPtr analyze_lt_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                                      IR::TypeExprPtr type, MIR::InstOperandTypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);
+    MIR::InstPtr analyze_ge_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+                                      IR::TypeExprPtr type, MIR::InstOperandTypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);
+    MIR::InstPtr analyze_le_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+                                      IR::TypeExprPtr type, MIR::InstOperandTypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);
+    MIR::InstPtr analyze_either_nan_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+                                            IR::TypeExprPtr type, MIR::InstOperandTypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);
+    MIR::InstPtr analyze_neither_nan_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                                             IR::TypeExprPtr type, MIR::InstOperandTypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);
+    
     MIR::InstPtr analyze_conv_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
     MIR::InstPtr analyze_unary_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
     MIR::InstPtr analyze_mem_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);

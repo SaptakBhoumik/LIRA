@@ -40,7 +40,7 @@
 - `` let T:%output_var = .shl(T:%input_var1, T:%input_var2)`` :- Bitwise shift left. T must be some integer of type ``i<N>`` or ``<i<N> , M>`` . It can have the attribute ``#[nuw]`` or ``#[nsw]`` or both.
 - `` let T:%output_var = .lshr(T:%input_var1, T:%input_var2)`` :- Logical shift right. T must be some integer of type ``i<N>`` or ``<i<N> , M>`` . It can have the attribute ``#[exact]``.
 - `` let T:%output_var = .ashr(T:%input_var1, T:%input_var2)`` :- Arithmetic shift right. T must be some integer of type ``i<N>`` or ``<i<N> , M>`` . It can have the attribute ``#[exact]``.
-
+  
 ## Comparison instructions
 
 - `` let T1:%output_var = .eq(T:%input_var1, T:%input_var2)`` :- Compares 2 values for equality. T can be any type of form ``T0`` or ``<T0,M>`` where T0 is some float/brain float/integer/ptr. The output is of type i1/<i1,M> based on if input type is vector or not

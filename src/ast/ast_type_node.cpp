@@ -1,4 +1,5 @@
 #include "ast/ast.hpp"
+#include <cstddef>
 
 namespace LIRA {
 namespace IR {
@@ -173,7 +174,7 @@ std::string MetaTypeExpr::to_string() const{
 }
 
 
-ArrayTypeExpr::ArrayTypeExpr(Token tok, TypeExprPtr base_type, Token size, std::vector<AttributePtr> attributes){
+ArrayTypeExpr::ArrayTypeExpr(Token tok, TypeExprPtr base_type, std::size_t size, std::vector<AttributePtr> attributes){
     this->tok = tok;
     this->base_type = base_type;
     this->size = size;
@@ -183,7 +184,7 @@ ArrayTypeExpr::ArrayTypeExpr(Token tok, TypeExprPtr base_type, Token size, std::
 TypeExprPtr ArrayTypeExpr::get_basetype() const{
     return this->base_type;
 }
-Token ArrayTypeExpr::get_size() const{
+std::size_t ArrayTypeExpr::get_size() const{
     return this->size;
 }
 
@@ -197,7 +198,7 @@ std::vector<AttributePtr> ArrayTypeExpr::get_attributes() const{
     return this->attributes;
 }
 std::string ArrayTypeExpr::to_string() const{
-    std::string res = "[" + this->base_type->to_string() + "," + this->size.value + "]";
+    std::string res = "[" + this->base_type->to_string() + "," + std::to_string(this->size) + "]";
     for(const auto& attr: this->attributes){
         res += " "+attr->to_string();
     }
@@ -208,7 +209,7 @@ std::string ArrayTypeExpr::to_string() const{
 }
 
 
-SIMDTypeExpr::SIMDTypeExpr(Token tok, TypeExprPtr base_type, Token size, std::vector<AttributePtr> attributes){
+SIMDTypeExpr::SIMDTypeExpr(Token tok, TypeExprPtr base_type, std::size_t size, std::vector<AttributePtr> attributes){
     this->tok = tok;
     this->base_type = base_type;
     this->size = size;
@@ -218,7 +219,7 @@ SIMDTypeExpr::SIMDTypeExpr(Token tok, TypeExprPtr base_type, Token size, std::ve
 TypeExprPtr SIMDTypeExpr::get_basetype() const{
     return this->base_type;
 }
-Token SIMDTypeExpr::get_size() const{
+std::size_t SIMDTypeExpr::get_size() const{
     return this->size;
 }
 
@@ -232,7 +233,7 @@ std::vector<AttributePtr> SIMDTypeExpr::get_attributes() const{
     return this->attributes;
 }
 std::string SIMDTypeExpr::to_string() const{
-    std::string res = "<" + this->size.value + " x " + this->base_type->to_string() + ">";
+    std::string res = "<" + std::to_string(this->size) + " x " + this->base_type->to_string() + ">";
     for(const auto& attr: this->attributes){
         res += " "+attr->to_string();
     }

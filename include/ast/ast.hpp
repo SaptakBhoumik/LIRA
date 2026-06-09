@@ -183,12 +183,12 @@ class ArrayTypeExpr : public TypeExpr{
     std::vector<AttributePtr> attributes;
     
     TypeExprPtr base_type;
-    Token size;
+    std::size_t size;
     public:
-    ArrayTypeExpr(Token tok, TypeExprPtr base_type, Token size, std::vector<AttributePtr> attributes);
+    ArrayTypeExpr(Token tok, TypeExprPtr base_type, std::size_t size, std::vector<AttributePtr> attributes);
 
     TypeExprPtr get_basetype() const;
-    Token get_size() const;
+    std::size_t get_size() const;
     
     TypeExprKind get_kind() const override;
     Token get_token() const override;
@@ -198,16 +198,16 @@ class ArrayTypeExpr : public TypeExpr{
 
 class SIMDTypeExpr : public TypeExpr{
     // <type,size> #[attributes]
-    Token tok;//the '[' token for error reporting
+    Token tok;//the '<' token for error reporting
     std::vector<AttributePtr> attributes;
     
     TypeExprPtr base_type;
-    Token size;
+    std::size_t size;
     public:
-    SIMDTypeExpr(Token tok, TypeExprPtr base_type, Token size, std::vector<AttributePtr> attributes);
+    SIMDTypeExpr(Token tok, TypeExprPtr base_type, std::size_t size, std::vector<AttributePtr> attributes);
 
     TypeExprPtr get_basetype() const;
-    Token get_size() const;
+    std::size_t get_size() const;
 
     TypeExprKind get_kind() const override;
     Token get_token() const override;

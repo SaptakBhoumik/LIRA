@@ -1,6 +1,7 @@
 #pragma once
 #include "ast/ast.hpp"
 #include "_instruction.hpp"
+#include <memory>
 namespace LIRA {
 namespace MIR {
 // ---------------------------Comparison Binary operations ---------------------------
@@ -25,7 +26,7 @@ class CmpBinaryInst:public Inst {
 
     virtual ~CmpBinaryInst() = default;
 
-    virtual InstOperandTypeVarient get_operand_type_varient() const final;//Can be calculated easily from ``type``. Just a helper function
+    virtual InstOperandTypeVarient get_operand_type_varient() const = 0;//Can be calculated easily from ``type``. Just a helper function
     virtual IR::TypeExprPtr get_operand_type() const final;
     virtual IR::LiteralExprPtr get_lhs() const final;
     virtual IR::LiteralExprPtr get_rhs() const final;
@@ -35,7 +36,7 @@ class CmpBinaryInst:public Inst {
     virtual InstType get_inst_type() const override final;
 };
 
-// ---------------------------Int Comparison Binary operations ---------------------------
+// ---------------------------Integer Comparison Binary operations ---------------------------
 class IntCmpBinaryInst:public CmpBinaryInst {
     protected:
     bool unsigned_;//Whether it is unsigned comparison or not. Ignored for eq and neq instructions
@@ -48,6 +49,7 @@ class IntCmpBinaryInst:public CmpBinaryInst {
 
     virtual std::shared_ptr<IR::IntTypeExpr> get_casted_operand_type() const final;//Returns the operand type casted to IntTypeExpr. Just a helper function to make life easier
     virtual std::size_t get_bit_width() const final;//Returns the bit width of the operand type. Just a helper function to make life easier
+    virtual InstOperandTypeVarient get_operand_type_varient() const final;
 };
 
 class IntEqInst:public IntCmpBinaryInst {
@@ -118,6 +120,7 @@ class VecIntCmpBinaryInst:public CmpBinaryInst {
     virtual std::shared_ptr<IR::SIMDTypeExpr> get_casted_operand_type() const final;//Returns the operand type casted to SIMDTypeExpr. Just a helper function to make life easier
     virtual std::size_t get_basetype_width() const final;//Returns the bit width of the operand basetype. Just a helper function to make life easier
     virtual std::size_t get_num_elements() const final;//Returns the number of elements in the vector. Just a helper function to make life easier
+    virtual InstOperandTypeVarient get_operand_type_varient() const final;
 };
 
 class VecIntEqInst:public VecIntCmpBinaryInst {
@@ -175,7 +178,7 @@ class VecIntGeInst:public VecIntCmpBinaryInst {
 };
 
 
-// ---------------------------Int Comparison Binary operations ---------------------------
+// ---------------------------Ptr Comparison Binary operations ---------------------------
 class PtrCmpBinaryInst:public CmpBinaryInst {
     public:
     //We already know the in type. No need to get the type again because it is always ptr
@@ -183,6 +186,7 @@ class PtrCmpBinaryInst:public CmpBinaryInst {
 
     virtual std::size_t get_bit_width() const final;//Returns the bit width of the operand type. We only support x86_64 so returns 64. I made this function just in case we support more arch in future
                                                     //Just a helper function to make life easier. 
+    virtual InstOperandTypeVarient get_operand_type_varient() const final;
 };
 
 class PtrEqInst:public PtrCmpBinaryInst {
@@ -235,15 +239,15 @@ class PtrGeInst:public PtrCmpBinaryInst {
     std::string to_string() const override;
 };
 
-// ---------------------------Vector integer Comparison Binary operations ---------------------------
+// ---------------------------Vector ptr Comparison Binary operations ---------------------------
 class VecPtrCmpBinaryInst:public CmpBinaryInst {
     public:
     VecPtrCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type);
 
-    virtual bool is_unsigned() const final;
-
+    virtual std::shared_ptr<IR::SIMDTypeExpr> get_casted_type() const final;
     virtual std::size_t get_basetype_width() const final;//Returns the bit width of the operand basetype. Returns 64 cuz we support only x86_64 but can return diffrent in future if we support more arch. Just a helper function to make life easier
     virtual std::size_t get_num_elements() const final;//Returns the number of elements in the vector. Just a helper function to make life easier
+    virtual InstOperandTypeVarient get_operand_type_varient() const final;
 };
 
 class VecPtrEqInst:public VecPtrCmpBinaryInst {
@@ -308,6 +312,8 @@ class FloatCmpBinaryInst:public CmpBinaryInst {
 
     virtual std::shared_ptr<IR::FloatTypeExpr> get_casted_operand_type() const final;//Returns the operand type casted to SIMDTypeExpr. Just a helper function to make life easier
     virtual std::size_t get_bit_width() const final;//Returns the bit width of the operand type. Just a helper function to make life easier
+    virtual bool is_brain_float() const final;
+    virtual InstOperandTypeVarient get_operand_type_varient() const final;
 };
 
 class FloatEqInst:public FloatCmpBinaryInst {
@@ -398,6 +404,7 @@ class VecFloatCmpBinaryInst:public CmpBinaryInst {
     virtual std::shared_ptr<IR::SIMDTypeExpr> get_casted_operand_type() const final;//Returns the operand type casted to SIMDTypeExpr. Just a helper function to make life easier
     virtual std::shared_ptr<IR::FloatTypeExpr> get_basetype() const final;//We dont return width of base type because it can be f16,bf16 and so on. Width alone not enough
     virtual std::size_t get_num_elements() const final;//Returns the number of elements in the vector. Just a helper function to make life easier
+    virtual InstOperandTypeVarient get_operand_type_varient() const final;
 };
 
 class VecFloatEqInst:public VecFloatCmpBinaryInst {

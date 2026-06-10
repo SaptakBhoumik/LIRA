@@ -9,7 +9,7 @@ class BitwiseBinaryInst:public Inst {
     IR::LiteralExprPtr lhs;
     IR::LiteralExprPtr rhs;
     public:
-    enum class OpType:std::uint32_t{
+    enum class OpType:std::uint64_t{
         AND = 1 << 6,
         OR = 1 << 7,
         XOR = 1 << 8,

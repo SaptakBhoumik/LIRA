@@ -15,7 +15,7 @@ class AtomicRMWInst:public Inst {
     IR::LiteralExprPtr value;
     IR::TypeExprPtr type;//Reduced type of value
     public:
-    enum class OpType:std::uint32_t{
+    enum class OpType:std::uint64_t{
         XCHG = 1 << 6,
         FETCH_ADD = 1 << 7,
         FETCH_SUB = 1 << 8,
@@ -33,7 +33,7 @@ class AtomicRMWInst:public Inst {
 
     virtual ~AtomicRMWInst() = default;
 
-    virtual InstOperandTypeVarient get_type_varient() const final;//Can be calculated easily from ``type``. Just a helper function
+    virtual InstOperandTypeVarient get_type_varient() const = 0;
     virtual IR::TypeExprPtr get_type() const final;
     virtual IR::LiteralExprPtr get_pointer() const final;
     virtual IR::LiteralExprPtr get_value() const final;
@@ -46,16 +46,19 @@ class AtomicRMWInst:public Inst {
     virtual InstType get_inst_type() const override final;
 };
 
+
 // --------------------------- Integer Atomic read modify operations ---------------------------
 class IntAtomicRMWInst:public AtomicRMWInst {
-    bool signed_;//Whether the integer type is signed or not. Just a helper function to make life easier. False for unsigned integer. Ignored for instruction that dont care
+    protected:
+    bool unsigned_;//Whether the integer type is unsigned or not. Just a helper function to make life easier. False for unsigned integer. Ignored for instruction that dont care
     public:
     IntAtomicRMWInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                     IR::TypeExprPtr type, std::size_t alignment, bool volatile_, SyncScope syncscope, AtomicOrdering ordering, bool signed_);
+                     IR::TypeExprPtr type, std::size_t alignment, bool volatile_, SyncScope syncscope, AtomicOrdering ordering, bool unsigned_);
 
-    std::shared_ptr<IR::IntTypeExpr> get_casted_type() const;//Returns the type casted to IntTypeExpr. Just a helper function to make life easier
-    std::size_t get_bit_width() const;//Returns the bit width of the type. Calculated automatically
+    virtual std::shared_ptr<IR::IntTypeExpr> get_casted_type() const final;//Returns the type casted to IntTypeExpr. Just a helper function to make life easier
+    virtual std::size_t get_bit_width() const final;//Returns the bit width of the type. Calculated automatically
 
+    virtual InstOperandTypeVarient get_type_varient() const override final;
 };
 
 class IntAtomicXchgInst:public IntAtomicRMWInst {
@@ -124,7 +127,7 @@ class IntAtomicFetchXorInst:public IntAtomicRMWInst {
 class IntAtomicFetchMaxInst:public IntAtomicRMWInst {
     public:
     IntAtomicFetchMaxInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                    IR::TypeExprPtr type, std::size_t alignment, bool volatile_, SyncScope syncscope, AtomicOrdering ordering, bool signed_);
+                    IR::TypeExprPtr type, std::size_t alignment, bool volatile_, SyncScope syncscope, AtomicOrdering ordering, bool unsigned_);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -133,7 +136,7 @@ class IntAtomicFetchMaxInst:public IntAtomicRMWInst {
 class IntAtomicFetchMinInst:public IntAtomicRMWInst {
     public:
     IntAtomicFetchMinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                    IR::TypeExprPtr type, std::size_t alignment, bool volatile_, SyncScope syncscope, AtomicOrdering ordering, bool signed_);
+                    IR::TypeExprPtr type, std::size_t alignment, bool volatile_, SyncScope syncscope, AtomicOrdering ordering, bool unsigned_);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -163,9 +166,11 @@ class FloatAtomicRMWInst:public AtomicRMWInst {
     FloatAtomicRMWInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                         IR::TypeExprPtr type, std::size_t alignment, bool volatile_, SyncScope syncscope, AtomicOrdering ordering);
 
-    std::shared_ptr<IR::FloatTypeExpr> get_casted_type() const;//Returns the type casted to FloatTypeExpr. Just a helper function to make life easier
-    std::size_t get_bit_width() const;//Returns the bit width of the type. Calculated automatically
-    bool is_brain_float() const;//Whether the type is brain float or not. Just a helper function to make life easier
+    virtual std::shared_ptr<IR::FloatTypeExpr> get_casted_type() const final;//Returns the type casted to FloatTypeExpr. Just a helper function to make life easier
+    virtual std::size_t get_bit_width() const final;//Returns the bit width of the type. Calculated automatically
+    virtual bool is_brain_float() const final;//Whether the type is brain float or not. Just a helper function to make life easier
+
+    virtual InstOperandTypeVarient get_type_varient() const override final;
 };
 
 class FloatAtomicXchgInst:public FloatAtomicRMWInst {

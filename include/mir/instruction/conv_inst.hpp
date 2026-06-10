@@ -10,7 +10,7 @@ class ConversionInst:public Inst {
     IR::TypeExprPtr in_type;//Reduced in type. 
     IR::TypeExprPtr out_type;//Reduced out type. 
     public:
-    enum class OpType:std::uint32_t{
+    enum class OpType:std::uint64_t{
         TRUNC = 1 << 6,
         EXT = 1 << 7,
         FLOAT_TO_INT = 1 << 8,

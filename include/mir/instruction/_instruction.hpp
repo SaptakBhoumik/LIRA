@@ -1,5 +1,6 @@
 #pragma once
 #include "ast/ast.hpp"
+#include <string>
 #include <sys/cdefs.h>
 #include "mir/destregister.hpp"
 namespace LIRA {
@@ -88,7 +89,7 @@ enum class InstOperandTypeVarient:std::uint64_t{
     /*
     We will usually do matching on InstOperandTypeVarient | Opcode. So for every enum opcode, make sure to have a unique bit pattern starting from 1 << 6.
     Like the following
-    enum class OpType:std::uint32_t{
+    enum class OpType:std::uint64_t{
         ADD = 1 << 6,
         SUB = 1 << 7,
         MUL = 1 << 8,
@@ -166,6 +167,7 @@ enum class SyncScope:std::uint64_t{
     SingleThread = 1 << 0,
     Global = 1 << 1
 };
+std::string to_string(SyncScope syncscope);
 
 enum class AtomicOrdering:std::uint64_t{
     UNORDERED = 1 << 0,
@@ -175,6 +177,7 @@ enum class AtomicOrdering:std::uint64_t{
     ACQUIRE_RELEASE = 1 << 4, // acq_rel
     SEQUENTIALLY_CONSISTENT = 1 << 5 // seq_cst
 };
+std::string to_string(AtomicOrdering ordering);
 
 enum class CallingConv:std::uint64_t{
     CCC = 1 << 0,
@@ -182,6 +185,7 @@ enum class CallingConv:std::uint64_t{
     COLDCC = 1 << 2,
     TAILCC = 1 << 3,
 };
+std::string to_string(CallingConv ordering);
 
 }
 }

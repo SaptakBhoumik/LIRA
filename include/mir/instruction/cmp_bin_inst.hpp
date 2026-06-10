@@ -11,7 +11,7 @@ class CmpBinaryInst:public Inst {
     IR::LiteralExprPtr rhs;
     IR::TypeExprPtr type;//Reduced type. 
     public:
-    enum class OpType:std::uint32_t{
+    enum class OpType:std::uint64_t{
         EQ = 1 << 6,
         NEQ = 1 << 7,
         LT = 1 << 8,

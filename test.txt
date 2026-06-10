@@ -1,1 +1,15 @@
 Debug/Intrinsic
+
+## Conversion instructions
+## Memory instructions 
+## Terminator instructions 
+## Call instruction
+
+
+## Conversion instructions
+## Unary instructions
+## Memory instructions 
+## Atomic Read-Modify-Write instructions
+## Terminator instructions 
+## Call instruction
+## Other instructions

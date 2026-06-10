@@ -233,7 +233,7 @@ std::vector<AttributePtr> SIMDTypeExpr::get_attributes() const{
     return this->attributes;
 }
 std::string SIMDTypeExpr::to_string() const{
-    std::string res = "<" + std::to_string(this->size) + " x " + this->base_type->to_string() + ">";
+    std::string res = "<" + this->base_type->to_string() + "," + std::to_string(this->size) + ">";
     for(const auto& attr: this->attributes){
         res += " "+attr->to_string();
     }

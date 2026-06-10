@@ -8,10 +8,9 @@ class ScalarSelectInst:public Inst {
     IR::LiteralExprPtr condition;//The condition to check. Must be of i1
     IR::LiteralExprPtr true_value;//The value and its type to return if condition is true
     IR::LiteralExprPtr false_value;//The value and its type to return if condition is false
-    IR::TypeExprPtr type;//The reduced type of true_value and false_value. Both must be of same type
     public:
     ScalarSelectInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr condition, 
-                     IR::LiteralExprPtr true_value, IR::LiteralExprPtr false_value, IR::TypeExprPtr type);
+                     IR::LiteralExprPtr true_value, IR::LiteralExprPtr false_value);
 
     IR::LiteralExprPtr get_condition() const;
     IR::LiteralExprPtr get_true_value() const;
@@ -26,11 +25,10 @@ class LanewiseSelectInst:public Inst {
     IR::LiteralExprPtr condition;//The condition to check. Must be of i1
     IR::LiteralExprPtr true_value;//The value and its type to return if condition is true
     IR::LiteralExprPtr false_value;//The value and its type to return if condition is false
-    IR::TypeExprPtr type;//The reduced type of true_value and false_value. Both must be of same type and must be SIMD type
 
     public:
     LanewiseSelectInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr condition, 
-                     IR::LiteralExprPtr true_value, IR::LiteralExprPtr false_value, IR::TypeExprPtr type);
+                       IR::LiteralExprPtr true_value, IR::LiteralExprPtr false_value);
         
     IR::LiteralExprPtr get_condition() const;
     IR::LiteralExprPtr get_true_value() const;
@@ -46,9 +44,8 @@ class LanewiseSelectInst:public Inst {
 
 class FreezeInst:public Inst {
     IR::LiteralExprPtr value;//The value and its type to freeze
-    IR::TypeExprPtr type;//The reduced type of value
     public:
-    FreezeInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr type);
+    FreezeInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value);
 
     IR::LiteralExprPtr get_value() const;
     IR::TypeExprPtr get_type() const;
@@ -62,7 +59,7 @@ class VaargInst:public Inst {
     IR::LiteralExprPtr pointer;//The pointer to the variable argument list. Must be of type i8*
     IR::TypeExprPtr type;//The type of the argument to retrieve. Can be any type
     public:
-    VaargInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::TypeExprPtr type);    
+    VaargInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer);    
 
     IR::LiteralExprPtr get_pointer() const;
     IR::TypeExprPtr get_type() const;
@@ -94,8 +91,11 @@ class ShuffleVectorInst:public Inst {
     ShuffleVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, std::pair<IR::LiteralExprPtr,IR::TypeExprPtr> input1, 
                       std::pair<IR::LiteralExprPtr,IR::TypeExprPtr> input2, std::vector<std::int16_t> mask);
     
-    std::pair<IR::LiteralExprPtr,std::shared_ptr<IR::SIMDTypeExpr>> get_input1() const;
-    std::pair<IR::LiteralExprPtr,std::shared_ptr<IR::SIMDTypeExpr>> get_input2() const;
+    std::pair<IR::LiteralExprPtr,IR::TypeExprPtr> get_input1() const;
+    std::pair<IR::LiteralExprPtr,IR::TypeExprPtr> get_input2() const;
+    std::pair<std::shared_ptr<IR::SIMDTypeExpr>,std::shared_ptr<IR::SIMDTypeExpr>> get_casted_input_types() const;
+    std::pair<std::size_t,std::size_t> get_input_vector_size() const;
+    IR::TypeExprPtr get_input_basetype() const;
     std::vector<std::int16_t> get_mask() const;
 
     InstType get_inst_type() const override;

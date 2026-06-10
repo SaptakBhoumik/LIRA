@@ -9,7 +9,7 @@ bool is_bitwise_bin_inst(std::string inst_name){
     return inst_name == ".and" || inst_name == ".or" || inst_name == ".xor" || inst_name == ".shl" || inst_name == ".lshr" || inst_name == ".ashr";
 }
 bool is_cmp_bin_inst(std::string inst_name){
-    return inst_name == ".eq" || inst_name == ".ne" || inst_name == ".gt" || inst_name == ".ge" || inst_name == ".lt" || inst_name == ".le" 
+    return inst_name == ".eq" || inst_name == ".neq" || inst_name == ".gt" || inst_name == ".ge" || inst_name == ".lt" || inst_name == ".le" 
             || inst_name == ".either_nan" || inst_name == ".neither_nan";
 }
 bool is_conv_inst(std::string inst_name){

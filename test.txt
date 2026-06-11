@@ -15,8 +15,3 @@ Debug/Intrinsic
 
 
 
-Let me count carefully by going through each group:
-1. Arithmetic: .clamp, .
-2. Overflow-Detecting: .add_overflow, .sub_overflow, .mul_overflow = 3
-4. Bit Manipulation: .fshl, .fshr = 9
-7. Vector/SIMD: .splat, .stepvector, .zip, .unzip, .widen_add, .widen_mul

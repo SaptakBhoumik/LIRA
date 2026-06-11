@@ -209,7 +209,7 @@ Unlikely but in future if we support other bit system like 32 bit then we have t
 
 - ``let T:%output_var = .parity(T:%input_var)`` :- Parity of an integer value. T must be some type of form ``T0`` or ``<T0,M>`` where T0 is some integer. The output is of type i1/<i1,M> based on if input type is vector or not. It returns 1 if the number of set bits in the input is odd and 0 if the number of set bits in the input is even.
 
-- ``let T:%output_var = .bswap(T:%input_var)`` :- Byte swap of an integer value. T must be some type of form ``T0`` or ``<T0,M>`` where T0 is some integer. It reverses the order of bytes in the input value. So for example if the input is 0x12345678 then the output will be 0x78563412. The bitwidth but be multile of 8
+- ``let T:%output_var = .bswap(T:%input_var)`` :- Byte swap of an integer/float value. T must be some type of form ``T0`` or ``<T0,M>`` where T0 is some integer/float/brain float. It reverses the order of bytes in the input value. So for example if the input is 0x12345678 then the output will be 0x78563412. The bitwidth but be multile of 8. The only reason it works for float is because the operation is kinda common for float(endians swap). Without float support, u would need bit case. Which works but no need to do it
 
 - ``let T:%output_var = .bitreverse(T:%input_var)`` :- Bit reverse of an integer value. T must be some type of form ``T0`` or ``<T0,M>`` where T0 is some integer. It reverses the order of bits in the input value. So for example if the input is 0b00000000000000000000000000001011 (32 bit) then the output will be 0b11010000000000000000000000000000 (32 bit). The bitwidth can be any integer type.
 
@@ -404,7 +404,7 @@ The following are atomic Read-Modify-Write. Atomically reads a value from memory
 
 - ``let T:%old = .fetch_parity(ptr:%ptr)`` :- Atomically computes the parity of the value at the memory location pointed to by ptr and returns the original value. The parity is 1 if the number of set bits in the value is odd and 0 if it is even. T must be an integer type.
 
-- ``let T:%old = .fetch_bswap(ptr:%ptr)`` :- Atomically swaps the byte order of the value at the memory location pointed to by ptr and returns the original value. T must be an integer type.
+- ``let T:%old = .fetch_bswap(ptr:%ptr)`` :- Atomically swaps the byte order of the value at the memory location pointed to by ptr and returns the original value. T must be an integer type/float. IT works for float because this endianness swap is common for float also. Without float support, u would need bit case. Which works but no need to do it
 
 - ``let T:%old = .fetch_bitreverse(ptr:%ptr)`` :- Atomically reverses the bits in the value at the memory location pointed to by ptr and returns the original value. T must be an integer type.
 

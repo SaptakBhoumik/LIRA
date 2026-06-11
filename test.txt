@@ -19,5 +19,4 @@ Let me count carefully by going through each group:
 1. Arithmetic: .clamp, .
 2. Overflow-Detecting: .add_overflow, .sub_overflow, .mul_overflow = 3
 4. Bit Manipulation: .fshl, .fshr = 9
-6. Memory Intrinsics: .memcpy, .memmove, .memset, .memcmp = 4
-7. Vector/SIMD: .splat, .stepvector, .zip, .unzip, .widen_add, .widen_mul, .reduce_and, .reduce_or, .reduce_xor, .reduce_min, .reduce_max = 13
+7. Vector/SIMD: .splat, .stepvector, .zip, .unzip, .widen_add, .widen_mul

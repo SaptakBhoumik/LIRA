@@ -80,7 +80,7 @@ class SemanticAnalyzer {
     MIR::InstPtr analyze_conv_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
     MIR::InstPtr analyze_unary_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
     MIR::InstPtr analyze_mem_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
-    MIR::InstPtr analyze_atomicrmw_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
+    MIR::InstPtr analyze_fetch_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
     MIR::InstPtr analyze_terminator_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
     MIR::InstPtr analyze_call_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
     MIR::InstPtr analyze_other_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);

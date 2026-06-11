@@ -1,0 +1,1 @@
+- Alignment is set to be 0 by default if aligment is not specified

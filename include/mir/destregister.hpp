@@ -1,6 +1,7 @@
 #pragma once
 #include "ast/ast.hpp"
 #include <sys/cdefs.h>
+#include <optional>
 namespace LIRA {
 namespace MIR{
 class LocalDestRegister{
@@ -19,11 +20,10 @@ class LocalDestRegister{
     std::string scope;//Empty if not set. Name of the scope variable in it. Used to define in what scope this register belongs to in the original user language. Set by the #[scope(scope:^scope_name)]
     std::string original_name;//Empty if not set. Name of the original variable(from user's language) that this register represents. Set by the #[name(str:"var name")]
     std::size_t dereferenceable_bytes; //If 0 means the value is not set
-    std::size_t alignment; //If 0 means the value is not set
-    std::optional<std::size_t> align;
+    std::size_t alignment;
     public:
     LocalDestRegister(std::string dest_register_name, IR::TypeExprPtr type,bool artificial, bool synthetic, bool nonnull, bool nopoison, bool nnan, bool ninf, 
-                      bool noalias, std::string original_name, std::string scope, std::size_t dereferenceable_bytes, std::size_t alignment,  std::optional<std::size_t> align);
+                      bool noalias, std::string original_name, std::string scope, std::size_t dereferenceable_bytes, std::size_t alignment);
 
     std::string get_dest_register_name() const;
     IR::TypeExprPtr get_type() const;
@@ -40,7 +40,6 @@ class LocalDestRegister{
     std::string get_scope() const;
     std::size_t get_dereferenceable_bytes() const;
     std::size_t get_alignment() const;
-    std::optional<std::size_t> get_align() const;
 
     std::string to_string() const;
 };

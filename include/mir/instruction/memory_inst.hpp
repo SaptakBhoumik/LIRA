@@ -21,7 +21,7 @@ class AllocaInst:public Inst {
     IR::TypeExprPtr size_var_type;//The type of the size variable. Must be of integer type.
     IR::LiteralExprPtr size_var;//The size variable 
 
-    std::size_t alignment;//The alignment of the allocated memory. Must be a power of 2 and less than or equal to 16. We need this because we want to support alloca with alignment in future. For now we can just set it to 0 and ignore it.
+    std::size_t alignment;
     public:
     AllocaInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::TypeExprPtr size_var_type, 
                 IR::LiteralExprPtr size_var, std::size_t alignment);

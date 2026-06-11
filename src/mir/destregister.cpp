@@ -4,7 +4,7 @@ namespace LIRA {
 namespace MIR{
 LocalDestRegister::LocalDestRegister(std::string dest_register_name, IR::TypeExprPtr type,bool artificial, bool synthetic, bool nonnull, bool nopoison, 
                                      bool nnan, bool ninf, bool noalias, std::string original_name, std::string scope, std::size_t dereferenceable_bytes, 
-                                     std::size_t alignment,  std::optional<std::size_t> align){
+                                     std::size_t alignment){
     this->dest_register_name = dest_register_name;
     this->type = type;
 
@@ -19,8 +19,7 @@ LocalDestRegister::LocalDestRegister(std::string dest_register_name, IR::TypeExp
     this->original_name = original_name;
     this->scope = scope;
     this->dereferenceable_bytes = dereferenceable_bytes;
-    this->alignment = alignment;
-    this->align = align;    
+    this->alignment = alignment;    
 }
 
 std::string LocalDestRegister::get_dest_register_name() const{
@@ -64,9 +63,6 @@ std::size_t LocalDestRegister::get_dereferenceable_bytes() const{
 std::size_t LocalDestRegister::get_alignment() const{
     return alignment;
 }
-std::optional<std::size_t> LocalDestRegister::get_align() const{
-    return align;
-}
 
 std::string LocalDestRegister::to_string() const{
     std::string result = type->to_string() + ":" + dest_register_name;
@@ -103,9 +99,6 @@ std::string LocalDestRegister::to_string() const{
     }
     if(alignment > 0) {
         result += " #[alignment(i64:" + std::to_string(alignment) + ")]";
-    }
-    if(align.has_value()) {
-        result += " #[align(i64:" + std::to_string(align.value()) + ")]";
     }
     return result;
 }

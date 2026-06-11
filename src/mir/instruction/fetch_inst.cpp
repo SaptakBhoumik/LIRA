@@ -65,7 +65,7 @@ AtomicRMWInst::OpType IntAtomicXchgInst::get_op_type() const{
 }
 std::string IntAtomicXchgInst::to_string() const{
     std::string result ="let " + this->get_destination()->to_string() + " = .int_atomic_xchg(ptr:" + this->pointer->to_string() + ", " + this->type->to_string() + " : " + this->value->to_string() + ")";
-    result += " #[ordering(" + MIR::to_string(this->ordering) + ")]";
+    result += " #[atomic(" + MIR::to_string(this->ordering) + ")]";
     result += " #[syncscope(" + MIR::to_string(this->syncscope) + ")]";
     result += " #[align(" + std::to_string(this->alignment) + ")]";
     if(this->volatile_){
@@ -83,7 +83,7 @@ AtomicRMWInst::OpType IntAtomicFetchAddInst::get_op_type() const{
 }
 std::string IntAtomicFetchAddInst::to_string() const{
     std::string result ="let " + this->get_destination()->to_string() + " = .int_atomic_fetchadd(ptr:" + this->pointer->to_string() + ", " + this->type->to_string() + " : " + this->value->to_string() + ")";
-    result += " #[ordering(" + MIR::to_string(this->ordering) + ")]";
+    result += " #[atomic(" + MIR::to_string(this->ordering) + ")]";
     result += " #[syncscope(" + MIR::to_string(this->syncscope) + ")]";
     result += " #[align(" + std::to_string(this->alignment) + ")]";
     if(this->volatile_){
@@ -101,7 +101,7 @@ AtomicRMWInst::OpType IntAtomicFetchSubInst::get_op_type() const{
 }
 std::string IntAtomicFetchSubInst::to_string() const{
     std::string result ="let " + this->get_destination()->to_string() + " = .int_atomic_fetchsub(ptr:" + this->pointer->to_string() + ", " + this->type->to_string() + " : " + this->value->to_string() + ")";
-    result += " #[ordering(" + MIR::to_string(this->ordering) + ")]";
+    result += " #[atomic(" + MIR::to_string(this->ordering) + ")]";
     result += " #[syncscope(" + MIR::to_string(this->syncscope) + ")]";
     result += " #[align(" + std::to_string(this->alignment) + ")]";
     if(this->volatile_){
@@ -119,7 +119,7 @@ AtomicRMWInst::OpType IntAtomicFetchAndInst::get_op_type() const{
 }
 std::string IntAtomicFetchAndInst::to_string() const{
     std::string result ="let " + this->get_destination()->to_string() + " = .int_atomic_fetchand(ptr:" + this->pointer->to_string() + ", " + this->type->to_string() + " : " + this->value->to_string() + ")";
-    result += " #[ordering(" + MIR::to_string(this->ordering) + ")]";
+    result += " #[atomic(" + MIR::to_string(this->ordering) + ")]";
     result += " #[syncscope(" + MIR::to_string(this->syncscope) + ")]";
     result += " #[align(" + std::to_string(this->alignment) + ")]";
     if(this->volatile_){
@@ -137,7 +137,7 @@ AtomicRMWInst::OpType IntAtomicFetchNandInst::get_op_type() const{
 }
 std::string IntAtomicFetchNandInst::to_string() const{
     std::string result ="let " + this->get_destination()->to_string() + " = .int_atomic_fetchnand(ptr:" + this->pointer->to_string() + ", " + this->type->to_string() + " : " + this->value->to_string() + ")";
-    result += " #[ordering(" + MIR::to_string(this->ordering) + ")]";
+    result += " #[atomic(" + MIR::to_string(this->ordering) + ")]";
     result += " #[syncscope(" + MIR::to_string(this->syncscope) + ")]";
     result += " #[align(" + std::to_string(this->alignment) + ")]";
     if(this->volatile_){
@@ -155,7 +155,7 @@ AtomicRMWInst::OpType IntAtomicFetchOrInst::get_op_type() const{
 }
 std::string IntAtomicFetchOrInst::to_string() const{
     std::string result ="let " + this->get_destination()->to_string() + " = .int_atomic_fetchor(ptr:" + this->pointer->to_string() + ", " + this->type->to_string() + " : " + this->value->to_string() + ")";
-    result += " #[ordering(" + MIR::to_string(this->ordering) + ")]";
+    result += " #[atomic(" + MIR::to_string(this->ordering) + ")]";
     result += " #[syncscope(" + MIR::to_string(this->syncscope) + ")]";
     result += " #[align(" + std::to_string(this->alignment) + ")]";
     if(this->volatile_){
@@ -173,7 +173,7 @@ AtomicRMWInst::OpType IntAtomicFetchXorInst::get_op_type() const{
 }
 std::string IntAtomicFetchXorInst::to_string() const{
     std::string result ="let " + this->get_destination()->to_string() + " = .int_atomic_fetchxor(ptr:" + this->pointer->to_string() + ", " + this->type->to_string() + " : " + this->value->to_string() + ")";
-    result += " #[ordering(" + MIR::to_string(this->ordering) + ")]";
+    result += " #[atomic(" + MIR::to_string(this->ordering) + ")]";
     result += " #[syncscope(" + MIR::to_string(this->syncscope) + ")]";
     result += " #[align(" + std::to_string(this->alignment) + ")]";
     if(this->volatile_){
@@ -191,7 +191,7 @@ AtomicRMWInst::OpType IntAtomicFetchMinInst::get_op_type() const{
 }
 std::string IntAtomicFetchMinInst::to_string() const{
     std::string result ="let " + this->get_destination()->to_string() + " = .int_atomic_fetchmin(ptr:" + this->pointer->to_string() + ", " + this->type->to_string() + " : " + this->value->to_string() + ")";
-    result += " #[ordering(" + MIR::to_string(this->ordering) + ")]";
+    result += " #[atomic(" + MIR::to_string(this->ordering) + ")]";
     result += " #[syncscope(" + MIR::to_string(this->syncscope) + ")]";
     result += " #[align(" + std::to_string(this->alignment) + ")]";
     if(this->volatile_){
@@ -212,7 +212,7 @@ AtomicRMWInst::OpType IntAtomicFetchMaxInst::get_op_type() const{
 }
 std::string IntAtomicFetchMaxInst::to_string() const{
     std::string result ="let " + this->get_destination()->to_string() + " = .int_atomic_fetchmax(ptr:" + this->pointer->to_string() + ", " + this->type->to_string() + " : " + this->value->to_string() + ")";
-    result += " #[ordering(" + MIR::to_string(this->ordering) + ")]";
+    result += " #[atomic(" + MIR::to_string(this->ordering) + ")]";
     result += " #[syncscope(" + MIR::to_string(this->syncscope) + ")]";
     result += " #[align(" + std::to_string(this->alignment) + ")]";
     if(this->volatile_){
@@ -233,7 +233,7 @@ AtomicRMWInst::OpType IntAtomicUincWrapInst::get_op_type() const{
 }
 std::string IntAtomicUincWrapInst::to_string() const{
     std::string result ="let " + this->get_destination()->to_string() + " = .int_atomic_uinc_wrap(ptr:" + this->pointer->to_string() + ", " + this->type->to_string() + " : " + this->value->to_string() + ")";
-    result += " #[ordering(" + MIR::to_string(this->ordering) + ")]";
+    result += " #[atomic(" + MIR::to_string(this->ordering) + ")]";
     result += " #[syncscope(" + MIR::to_string(this->syncscope) + ")]";
     result += " #[align(" + std::to_string(this->alignment) + ")]";
     if(this->volatile_){
@@ -251,7 +251,7 @@ AtomicRMWInst::OpType IntAtomicIdecWrapInst::get_op_type() const{
 }
 std::string IntAtomicIdecWrapInst::to_string() const{
     std::string result ="let " + this->get_destination()->to_string() + " = .int_atomic_idec_wrap(ptr:" + this->pointer->to_string() + ", " + this->type->to_string() + " : " + this->value->to_string() + ")";
-    result += " #[ordering(" + MIR::to_string(this->ordering) + ")]";
+    result += " #[atomic(" + MIR::to_string(this->ordering) + ")]";
     result += " #[syncscope(" + MIR::to_string(this->syncscope) + ")]";
     result += " #[align(" + std::to_string(this->alignment) + ")]";
     if(this->volatile_){
@@ -287,7 +287,7 @@ AtomicRMWInst::OpType FloatAtomicXchgInst::get_op_type() const{
 }
 std::string FloatAtomicXchgInst::to_string() const{
     std::string result ="let " + this->get_destination()->to_string() + " = .float_atomic_xchg(ptr:" + this->pointer->to_string() + ", " + this->type->to_string() + " : " + this->value->to_string() + ")";
-    result += " #[ordering(" + MIR::to_string(this->ordering) + ")]";
+    result += " #[atomic(" + MIR::to_string(this->ordering) + ")]";
     result += " #[syncscope(" + MIR::to_string(this->syncscope) + ")]";
     result += " #[align(" + std::to_string(this->alignment) + ")]";
     if(this->volatile_){
@@ -305,7 +305,7 @@ AtomicRMWInst::OpType FloatAtomicFetchAddInst::get_op_type() const{
 }
 std::string FloatAtomicFetchAddInst::to_string() const{
     std::string result ="let " + this->get_destination()->to_string() + " = .float_atomic_fetchadd(ptr:" + this->pointer->to_string() + ", " + this->type->to_string() + " : " + this->value->to_string() + ")";
-    result += " #[ordering(" + MIR::to_string(this->ordering) + ")]";
+    result += " #[atomic(" + MIR::to_string(this->ordering) + ")]";
     result += " #[syncscope(" + MIR::to_string(this->syncscope) + ")]";
     result += " #[align(" + std::to_string(this->alignment) + ")]";
     if(this->volatile_){
@@ -323,7 +323,7 @@ AtomicRMWInst::OpType FloatAtomicFetchSubInst::get_op_type() const{
 }
 std::string FloatAtomicFetchSubInst::to_string() const{
     std::string result ="let " + this->get_destination()->to_string() + " = .float_atomic_fetchsub(ptr:" + this->pointer->to_string() + ", " + this->type->to_string() + " : " + this->value->to_string() + ")";
-    result += " #[ordering(" + MIR::to_string(this->ordering) + ")]";
+    result += " #[atomic(" + MIR::to_string(this->ordering) + ")]";
     result += " #[syncscope(" + MIR::to_string(this->syncscope) + ")]";
     result += " #[align(" + std::to_string(this->alignment) + ")]";
     if(this->volatile_){
@@ -341,7 +341,7 @@ AtomicRMWInst::OpType FloatAtomicFetchMaxInst::get_op_type() const{
 }
 std::string FloatAtomicFetchMaxInst::to_string() const{
     std::string result ="let " + this->get_destination()->to_string() + " = .float_atomic_fetchmax(ptr:" + this->pointer->to_string() + ", " + this->type->to_string() + " : " + this->value->to_string() + ")";
-    result += " #[ordering(" + MIR::to_string(this->ordering) + ")]";
+    result += " #[atomic(" + MIR::to_string(this->ordering) + ")]";
     result += " #[syncscope(" + MIR::to_string(this->syncscope) + ")]";
     result += " #[align(" + std::to_string(this->alignment) + ")]";
     if(this->volatile_){
@@ -359,7 +359,7 @@ AtomicRMWInst::OpType FloatAtomicFetchMinInst::get_op_type() const{
 }
 std::string FloatAtomicFetchMinInst::to_string() const{
     std::string result ="let " + this->get_destination()->to_string() + " = .float_atomic_fetchmin(ptr:" + this->pointer->to_string() + ", " + this->type->to_string() + " : " + this->value->to_string() + ")";
-    result += " #[ordering(" + MIR::to_string(this->ordering) + ")]";
+    result += " #[atomic(" + MIR::to_string(this->ordering) + ")]";
     result += " #[syncscope(" + MIR::to_string(this->syncscope) + ")]";
     result += " #[align(" + std::to_string(this->alignment) + ")]";
     if(this->volatile_){

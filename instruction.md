@@ -30,16 +30,35 @@
 
     If ``T0`` is float or brain float then it can have the fast math attribute like ``#[fast]`` or ``#[nnan]`` or ``#[ninf]`` or ``#[nsz]`` or ``#[arcp]`` or ``#[contract]`` or ``#[afn]`` or ``#[reassoc]`` or any combination of these.
 
+- ``let T:%output_var = .copysign(T:%input_var1, T:%input_var2)`` :-  Copies the sign of input_var2 to input_var1. T must be some type of form ``T0`` or ``<T0,M>`` where T0 is some float/brain float/intger. If integer we assume it is signed because invalid for unsigned integer. 
 
+    If T0 is float or brain float then it can have the fast math attribute like ``#[fast]`` or ``#[nnan]`` or ``#[ninf]`` or ``#[nsz]`` or ``#[arcp]`` or ``#[contract]`` or ``#[afn]`` or ``#[reassoc]`` or any combination of these.
+
+- ``let T:%output_var = .min(T:%input_var1, T:%input_var2)`` :- Minimum of 2 values. T must be some type of form ``T0`` or ``<T0,M>`` where T0 is some float/brain float/integer. 
+
+    If T0 is integer then it can have the attribute ``#[unsigned]`` to indicate that it is unsigned minimum. By default it is signed minimum.
+
+    If T0 is float or brain float then it can have the fast math attribute like ``#[fast]`` or ``#[nnan]`` or ``#[ninf]`` or ``#[nsz]`` or ``#[arcp]`` or ``#[contract]`` or ``#[afn]`` or ``#[reassoc]`` or any combination of these. It also has the ``#[unordered]`` attribute and by default it is ordered min where if any of the input is NaN then the result is NaN. If you have #[unordered] then it is unordered min where if any of the input is NaN then the result is the other input. So if you do min(5.0, NaN) then the result is 5.0 if you have #[unordered] and the result is NaN if you dont have #[unordered].
+
+- ``let T:%output_var = .max(T:%input_var1, T:%input_var2)`` :- Maximum of 2 values. T must be some type of form ``T0`` or ``<T0,M>`` where T0 is some float/brain float/integer. 
+
+    If T0 is integer then it can have the attribute ``#[unsigned]`` to indicate that it is unsigned maximum. By default it is signed maximum.
+
+    If T0 is float or brain float then it can have the fast math attribute like ``#[fast]`` or ``#[nnan]`` or ``#[ninf]`` or ``#[nsz]`` or ``#[arcp]`` or ``#[contract]`` or ``#[afn]`` or ``#[reassoc]`` or any combination of these. It also has the attribute #[unordered] and by default it is ordered max where if any of the input is NaN then the result is NaN. If you have #[unordered] then it is unordered max where if any of the input is NaN then the result is the other input. So if you do max(5.0, NaN) then the result is 5.0 if you have #[unordered] and the result is NaN if you dont have #[unordered].
 
 ## Bitwise instructions
 
 - `` let T:%output_var = .and(T:%input_var1, T:%input_var2)`` :- Bitwise and. T must be some integer of type ``i<N>`` or ``<i<N> , M>`` .
 - `` let T:%output_var = .or(T:%input_var1, T:%input_var2)`` :- Bitwise or. T must be some integer of type ``i<N>`` or ``<i<N> , M>`` . It can have the attribute ``#[disjoint]``
 - `` let T:%output_var = .xor(T:%input_var1, T:%input_var2)`` :- Bitwise xor. T must be some integer of type ``i<N>`` or ``<i<N> , M>`` .
+- `` let T:%output_var = .nand(T:%input_var1, T:%input_var2)`` :- Bitwise nand. T must be some integer of type ``i<N>`` or ``<i<N> , M>`` . 
+- `` let T:%output_var = .nor(T:%input_var1, T:%input_var2)`` :- Bitwise nor. T must be some integer of type ``i<N>`` or ``<i<N> , M>`` .It can have the attribute ``#[disjoint]``
+- `` let T:%output_var = .xnor(T:%input_var1, T:%input_var2)`` :- Bitwise xnor. T must be some integer of type ``i<N>`` or ``<i<N> , M>`` .
 - `` let T:%output_var = .shl(T:%input_var1, T:%input_var2)`` :- Bitwise shift left. T must be some integer of type ``i<N>`` or ``<i<N> , M>`` . It can have the attribute ``#[nuw]`` or ``#[nsw]`` or both.
 - `` let T:%output_var = .lshr(T:%input_var1, T:%input_var2)`` :- Logical shift right. T must be some integer of type ``i<N>`` or ``<i<N> , M>`` . It can have the attribute ``#[exact]``.
 - `` let T:%output_var = .ashr(T:%input_var1, T:%input_var2)`` :- Arithmetic shift right. T must be some integer of type ``i<N>`` or ``<i<N> , M>`` . It can have the attribute ``#[exact]``.
+- ``let T:%output_var = .rotl(T:%input_var1, T:%input_var2)`` :- Rotate left of an integer value. T must be some type of form ``T0`` or ``<T0,M>`` where T0 is some integer. It rotates the bits of input_var1 to the left by the number of bits specified by input_var2. The bits that are rotated out on the left are rotated back in on the right. The bitwidth can be any integer type.
+- ``let T:%output_var = .rotr(T:%input_var1, T:%input_var2)`` :- Rotate right of an integer value. T must be some type of form ``T0`` or ``<T0,M>`` where T0 is some integer. It rotates the bits of input_var1 to the right by the number of bits specified by input_var2. The bits that are rotated out on the right are rotated back in on the left. The bitwidth can be any integer type.
   
 ## Comparison instructions
 
@@ -136,9 +155,89 @@ Unlikely but in future if we support other bit system like 32 bit then we have t
 
 - ``let T:%output_var = .not(T:%input_var)`` :- Bitwise not of an integer value. T must be some type of form ``T0`` or ``<T0,M>`` where T0 is some integer. 
 
+- ``let T:%output_var = .abs(T:%input_var)`` :- Absolute value of a float/brain float/integer value. T must be some type of form ``T0`` or ``<T0,M>`` where T0 is some float/brain float/integer. For int it assumes signed
+
+    If T0 is integer then it can have the attribute ``#[nsw]`` or ``#[nuw]`` or both for the abs instruction.
+
+    If T0 is float/brain float then it can have the fast math attribute like ``#[fast]`` or ``#[nnan]`` or ``#[ninf]`` or ``#[nsz]`` or ``#[arcp]`` or ``#[contract]`` or ``#[afn]`` or ``#[reassoc]`` or any combination of these.
+
+- ``let T:%output_var = .ceil(T:%input_var)`` :- Ceil of a float/brain float value. T must be some type of form ``T0`` or ``<T0,M>`` where T0 is some float/brain float. 
+
+    It can have the fast math attribute like ``#[fast]`` or ``#[nnan]`` or ``#[ninf]`` or ``#[nsz]`` or ``#[arcp]`` or ``#[contract]`` or ``#[afn]`` or ``#[reassoc]`` or any combination of these.
+
+- ``let T:%output_var = .floor(T:%input_var)`` :- Floor of a float/brain float value. T must be some type of form ``T0`` or ``<T0,M>`` where T0 is some float/brain float.
+
+    It can have the fast math attribute like ``#[fast]`` or ``#[nnan]`` or ``#[ninf]`` or ``#[nsz]`` or ``#[arcp]`` or ``#[contract]`` or ``#[afn]`` or ``#[reassoc]`` or any combination of these.
+
+- ``let T:%output_var = .integral_part(T:%input_var)`` :- Get integral part of a float/brain float value. T must be some type of form ``T0`` or ``<T0,M>`` where T0 is some float/brain float.
+
+    It can have the fast math attribute like ``#[fast]`` or ``#[nnan]`` or ``#[ninf]`` or ``#[nsz]`` or ``#[arcp]`` or ``#[contract]`` or ``#[afn]`` or ``#[reassoc]`` or any combination of these.
+
+- ``let T:%output_var = .roundeven(T:%input_var)`` :- Roundeven of a float/brain float value. T must be some type of form ``T0`` or ``<T0,M>`` where T0 is some float/brain float.
+
+    It can have the fast math attribute like ``#[fast]`` or ``#[nnan]`` or ``#[ninf]`` or ``#[nsz]`` or ``#[arcp]`` or ``#[contract]`` or ``#[afn]`` or ``#[reassoc]`` or any combination of these.
+
+- ``let T:%output_var = .sqrt(T:%input_var)`` :- Square root of a float/brain float value. T must be some type of form ``T0`` or ``<T0,M>`` where T0 is some float/brain float.
+
+    It can have the fast math attribute like ``#[fast]`` or ``#[nnan]`` or ``#[ninf]`` or ``#[nsz]`` or ``#[arcp]`` or ``#[contract]`` or ``#[afn]`` or ``#[reassoc]`` or any combination of these.
+
+- ``let T:%output_var = .approx_reciprocal(T:%input_var)`` :- Reciprocal of a float/brain float value. T must be some type of form ``T0`` or ``<T0,M>`` where T0 is some float/brain float.
+
+    It can have the fast math attribute like ``#[fast]`` or ``#[nnan]`` or ``#[ninf]`` or ``#[nsz]`` or ``#[arcp]`` or ``#[contract]`` or ``#[afn]`` or ``#[reassoc]`` or any combination of these.
+
+- ``let T:%output_var = .approx_rsqrt(T:%input_var)`` :- Reciprocal square root of a float/brain float value. T must be some type of form ``T0`` or ``<T0,M>`` where T0 is some float/brain float.
+
+    It can have the fast math attribute like ``#[fast]`` or ``#[nnan]`` or ``#[ninf]`` or ``#[nsz]`` or ``#[arcp]`` or ``#[contract]`` or ``#[afn]`` or ``#[reassoc]`` or any combination of these.
+
+- ``let T:%output_var = .popcount(T:%input_var)`` :- Population count of an integer value. T must be some type of form ``T0`` or ``<T0,M>`` where T0 is some integer. The output is of type iN/<iN,M> where N is the bitwidth of the input type.
+
+- ``let T:%output_var = .ctz(T:%input_var)`` :- Count trailing zeros of an integer value. T must be some type of form ``T0`` or ``<T0,M>`` where T0 is some integer. The output is of type iN/<iN,M> where N is the bitwidth of the input type. It has #[zero_poison] attribute which if present, result is poison when input is zero 
+
+- ``let T:%output_var = .clz(T:%input_var)`` :- Count leading zeros of an integer value. T must be some type of form ``T0`` or ``<T0,M>`` where T0 is some integer. The output is of type iN/<iN,M> where N is the bitwidth of the input type. It has #[zero_poison] attribute which if present, result is poison when input is zero 
+
+- ``let T:%output_var = .parity(T:%input_var)`` :- Parity of an integer value. T must be some type of form ``T0`` or ``<T0,M>`` where T0 is some integer. The output is of type i1/<i1,M> based on if input type is vector or not. It returns 1 if the number of set bits in the input is odd and 0 if the number of set bits in the input is even.
+
+- ``let T:%output_var = .bswap(T:%input_var)`` :- Byte swap of an integer value. T must be some type of form ``T0`` or ``<T0,M>`` where T0 is some integer. It reverses the order of bytes in the input value. So for example if the input is 0x12345678 then the output will be 0x78563412. The bitwidth but be multile of 8
+
+- ``let T:%output_var = .bitreverse(T:%input_var)`` :- Bit reverse of an integer value. T must be some type of form ``T0`` or ``<T0,M>`` where T0 is some integer. It reverses the order of bits in the input value. So for example if the input is 0b00000000000000000000000000001011 (32 bit) then the output will be 0b11010000000000000000000000000000 (32 bit). The bitwidth can be any integer type.
+
+## Float Classification unary instructions
+
+- ``let T0:%output_var = .isnan(T:%input_var)`` :- Checks if a float/brain float value is NaN. T must be some type of form ``T0`` or ``<T0,M>`` where T0 is some float/brain float. The output is of type i1/<i1,M> based on if input type is vector or not
+
+    It can have the fast math attribute like ``#[fast]`` or ``#[nnan]`` or ``#[ninf]`` or ``#[nsz]`` or ``#[arcp]`` or ``#[contract]`` or ``#[afn]`` or ``#[reassoc]`` or any combination of these.
+
+- ``let T0:%output_var = .isinf(T:%input_var)`` :- Checks if a float/brain float value is infinity. T must be some type of form ``T0`` or ``<T0,M>`` where T0 is some float/brain float. The output is of type i1/<i1,M> based on if input type is vector or not
+
+    It can have the fast math attribute like ``#[fast]`` or ``#[nnan]`` or ``#[ninf]`` or ``#[nsz]`` or ``#[arcp]`` or ``#[contract]`` or ``#[afn]`` or ``#[reassoc]`` or any combination of these. 
+
+- ``let T0:%output_var = .isfinite(T:%input_var)`` :- Checks if a float/brain float value is finite. T must be some type of form ``T0`` or ``<T0,M>`` where T0 is some float/brain float. The output is of type i1/<i1,M> based on if input type is vector or not
+
+    It can have the fast math attribute like ``#[fast]`` or ``#[nnan]`` or ``#[ninf]`` or ``#[nsz]`` or ``#[arcp]`` or ``#[contract]`` or ``#[afn]`` or ``#[reassoc]`` or any combination of these.
+
+- ``let T0:%output_var = .issubnormal(T:%input_var)`` :- Checks if a float/brain float value is subnormal. T must be some type of form ``T0`` or ``<T0,M>`` where T0 is some float/brain float. The output is of type i1/<i1,M> based on if input type is vector or not
+
+    It can have the fast math attribute like ``#[fast]`` or ``#[nnan]`` or ``#[ninf]`` or ``#[nsz]`` or ``#[arcp]`` or ``#[contract]`` or ``#[afn]`` or ``#[reassoc]`` or any combination of these.
+
+- ``let T0:%output_var = .isnormal(T:%input_var)`` :- Checks if a float/brain float value is normal. T must be some type of form ``T0`` or ``<T0,M>`` where T0 is some float/brain float. The output is of type i1/<i1,M> based on if input type is vector or not
+
+    It can have the fast math attribute like ``#[fast]`` or ``#[nnan]`` or ``#[ninf]`` or ``#[nsz]`` or ``#[arcp]`` or ``#[contract]`` or ``#[afn]`` or ``#[reassoc]`` or any combination of these.
+
+- ``let T0:%output_var = .iszero(T:%input_var)`` :- Checks if a float/brain float value is +0/-0. T must be some type of form ``T0`` or ``<T0,M>`` where T0 is some float/brain float. The output is of type i1/<i1,M> based on if input type is vector or not
+
+    It can have the fast math attribute like ``#[fast]`` or ``#[nnan]`` or ``#[ninf]`` or ``#[nsz]`` or ``#[arcp]`` or ``#[contract]`` or ``#[afn]`` or ``#[reassoc]`` or any combination of these.
+
+- ``let T0:%output_var = .isnegative(T:%input_var)`` :- Checks if a float/brain float value is negative. T must be some type of form ``T0`` or ``<T0,M>`` where T0 is some float/brain float. The output is of type i1/<i1,M> based on if input type is vector or not
+
+    It can have the fast math attribute like ``#[fast]`` or ``#[nnan]`` or ``#[ninf]`` or ``#[nsz]`` or ``#[arcp]`` or ``#[contract]`` or ``#[afn]`` or ``#[reassoc]`` or any combination of these.
+
+- ``let T0:%output_var = .ispositive(T:%input_var)`` :- Checks if a float/brain float value is positive. T must be some type of form ``T0`` or ``<T0,M>`` where T0 is some float/brain float. The output is of type i1/<i1,M> based on if input type is vector or not
+
+    It can have the fast math attribute like ``#[fast]`` or ``#[nnan]`` or ``#[ninf]`` or ``#[nsz]`` or ``#[arcp]`` or ``#[contract]`` or ``#[afn]`` or ``#[reassoc]`` or any combination of these.
+
 ## Memory instructions 
 
-- ``let ptr:$global_var = .global(T:value)`` :- Defines a global variable. The type of the output variable must be a pointer type. The value can be any constantexpr literal(Not a variable). $global_var contains address of the global variable such that *$global_var is the value of the global variable. Innitialized by the value specified in the instruction. This instruction is not part of MIR. Stored in the global variable section of the module.
+- ``let ptr:$global_var = .global(T:value)`` :- Defines a global variable. The type of the output variable must be a pointer type. The value can be any constantexpr literal(Not a variable). $global_var contains address of the global variable such that *$global_var is the value of the global variable. Innitialized by the value specified in the instruction. This instruction is not part of MIR. Stored in the global variable section of the module. It has the ``#[align(i8:N)]`` attribute also
 
 - ``let T:%local_var = .local(T:initial_value)`` :- Defines a local variable. The value can be anything. In llvm u can do ``%local_var = initial_value`` but here you need this to keep the parser simpler(Actually the innitial design plan was diffrent but that changed but we still have some leftover from the innitial). This instruction is a part of MIR although doesnt do much. It is just a way to define a local variable and innitialize it with some value. T can be any type
 
@@ -147,6 +246,9 @@ Unlikely but in future if we support other bit system like 32 bit then we have t
 - ``let T:%output_var = .load(ptr:%ptr)`` :- Loads a value from memory of type T. It has the attribute ``#[align(i8:N)]`` to specify the alignment of the load and by default it is 16. The alignment must be a power of 2 and it is in bytes. By default the alignment is 16 byte. It also has the attribute ``#[volatile]`` to indicate that the load is volatile. It has the attribute ``#[invarient.load]`` to indicate that the value loaded is invariant and it will not change during the execution of the program. It has the attribute ``#[nontemporal]`` to indicate that the load is non temporal. It also has the attribute ``#[nonull]`` and ``#[nopoison]``. It has the attribute ``#[dereferenceable(i64:N)]`` to indicate that the pointer is dereferenceable for N bytes. It also has the attribute ``#[atomic(str:ordering)]`` to indicate that the load is atomic with the specified ordering. The ordering can be one of the following: ``acquire``, ``monotonic``, ``unordered`` and ``seq_cst``. If the attribute is not present then it is not an atomic load. If atomic it can also have the attribute ``#[syncscope("singlethreaded")]`` to indicate that the atomic load is only synchronized with other atomic operations in the same thread. By default it is synchronized with atomic operations in all threads i.e "global". We supporting only x86_64 so only these 2 we can have. Note:-If atomic then we require an explicit alignment
 
 - ``.store(T:%value, ptr:%ptr)`` :- Stores a value to memory. It has the attribute ``#[align(i8:N)]`` to specify the alignment of the store and by default it is 16. The alignment must be a power of 2 and it is in bytes. By default the alignment is 16 byte. It also has the attribute ``#[volatile]`` to indicate that the store is volatile. It has the attribute ``#[nontemporal]`` to indicate that the store is non temporal. It also has the attribute ``#[nonull]`` and ``#[nopoison]``. It has the attribute ``#dereferenceable(i64:N)`` to indicate that the pointer is dereferenceable for N bytes. It also has the attribute ``#[atomic(str:ordering)]`` to indicate that the load is atomic with the specified ordering. The ordering can be one of the following: ``acquire``, ``monotonic``, ``unordered`` and ``seq_cst``. If the attribute is not present then it is not an atomic load. If atomic it can also have the attribute ``#[syncscope("singlethreaded")]`` to indicate that the atomic load is only synchronized with other atomic operations in the same thread. By default it is synchronized with atomic operations in all threads i.e "global". We supporting only x86_64 so only these 2 we can have. Note:-If atomic then we require an explicit alignment
+
+- ``.memcpy(ptr:%dest, ptr:%src, iN:%size)`` TODO:Ask if we want nontemporal and nonull and other attribute that store supports. Do same for memmove and all that
+
 
 - ``let ptr:%output_var = .getaddress(T:%var, iN:%offset)`` :- Gets &var + offset. The type of output variable must be a pointer type. The type of var can be any type. The offset is in bytes. Note:-var is a variable and not a literal/expression. It has the attribute ``#[unsigned]`` to indicate that the offset is unsigned. By default it is signed. It also has ``#[nsw]`` or ``#[nuw]`` or both to indicate that the offset does not cause signed or unsigned overflow. Also has the attribute ``#[inbounds]`` . We dont have blockaddress instruction like llvm. Just use this 
 
@@ -160,31 +262,39 @@ Unlikely but in future if we support other bit system like 32 bit then we have t
 
 - ``let {T,i1}:%output_var = .cmpxchg(ptr:%ptr, T:%expected, T:%desired, str:success_ordering,str:failure_ordering)`` :- Compare and exchange instruction. It atomically compares the value at the memory location pointed to by ptr with the expected value. If they are equal then it atomically replaces the value at the memory location with the desired value and returns the original value and true. If they are not equal then it does not modify the memory location and returns the original value and false. The type of output variable is a struct of form {T, i1} where T is the type of the value at the memory location and i1 is a boolean indicating whether the exchange was successful or not. It has the compulsory attribute ``#[align(i8:N)]`` to specify the alignment of the operation and by default it is 16. The alignment must be a power of 2 and it is in bytes. It also has the attribute ``#[volatile]`` and ``#[weak]`` to indicate that the operation is volatile or weak.It can also have the attribute ``#[syncscope("singlethreaded")]`` to indicate that the atomic operation is only synchronized with other atomic operations in the same thread. By default it is synchronized with atomic operations in all threads i.e "global". We supporting only x86_64 so only these 2 we can have. ``success_ordering`` and ``failure_ordering`` must be const expr and ``success_ordering`` must be one of the following: monotonic, acquire, release, acq_rel, seq_cst but ``failure_ordering`` can only be one of the following: monotonic, acquire, seq_cst and it must not be release or acq_rel. 
 
-## Atomic Read-Modify-Write instructions
+## Fetch instruction instructions
 
-The following are atomic Read-Modify-Write. Atomically reads a value from memory, applies a binary operation with a given operand, and writes the result back. Returns the original value. All of them have the attribute ``#[align(i8:N)]`` to specify the alignment of the operation and by default it is 16. The alignment must be a power of 2 and it is in bytes. They also have the attribute ``#[volatile]`` to indicate that the operation is volatile. They can also have the attribute ``#[syncscope("singlethreaded")]`` to indicate that the atomic operation is only synchronized with other atomic operations in the same thread. By default it is synchronized with atomic operations in all threads i.e "global". We supporting only x86_64 so only these 2 we can have. It supports the following ordering monotonic, acquire, release, acq_rel, seq_cst
+The following are atomic Read-Modify-Write. Atomically reads a value from memory, applies a binary operation with a given operand, and writes the result back. Returns the original value. All of them have the attribute ``#[align(i8:N)]`` to specify the alignment of the operation and by default it is 16. The alignment must be a power of 2 and it is in bytes. They also have the attribute ``#[volatile]`` to indicate that the operation is volatile.If it is a atomic then you must specify with #[atomic(str:<ordering>)]. By default it is not atomic. For atomic they can also have the attribute ``#[syncscope("singlethreaded")]`` to indicate that the atomic operation is only synchronized with other atomic operations in the same thread. By default it is synchronized with atomic operations in all threads i.e "global". We supporting only x86_64 so only these 2 we can have. It supports the following ordering monotonic, acquire, release, acq_rel, seq_cst
 
-- ``let T:%old = .atomic_xchg(ptr:%ptr, T:%value)`` :- Atomically replaces the value at the memory location pointed to by ptr with the given value and returns the original value. T can be integer or float
+- ``let T:%old = .fetchxchg(ptr:%ptr, T:%value)`` :- Atomically replaces the value at the memory location pointed to by ptr with the given value and returns the original value. T can be integer or float
 
-- ``let T:%old = .atomic_fetchadd(ptr:%ptr, T:%value)`` :- Atomically adds the given value to the value at the memory location pointed to by ptr and returns the original value. T can be integer or float
+- ``let T:%old = .fetchadd(ptr:%ptr, T:%value)`` :- Atomically adds the given value to the value at the memory location pointed to by ptr and returns the original value. T can be integer or float
 
-- ``let T:%old = .atomic_fetchsub(ptr:%ptr, T:%value)`` :- Atomically subtracts the given value from the value at the memory location pointed to by ptr and returns the original value. T can be integer or float
+    If T is an integer type then it can have the attribute ``#[nsw]`` or ``#[nuw]`` or both to indicate that the addition does not cause signed or unsigned overflow.
 
-- ``let T:%old = .atomic_fetchand(ptr:%ptr, T:%value)`` :- Atomically performs a bitwise and operation between the given value and the value at the memory location pointed to by ptr and returns the original value. T must be an integer type.
+    If T is a float type then it can have the fast math attribute like ``#[fast]`` or ``#[nnan]`` or ``#[ninf]`` or ``#[nsz]`` or ``#[arcp]`` or ``#[contract]`` or ``#[afn]`` or ``#[reassoc]`` or any combination of these.
 
-- ``let T:%old = .atomic_fetchnand(ptr:%ptr, T:%value)`` :- Atomically performs a bitwise nand operation between the given value and the value at the memory location pointed to by ptr and returns the original value. T must be an integer type.
+- ``let T:%old = .fetchsub(ptr:%ptr, T:%value)`` :- Atomically subtracts the given value from the value at the memory location pointed to by ptr and returns the original value. T can be integer or float
 
-- ``let T:%old = .atomic_fetchor(ptr:%ptr, T:%value)`` :- Atomically performs a bitwise or operation between the given value and the value at the memory location pointed to by ptr and returns the original value. T must be an integer type.
+    If T is an integer type then it can have the attribute ``#[nsw]`` or ``#[nuw]`` or both to indicate that the addition does not cause signed or unsigned overflow.
 
-- ``let T:%old = .atomic_fetchxor(ptr:%ptr, T:%value)`` :- Atomically performs a bitwise xor operation between the given value and the value at the memory location pointed to by ptr and returns the original value. T must be an integer type.
+    If T is a float type then it can have the fast math attribute like ``#[fast]`` or ``#[nnan]`` or ``#[ninf]`` or ``#[nsz]`` or ``#[arcp]`` or ``#[contract]`` or ``#[afn]`` or ``#[reassoc]`` or any combination of these.
 
-- ``let T:%old = .atomic_fetchmax(ptr:%ptr, T:%value)`` :- Atomically compares the given value with the value at the memory location pointed to by ptr and replaces the value at the memory location with the maximum of the two values. Returns the original value. T can be integer or float. For integer it can be signed or unsigned based on the presence of ``#[unsigned]`` attribute. By default it is signed
+- ``let T:%old = .fetchand(ptr:%ptr, T:%value)`` :- Atomically performs a bitwise and operation between the given value and the value at the memory location pointed to by ptr and returns the original value. T must be an integer type.
 
-- ``let T:%old = .atomic_fetchmin(ptr:%ptr, T:%value)`` :- Atomically compares the given value with the value at the memory location pointed to by ptr and replaces the value at the memory location with the minimum of the two values. Returns the original value. T can be integer or float. For integer it can be signed or unsigned based on the presence of ``#[unsigned]`` attribute. By default it is signed
+- ``let T:%old = .fetchnand(ptr:%ptr, T:%value)`` :- Atomically performs a bitwise nand operation between the given value and the value at the memory location pointed to by ptr and returns the original value. T must be an integer type.
 
-- ``let T:%old = .atomic_uinc_wrap(ptr:%ptr, T:%value)`` :- Returns ``(*ptr >= value) ? 0 : *ptr + 1``. T must be integer
+- ``let T:%old = .fetchor(ptr:%ptr, T:%value)`` :- Atomically performs a bitwise or operation between the given value and the value at the memory location pointed to by ptr and returns the original value. T must be an integer type.
 
-- ``let T:%old = .atomic_idec_wrap(ptr:%ptr, T:%value)`` :- Returns ``(*ptr <= value) ? 0 : *ptr - 1``. T must be integer
+- ``let T:%old = .fetchnor(ptr:%ptr, T:%value)`` :- Atomically performs a bitwise nor operation between the given value and the value at the memory location pointed to by ptr and returns the original value. T must be an integer type.
+
+- ``let T:%old = .fetchxor(ptr:%ptr, T:%value)`` :- Atomically performs a bitwise xor operation between the given value and the value at the memory location pointed to by ptr and returns the original value. T must be an integer type.
+
+- ``let T:%old = .fetchxnor(ptr:%ptr, T:%value)`` :- Atomically performs a bitwise xnor operation between the given value and the value at the memory location pointed to by ptr and returns the original value. T must be an integer type.
+
+- ``let T:%old = .fetchmax(ptr:%ptr, T:%value)`` :- Atomically compares the given value with the value at the memory location pointed to by ptr and replaces the value at the memory location with the maximum of the two values. Returns the original value. T can be integer or float. For integer it can be signed or unsigned based on the presence of ``#[unsigned]`` attribute. By default it is signed
+
+- ``let T:%old = .fetchmin(ptr:%ptr, T:%value)`` :- Atomically compares the given value with the value at the memory location pointed to by ptr and replaces the value at the memory location with the minimum of the two values. Returns the original value. T can be integer or float. For integer it can be signed or unsigned based on the presence of ``#[unsigned]`` attribute. By default it is signed
 
 
 ## Terminator instructions 
@@ -194,6 +304,8 @@ A terminator statement must be present at the end of a instruction. If no termin
 - ``.ret`` or ``.ret(T:%return_value)`` :- Return from a function. If the function return type is void then use ``.ret`` with no return value. If the function return type is not void then. It has the attribute ``#[noreturn]`` to indicate that the function does not return. In that case you can also use ``.ret`` with no return value even if the function return type is not void. But if you have a return value then it must be of the same type as the function return type.
 
 - ``.unreachable`` :- Indicates that the code is unreachable. Maybe when u call exit() u can used ``.unreachable`` after the call. Used when you dont jump to a diffrent block but you also dont want to return from the function. 
+
+- ``.trap`` :-  Emits a hardware trap instruction. Distinct from ``.unreachable`` which is a compiler hint about dead code with no guaranteed runtime effect. ``.trap`` is observable and guaranteed to halt execution. It has the ``#[breakpoint]`` attribute to indicate that it is a breakpoint trap which can be used for debugging.
 
 - ``.br(T0:@dest,T1:{...})`` :- Unconditional branch to the destination block.T0 is some label type. T1 is the input argument type as a struct. i.e if %dest takes in i32 and i64 then T1 = {i32, i64}. If it takes no arguments then T1 = {} and so on. T1 must be an ananomous struct of form {...}. Note you must write the arguments are {...} so u cant do T1:%x just because %x has same type as T1. You have to write T1:{...}. Because this is more of a parser trick to make it easier to parse the instruction. Actually we wanted %dest(...) but that is a bit harder to parse. So going with this. 
 
@@ -244,6 +356,16 @@ Seperate category cuz this instruction is big and complex enough to deserve its 
 
 - ``.call(T:%func, T1:%arg1, T2:%arg2...)`` :- Same as above but for functions that return void.
 
+## SIMD instruction 
+
+- `` let <T, M>:%output_var = .shufflevector(<T, N2>:%input1, <T, N3>:%input2, <i16, M>:%mask)`` :- Shuffles the elements of 2 vectors according to a mask. Mask is compile time not run time
+
+- ``let T0:%output_var = .reduce_add(<T0, N>:%input_vector)`` :- Reduces a vector by adding all its elements together. The result is a scalar value of type T.
+
+    If ``T0`` is integer then it can have 2 attribute. It can have attributes ``#[nsw]`` or ``#[nuw]` or both. Dont care if signed or unsigned, the result is same regardless
+
+    If ``T0`` is float or brain float then it can have the fast math attribute like ``#[fast]`` or ``#[nnan]`` or ``#[ninf]`` or ``#[nsz]`` or ``#[arcp]`` or ``#[contract]`` or ``#[afn]`` or ``#[reassoc]`` or any combination of these. 
+
 ## Other instructions
 
 - ``let T0:%m = .select(T1:%condition, T0:%true_value, T0:%false_value)`` :- If T1 is of type i1 then we select %true_value if condition is true and select %false_value if condition is false. T0 can be any type. If T1 is of type <i1,M> then we select element wise from true_value and false_value based on the condition. So if the first element of condition is true then we select the first element of true_value otherwise we select the first element of false_value and so on for all elements. In this case T0 must be a vector type and the output is also a vector where each element is selected based on the corresponding element in the condition vector.
@@ -253,7 +375,5 @@ Seperate category cuz this instruction is big and complex enough to deserve its 
 - ``let T:%output_var = .va_arg(ptr:%input_var)`` :- Used to access the variable arguments in a function that takes variable arguments. The input_var is of type ptr and T is the type of the variable argument that we want to access
 
 - ``let T:%output_var = .ptrmask(T:%input_var,T1:%mask)`` :- Masks a pointer with a mask. T is a ptr or vector of ptr. Mask is an integer or vector of integer. If T1 is vector then T must also be a vector of same size
-
-- `` let <T, M>:%output_var = .shufflevector(<T, N2>:%input1, <T, N3>:%input2, <i16, M>:%mask)`` :- Shuffles the elements of 2 vectors according to a mask. Mask is compile time not run time
 
 - ``let type:%type_name = .assign_type(type:<type defination>)`` :- USed to create a typedef. Note:-This is not an actual instruction. Just to make the parser simpler. Ignored by MIR

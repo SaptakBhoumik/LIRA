@@ -23,10 +23,10 @@ bool is_mem_inst(std::string inst_name){
     return inst_name == ".local" || inst_name == ".alloca" || inst_name == ".load" || inst_name == ".store" || inst_name == ".getaddress" || inst_name == ".ptroffset"
             || inst_name == ".extractelement" || inst_name == ".insertelement" || inst_name == ".fence" || inst_name == ".cmpxchg";
 }
-bool is_atomicrmw_inst(std::string inst_name){
-    return inst_name == ".atomic_xchg" || inst_name == ".atomic_fetchadd" || inst_name == ".atomic_fetchsub" || inst_name == ".atomic_fetchand" 
-            || inst_name == ".atomic_fetchnand" || inst_name == ".atomic_fetchor" || inst_name == ".atomic_fetchxor" || inst_name == ".atomic_fetchmin" 
-            || inst_name == ".atomic_fetchmax" || inst_name == ".atomic_uinc_wrap" || inst_name == ".atomic_idec_wrap";
+bool is_fetch_inst(std::string inst_name){
+    return inst_name == ".fetchxchg" || inst_name == ".fetchadd" || inst_name == ".fetchsub" || inst_name == ".fetchand" 
+            || inst_name == ".fetchnand" || inst_name == ".fetchor" || inst_name == ".fetchxor" || inst_name == ".fetchmin" 
+            || inst_name == ".fetchmax";
 }
 bool is_terminator_inst(std::string inst_name){
     return inst_name == ".ret" || inst_name == ".unreachable" || inst_name == ".br" || inst_name == ".switch" || inst_name == ".indirectbr";
@@ -57,8 +57,8 @@ MIR::InstPtr SemanticAnalyzer::analyze_instruction(IR::InstructionStmtPtr inst_s
     else if(is_mem_inst(inst_name.value)){
         return analyze_mem_inst(inst_name,inst_stmt);
     }
-    else if(is_atomicrmw_inst(inst_name.value)){
-        return analyze_atomicrmw_inst(inst_name,inst_stmt);
+    else if(is_fetch_inst(inst_name.value)){
+        return analyze_fetch_inst(inst_name,inst_stmt);
     }
     else if(is_terminator_inst(inst_name.value)){
         return analyze_terminator_inst(inst_name,inst_stmt);

@@ -5,7 +5,7 @@
 #include "instruction/conv_inst.hpp"
 #include "instruction/unary_inst.hpp"
 #include "instruction/memory_inst.hpp"
-#include "instruction/atomicrmw_inst.hpp"
+#include "instruction/fetch_inst.hpp"
 #include "instruction/terminator_inst.hpp"
 #include "instruction/call_inst.hpp"
 #include "instruction/other_inst.hpp"

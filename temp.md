@@ -68,21 +68,37 @@
 
 ## Trinary Arithmetic Instructions
 
-- `let T:%output_var = .fma(T:%input_var1, T:%input_var2, T:%input_var3)` - Fused multiply-add: `(input_var1 * input_var2) + input_var3` with a single rounding step. T must be of the form `T0` or `<T0,M>` where T0 is some float/bfloat.
+- `let T:%output_var = .fma(T:%input_var1, T:%input_var2, T:%input_var3)` - Fused multiply-add: `(input_var1 * input_var2) + input_var3` with a single rounding step. T must be of the form `T0` or `<T0,M>` where T0 is some float/bfloat/integer.
 
-    Attributes: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+    If `T0` is integer:
+    - `#[nsw]` - poison on signed overflow
+    - `#[nuw]` - poison on unsigned overflow
 
-- `let T:%output_var = .fms(T:%input_var1, T:%input_var2, T:%input_var3)` - Fused multiply-subtract: `(input_var1 * input_var2) - input_var3` with a single rounding step. T must be of the form `T0` or `<T0,M>` where T0 is some float/bfloat.
+    If `T0` is float/bfloat: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
-    Attributes: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+- `let T:%output_var = .fms(T:%input_var1, T:%input_var2, T:%input_var3)` - Fused multiply-subtract: `(input_var1 * input_var2) - input_var3` with a single rounding step. T must be of the form `T0` or `<T0,M>` where T0 is some float/bfloat/integer.
 
-- `let T:%output_var = .fnma(T:%input_var1, T:%input_var2, T:%input_var3)` - Fused negative multiply-add: `-(input_var1 * input_var2) + input_var3` with a single rounding step. T must be of the form `T0` or `<T0,M>` where T0 is some float/bfloat.
+    If `T0` is integer:
+    - `#[nsw]` - poison on signed overflow
+    - `#[nuw]` - poison on unsigned overflow
 
-    Attributes: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+    If `T0` is float/bfloat: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
-- `let T:%output_var = .fnms(T:%input_var1, T:%input_var2, T:%input_var3)` - Fused negative multiply-subtract: `-(input_var1 * input_var2) - input_var3` with a single rounding step. T must be of the form `T0` or `<T0,M>` where T0 is some float/bfloat.
+- `let T:%output_var = .fnma(T:%input_var1, T:%input_var2, T:%input_var3)` - Fused negative multiply-add: `-(input_var1 * input_var2) + input_var3` with a single rounding step. T must be of the form `T0` or `<T0,M>` where T0 is some float/bfloat/integer.
 
-    Attributes: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+    If `T0` is integer:
+    - `#[nsw]` - poison on signed overflow
+    - `#[nuw]` - poison on unsigned overflow
+
+    If `T0` is float/bfloat: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+
+- `let T:%output_var = .fnms(T:%input_var1, T:%input_var2, T:%input_var3)` - Fused negative multiply-subtract: `-(input_var1 * input_var2) - input_var3` with a single rounding step. T must be of the form `T0` or `<T0,M>` where T0 is some float/bfloat/integer.
+
+    If `T0` is integer:
+    - `#[nsw]` - poison on signed overflow
+    - `#[nuw]` - poison on unsigned overflow
+
+    If `T0` is float/bfloat: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 - `let T:%output_var = .clamp(T:%input_var, T:%min, T:%max)` - Clamps `input_var` to `[min, max]`. Returns `min` if below, `max` if above, otherwise the value itself. T must be of the form `T0` or `<T0,M>` where T0 is some float/bfloat/integer.
 
@@ -98,7 +114,7 @@
 - `let T:%output_var = .fshr(T:%input_var1, T:%input_var2, T:%shift)` - Funnel shift right. Conceptually concatenates `input_var1:input_var2`, shifts right by `shift mod bitwidth`, and returns the low T-sized bits. T must be of the form `T0` or `<T0,M>` where T0 is some integer. No attributes.
 
 ---
-
+<!-- 
 ## Overflow-Detecting Arithmetic Instructions
 
 These return `{T, i1}` - the result paired with an overflow flag (1 if overflow occurred). T must be of the form `T0` or `<T0,M>` where T0 is some integer.
@@ -112,7 +128,7 @@ These return `{T, i1}` - the result paired with an overflow flag (1 if overflow 
 - `let {T,i1}:%output_var = .mul_overflow(T:%input_var1, T:%input_var2)` - Multiplication with overflow detection.
     - `#[unsigned]` - detect unsigned overflow; default detects signed overflow
 
----
+--- -->
 
 ## Bitwise Instructions
 
@@ -307,17 +323,17 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
 
 - `let ptr:$global_var = .global(T:value)` - Defines a global variable. Output must be a pointer type; `$global_var` holds the address. Value must be a constant expression (not a variable). Not part of MIR; stored in the module's global section.
 
-    - `#[align(i8:N)]` - alignment of the global in bytes; must be a power of 2
+    - `#[align(i8:N)]` - alignment of the global in bytes; must be a power of 2; default is 16
 
 - `let T:%local_var = .local(T:initial_value)` - Defines and initializes a local variable. Value can be anything. Present for parser simplicity; does little in MIR. T can be any type. No attributes.
 
 - `let ptr:%local_var = .alloca(iN:%size)` - Allocates `size` bytes on the stack. Returns a pointer to the allocation.
 
-    - `#[align(i8:N)]` - alignment of the allocation in bytes; must be a power of 2; default is 1
+    - `#[align(i8:N)]` - alignment of the allocation in bytes; must be a power of 2; default is 16
 
 - `let T:%output_var = .load(ptr:%ptr)` - Loads a value of type T from memory.
 
-    - `#[align(i8:N)]` - alignment of the pointer; must be a power of 2; required if atomic
+    - `#[align(i8:N)]` - alignment of the pointer; must be a power of 2; required if atomic; default is 16
     - `#[volatile]` - volatile load; not elided or reordered
     - `#[invariant.load]` - the loaded value will not change during program execution
     - `#[nontemporal]` - non-temporal (cache-bypassing) load
@@ -330,7 +346,7 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
 
 - `.store(T:%value, ptr:%ptr)` - Stores a value to memory.
 
-    - `#[align(i8:N)]` - alignment of the pointer; must be a power of 2; required if atomic
+    - `#[align(i8:N)]` - alignment of the pointer; must be a power of 2; required if atomic; default is 16
     - `#[volatile]` - volatile store
     - `#[nontemporal]` - non-temporal (cache-bypassing) store
     - `#[nonnull]` - asserts the pointer is not null
@@ -342,7 +358,7 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
 - `.memcpy(ptr:%dest, ptr:%src, iN:%size)` - Copies `size` bytes from `src` to `dest`. Regions must not overlap; use `.memmove` if they may. The index `0` refers to `src` and `1` refers to `dest` in per-pointer attributes.
 
     - `#[volatile]` - volatile copy
-    - `#[align(i8:N, iN:idx...)]` - alignment of the specified pointer(s); must be a power of 2; at least one index required
+    - `#[align(i8:N, iN:idx...)]` - alignment of the specified pointer(s); must be a power of 2; at least one index required; default is 16
     - `#[nontemporal(iN:idx...)]` - non-temporal access for the specified pointer(s); at least one index required
     - `#[nonnull(iN:idx...)]` - asserts the specified pointer(s) are not null; at least one index required
     - `#[nopoison(iN:idx...)]` - asserts the memory at the specified pointer(s) contains no poison; at least one index required
@@ -353,7 +369,7 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
 - `.memset(ptr:%dest, i8:%value, iN:%size)` - Fills `size` bytes at `dest` with `value`.
 
     - `#[volatile]` - volatile set
-    - `#[align(i8:N)]` - alignment of `dest`; must be a power of 2
+    - `#[align(i8:N)]` - alignment of `dest`; must be a power of 2; default is 16
     - `#[nontemporal]` - non-temporal stores
     - `#[nonnull]` - asserts `dest` is not null
     - `#[nopoison]` - asserts the region contains no poison
@@ -362,7 +378,7 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
 - `let i32:%output_var = .memcmp(ptr:%ptr1, ptr:%ptr2, iN:%size)` - Compares `size` bytes at `ptr1` and `ptr2`. Returns a negative, zero, or positive integer if the region at `ptr1` is respectively less than, equal to, or greater than the region at `ptr2`. The index `0` refers to `ptr1` and `1` refers to `ptr2` in per-pointer attributes.
 
     - `#[volatile]` - volatile compare
-    - `#[align(i8:N, iN:idx...)]` - alignment of the specified pointer(s); at least one index required
+    - `#[align(i8:N, iN:idx...)]` - alignment of the specified pointer(s); at least one index required; default is 16
     - `#[nontemporal(iN:idx...)]` - non-temporal access for the specified pointer(s); at least one index required
     - `#[nonnull(iN:idx...)]` - asserts the specified pointer(s) are not null; at least one index required
     - `#[nopoison(iN:idx...)]` - asserts the memory at the specified pointer(s) contains no poison; at least one index required
@@ -398,9 +414,9 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
 
     - `#[syncscope("singlethreaded")]` - synchronizes only with atomic ops in the same thread; default is global
 
-- `let {T,i1}:%output_var = .cmpxchg(ptr:%ptr, T:%expected, T:%desired, str:success_ordering, str:failure_ordering)` - Atomically compares `*ptr` with `expected`. If equal, stores `desired` and returns `{original, true}`; otherwise leaves memory unchanged and returns `{original, false}`. `success_ordering` must be one of: `monotonic`, `acquire`, `release`, `acq_rel`, `seq_cst`. `failure_ordering` must be one of: `monotonic`, `acquire`, `seq_cst` (not `release` or `acq_rel`).
+- `let {T,i1}:%output_var = .atomic_cmpxchg(ptr:%ptr, T:%expected, T:%desired, str:success_ordering, str:failure_ordering)` - Atomically compares `*ptr` with `expected`. If equal, stores `desired` and returns `{original, true}`; otherwise leaves memory unchanged and returns `{original, false}`. `success_ordering` must be one of: `monotonic`, `acquire`, `release`, `acq_rel`, `seq_cst`. `failure_ordering` must be one of: `monotonic`, `acquire`, `seq_cst` (not `release` or `acq_rel`).
 
-    - `#[align(i8:N)]` - required; alignment of the operation; must be a power of 2
+    - `#[align(i8:N)]` - required; alignment of the operation; must be a power of 2; default is 16
     - `#[volatile]` - volatile operation
     - `#[weak]` - weak CAS; permitted to spuriously fail even when `*ptr == expected`
     - `#[syncscope("singlethreaded")]` - synchronizes only with atomic ops in the same thread; default is global
@@ -412,7 +428,7 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
 Read-modify-write instructions that read a value from memory, apply a binary operation with a given operand, write the result back, and return the original value. Can optionally be made atomic with `#[atomic]`.
 
 **Attributes shared by all fetch instructions:**
-- `#[align(i8:N)]` - alignment of the pointer; must be a power of 2
+- `#[align(i8:N)]` - alignment of the pointer; must be a power of 2; default is 16
 - `#[volatile]` - volatile operation
 - `#[atomic(str:ordering)]` - makes the operation atomic; ordering must be one of: `monotonic`, `acquire`, `release`, `acq_rel`, `seq_cst`. If absent, the operation is not atomic.
 - `#[syncscope("singlethreaded")]` - only valid with `#[atomic]`; synchronizes only within the same thread; default is global
@@ -519,7 +535,7 @@ Read-modify-write instructions that read a value from memory, apply a binary ope
 
 Read-modify-write instructions that apply a unary operation to the value at a memory location and return the original value. Can optionally be made atomic with `#[atomic]`.
 
-**Attributes shared by all unary fetch instructions:** same as Binary Fetch - `#[align(i8:N)]`, `#[volatile]`, `#[atomic(str:ordering)]`, `#[syncscope("singlethreaded")]`.
+**Attributes shared by all unary fetch instructions:** same as Binary Fetch - `#[align(i8:N)]` (default is 16), `#[volatile]`, `#[atomic(str:ordering)]`, `#[syncscope("singlethreaded")]`.
 
 ---
 
@@ -643,13 +659,13 @@ A terminator must be the final instruction of every block. Falling through to th
 
     **Per-argument attributes** (override function definition for this call site; useful for function pointers where no definition is available):
     - `#[noalias(i64:idx...)]`, `#[readonly(i64:idx...)]`, `#[nonnull(i64:idx...)]`, `#[align(i64:N, i64:idx...)]`, `#[dereferenceable(i64:N, i64:idx...)]`, `#[nopoison(i64:idx...)]`, `#[readnone(i64:idx...)]`, `#[writeonly(i64:idx...)]`, `#[writable(i64:idx...)]`, `#[returned(i64:idx...)]`, `#[nocapture(i64:idx...)]`
-    - `#[byval(type:T0, i64:idx...)]`, `#[byref(type:T0, i64:idx...)]`, `#[inalloca(type:T0, i64:idx...)]`, `#[preallocated(type:T0, i64:idx...)]`, `#[sret(type:T0, i64:idx...)]`
+    - `#[byval(type:T0, i64:arg_index0, type:T1, i64:arg_index1, ...)]`, `#[byref(type:T0, i64:arg_index0, type:T1, i64:arg_index1, ...)]`, `#[inalloca(type:T0, i64:arg_index0, type:T1, i64:arg_index1, ...)]`, `#[preallocated(type:T0, i64:arg_index0, type:T1, i64:arg_index1, ...)]`, `#[sret(type:T0, i64:arg_index0, type:T1, i64:arg_index1, ...)]`
     - `#[zeroext(i64:idx...)]`, `#[signext(i64:idx...)]`
 
     **Return value attributes** (applied to the output variable):
-    ```
+
     let T:%output_var #[noalias] = .call(...)
-    ```
+
     Valid return-value attributes: `#[noalias]`, `#[nonnull]`, `#[dereferenceable(i64:N)]`, `#[nopoison]`, `#[align(i64:N)]`, `#[nnan]`, `#[ninf]`
 
 - `.call(T:%func, T1:%arg1, T2:%arg2...)` - Same as above for void-returning functions.

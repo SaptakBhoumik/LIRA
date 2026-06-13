@@ -3,7 +3,8 @@
 namespace LIRA {
 namespace Pass {
 bool is_arithmetic_bin_inst(std::string inst_name){
-    return inst_name == ".add" || inst_name == ".sub" || inst_name == ".mul" || inst_name == ".div" || inst_name == ".rem";
+    return inst_name == ".add" || inst_name == ".sub" || inst_name == ".mul" || inst_name == ".div" || inst_name == ".rem" 
+            || inst_name == ".copysign" || inst_name == ".min" || inst_name == ".max" || inst_name == ".avg";
 }
 bool is_bitwise_bin_inst(std::string inst_name){
     return inst_name == ".and" || inst_name == ".or" || inst_name == ".xor" || inst_name == ".shl" || inst_name == ".lshr" || inst_name == ".ashr";

@@ -40,12 +40,11 @@
 - `let T:%output_var = .rem(T:%input_var1, T:%input_var2)` - Remainder of division. T must be of the form `T0` or `<T0,M>` where T0 is some float/bfloat/integer.
 
     If `T0` is integer:
-    - `#[exact]` - poison if the division is not exact (i.e. has a remainder)
     - `#[unsigned]` - remainder of unsigned division; default is signed
 
     If `T0` is float/bfloat: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
-- `let T:%output_var = .copysign(T:%input_var1, T:%input_var2)` - Copies the sign of `input_var2` onto `input_var1`. T must be of the form `T0` or `<T0,M>` where T0 is float/bfloat/integer. For integer, signed is assumed (unsigned integers have no sign bit).
+- `let T:%output_var = .copysign(T:%input_var1, T:%input_var2)` - Copies the sign of `input_var2` onto `input_var1`. T must be of the form `T0` or `<T0,M>` where T0 is float/bfloat/integer. For integer, signed is assumed (unsigned integers sign bit but make no sense).
 
     If `T0` is float/bfloat: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
@@ -78,7 +77,6 @@
     - `#[nuw]` - poison on unsigned intermediate overflow; only valid with `#[unsigned]`
 
     **If `T0` is float/bfloat:** Computes `(a + b) * 0.5` exactly.
-    - `#[geometric]` - compute `sqrt(a * b)` (geometric mean) instead; only valid for float/bfloat
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 ---
@@ -208,7 +206,6 @@ These instructions thread a carry or borrow bit in and out, enabling multi-word 
 - `let {T, T}:%out = .divmod(T:%a, T:%b)` - Returns both quotient and remainder from a single division, avoiding two separate hardware divides. `T` must be of the form `T0` or `<T0,M>` where `T0` is an integer. For vectors, the operation is lanewise.
 
     - `#[unsigned]` - unsigned division and remainder; default is signed
-    - `#[exact]` - poison if the remainder is non-zero (i.e. division is not exact)
 
 - `let {T, T}:%out = .divmod(T:%a, T:%b)` - Float variant: returns `{quotient: T, remainder: T}` where `quotient = integral_part(a / b)` and `remainder = a - quotient * b` (i.e. IEEE 754 remainder with truncation toward zero). `T` must be of the form `T0` or `<T0,M>` where `T0` is float/bfloat. For vectors, the operation is lanewise.
 
@@ -667,7 +664,7 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
 
 ---
 
-## Binary Fetch Instructions
+## Binary Fetch Modify Instructions
 
 Read-modify-write instructions that read a value from memory, apply a binary operation with a given operand, write the result back, and return the original value. Can optionally be made atomic with `#[atomic]`.
 
@@ -779,7 +776,7 @@ Read-modify-write instructions that read a value from memory, apply a binary ope
 
 ---
 
-## Unary Fetch Instructions
+## Unary Fetch Modify Instructions
 
 Read-modify-write instructions that apply a unary operation to the value at a memory location and return the original value. Can optionally be made atomic with `#[atomic]`.
 
@@ -928,53 +925,64 @@ A terminator must be the final instruction of every block. Falling through to th
 
 - `let <T,M>:%output_var = .shufflevector(<T,N2>:%input1, <T,N3>:%input2, <i16,M>:%mask)` - Shuffles elements of two vectors according to a mask(Run time or compile time). No attributes.
 
-- `let T0:%output_var = .reduce_add(<T0,N>:%input_vector)` - Sums all elements of the vector; result is scalar.
+- `let <i1,N>:%output_var = .ternlog(<i1,N>:%a, <i1,N>:%b, <i1,N>:%c, i8:imm)` - Ternary logic operation on the bitwise representation of `a`, `b`, and `c`. For each bit position, the result is determined by the corresponding bit in `imm` (0-255). For example, if `imm` is 0b11110000, the result bit will be `a` for input 000, `b` for 001, `c` for 010, `a&b` for 011, `a&c` for 100, `b&c` for 101, `a|b|c` for 110, and `0` for 111. No attributes.
+
+- `let T0:%output_var = .reduce_add(<T0,N>:%input_vector [, <i1,N>:%mask])`  
+  Sums all elements of the vector where the mask is true (or all elements if no mask); result is scalar.
 
     If `T0` is integer:
-    - `#[nsw]` - poison on signed overflow
-    - `#[nuw]` - poison on unsigned overflow
-    - `#[saturating]` - clamp instead of wrap; pair with `#[unsigned]` for unsigned saturation
+    - `#[nsw]` – poison on signed overflow
+    - `#[nuw]` – poison on unsigned overflow
+    - `#[saturating]` – clamp instead of wrap; pair with `#[unsigned]` for unsigned saturation
 
     If `T0` is float/bfloat: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
-- `let T0:%output_var = .reduce_mul(<T0,N>:%input_vector)` - Multiplies all elements of the vector; result is scalar.
+- `let T0:%output_var = .reduce_mul(<T0,N>:%input_vector [, <i1,N>:%mask])`  
+  Multiplies all elements of the vector where the mask is true (or all elements if no mask); result is scalar.
 
     If `T0` is integer:
-    - `#[nsw]` - poison on signed overflow
-    - `#[nuw]` - poison on unsigned overflow
-    - `#[saturating]` - clamp instead of wrap; pair with `#[unsigned]` for unsigned saturation
+    - `#[nsw]` – poison on signed overflow
+    - `#[nuw]` – poison on unsigned overflow
+    - `#[saturating]` – clamp instead of wrap; pair with `#[unsigned]` for unsigned saturation
 
     If `T0` is float/bfloat: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
-- `let T0:%out = .reduce_avg(<T0,N>:%vec)` - Returns the arithmetic mean of all lanes. Result is scalar. `T0` can be integer or float/bfloat. Same attribute rules as `.avg`, including `#[geometric]` for float.
+- `let T0:%out = .reduce_avg(<T0,N>:%vec [, <i1,N>:%mask])`  
+  Returns the arithmetic mean of all lanes where the mask is true (or all lanes if no mask). Result is scalar. `T0` can be integer or float/bfloat. Same attribute rules as `.avg`.
 
-- `let T0:%output_var = .reduce_and(<T0,N>:%input_vector)` - Bitwise AND of all elements; result is scalar. T0 must be integer. No attributes.
+- `let T0:%output_var = .reduce_and(<T0,N>:%input_vector [, <i1,N>:%mask])`  
+  Bitwise AND of all elements where the mask is true (or all elements if no mask); result is scalar. T0 must be integer. No attributes.
 
-- `let T0:%output_var = .reduce_or(<T0,N>:%input_vector)` - Bitwise OR of all elements; result is scalar. T0 must be integer.
-    - `#[disjoint]` - asserts no bit is set in more than one element; poison if violated
+- `let T0:%output_var = .reduce_or(<T0,N>:%input_vector [, <i1,N>:%mask])`  
+  Bitwise OR of all elements where the mask is true (or all elements if no mask); result is scalar. T0 must be integer.
+    - `#[disjoint]` – asserts no bit is set in more than one element; poison if violated
 
-- `let T0:%output_var = .reduce_xor(<T0,N>:%input_vector)` - Bitwise XOR of all elements; result is scalar. T0 must be integer. No attributes.
+- `let T0:%output_var = .reduce_xor(<T0,N>:%input_vector [, <i1,N>:%mask])`  
+  Bitwise XOR of all elements where the mask is true (or all elements if no mask); result is scalar. T0 must be integer. No attributes.
 
-- `let T0:%output_var = .reduce_xnor(<T0,N>:%input_vector)` - Bitwise XNOR of all elements; result is scalar. T0 must be integer. No attributes.
+- `let T0:%output_var = .reduce_xnor(<T0,N>:%input_vector [, <i1,N>:%mask])`  
+  Bitwise XNOR of all elements where the mask is true (or all elements if no mask); result is scalar. T0 must be integer. No attributes.
 
-- `let T0:%output_var = .reduce_min(<T0,N>:%input_vector)` - Minimum element of the vector; result is scalar. T0 can be integer or float.
+- `let T0:%output_var = .reduce_min(<T0,N>:%input_vector [, <i1,N>:%mask])`  
+  Minimum element among the lanes where the mask is true (or all lanes if no mask); result is scalar. T0 can be integer or float.
 
     If `T0` is integer:
-    - `#[unsigned]` - unsigned minimum; default is signed
+    - `#[unsigned]` – unsigned minimum; default is signed
 
     If `T0` is float/bfloat:
-    - `#[unordered]` - NaN-ignoring min (IEEE "minNum"); default propagates NaN
-    - `#[ieee754_2019]` - correct signed-zero ordering across the full reduction; when combined with `#[unordered]`, gets 754-2019 `minimumNumber` semantics. Combining with `#[nsz]` is a compile error. Only valid when T0 is float or bfloat.
+    - `#[unordered]` – NaN-ignoring min (IEEE "minNum"); default propagates NaN
+    - `#[ieee754_2019]` – correct signed-zero ordering across the full reduction; when combined with `#[unordered]`, gets 754-2019 `minimumNumber` semantics. Combining with `#[nsz]` is a compile error. Only valid when T0 is float or bfloat.
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
-- `let T0:%output_var = .reduce_max(<T0,N>:%input_vector)` - Maximum element of the vector; result is scalar. T0 can be integer or float.
+- `let T0:%output_var = .reduce_max(<T0,N>:%input_vector [, <i1,N>:%mask])`  
+  Maximum element among the lanes where the mask is true (or all lanes if no mask); result is scalar. T0 can be integer or float.
 
     If `T0` is integer:
-    - `#[unsigned]` - unsigned maximum; default is signed
+    - `#[unsigned]` – unsigned maximum; default is signed
 
     If `T0` is float/bfloat:
-    - `#[unordered]` - NaN-ignoring max (IEEE "maxNum"); default propagates NaN
-    - `#[ieee754_2019]` - correct signed-zero ordering across the full reduction; when combined with `#[unordered]`, gets 754-2019 `maximumNumber` semantics. Combining with `#[nsz]` is a compile error. Only valid when T0 is float or bfloat.
+    - `#[unordered]` – NaN-ignoring max (IEEE "maxNum"); default propagates NaN
+    - `#[ieee754_2019]` – correct signed-zero ordering across the full reduction; when combined with `#[unordered]`, gets 754-2019 `maximumNumber` semantics. Combining with `#[nsz]` is a compile error. Only valid when T0 is float or bfloat.
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 Note: `.reduce_sub`, `.reduce_nand`, `.reduce_nor`, `.reduce_div`, `.reduce_rem` are intentionally absent - these operations are neither associative nor commutative (or both), so a well-defined reduction order cannot be assumed.
@@ -1107,17 +1115,23 @@ Note: `.reduce_sub`, `.reduce_nand`, `.reduce_nor`, `.reduce_div`, `.reduce_rem`
 
 ### Widening Reductions
 
-- `let T2:%out = .reduce_add_wide(<T1,N>:%v)` - Sums all lanes, accumulating in `T2`. `T1` must be integer; `T2` must be integer with `bitwidth(T2) >= bitwidth(T1)`.
-    - `#[unsigned]` - treat lanes as unsigned; default is signed
-    - `#[saturating]` - clamp accumulator to `T2` range instead of wrapping; pair with `#[unsigned]` for unsigned saturation
+- `let T2:%out = .reduce_add_wide(<T1,N>:%v [, <i1,N>:%mask])`  
+  Sums all lanes where the mask is true (or all lanes if no mask), accumulating in `T2`.  
+  `T1` must be integer; `T2` must be integer with `bitwidth(T2) >= bitwidth(T1)`.
+    - `#[unsigned]` – treat lanes as unsigned; default is signed
+    - `#[saturating]` – clamp accumulator to `T2` range instead of wrapping; pair with `#[unsigned]` for unsigned saturation
 
-- `let T2:%out = .reduce_mul_wide(<T1,N>:%v)` - Multiplies all lanes together, accumulating in `T2`. `T1` must be integer; `T2` must be integer with `bitwidth(T2) >= 2 * bitwidth(T1)`.
-    - `#[unsigned]` - treat lanes as unsigned; default is signed
-    - `#[saturating]` - clamp accumulator to `T2` range
+- `let T2:%out = .reduce_mul_wide(<T1,N>:%v [, <i1,N>:%mask])`  
+  Multiplies all lanes where the mask is true (or all lanes if no mask), accumulating in `T2`.  
+  `T1` must be integer; `T2` must be integer with `bitwidth(T2) >= 2 * bitwidth(T1)`.
+    - `#[unsigned]` – treat lanes as unsigned; default is signed
+    - `#[saturating]` – clamp accumulator to `T2` range
 
-- `let T2:%out = .reduce_avg_wide(<T1,N>:%v)` - Computes the arithmetic mean of all lanes with intermediate accumulation in `T2`. `T1` must be integer; `T2` must be integer wide enough to hold the full sum before the final divide.
-    - `#[unsigned]` - treat lanes as unsigned; default is signed
-    - `#[floor]` - round toward negative infinity; default rounds toward positive infinity
+- `let T2:%out = .reduce_avg_wide(<T1,N>:%v [, <i1,N>:%mask])`  
+  Computes the arithmetic mean of all lanes where the mask is true (or all lanes if no mask) with intermediate accumulation in `T2`.  
+  `T1` must be integer; `T2` must be integer wide enough to hold the full sum before the final divide.
+    - `#[unsigned]` – treat lanes as unsigned; default is signed
+    - `#[floor]` – round toward negative infinity; default rounds toward positive infinity
 
 ---
 

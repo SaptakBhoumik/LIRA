@@ -1,34 +1,161 @@
+## Trinary Arithmetic Instructions
+## Fixed-Point Arithmetic Instructions
+## Widening Arithmetic Instructions
+## Carrying / Borrow Arithmetic Instructions
+## Combined Quotient and Remainder (`divmod`)
+## Overflow-Wrap (Checked Arithmetic) Instructions
+## High-Half Multiply
+## N-Bit Carry Shifts
+## Bitwise Instructions
+    ### BMI1 Bit Manipulation
+    ### Parallel Bit Extract/Deposit
+## Comparison Instructions
+## Conversion Instructions
+## Unary Instructions
+## Float Classification Instructions
+## Memory Instructions
+    ### Cache Control Instructions
+    ### Lifetime and Invariant Scope Instructions
+## Binary Fetch Modify Instructions
+## Unary Fetch Modify Instructions
+## Terminator Instructions
+## Call Instruction
+## SIMD Instructions
+    ### Horizontal SIMD Instructions
+    ### Dot Product Instruction
+    ### Absolute Difference Instructions
+    ### Pack / Unpack Instructions
+    ### Vector Layout Instructions
+    ### Lane Mask Conversion Instructions
+    ### Widening Reductions
+## Other Instructions
+    ### Optimizer Hint Instructions
+        #### Binding Assumptions (UB if violated)
+        #### Non-Binding Expectation Hints
+    ### Metadata and Machine Instructions
+    ### Pointer Provenance Instructions
+## Hardware-Specific Instructions
+    ### Processor Identification
+    ### Timestamp Counter Instructions
+    ### Hardware Random Number Instructions
+    ### Floating-Point Environment (SSE)
+    ### x87 FP Environment
+    ### Crypto Extensions
+        #### AES (operate on `<i8,16>` blocks)
+        #### Carry-less Multiply
+        #### SHA (operate on `<i32,4>` state)
+        #### CRC32
+    ### System Call
+    ### CET Shadow Stack
 
-Reads/writes the x87 FPU control word (`FCW`), via `FNSTCW`/`FLDCW`. Opaque `i16` token, round-tripped the same way `.get_fpenv`/`.set_fpenv` round-trip `MXCSR`. `.set_fpenv87` requires `#[volatile]` for the same reason `.set_fpenv` does (suppressing reordering when the *side effect* on subsequent f80 ops, not the FCW value itself, is what matters).
 
-#### `.fpenv87_get_field` / `.fpenv87_set_field`
+## Trinary Arithmetic Instructions
+## Fixed-Point Arithmetic Instructions
+## Widening Arithmetic Instructions
+## Carrying / Borrow Arithmetic Instructions
+## Combined Quotient and Remainder (`divmod`)
+## Overflow-Wrap (Checked Arithmetic) Instructions
+## High-Half Multiply
+## N-Bit Carry Shifts
+## Bitwise Instructions
+    ### BMI1 Bit Manipulation
+    ### Parallel Bit Extract/Deposit
+## Comparison Instructions
+## Conversion Instructions
+## Unary Instructions
+## Float Classification Instructions
+## Memory Instructions
+    ### Cache Control Instructions
+    ### Lifetime and Invariant Scope Instructions
+## Binary Fetch Modify Instructions
+## Unary Fetch Modify Instructions
+## Terminator Instructions
+## Call Instruction
+## SIMD Instructions
+    ### Horizontal SIMD Instructions
+    ### Dot Product Instruction
+    ### Absolute Difference Instructions
+    ### Pack / Unpack Instructions
+    ### Vector Layout Instructions
+    ### Lane Mask Conversion Instructions
+    ### Widening Reductions
+## Other Instructions
+    ### Optimizer Hint Instructions
+        #### Binding Assumptions (UB if violated)
+        #### Non-Binding Expectation Hints
+    ### Metadata and Machine Instructions
+    ### Pointer Provenance Instructions
+## Hardware-Specific Instructions
+    ### Processor Identification
+    ### Timestamp Counter Instructions
+    ### Hardware Random Number Instructions
+    ### Floating-Point Environment (SSE)
+    ### x87 FP Environment
+    ### Crypto Extensions
+        #### AES (operate on `<i8,16>` blocks)
+        #### Carry-less Multiply
+        #### SHA (operate on `<i32,4>` state)
+        #### CRC32
+    ### System Call
+    ### CET Shadow Stack
 
-```
-let i32:%out = .fpenv87_get_field(i16:%env, str:field)
-let i16:%out = .fpenv87_set_field(i16:%env, str:field, i32:%value)
-```
-
-Same shape as the MXCSR versions. `field` is one of:
-- `"round"` - same 4-value encoding as the MXCSR `"round"` field (0=nearest-even, 1=toward `-inf`, 2=toward `+inf`, 3=toward zero). x87 encodes this in `FCW` bits 10–11, same numeric meaning, different bit position - the field accessor hides that.
-- `"precision"` - **x87-only field, no MXCSR equivalent.** Controls the internal computation precision for x87 arithmetic independent of the operand type: `0` = single (24-bit mantissa), `2` = double (53-bit), `3` = extended/80-bit (64-bit mantissa). `1` is reserved/undefined - `.fpenv87_set_field` with `1` is a compile error if the value is a compile-time constant, UB otherwise. Note this is largely a historical footgun (x87's "set precision to double so `f80` intermediates round like `f64`" trick) and most code should leave it at `3`.
-- `"except_mask"` - same 6-bit packed layout/order as the MXCSR version (invalid, denormal, divide-by-zero, overflow, underflow, inexact; `1`=masked).
-- No `"ftz"`/`"daz"` - x87 has no equivalent; requesting these is a compile error.
-
-#### `.get_fpstatus87` / `.clear_fpstatus87` - x87 Status Word
-
-```
-let i16:%out = .get_fpstatus87()
-.clear_fpstatus87()
-```
-
-`.get_fpstatus87` reads `FSW` via `FNSTSW` (read-only - there is no `FLDSW`). Use `.fpenv87_get_field` semantics conceptually on this value with `field = "except_status"` (same 6-bit order as MXCSR's `"except_status"`) to extract individual sticky flags - but note `.fpenv87_set_field` does **not** accept `"except_status"` as a settable field on an `i16` you'd feed back into `.set_fpenv87`, because writing `FCW` via `FLDCW` does not affect `FSW` at all.
-
-`.clear_fpstatus87` clears **all** sticky exception flags in `FSW` at once via `FNCLEX` - unlike the MXCSR path (`.fpenv_set_field(..., "except_status", ...)` can clear individual bits by writing back through `.set_fpenv`), x87 only supports clear-all. `#[volatile]`, no inputs/outputs beyond that.
-
-#### Net effect on the existing instructions
-
-Document explicitly in  That one sentence closes the gap without touching the existing four instructions' signatures at all.
 
 
+## Binary Arithmetic Instructions
+## Trinary Arithmetic Instructions
+## Fixed-Point Arithmetic Instructions
+## Widening Arithmetic Instructions
+## Carrying / Borrow Arithmetic Instructions
+## Combined Quotient and Remainder (`divmod`)
+## Overflow-Wrap (Checked Arithmetic) Instructions
+## High-Half Multiply
+## N-Bit Carry Shifts
+## Bitwise Instructions
+    ### BMI1 Bit Manipulation
+    ### Parallel Bit Extract/Deposit
+## Comparison Instructions
+## Conversion Instructions
+## Unary Instructions
+## Float Classification Instructions
+## Memory Instructions
+    ### Cache Control Instructions
+    ### Lifetime and Invariant Scope Instructions
+## Binary Fetch Modify Instructions
+## Unary Fetch Modify Instructions
+## Terminator Instructions
+## Call Instruction
+## SIMD Instructions
+    ### Horizontal SIMD Instructions
+    ### Dot Product Instruction
+    ### Absolute Difference Instructions
+    ### Pack / Unpack Instructions
+    ### Vector Layout Instructions
+    ### Lane Mask Conversion Instructions
+    ### Widening Reductions
+## Other Instructions
+    ### Optimizer Hint Instructions
+        #### Binding Assumptions (UB if violated)
+        #### Non-Binding Expectation Hints
+    ### Metadata and Machine Instructions
+    ### Pointer Provenance Instructions
+## Hardware-Specific Instructions
+    ### Processor Identification
+    ### Timestamp Counter Instructions
+    ### Hardware Random Number Instructions
+    ### Floating-Point Environment (SSE)
+    ### x87 FP Environment
+    ### Crypto Extensions
+        #### AES (operate on `<i8,16>` blocks)
+        #### Carry-less Multiply
+        #### SHA (operate on `<i32,4>` state)
+        #### CRC32
+    ### System Call
+    ### CET Shadow Stack
+
+    
+
+
+
+        
 
 

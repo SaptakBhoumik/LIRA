@@ -43,6 +43,14 @@ class SemanticAnalyzer {
                                       IR::InstructionStmtPtr inst_stmt);
     MIR::InstPtr analyze_rem_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::InstOperandTypeVarient type_varient, 
                                       IR::InstructionStmtPtr inst_stmt);
+    MIR::InstPtr analyze_copysign_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::InstOperandTypeVarient type_varient, 
+                                      IR::InstructionStmtPtr inst_stmt);
+    MIR::InstPtr analyze_min_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::InstOperandTypeVarient type_varient, 
+                                      IR::InstructionStmtPtr inst_stmt);
+    MIR::InstPtr analyze_max_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::InstOperandTypeVarient type_varient, 
+                                      IR::InstructionStmtPtr inst_stmt);
+    MIR::InstPtr analyze_avg_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::InstOperandTypeVarient type_varient, 
+                                      IR::InstructionStmtPtr inst_stmt);
 
     MIR::InstPtr analyze_bitwise_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
     MIR::InstPtr analyze_and_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::InstOperandTypeVarient type_varient, 

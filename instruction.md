@@ -1,3 +1,5 @@
+# Current instruction set
+
 ## Binary Arithmetic Instructions
 
 - `let T:%output_var = .add(T:%input_var1, T:%input_var2)` - Adds 2 numbers. T must be of the form `T0` or `<T0,M>` where T0 is some float/bfloat/integer.
@@ -38,6 +40,7 @@
 - `let T:%output_var = .rem(T:%input_var1, T:%input_var2)` - Remainder of division. T must be of the form `T0` or `<T0,M>` where T0 is some float/bfloat/integer.
 
     If `T0` is integer:
+    - `#[exact]` - poison if the division is not exact (i.e. has a remainder)
     - `#[unsigned]` - remainder of unsigned division; default is signed
 
     If `T0` is float/bfloat: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
@@ -473,7 +476,7 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
     - `#[nopoison(iN:idx...)]` - asserts the memory at the specified pointer(s) contains no poison; at least one index required
     - `#[dereferenceable(i64:N, iN:idx...)]` - asserts the specified pointer(s) are dereferenceable for N bytes; at least one index required
 
-- `let ptr:%output_var = .getaddress(T:%var, iN:%offset)` - Returns `&var + offset`. Output must be a pointer. `var` must be a variable (not a literal). Offset is in bytes.
+- `let ptr:%output_var = .getaddress(T:%var, iN:%offset)` - Returns `&var + offset`. Output must be a pointer. `var` must be a variable (not a literal). Offset is in bytes. Note:-We have no seperate block address. If you want address of label just use this
 
     - `#[unsigned]` - offset is unsigned; default is signed
     - `#[nsw]` - poison if the offset causes signed overflow
@@ -742,8 +745,10 @@ A terminator must be the final instruction of every block. Falling through to th
 
     **Call-site attributes:**
     - `#[cold]` - marks this call site as cold even if the function itself is not
+    - `#[hot]` - marks this call site as hot even if the function itself is not
     - `#[noreturn]` - marks this call site as non-returning even if the function definition does not say so; `.call` with no output variable is then permitted even for non-void functions
     - `#[nosideeffect]` - asserts this call has no observable side effects; the optimizer may remove the call if its return value is unused; overrides the function definition for this call site
+    - `#[pure]` - asserts this call has no observable side effects and its return value depends only on its arguments; the optimizer may remove the call if its return value is unused or if the same call with the same arguments has already been made; overrides the function definition for this call site
     - `#[cc(str:calling_convention)]` - calling convention; one of `ccc`, `fastcc`, `coldcc`, `tailcc`; default is `ccc`
     - `#[return_extension(str:extension_type)]` - how the return value is extended; one of `"zero"`, `"sign"`, `"no"`
 
@@ -767,7 +772,7 @@ A terminator must be the final instruction of every block. Falling through to th
 
 ## SIMD Instructions
 
-- `let <T,M>:%output_var = .shufflevector(<T,N2>:%input1, <T,N3>:%input2, <i16,M>:%mask)` - Shuffles elements of two vectors according to a compile-time mask. No attributes.
+- `let <T,M>:%output_var = .shufflevector(<T,N2>:%input1, <T,N3>:%input2, <i16,M>:%mask)` - Shuffles elements of two vectors according to a mask(Run time or compile time). No attributes.
 
 - `let T0:%output_var = .reduce_add(<T0,N>:%input_vector)` - Sums all elements of the vector; result is scalar.
 

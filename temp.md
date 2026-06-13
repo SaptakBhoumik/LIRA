@@ -1,0 +1,9 @@
+Function / Module Level
+No #[cold] / #[hot] on function definitions themselves. You have #[cold] on call sites. You need it on function definitions too for profile-guided layout.
+No #[naked] function attribute. For hand-written assembly trampolines, signal handlers, and context-switch code in a runtime. A naked function emits no prologue/epilogue. Essential for any systems runtime.
+No #[interrupt] / #[signal_handler] function attribute. x86_64 interrupt handlers need IRETQ instead of RET and have different register-saving requirements. If you're compiling OS kernels or embedded code this is necessary.
+No #[section("name")] on globals or functions. Placing a symbol in a specific ELF section — linker scripts, read-only data, hot/cold splitting. Without it you can't control memory layout for things like .rodata, custom linker sections, or hot/cold function splitting.
+No #[weak] / #[comdat] on symbols. Weak symbols and COMDAT groups are needed for C++ template instantiations, inline functions with external linkage, and LTO. Without them you can't correctly compile C++ or support link-time deduplication.
+No #[visibility("hidden"/"protected")]. ELF symbol visibility. Hidden symbols don't appear in the dynamic symbol table — essential for shared library ABIs and for the optimizer to devirtualize calls when building .so files. Without #[hidden] you can't implement -fvisibility=hidden.
+No #[alias] for symbol aliases. .set foo, bar in assembly / __attribute__((alias)) in GCC. Used for versioned symbols, weak aliases, and ABI compatibility shims.
+No inline assembly instruction. .asm(str:%template, ...) — the ability to embed raw assembly strings with input/output constraints. This is unavoidable for a production systems compiler. CPUID, RDTSC, RDRAND, custom instructions, privileged instructions in kernels — all need it. Without it you'll always have gaps that require workarounds.

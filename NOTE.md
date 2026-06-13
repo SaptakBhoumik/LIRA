@@ -1,1 +1,2 @@
 - Alignment is set to be 0 by default if aligment is not specified
+- i1 is not supported by any instruction. It is only used for control flow and comparisons. In struct it is i8 basically. Same in array. Keep it in mind when u do pointer arithmetic on i1. For SIMD it depends. Can be a literal mask if supported by the instruction, otherwise it is i32(Or something like that)

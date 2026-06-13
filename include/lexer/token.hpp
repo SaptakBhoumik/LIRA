@@ -1,7 +1,7 @@
 #pragma once
 #include <cstddef>
 #include <string>
-
+#include "utils.hpp"
 namespace LIRA {
 namespace IR {
 enum class TokenType {

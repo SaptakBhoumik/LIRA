@@ -65,7 +65,7 @@ TypeExprPtr Parser::parse_named_type_expr(bool has_attribute){
         bool is_brain_float = name.value == "bf16";
         std::size_t bits = 0;
         if(name.value[0] == 'f') {
-            bits = std::stoull(name.value.substr(1));
+            bits = Utils::to_numeric<std::size_t>(name.value.substr(1));
         }
         else{
             //Happens only for bf16
@@ -73,14 +73,14 @@ TypeExprPtr Parser::parse_named_type_expr(bool has_attribute){
         }
         return std::make_shared<FloatTypeExpr>(name, bits, is_brain_float, attributes);
     }
-    else if(name.value[0] == 'i'){
-        //Check if the rest is a number
-        if(name.value.length() < 2 || !std::all_of(name.value.begin() + 1, name.value.end(), ::isdigit)){
-            //Not a valid integer type, treat it as a named type
+    else if(name.value[0] == 'i' && name.value.length() > 1){
+        try{
+            std::size_t bits = Utils::to_numeric<std::size_t>(name.value.substr(1));
+            return std::make_shared<IntTypeExpr>(name, bits, attributes);
+        }
+        catch(const std::exception& e){
             return std::make_shared<NamedTypeExpr>(name, attributes);
         }
-        std::size_t bits = std::stoull(name.value.substr(1));
-        return std::make_shared<IntTypeExpr>(name, bits, attributes);
     }
     
     return std::make_shared<NamedTypeExpr>(name, attributes);
@@ -93,7 +93,7 @@ TypeExprPtr Parser::parse_array_type_expr(bool has_attribute){
     expect(TokenType::number, "Expected array size after '[' in array type expression");
     std::size_t size;
     try{
-        size = std::stoull(this->curr_tok.value);
+        size = Utils::to_numeric<std::size_t>(this->curr_tok.value, true, true);
     }
     catch(const std::exception& e){
         error(this->curr_tok, "Invalid array size in array type expression", "Expected a positive integer");
@@ -114,7 +114,7 @@ TypeExprPtr Parser::parse_simd_type_expr(bool has_attribute){
     expect(TokenType::number, "Expected SIMD size after '<' in SIMD type expression");
     std::size_t size;
     try{
-        size = std::stoull(this->curr_tok.value);
+        size = Utils::to_numeric<std::size_t>(this->curr_tok.value, true, true);
     }
     catch(const std::exception& e){
         error(this->curr_tok, "Invalid SIMD size in SIMD type expression", "Expected a positive integer");

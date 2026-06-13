@@ -1198,6 +1198,84 @@ Note: `.reduce_sub`, `.reduce_nand`, `.reduce_nor`, `.reduce_div`, `.reduce_rem`
 
 ### Hardware Random Number Instructions
 
-- `let {T, i1}:%out = .rdrand()` - Returns `{value: T, success: i1}`. `value` is a hardware-generated random number from the CSPRNG. `success` indicates whether a valid value was produced; if false, retry. `T` must be `i16`, `i32`, or `i64`.
+- `let {T, i1}:%out = .rdrand()` - Returns `{value: T, success: i1}`. `value` is a hardware-generated random number from the CSPRNG. `success` indicates whether a valid value was produced; if false, retry. `T` must be `i16`, `i32`, or `i64`. No attributes.
 
-- ``let {T, i1}:%out = .rdseed()`` - Returns `{value: T, success: i1}`. `value` is a hardware-generated random number from the entropy source. `success` indicates whether a valid value was produced; if false, retry. `T` must be `i16`, `i32`, or `i64`.
+- `let {T, i1}:%out = .rdseed()` - Returns `{value: T, success: i1}` from the true hardware entropy source (lower throughput). `T` must be `i16`, `i32`, or `i64`. Retry semantics same as `.rdrand`. No attributes.
+
+### Floating-Point Environment (SSE)
+
+These instructions read/write `MXCSR` only and have no effect on `f80` arithmetic; rounding mode, precision, and exception state for `f80` operations are controlled exclusively via the x87 FP environment instructions.
+
+- `let i32:%out = .get_fpenv()` - Reads the processor's `MXCSR` register. Returns an opaque `i32` bit-pattern. No attributes.
+
+- `.set_fpenv(i32:%env)` - Writes `%env` to `MXCSR`. `%env` should be a value obtained from `.get_fpenv` (possibly modified via field accessors); writing arbitrary bit patterns with reserved bits set incorrectly is undefined behavior.
+    - `#[volatile]` - prevents the optimizer from eliminating, reordering across other FP ops, or merging redundant calls. Use when the side effect on FP exception trapping matters.
+
+- `let i32:%out = .fpenv_get_field(i32:%env, str:field)` - Extracts a named field from an opaque FP environment value. `field` must be a compile-time string literal: `"round"` (0=nearest-even, 1=neg inf, 2=pos inf, 3=zero), `"ftz"`, `"daz"`, `"except_mask"` (6-bit packed: bits 0–5 invalid, denorm, divzero, overflow, underflow, inexact; 1=masked), `"except_status"` (same 6-bit order for sticky flags). No attributes.
+
+- `let i32:%out = .fpenv_set_field(i32:%env, str:field, i32:%value)` - Returns a copy of `%env` with the named field replaced by `%value`. For `"except_status"`, setting a bit clears the corresponding sticky exception flag. Does not modify processor state; pass the result to `.set_fpenv` to take effect. No attributes.
+
+### x87 FP Environment
+
+- `let i16:%out = .get_fpenv87()` - Reads the x87 FPU control word (`FCW`) via `FNSTCW`. Returns an opaque `i16` token. No attributes.
+
+- `.set_fpenv87(i16:%env)` - Writes `%env` to `FCW` via `FLDCW`. Requires `#[volatile]` for the same reason as `.set_fpenv` (suppresses reordering when side effects on subsequent f80 ops matter).
+
+- `let i32:%out = .fpenv87_get_field(i16:%env, str:field)` - Extracts a named field from an x87 control word. Fields: `"round"` (same 4-value encoding), `"precision"` (0=single, 2=double, 3=extended; 1 is undefined/UB), `"except_mask"` (same 6-bit layout). `"ftz"`/`"daz"` are compile errors (x87 has no equivalent). No attributes.
+
+- `let i16:%out = .fpenv87_set_field(i16:%env, str:field, i32:%value)` - Returns a copy of `%env` with the named field replaced. `"except_status"` is not a settable field (x87 status is separate). No attributes.
+
+- `let i16:%out = .get_fpstatus87()` - Reads the x87 status word (`FSW`) via `FNSTSW`. No attributes.
+
+- `.clear_fpstatus87()` - Clears all sticky exception flags in `FSW` via `FNCLEX`. `#[volatile]` implicitly. No inputs/outputs.
+
+### Crypto Extensions
+
+All instructions are pure functions of their operands; constant-foldable, CSE-able, reorderable freely. They operate on register values and do not fault.
+
+#### AES (operate on `<i8,16>` blocks)
+- `let <i8,16>:%out = .aesenc(<i8,16>:%state, <i8,16>:%roundkey)` - AES encrypt round. No attributes.
+- `let <i8,16>:%out = .aesenclast(<i8,16>:%state, <i8,16>:%roundkey)` - AES encrypt last round (no MixColumns). No attributes.
+- `let <i8,16>:%out = .aesdec(<i8,16>:%state, <i8,16>:%roundkey)` - AES decrypt round. No attributes.
+- `let <i8,16>:%out = .aesdeclast(<i8,16>:%state, <i8,16>:%roundkey)` - AES decrypt last round (no InvMixColumns). No attributes.
+- `let <i8,16>:%out = .aesimc(<i8,16>:%roundkey)` - AES inverse mix columns on a round key. No attributes.
+- `let <i8,16>:%out = .aeskeygenassist(<i8,16>:%a, i8:rcon)` - AES key generation assist. `rcon` must be a compile-time integer literal. No attributes.
+
+#### Carry-less Multiply
+- `let i128:%out = .clmul(i64:%a, i64:%b)` - Carry-less (GF(2)) multiply, 64x64->128. No attributes.
+
+#### SHA (operate on `<i32,4>` state)
+- `let <i32,4>:%out = .sha1rnds4(<i32,4>:%abcd, <i32,4>:%msg, i8:func)` - SHA-1 four rounds. `func` compile-time literal 0–3. No attributes.
+- `let <i32,4>:%out = .sha1nexte(<i32,4>:%abcd, <i32,4>:%e)` - SHA-1 next E. No attributes.
+- `let <i32,4>:%out = .sha1msg1(<i32,4>:%a, <i32,4>:%b)` - SHA-1 message schedule step 1. No attributes.
+- `let <i32,4>:%out = .sha1msg2(<i32,4>:%a, <i32,4>:%b)` - SHA-1 message schedule step 2. No attributes.
+- `let <i32,4>:%out = .sha256rnds2(<i32,4>:%abef, <i32,4>:%cdgh, <i32,4>:%wk)` - SHA-256 two rounds. No attributes.
+- `let <i32,4>:%out = .sha256msg1(<i32,4>:%a, <i32,4>:%b)` - SHA-256 message schedule step 1. No attributes.
+- `let <i32,4>:%out = .sha256msg2(<i32,4>:%a, <i32,4>:%b)` - SHA-256 message schedule step 2. No attributes.
+
+#### CRC32
+- `let T2:%out = .crc32(T2:%acc, T1:%data)` - CRC32C checksum update. `T2` accumulator/output must be `i32` or `i64`. `T1` must be `i8`, `i16`, or `i32` when `T2=i32`; or `i8` or `i64` when `T2=i64`. No attributes.
+
+### System Call
+
+- `let i64:%out = .syscall(i64:%nr, i64:%arg1, i64:%arg2, i64:%arg3, i64:%arg4, i64:%arg5, i64:%arg6)` - Issues the x86_64 Linux `SYSCALL` instruction. Arguments map to `rax, rdi, rsi, rdx, r10, r8, r9` in order. The argument list is variadic with 0–6 arguments; unused trailing args are omitted. All operands and the result must be `i64`. Treated as an arbitrary external call with unknown side effects; the optimizer must not reorder relative to memory ops, must not CSE identical calls, and must not eliminate if `%out` is unused, unless `#[nosideeffect]` is given.
+    - `#[noreturn]` - for syscalls that never return on success; `.syscall` with no output variable is then permitted.
+    - `#[nosideeffect]` - opt-in assertion that this call has no side effects beyond its return value, allowing DCE/CSE.
+
+### CET Shadow Stack
+
+On hardware with CET-SS disabled, every instruction in this section executes as a documented no-op (except `.wrss`, which faults if user-mode WRSS is not enabled). All are opaque side-effecting w.r.t. the shadow stack.
+
+- `let ptr:%out = .rdssp()` - Returns the current shadow stack pointer (`SSP`). On CET-SS-disabled hardware, result is implementation-defined (may be 0). No attributes.
+
+- `.incssp(i64:%count)` - Pops `%count` 8-byte slots off the shadow stack (advances `SSP` by `8*count`). `%count` must be `>= 1`. No output. No attributes.
+
+- `.saveprevssp()` - Pushes a previous-SSP token onto the current shadow stack. No output. No attributes.
+
+- `.rstorssp(ptr:%token_addr)` - Loads `SSP` from the restore-token at `%token_addr` and validates it. No output. No attributes.
+
+- `.setssbsy()` - Sets the "busy" bit on the current shadow-stack's supervisor token. No output. No attributes.
+
+- `.wrss(T:%value, ptr:%addr)` - Writes `%value` directly into shadow-stack memory at `%addr`. `T` must be `i32` or `i64`. Requires user-mode WRSS enable; faults otherwise. `#[volatile]` implicitly. No additional attributes.
+
+---

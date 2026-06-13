@@ -69,6 +69,18 @@
     - `#[ieee754_2019]` - get correct signed-zero ordering (`-0.0 < +0.0`) under the NaN-propagating (default ordered) path; when combined with `#[unordered]`, gets 754-2019 `maximumNumber` semantics (NaN-ignoring and correctly ordered for signed zero). Combining with `#[nsz]` is a compile error. Only valid when T0 is float or bfloat.
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
+- `let T:%out = .avg(T:%a, T:%b)` - Returns the average of `a` and `b`. `T` must be of the form `T0` or `<T0,M>` where `T0` is integer, float, or bfloat. For vectors, the operation is lanewise.
+
+    **If `T0` is integer:** Computes `(a + b + 1) >> 1` (rounds toward positive infinity, matching `PAVGB`/`PAVGW`). Default is signed.
+    - `#[unsigned]` - treat `a` and `b` as unsigned; default is signed
+    - `#[floor]` - round toward negative infinity (`(a + b) >> 1`) instead of the default ceiling
+    - `#[nsw]` - poison if the intermediate sum `a + b` overflows before the shift
+    - `#[nuw]` - poison on unsigned intermediate overflow; only valid with `#[unsigned]`
+
+    **If `T0` is float/bfloat:** Computes `(a + b) * 0.5` exactly.
+    - `#[geometric]` - compute `sqrt(a * b)` (geometric mean) instead; only valid for float/bfloat
+    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+
 ---
 
 ## Trinary Arithmetic Instructions
@@ -134,21 +146,119 @@
 
 ---
 
-<!-- 
-## Overflow-Detecting Arithmetic Instructions
+## Widening Arithmetic Instructions
 
-These return `{T, i1}` - the result paired with an overflow flag (1 if overflow occurred). T must be of the form `T0` or `<T0,M>` where T0 is some integer.
+Widening instructions compute `a OP b` at the full precision of the *output* type - the inputs are sign- or zero-extended to the output width before the operation. The output type `T2` must be at least as wide as the input type `T1` (strictly wider is the normal case; equal width is permitted and behaves identically to the non-widening form). Both scalar and vector forms are supported; for vectors, the lane count stays the same and only the element width widens.
 
-- `let {T,i1}:%output_var = .add_overflow(T:%input_var1, T:%input_var2)` - Addition with overflow detection.
+- `let T2:%out = .widening_add(T1:%a, T1:%b)` - Adds `a` and `b`, returning the result in the wider type `T2`. For integers, inputs are sign-extended (default) or zero-extended (`#[unsigned]`) to the output width before addition. For floats, inputs are precision-extended before the addition.
+
+    `T1` and `T2` must share the same kind (integer->integer, float->float, bfloat->bfloat, or `<T0,M>`->`<T0,M>`). `bitwidth(T2) >= bitwidth(T1)`.
+
+    **If `T1`/`T2` base type is integer:**
+    - `#[unsigned]` - zero-extend inputs; default is sign-extend
+    - `#[nsw]` - poison on signed overflow of the *widened* result (rarely needed since widening usually prevents overflow)
+    - `#[nuw]` - poison on unsigned overflow of the widened result; only valid with `#[unsigned]`
+
+    **If `T1`/`T2` base type is float/bfloat:** `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+
+- `let T2:%out = .widening_sub(T1:%a, T1:%b)` - Subtracts `b` from `a`, returning the result in the wider type `T2`. Same extension and attribute rules as `.widening_add`.
+
+- `let T2:%out = .widening_mul(T1:%a, T1:%b)` - Multiplies `a` and `b`, returning the full-width product in `T2`. This is the primary use case for widening: an `i32 x i32 -> i64` multiply without a prior `.ext`, and `f32 x f32 -> f64` without precision loss in the intermediate. Same extension rules as `.widening_add`.
+
+    **If `T1`/`T2` base type is integer:**
+    - `#[unsigned]` - treat both inputs as unsigned before extension
+    - `#[nsw]` - poison if the result does not fit in the *input* type range (i.e. overflow would have occurred at the narrow width)
+    - `#[nuw]` - same but unsigned; only valid with `#[unsigned]`
+
+    **If `T1`/`T2` base type is float/bfloat:** `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+
+---
+
+## Carrying / Borrow Arithmetic Instructions
+
+These instructions thread a carry or borrow bit in and out, enabling multi-word arithmetic. All inputs and outputs are scalar; the carry/borrow is always `i1`. There are no direct vector forms - carry semantics are inherently sequential across words, so a carry chain over a vector is expressed as a loop over scalar words. Lanewise application is valid and expected: apply the instruction to one lane (word) per loop iteration, feeding the carry-out of iteration `i` as the carry-in of iteration `i+1`. The carry-in `%cin` must be `i1`; typically `0i1` for the least-significant word and the carry-out of the previous word for higher words.
+
+- `let {T, i1}:%out = .carry_add(T:%a, T:%b, i1:%cin)` - Add with carry. Computes `a + b + cin`, returning the sum and carry-out as a struct `{T, i1}`. `T` must be `i<N>`. No overflow attributes - the carry-out is the mechanism for propagating overflow.
+
+    - `#[unsigned]` - carry-out reflects unsigned overflow; default is signed carry semantics
+
+- `let {T, i1}:%out = .carry_sub(T:%a, T:%b, i1:%bin)` - Subtract with borrow. Computes `a - b - bin`, returning the difference and borrow-out as a struct `{T, i1}`. `T` must be `i<N>`. Borrow-out is `1` if the subtraction underflowed (i.e., borrowed from the next word).
+
+    - `#[unsigned]` - borrow-out reflects unsigned underflow; default is signed
+
+- `let {T, i1}:%out = .carry_shl(T:%a, i1:%cin)` - Shift left by one bit with carry in/out. The incoming carry (`%cin`) fills the vacated LSB; the outgoing carry is the bit shifted out of the MSB. Equivalent to `(a << 1) | cin` with carry-out = `a >> (bitwidth-1)`. `T` must be `i<N>`. No attributes.
+
+- `let {T, i1}:%out = .carry_lshr(T:%a, i1:%cin)` - Logical shift right by one bit with carry in/out. The incoming carry fills the vacated MSB; the outgoing carry is the bit shifted out of the LSB. `T` must be `i<N>`. No attributes.
+
+- `let {T, i1}:%out = .carry_ashr(T:%a, i1:%cin)` - Arithmetic shift right by one bit with carry out. The MSB is filled by the sign bit; `%cin` is unused for the fill but included for API uniformity. Carry-out is the bit shifted out of the LSB. `T` must be `i<N>`. No attributes.
+
+- `let {T, T}:%out = .mac_wide(T:%a, T:%b, T:%acc)` - Widening multiply-accumulate. Computes `(a * b) + acc` at double width, returning a struct `{high_word: T, low_word: T}`. `T` must be `i<N>`.
+
+    - `#[unsigned]` - unsigned widening multiply; default is signed
+
+- `let {T, T}:%out = .widening_div(T:%dividend_hi, T:%dividend_lo, T:%divisor)` - Widening division. Divides a double-width dividend `(dividend_hi:dividend_lo)` by `divisor`, returning `{quotient: T, remainder: T}`. Equivalent to x86 `DIV`/`IDIV` with a `2N`-bit dividend. `T` must be `i<N>`. Poison if divisor is zero or if the quotient overflows `T`.
+
+    - `#[unsigned]` - unsigned division; default is signed
+    - `#[exact]` - poison if the remainder is non-zero
+
+---
+
+## Combined Quotient and Remainder (`divmod`)
+
+- `let {T, T}:%out = .divmod(T:%a, T:%b)` - Returns both quotient and remainder from a single division, avoiding two separate hardware divides. `T` must be of the form `T0` or `<T0,M>` where `T0` is an integer. For vectors, the operation is lanewise.
+
+    - `#[unsigned]` - unsigned division and remainder; default is signed
+    - `#[exact]` - poison if the remainder is non-zero (i.e. division is not exact)
+
+- `let {T, T}:%out = .divmod(T:%a, T:%b)` - Float variant: returns `{quotient: T, remainder: T}` where `quotient = integral_part(a / b)` and `remainder = a - quotient * b` (i.e. IEEE 754 remainder with truncation toward zero). `T` must be of the form `T0` or `<T0,M>` where `T0` is float/bfloat. For vectors, the operation is lanewise.
+
+    Float-specific attributes: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+
+---
+
+## Overflow-Wrap (Checked Arithmetic) Instructions
+
+These return `{T, i1}` - the wrapped result paired with an overflow flag (`1` if overflow occurred, `0` if not). Useful for implementing checked arithmetic in safe languages. `T` must be `i<N>` or `<i<N>,M>` (vector form is lanewise; each lane produces its own flag bit). For vectors the return type is `{<T,M>, <i1,M>}`.
+
+- `let {T, i1}:%out = .add_wrap(T:%a, T:%b)` - Adds `a` and `b` with wrapping, returning the wrapped result and an overflow flag.
+
     - `#[unsigned]` - detect unsigned overflow; default detects signed overflow
 
-- `let {T,i1}:%output_var = .sub_overflow(T:%input_var1, T:%input_var2)` - Subtraction with overflow/underflow detection.
+- `let {T, i1}:%out = .sub_wrap(T:%a, T:%b)` - Subtracts `b` from `a` with wrapping, returning the wrapped result and an underflow/overflow flag.
+
     - `#[unsigned]` - detect unsigned underflow; default detects signed overflow
 
-- `let {T,i1}:%output_var = .mul_overflow(T:%input_var1, T:%input_var2)` - Multiplication with overflow detection.
+- `let {T, i1}:%out = .mul_wrap(T:%a, T:%b)` - Multiplies `a` and `b` with wrapping, returning the wrapped result and an overflow flag.
+
     - `#[unsigned]` - detect unsigned overflow; default detects signed overflow
 
---- -->
+---
+
+## High-Half Multiply
+
+- `let T:%out = .mulhi(T:%a, T:%b)` - Returns the **high half** of the full `NxN->2N` product of `a` and `b`. Equivalent to `widening_mul(a, b) >> bitwidth(T)` but does not require a `2xbitwidth(T)` output type - useful when `T` is `i64` and no `i128` type exists(I mean we do emulate i128 but why bother). `T` must be of the form `T0` or `<T0,M>` where `T0` is an integer. For vectors, the operation is lanewise.
+
+    - `#[unsigned]` - unsigned multiply; default is signed
+
+---
+
+## N-Bit Carry Shifts
+
+These extend the 1-bit carry shift instructions to handle a shift count of more than one bit at a time, enabling multi-word arbitrary-amount shifts without a loop of single-bit steps. Each instruction shifts one word by `shift` bits and threads the displaced bits as a full-word carry between words. Only the low `shift` bits of the carry operands are meaningful.
+
+`T` must be `i<N>`. No vector form - chain these in a loop over scalar words, exactly like the 1-bit carry shifts.
+
+- `let {T, T}:%out = .shl_carry_n(T:%a, T:%shift, T:%carry_in)` - Left shift by N with carry. Shifts `a` left by `shift` bits. The low `shift` bits of `carry_in` fill the vacated LSBs. Returns `{result, carry_out}` where `carry_out` holds the `shift` MSBs that were displaced, positioned in the low bits (ready to pass as `carry_in` to the next word).
+
+    Formally: `result = (a << shift) | (carry_in & mask(shift))`, `carry_out = a >> (bitwidth(T) - shift)`. No attributes.
+
+- `let {T, T}:%out = .lshr_carry_n(T:%a, T:%shift, T:%carry_in)` - Logical right shift by N with carry. Shifts `a` right by `shift` bits logically. The low `shift` bits of `carry_in` fill the vacated MSBs (shifted into the top). Returns `{result, carry_out}` where `carry_out` holds the `shift` LSBs that were displaced, in the low positions.
+
+    Formally: `result = (a >> shift) | (carry_in << (bitwidth(T) - shift))`, `carry_out = a & mask(shift)`. Process words high-to-low, feeding carry-out of word `i` as carry-in of word `i-1`. No attributes.
+
+- `let {T, T}:%out = .ashr_carry_n(T:%a, T:%shift, T:%carry_in)` - Arithmetic right shift by N with carry. Same as `.lshr_carry_n` but the sign bit of `a` propagates into the `shift` vacated MSBs of the **most significant word only**. For all other words in the chain, pass the carry-out of the word above as `carry_in`, just as with `.lshr_carry_n`. Carry-out is the `shift` displaced LSBs in low positions. No attributes.
+
+---
 
 ## Bitwise Instructions
 
@@ -179,6 +289,22 @@ These return `{T, i1}` - the result paired with an overflow flag (1 if overflow 
 - `let T:%output_var = .rotl(T:%input_var1, T:%input_var2)` - Rotate left. Bits shifted out on the left are rotated back in on the right. T must be of the form `T0` or `<T0,M>` where T0 is some integer. Shift amount is taken modulo bitwidth. No attributes.
 
 - `let T:%output_var = .rotr(T:%input_var1, T:%input_var2)` - Rotate right. Bits shifted out on the right are rotated back in on the left. T must be of the form `T0` or `<T0,M>` where T0 is some integer. Shift amount is taken modulo bitwidth. No attributes.
+
+- `let T:%out = .bitblend(T:%mask, T:%a, T:%b)` - Bitwise blend / masked merge. Computes `(a & mask) | (b & ~mask)`. For each bit position: if the mask bit is 1, take from `a`; if 0, take from `b`. `T` must be `i<N>` or `<i<N>,M>`. No attributes.
+
+### BMI1 Bit Manipulation
+
+- `let T:%out = .blsi(T:%input)` - Isolate lowest set bit. Returns a value with only the lowest set bit of `%input` set; `0` if `%input` is `0`. Equivalent to `x & -x`. `T` must be `i32` or `i64`. No attributes.
+
+- `let T:%out = .blsr(T:%input)` - Reset lowest set bit. Returns `%input` with its lowest set bit cleared; `0` if `%input` is `0`. Equivalent to `x & (x-1)`. `T` must be `i32` or `i64`. No attributes.
+
+- `let T:%out = .blsmsk(T:%input)` - Get mask up to lowest set bit. Returns a mask with all bits set up to and including the lowest set bit of `%input` (e.g. `0b10100 -> 0b00111`); all bits set (`-1`) if `%input` is `0`. Equivalent to `x ^ (x-1)`. `T` must be `i32` or `i64`. No attributes.
+
+### Parallel Bit Extract/Deposit
+
+- `let T:%out = .pext(T:%src, T:%mask)` - Parallel bit extract. Extracts bits from `src` at positions where `mask` has a 1 bit, compacting them into the contiguous low bits of the result. The number of meaningful result bits equals `popcount(mask)`; remaining high bits are zero. Corresponds to x86 BMI2 `PEXT`. `T` must be `i32` or `i64`. No attributes.
+
+- `let T:%out = .pdep(T:%src, T:%mask)` - Parallel bit deposit. Inverse of `.pext`. Deposits bits from the consecutive low bits of `src` into the output at positions where `mask` has a 1 bit. All other output bits are zero. Corresponds to x86 BMI2 `PDEP`. `T` must be `i32` or `i64`. No attributes.
 
 ---
 
@@ -219,7 +345,7 @@ These return `{T, i1}` - the result paired with an overflow flag (1 if overflow 
 
 ## Conversion Instructions
 
-- `let T2:%output_var = .trunc(T1:%input_var)` - Truncates from a wider to a narrower type. Base type of T1 and T2 must match in kind (integer→integer, float→float). Bitwidth of T1's base type must be strictly greater than T2's. Both must be vector or both non-vector.
+- `let T2:%output_var = .trunc(T1:%input_var)` - Truncates from a wider to a narrower type. Base type of T1 and T2 must match in kind (integer->integer, float->float). Bitwidth of T1's base type must be strictly greater than T2's. Both must be vector or both non-vector.
 
     If base type is integer:
     - `#[nsw]` - poison if the truncated value does not sign-extend back to the original
@@ -323,6 +449,8 @@ These return `{T, i1}` - the result paired with an overflow flag (1 if overflow 
 
 - `let T:%output_var = .bitreverse(T:%input_var)` - Reverses bit order. T must be of the form `T0` or `<T0,M>` where T0 is some integer. No attributes.
 
+- `let T:%out = .clrsb(T:%input)` - Count leading redundant sign bits. Returns the number of leading bits equal to the sign bit, **not counting the sign bit itself**. Equivalently: `clz(x >= 0 ? x : ~x) - 1`. `T` must be of the form `T0` or `<T0,M>` where `T0` is a **signed** integer. Output type matches input. No attributes.
+
 ---
 
 ## Float Classification Instructions
@@ -378,9 +506,9 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
 
 - `let <T,N>:%out = .masked_load(ptr:%ptr, <i1,N>:%mask, <T,N>:%passthru)` - Loads elements from memory into a vector, but only for lanes where the mask is true. Lanes where the mask is false take their value from `passthru` instead.
 
-    - `ptr:%ptr` — pointer to the base address; must be valid for at least `N * sizeof(T)` bytes for active lanes
-    - `<i1,N>:%mask` — per-lane predicate; true = load from memory, false = take from passthru
-    - `<T,N>:%passthru` — values used for inactive lanes; T can be any integer, float, bfloat, or ptr
+    - `ptr:%ptr` - pointer to the base address; must be valid for at least `N * sizeof(T)` bytes for active lanes
+    - `<i1,N>:%mask` - per-lane predicate; true = load from memory, false = take from passthru
+    - `<T,N>:%passthru` - values used for inactive lanes; T can be any integer, float, bfloat, or ptr
 
     Attributes:
     - `#[align(i8:N)]` - alignment of `ptr` in bytes; must be a power of 2; default is 1 (unaligned is the safe default since masked loads are often used for tail handling where alignment cannot be guaranteed)
@@ -390,11 +518,11 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
     - `#[dereferenceable(i64:N)]` - asserts `ptr` is dereferenceable for N bytes across the entire vector range (not just active lanes)
     - `#[zeropassthru]` - shorthand: inactive lanes are zeroed; equivalent to passing a zero vector as passthru but allows the backend to emit a zeroing-masked instruction directly rather than materializing a zero vector
 
-- `.masked_store(<T,N>:%val, ptr:%ptr, <i1,N>:%mask)` - Stores elements to memory only for lanes where the mask is true. Inactive lanes do not produce any memory write — not even to a padding location.
+- `.masked_store(<T,N>:%val, ptr:%ptr, <i1,N>:%mask)` - Stores elements to memory only for lanes where the mask is true. Inactive lanes do not produce any memory write - not even to a padding location.
 
-    - `<T,N>:%val` — vector of values to store; T can be any integer, float, bfloat, or ptr
-    - `ptr:%ptr` — base address
-    - `<i1,N>:%mask` — per-lane predicate; true = store to memory, false = no write
+    - `<T,N>:%val` - vector of values to store; T can be any integer, float, bfloat, or ptr
+    - `ptr:%ptr` - base address
+    - `<i1,N>:%mask` - per-lane predicate; true = store to memory, false = no write
 
     No output.
 
@@ -407,9 +535,9 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
 
 - `let <T,N>:%out = .gather(<ptr,N>:%ptrs, <i1,N>:%mask, <T,N>:%passthru)` - Loads one scalar element per lane from a distinct pointer. Each lane `i` loads from `ptrs[i]`. Inactive lanes (where mask is false) take their value from `passthru`.
 
-    - `<ptr,N>:%ptrs` — vector of N pointers, one per lane
-    - `<i1,N>:%mask` — per-lane predicate; true = load from `ptrs[i]`, false = use `passthru[i]`
-    - `<T,N>:%passthru` — fallback values for inactive lanes; T can be any integer, float, or bfloat
+    - `<ptr,N>:%ptrs` - vector of N pointers, one per lane
+    - `<i1,N>:%mask` - per-lane predicate; true = load from `ptrs[i]`, false = use `passthru[i]`
+    - `<T,N>:%passthru` - fallback values for inactive lanes; T can be any integer, float, or bfloat
 
     Attributes:
     - `#[align(i8:N)]` - alignment guarantee for each individual pointer in the vector; default is 1
@@ -420,9 +548,9 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
 
 - `.scatter(<T,N>:%val, <ptr,N>:%ptrs, <i1,N>:%mask)` - Stores one scalar element per lane to a distinct pointer. Each lane `i` stores `val[i]` to `ptrs[i]`. Inactive lanes produce no write. If two active lanes write to the same address, the result is undefined (no ordering guarantee). 
 
-    - `<T,N>:%val` — values to scatter; T can be any integer, float, or bfloat
-    - `<ptr,N>:%ptrs` — vector of N destination pointers
-    - `<i1,N>:%mask` — per-lane predicate
+    - `<T,N>:%val` - values to scatter; T can be any integer, float, or bfloat
+    - `<ptr,N>:%ptrs` - vector of N destination pointers
+    - `<i1,N>:%mask` - per-lane predicate
 
     No output.
 
@@ -432,19 +560,19 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
     - `#[nonnull]` - asserts all active pointers are non-null
     - `#[dereferenceable(i64:N)]` - asserts all active pointers are dereferenceable for N bytes
 
-- `.prefetch(ptr:%addr)` - Emits a prefetch hint to bring a cache line into the specified cache level before it is needed. Not a memory operation — has no effect on program semantics, cannot fault, and may be ignored by the hardware.
+- `.prefetch(ptr:%addr)` - Emits a prefetch hint to bring a cache line into the specified cache level before it is needed. Not a memory operation - has no effect on program semantics, cannot fault, and may be ignored by the hardware.
 
-    - `ptr:%addr` — address to prefetch; does not need to be valid (a bad address is silently ignored by the hardware)
+    - `ptr:%addr` - address to prefetch; does not need to be valid (a bad address is silently ignored by the hardware)
 
     No output.
 
     Attributes:
     - `#[write]` - prefetch for write (`PREFETCHW`); hints that the line will be modified, so it is fetched in exclusive/modified state to avoid a later RFO (Request For Ownership); default is read-only prefetch
     - `#[locality(i8:N)]` - temporal locality hint, 0–3:
-        - `0` — no temporal locality; use `PREFETCHNTA`, pulls into L1 while minimizing cache pollution
-        - `1` — low locality; `PREFETCHT2` (L3)
-        - `2` — moderate locality; `PREFETCHT1` (L2)
-        - `3` — high locality; `PREFETCHT0` (L1); this is the default
+        - `0` - no temporal locality; use `PREFETCHNTA`, pulls into L1 while minimizing cache pollution
+        - `1` - low locality; `PREFETCHT2` (L3)
+        - `2` - moderate locality; `PREFETCHT1` (L2)
+        - `3` - high locality; `PREFETCHT0` (L1); this is the default
     - `#[instruction]` - prefetch into the instruction cache rather than the data cache; `#[write]` is invalid when `#[instruction]` is set; `#[locality]` still applies
 
 - `.memcpy(ptr:%dest, ptr:%src, iN:%size)` - Copies `size` bytes from `src` to `dest`. Regions must not overlap; use `.memmove` if they may. The index `0` refers to `src` and `1` refers to `dest` in per-pointer attributes.
@@ -505,6 +633,8 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
 - `.fence(str:ordering)` - Memory fence. Ordering and syncscope must be constant expressions. Valid orderings: `acquire`, `release`, `acq_rel`, `seq_cst`. Has no input or output; acts purely as a barrier.
 
     - `#[syncscope("singlethreaded")]` - synchronizes only with atomic ops in the same thread; default is global
+    - `#[store_only]` - emit `SFENCE` (store fence only); valid orderings: `release`, `seq_cst`. Required after sequences of non-temporal stores to enforce visibility ordering. Mutually exclusive with `#[load_only]`.
+    - `#[load_only]` - emit `LFENCE` (load fence only); valid orderings: `acquire`, `seq_cst`. Mutually exclusive with `#[store_only]`. Without either attribute, `.fence` maps to `MFENCE` (full fence).
 
 - `let {T,i1}:%output_var = .atomic_cmpxchg(ptr:%ptr, T:%expected, T:%desired, str:success_ordering, str:failure_ordering)` - Atomically compares `*ptr` with `expected`. If equal, stores `desired` and returns `{original, true}`; otherwise leaves memory unchanged and returns `{original, false}`. `success_ordering` must be one of: `monotonic`, `acquire`, `release`, `acq_rel`, `seq_cst`. `failure_ordering` must be one of: `monotonic`, `acquire`, `seq_cst` (not `release` or `acq_rel`).
 
@@ -512,6 +642,28 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
     - `#[volatile]` - volatile operation
     - `#[weak]` - weak CAS; permitted to spuriously fail even when `*ptr == expected`
     - `#[syncscope("singlethreaded")]` - synchronizes only with atomic ops in the same thread; default is global
+
+### Cache Control Instructions
+
+- `.clflush(ptr:%addr)` - Evicts the cache line containing `addr` from all levels of the CPU cache hierarchy, forcing the next access to reload from main memory. Corresponds to `CLFLUSH`. Has no effect if the address is not cached. Does not wait for the flush to complete; use `.fence` with `seq_cst` afterward if ordering is required. No output.
+
+    - `#[opt]` - emit `CLFLUSHOPT` instead; allows more pipelining of multiple flushes but requires an explicit fence for ordering (the default `CLFLUSH` is self-serializing)
+
+- `.clwb(ptr:%addr)` - Write back any dirty cache line containing `addr` to main memory while optionally retaining the line in cache in a non-dirty state. Corresponds to `CLWB`. More efficient than `.clflush` for persistent-memory write-back patterns where data will be re-read soon. No output. No attributes.
+
+- `.cldemote(ptr:%addr)` - Hint to move the cache line containing `addr` to a more distant cache level (e.g., L1->L3). Corresponds to `CLDEMOTE`. Has no semantic effect; the CPU may ignore it. No output. No attributes.
+
+### Lifetime and Invariant Scope Instructions
+
+- `.lifetime_start(ptr:%ptr, i64:%size)` - Marks the beginning of the live range of a stack allocation. `%ptr` must be the result of an `.alloca`. `%size` is the size in bytes and must be a compile-time constant literal. Between a `lifetime_start` and `lifetime_end`, the memory is considered live; outside this range the optimizer may reuse the stack slot. Reading before start or after end is undefined behavior.
+
+    - No attributes. No output.
+
+- `.lifetime_end(ptr:%ptr, i64:%size)` - Marks the end of the live range of a stack allocation. Must have a matching `.lifetime_start` on all reaching control-flow paths. Same signature and restrictions. No attributes. No output.
+
+- `let ptr:%scope = .invariant_start(ptr:%ptr, i64:%size)` - Asserts that the `%size` bytes of memory at `%ptr` will not be modified between this point and the matching `.invariant_end`. Returns an opaque `%scope` handle for the paired end. The size must be a compile-time constant literal. The optimizer may hoist loads, eliminate redundant reloads, and refine aliasing. Writing to the memory between start and end is undefined behavior. No attributes.
+
+- `.invariant_end(ptr:%scope, ptr:%ptr, i64:%size)` - Ends the invariant scope established by `.invariant_start`. `%scope` must be the handle returned by the paired start. No additional attributes.
 
 ---
 
@@ -622,6 +774,8 @@ Read-modify-write instructions that read a value from memory, apply a binary ope
 - `let T:%old = .fetch_rotl(ptr:%ptr, T:%value)` - Rotates `*ptr` left by `value`; returns the original. T must be integer. No additional attributes.
 
 - `let T:%old = .fetch_rotr(ptr:%ptr, T:%value)` - Rotates `*ptr` right by `value`; returns the original. T must be integer. No additional attributes.
+
+- `let T:%old = .fetch_avg(ptr:%ptr, T:%value)` - Fetch and average: reads `*ptr`, computes `avg(*ptr, value)`, writes back, and returns the original. Shared fetch attributes apply. Type and rounding attributes same as `.avg`.
 
 ---
 
@@ -792,6 +946,8 @@ A terminator must be the final instruction of every block. Falling through to th
 
     If `T0` is float/bfloat: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
+- `let T0:%out = .reduce_avg(<T0,N>:%vec)` - Returns the arithmetic mean of all lanes. Result is scalar. `T0` can be integer or float/bfloat. Same attribute rules as `.avg`, including `#[geometric]` for float.
+
 - `let T0:%output_var = .reduce_and(<T0,N>:%input_vector)` - Bitwise AND of all elements; result is scalar. T0 must be integer. No attributes.
 
 - `let T0:%output_var = .reduce_or(<T0,N>:%input_vector)` - Bitwise OR of all elements; result is scalar. T0 must be integer.
@@ -831,28 +987,137 @@ Note: `.reduce_sub`, `.reduce_nand`, `.reduce_nor`, `.reduce_div`, `.reduce_rem`
 
 - `let <T,N>:%out = .insert_subvector(<T,N>:%vec, <T,M>:%sub, i64:%index)` - Inserts a shorter vector into a lane-aligned position within a longer vector, returning the updated longer vector. The other lanes are unchanged. 
 
-    - `<T,N>:%vec` — the destination vector; T can be any integer, float, or bfloat; N is the total lane count
-    - `<T,M>:%sub` — the subvector to insert; same element type T; M < N; M must divide N
-    - `i64:%index` — the starting lane index in `vec` where insertion begins; must be a compile-time integer literal; must be a multiple of M (i.e. aligned to subvector boundaries); must satisfy `index + M <= N`
+    - `<T,N>:%vec` - the destination vector; T can be any integer, float, or bfloat; N is the total lane count
+    - `<T,M>:%sub` - the subvector to insert; same element type T; M < N; M must divide N
+    - `i64:%index` - the starting lane index in `vec` where insertion begins; must be a compile-time integer literal; must be a multiple of M (i.e. aligned to subvector boundaries); must satisfy `index + M <= N`
 
-    Output type: `<T,N>` — same type as `vec`. No attributes.
+    Output type: `<T,N>` - same type as `vec`. No attributes.
 
 - `let <T,M>:%out = .extract_subvector(<T,N>:%vec, i64:%index)` - Extracts a contiguous slice of lanes from a vector into a shorter vector. 
 
-    - `<T,N>:%vec` — the source vector; T can be any integer, float, or bfloat
-    - `i64:%index` — the starting lane index; must be a compile-time integer literal; must be a multiple of M; must satisfy `index + M <= N`
+    - `<T,N>:%vec` - the source vector; T can be any integer, float, or bfloat
+    - `i64:%index` - the starting lane index; must be a compile-time integer literal; must be a multiple of M; must satisfy `index + M <= N`
 
-    Output type: `<T,M>` — the element type is the same T; M is determined by the declared output type; M < N; M must divide N. No attributes.
+    Output type: `<T,M>` - the element type is the same T; M is determined by the declared output type; M < N; M must divide N. No attributes.
 
-- `let <i1,N>:%mask = .active_lane_mask(T:%base, T:%count)` - Generates a boolean vector mask where lane `i` is true if and only if `base + i < count`. Used to safely handle loop tail iterations in vectorized loops without out-of-bounds memory access — the mask is passed directly to `.masked_load` / `.masked_store`. 
+- `let <i1,N>:%mask = .active_lane_mask(T:%base, T:%count)` - Generates a boolean vector mask where lane `i` is true if and only if `base + i < count`. Used to safely handle loop tail iterations in vectorized loops without out-of-bounds memory access - the mask is passed directly to `.masked_load` / `.masked_store`. 
 
-    - `T:%base` — the starting index for this iteration; T must be an integer type (`i32` or `i64`; `i64` recommended to avoid truncation issues on large arrays)
-    - `T:%count` — the total element count (exclusive upper bound); must be the same type as `base`
+    - `T:%base` - the starting index for this iteration; T must be an integer type (`i32` or `i64`; `i64` recommended to avoid truncation issues on large arrays)
+    - `T:%count` - the total element count (exclusive upper bound); must be the same type as `base`
 
-    Output type: `<i1,N>` — N is determined by the declared output type; reflects the target vector width.
+    Output type: `<i1,N>` - N is determined by the declared output type; reflects the target vector width.
 
     Attributes:
     - `#[unsigned]` - comparison `base + i < count` is unsigned; this is almost always what you want since indices are non-negative; default is signed
+
+### Horizontal SIMD Instructions
+
+- `let <T0,N>:%out = .hadd(<T0,N>:%a, <T0,N>:%b)` - Pairwise-adds adjacent lanes, consuming two `N`-lane input vectors and producing one `N`-lane output vector. The lower `N/2` output lanes are pairwise sums from `a`; the upper `N/2` output lanes are pairwise sums from `b`. Mirrors `HADDPS`/`PHADDW`/`PHADDD` semantics. `N` must be even. `T0` can be integer or float/bfloat.
+
+    **If `T0` is integer:**
+    - `#[unsigned]` - treat lane values as unsigned for overflow semantics
+    - `#[nsw]` - poison on signed overflow
+    - `#[nuw]` - poison on unsigned overflow; only valid with `#[unsigned]`
+    - `#[saturating]` - clamp instead of wrap; pair with `#[unsigned]` for unsigned saturation
+
+    **If `T0` is float/bfloat:** `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+
+- `let <T0,N>:%out = .hsub(<T0,N>:%a, <T0,N>:%b)` - Pairwise-subtracts adjacent lanes. Lane `2i` minus lane `2i+1` for each pair. Lower `N/2` from `a`, upper `N/2` from `b`. Mirrors `HSUBPS`/`PHSUBW`/`PHSUBD`. Same type and attribute rules as `.hadd`.
+
+- `let <T0,N>:%out = .havg(<T0,N>:%a, <T0,N>:%b)` - Horizontal (pairwise) average. Lower `N/2` output lanes are pairwise averages from `a`; upper `N/2` are pairwise averages from `b`. `N` must be even. Same attribute rules as `.avg`.
+
+### Dot Product Instruction
+
+- `let T2:%out = .dot(<T1,N>:%a, <T1,N>:%b)` - Computes the dot product of `a` and `b`: sum of `a[i] * b[i]` over all lanes `i`, returning a scalar result in `T2`. When an optional third argument `%acc` is provided (`let T2:%out = .dot(<T1,N>:%a, <T1,N>:%b, T2:%acc)`), it is added to the result (`dot(a, b) + acc`), mapping directly to VNNI-style instructions and fused floating-point MACs. Output is always scalar.
+
+    **If `T1` is integer:** The per-lane multiply is widening (products computed at `2xbitwidth(T1)` internally before accumulation). `T2` must be an integer type with `bitwidth(T2) >= 2 * bitwidth(T1)`. When `%acc` is provided it must be of type `T2`.
+    - `#[unsigned]` - treat lane values as unsigned; default is signed
+    - `#[nsw]` - poison if the accumulated sum overflows `T2`
+    - `#[nuw]` - poison on unsigned overflow; only valid with `#[unsigned]`
+    - `#[saturating]` - clamp the accumulator to the `T2` range instead of wrapping
+
+    **If `T1` is float/bfloat:** `T2` must be float/bfloat with `bitwidth(T2) >= bitwidth(T1)`. When `%acc` is provided it must be of type `T2`. Float attributes: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+
+### Absolute Difference Instructions
+
+- `let T:%out = .absdiff(T:%a, T:%b)` - Returns `|a - b|`. `T` must be of the form `T0` or `<T0,M>` where `T0` is integer, float, or bfloat. For vectors, the operation is lanewise. Equivalent to `abs(a - b)` but expressed as a single instruction so the backend can emit `VABSSUBPS`, `VPABSB`/`VPABSW`/`VPABSD` patterns directly.
+
+    **If `T0` is integer:**
+    - `#[unsigned]` - treat values as unsigned (result is always non-negative; equivalent to `max(a,b) - min(a,b)` unsigned); default is signed
+    - `#[nsw]` - poison if the subtraction overflows before taking absolute value
+
+    **If `T0` is float/bfloat:** `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+
+- `let T2:%out = .sad(<T1,N>:%a, <T1,N>:%b)` - Sum of absolute differences: returns the sum of `|a[i] - b[i]|` over all lanes, scalar result in `T2`. Default is signed; use `#[unsigned]` for unsigned (natural for pixel data; matches `PSADBW` semantics).
+
+    **If `T1` is integer:** Lane-wise differences are computed without overflow (widened to `2xbitwidth(T1)` internally before summing). `T2` must be an integer type with sufficient width for the full sum.
+    - `#[unsigned]` - treat lane values as unsigned before differencing
+    - `#[nsw]` / `#[nuw]` - poison on signed/unsigned overflow of the accumulated sum
+
+    **If `T1` is float/bfloat:** Each `|a[i] - b[i]|` is computed as a float absolute difference and then accumulated into `T2`. `T2` must be float/bfloat with `bitwidth(T2) >= bitwidth(T1)`. Float attributes: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+
+### Pack / Unpack Instructions
+
+- `let <T2,N2>:%out = .pack_sat(<T1,N>:%a, <T1,N>:%b)` - Narrows both input vectors and concatenates them into one output vector. `bitwidth(T2) < bitwidth(T1)`; `N2 = 2*N`. Each element is clamped to the *signed* range of `T2` before truncation, even if the inputs are unsigned. Mirrors `PACKSSWB`, `PACKSSDW`.
+    - `#[unsigned]` - clamp to the *unsigned* range of `T2` instead (e.g., `[0, 255]` for `i8`); mirrors `PACKUSWB`, `PACKUSDW`
+
+- `let <T2,N2>:%out = .unpack_lo(<T1,N>:%a, <T1,N>:%b)` - Interleaves the *lower half* lanes of `a` and `b` into a single output vector. `N2 = N`; each output element is widened from `T1` to `T2` (`bitwidth(T2) = 2 * bitwidth(T1)`). Output order: `a[0], b[0], a[1], b[1], ..., a[N/2-1], b[N/2-1]`. Mirrors `PUNPCKLBW` / `PUNPCKLWD` / `PUNPCKLDQ`.
+    - `#[unsigned]` - zero-extend lanes; default is sign-extend
+
+- `let <T2,N2>:%out = .unpack_hi(<T1,N>:%a, <T1,N>:%b)` - Same as `.unpack_lo` but takes the *upper half* lanes. Output order: `a[N/2], b[N/2], ..., a[N-1], b[N-1]`. Mirrors `PUNPCKHBW` / `PUNPCKHWD` / `PUNPCKHDQ`.
+    - `#[unsigned]` - zero-extend lanes; default is sign-extend
+
+### Vector Layout Instructions
+
+- `let <T,N>:%out = .compress(<T,N>:%src, <i1,N>:%mask)` - Packs active lanes (where `mask` is true) contiguously into the low lanes of the output. Inactive output lanes are zeroed unless `#[undef_inactive]` is set. Mirrors `VPCOMPRESSPS`/`VPCOMPRESSQ`/`VPCOMPRESSB`. `T` can be any integer, float, or bfloat.
+    - `#[undef_inactive]` - inactive output lanes are undefined (allows the backend to skip zeroing)
+
+- `let <T,N>:%out = .expand(<T,N>:%src, <i1,N>:%mask, <T,N>:%passthru)` - Inverse of `.compress`. Reads elements from the consecutive low lanes of `src` and scatters them into the active (mask=true) lanes of the output. Inactive lanes take their value from `passthru`. Mirrors `VPEXPANDPS`/`VPEXPANDQ`/`VPEXPANDB`.
+    - `#[zeropassthru]` - inactive lanes are zeroed; avoids materialising a zero `passthru` vector
+
+- `let <T,N>:%out = .broadcast_load(ptr:%ptr)` - Loads a single scalar of type `T` from memory and broadcasts it to every lane. A single instruction on x86 (`VBROADCASTSS`, `VBROADCASTSD`, etc.); the backend guarantees the fusion that a `.load` + `.splat` pair might not. `T` must be a scalar integer, float, or bfloat (not a vector).
+    - `#[align(i8:N)]` - alignment of `ptr`; must be a power of 2; default is natural alignment of `T`
+    - `#[volatile]` - volatile load
+    - `#[nonnull]` - asserts `ptr` is not null
+    - `#[nontemporal]` - non-temporal (cache-bypassing) load
+
+- `let <T,N2>:%out = .interleave2(<T,N>:%a, <T,N>:%b)` - Interleaves channels into a single packed vector. `N2 = 2*N`. Output element at position `i*2 + j` equals input `vj[i]` (channel `j`, element `i`). `T` can be any integer, float, or bfloat. No attributes.
+- `let <T,N3>:%out = .interleave3(<T,N>:%a, <T,N>:%b, <T,N>:%c)` - Interleave three channels. `N3 = 3*N`. Same rules.
+- `let <T,N4>:%out = .interleave4(<T,N>:%a, <T,N>:%b, <T,N>:%c, <T,N>:%d)` - Interleave four channels. `N4 = 4*N`. Same rules.
+
+- `let <T,N>:%out = .deinterleave2(<T,N2>:%v, i8:channel)` - Extracts one channel from an interleaved vector. `channel` must be a compile-time literal in `[0, 1]`. Extracts elements at positions `channel, channel+2, channel+4, ...`. Output length `N = N2/2`.
+- `let <T,N>:%out = .deinterleave3(<T,N3>:%v, i8:channel)` - Same for 3-channel interleaving, `channel` in `[0, 2]`. Output length `N = N3/3`.
+- `let <T,N>:%out = .deinterleave4(<T,N4>:%v, i8:channel)` - Same for 4-channel interleaving, `channel` in `[0, 3]`. Output length `N = N4/4`.
+
+- `let <T0,N>:%out = .addsub(<T0,N>:%a, <T0,N>:%b)` - Alternates subtraction and addition on adjacent lanes: even-indexed lanes compute `a[i] - b[i]`; odd-indexed lanes compute `a[i] + b[i]`. `N` must be even. Mirrors `ADDSUBPS`/`ADDSUBPD`. Primary use case: complex number multiplication. `T0` can be integer or float/bfloat.
+
+    **If `T0` is integer:**
+    - `#[nsw]` - poison on signed overflow in any lane
+    - `#[nuw]` - poison on unsigned overflow; only valid with `#[unsigned]`
+    - `#[unsigned]` - treat lanes as unsigned
+    - `#[saturating]` - clamp instead of wrap
+
+    **If `T0` is float/bfloat:** `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+
+### Lane Mask Conversion Instructions
+
+- `let iM:%out = .lane_mask_to_int(<i1,N>:%mask)` - Packs the N single-bit lanes of `mask` into the low N bits of a scalar integer of type `iM`. Lane `i` maps to bit `i` of the result; the remaining `M - N` high bits are zeroed. Mirrors `VMOVMSKPS`/`VPMOVMSKB`/`KMOVD` semantics. `M` must satisfy `M >= N`. No attributes.
+
+- `let <i1,N>:%out = .int_to_lane_mask(iM:%bits)` - Inverse of `.lane_mask_to_int`. Unpacks the low N bits of `bits` into an N-lane `i1` vector. Bit `i` of `bits` becomes lane `i` of the output. High bits beyond N are ignored. Mirrors `KMOVD`/`VPMOVM2B` semantics. `M` must satisfy `M >= N`. No attributes.
+
+### Widening Reductions
+
+- `let T2:%out = .reduce_add_wide(<T1,N>:%v)` - Sums all lanes, accumulating in `T2`. `T1` must be integer; `T2` must be integer with `bitwidth(T2) >= bitwidth(T1)`.
+    - `#[unsigned]` - treat lanes as unsigned; default is signed
+    - `#[saturating]` - clamp accumulator to `T2` range instead of wrapping; pair with `#[unsigned]` for unsigned saturation
+
+- `let T2:%out = .reduce_mul_wide(<T1,N>:%v)` - Multiplies all lanes together, accumulating in `T2`. `T1` must be integer; `T2` must be integer with `bitwidth(T2) >= 2 * bitwidth(T1)`.
+    - `#[unsigned]` - treat lanes as unsigned; default is signed
+    - `#[saturating]` - clamp accumulator to `T2` range
+
+- `let T2:%out = .reduce_avg_wide(<T1,N>:%v)` - Computes the arithmetic mean of all lanes with intermediate accumulation in `T2`. `T1` must be integer; `T2` must be integer wide enough to hold the full sum before the final divide.
+    - `#[unsigned]` - treat lanes as unsigned; default is signed
+    - `#[floor]` - round toward negative infinity; default rounds toward positive infinity
 
 ---
 
@@ -877,3 +1142,62 @@ Note: `.reduce_sub`, `.reduce_nand`, `.reduce_nor`, `.reduce_div`, `.reduce_rem`
 - `let type:%type_name = .assign_type(type:<type_definition>)` - Creates a type alias. Not a real instruction; ignored by MIR. Present only to simplify the parser.
 
 - `.pause` - Emits the x86 `PAUSE` instruction, which is a hint to the processor that the current thread is in a spin-wait loop. On out-of-order CPUs this prevents the speculative execution pipeline from being flooded with iterations of a tight spin loop, reducing power consumption and improving performance when the lock is released (the pipeline does not need to be flushed). On hyperthreaded cores it also yields the execution resources to the sibling thread. Has no observable effect on program semantics; the CPU may treat it as a no-op on cores that do not support it. No inputs. No output. No attributes.
+
+### Optimizer Hint Instructions
+
+#### Binding Assumptions (UB if violated)
+- `.assume(T:%var, T:compile_time_value)` - Tells the optimizer that `%var` holds `compile_time_value` at this program point. The compiler may propagate this as a known value. Undefined behavior if the assumption is false. `T` can be any scalar integer, float, bfloat, or `ptr`. `compile_time_value` must be a literal.
+    - `#[noundef]` - additionally asserts that `%var` is not poison or undef
+
+- `.assume_range(T:%var, T:compile_time_lo, T:compile_time_hi)` - Asserts that `%var` lies in the closed interval `[lo, hi]`. Undefined behavior if wrong. `T` must be integer or float scalar; `lo` and `hi` must be compile-time literals.
+    - `#[unsigned]` - interval interpreted as unsigned (integer only); default is signed
+    - `#[noundef]` - additionally asserts the value is not poison
+
+- `.assume_values(T:%var, T:v0, T:v1, ...)` - Asserts that `%var` is one of the listed compile-time values. Undefined behavior if wrong. `T` can be any scalar integer, float, bfloat, or `ptr`. At least one value required.
+    - `#[noundef]` - additionally asserts `%var` is not poison
+
+#### Non-Binding Expectation Hints
+- `.expect(T:%var, T:compile_time_value)` - Hints that `%var` most commonly holds `compile_time_value`. No UB if wrong. Analogous to `__builtin_expect`. `T` any scalar integer, float, bfloat, or `ptr`.
+    - `#[probability(f32:P)]` - probability the value matches (0.0–1.0); default unspecified
+
+- `.expect_range(T:%var, T:compile_time_lo, T:compile_time_hi)` - Hints that `%var` most commonly falls in `[lo, hi]`. `T` integer or float scalar. No UB if wrong.
+    - `#[unsigned]` - interval unsigned
+    - `#[probability(f32:P)]` - probability the value is in range
+
+- `.expect_values(T:%var, T:v0, T:v1, ...)` - Hints that `%var` is most likely one of the listed values. No UB if wrong.
+    - `#[probability(f32:P)]` - probability the value is in the list
+
+### Metadata and Machine Instructions
+
+- `.nop(i8:size)` - Emits `size` bytes of NOP instructions. `size` must be a compile-time integer literal in `[1, 15]`. Has no effect on semantics.
+    - `#[multi_byte]` - prefer a single multi-byte NOP encoding; default is implementation choice
+
+- `.annotation(str:message)` - Emits `message` as a comment/annotation into the generated assembly. Optimizer-transparent. `message` must be a compile-time string literal. No output. No attributes.
+
+- `.endbr64` - Emits the Intel CET `ENDBR64` instruction. Must be the first instruction of every valid indirect-branch target when CET is enabled. On non-CET hardware executes as NOP. No input, no output, no attributes.
+
+### Pointer Provenance Instructions
+
+- `let ptr:%out = .launder(ptr:%ptr)` - Returns a pointer with the same address as `ptr` but with fresh provenance, severing the alias relationship the optimizer may have established. The returned pointer and the input compare equal at runtime but the optimizer must treat them as potentially aliasing distinct objects. Corresponds to LLVM `llvm.launder.invariant.group`. No attributes.
+
+- `let ptr:%out = .strip_invariant_group(ptr:%ptr)` - Strips the invariant-group annotation from a pointer, allowing the optimizer to see stores through the returned pointer as potentially observable by loads from the original pointer. Corresponds to LLVM `llvm.strip.invariant.group`. No attributes.
+
+---
+
+## Hardware-Specific Instructions
+
+### Processor Identification
+
+- `let {i32, i32, i32, i32}:%out = .cpuid(i32:%leaf, i32:%subleaf)` - Executes the x86 `CPUID` instruction with `EAX = leaf` and `ECX = subleaf`, returning `{eax, ebx, ecx, edx}`. `CPUID` is fully serializing (acts as a barrier). Both `%leaf` and `%subleaf` may be runtime values. No attributes.
+
+### Timestamp Counter Instructions
+
+- `let i64:%out = .rdtsc()` - Returns the current value of the processor's time-stamp counter. Corresponds to `RDTSC`. Not ordered with respect to surrounding instructions by default; pair with a serializing instruction (`lfence; rdtsc` idiom) for a fully serialized timestamp. No attributes. `#[unsigned]` permitted but has no effect.
+
+- `let {i64, i32}:%out = .rdtscp()` - Returns `{timestamp: i64, cpuid_aux: i32}`. `cpuid_aux` is the value of `IA32_TSC_AUX` MSR (typically a core identifier). Corresponds to `RDTSCP`. Partially serializing: waits for prior instructions to execute before reading the counter, but does not prevent subsequent instructions from starting. No attributes.
+
+### Hardware Random Number Instructions
+
+- `let {T, i1}:%out = .rdrand()` - Returns `{value: T, success: i1}`. `value` is a hardware-generated random number from the CSPRNG. `success` indicates whether a valid value was produced; if false, retry. `T` must be `i16`, `i32`, or `i64`.
+
+- ``let {T, i1}:%out = .rdseed()`` - Returns `{value: T, success: i1}`. `value` is a hardware-generated random number from the entropy source. `success` indicates whether a valid value was produced; if false, retry. `T` must be `i16`, `i32`, or `i64`.

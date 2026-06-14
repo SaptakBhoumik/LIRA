@@ -13,13 +13,18 @@ bool is_arithmetic_tri_inst(std::string inst_name){
 bool is_widening_bin_inst(std::string inst_name){
     return inst_name == ".widening_add" || inst_name == ".widening_sub" || inst_name == ".widening_mul";
 }
-
+// ## Carrying / Borrow Arithmetic Instructions
+// ## Combined Quotient and Remainder (`divmod`)
+// ## Overflow-Wrap (Checked Arithmetic) Instructions
+// ## High-Half Multiply
+// ## N-Bit Carry Shifts
 bool is_bitwise_bin_inst(std::string inst_name){
     return inst_name == ".and" || inst_name == ".or" || inst_name == ".xor" || inst_name == ".shl" || inst_name == ".lshr" || inst_name == ".ashr";
 }
+// ## Bitwise Trinary Instructions
 bool is_cmp_bin_inst(std::string inst_name){
     return inst_name == ".eq" || inst_name == ".neq" || inst_name == ".gt" || inst_name == ".ge" || inst_name == ".lt" || inst_name == ".le" 
-            || inst_name == ".either_nan" || inst_name == ".neither_nan";
+            || inst_name == ".either_nan" || inst_name == ".neither_nan" || inst_name == ".both_nan";
 }
 bool is_conv_inst(std::string inst_name){
     return inst_name == ".trunc" || inst_name == ".ext" || inst_name == ".float_to_int" || inst_name == ".int_to_float" || inst_name == ".ptr_to_int" 
@@ -54,14 +59,19 @@ MIR::InstPtr SemanticAnalyzer::analyze_instruction(IR::InstructionStmtPtr inst_s
     else if(is_arithmetic_tri_inst(inst_name.value)){
         return analyze_arithmetic_tri_inst(inst_name,inst_stmt);
     }
-    //## Fixed-Point Arithmetic Instructions
+    // ## Fixed-Point Arithmetic Instructions
     else if(is_widening_bin_inst(inst_name.value)){
         return analyze_widening_bin_inst(inst_name,inst_stmt);
     }
-    //## Fixed-Point Arithmetic Instructions
+    // ## Carrying / Borrow Arithmetic Instructions
+    // ## Combined Quotient and Remainder (`divmod`)
+    // ## Overflow-Wrap (Checked Arithmetic) Instructions
+    // ## High-Half Multiply
+    // ## N-Bit Carry Shifts
     else if(is_bitwise_bin_inst(inst_name.value)){
         return analyze_bitwise_bin_inst(inst_name,inst_stmt);
     }
+    // ## Bitwise Trinary Instructions
     else if(is_cmp_bin_inst(inst_name.value)){
         return analyze_cmp_bin_inst(inst_name,inst_stmt);
     }

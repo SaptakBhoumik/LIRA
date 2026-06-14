@@ -1,6 +1,5 @@
 #include "mir/instruction/cmp_bin_inst.hpp"
 #include "ast/ast.hpp"
-#include "mir/instruction.hpp"
 #include <memory>
 #include <string>
 #include <memory>
@@ -32,6 +31,13 @@ IntCmpBinaryInst::IntCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, Loca
                                     IR::TypeExprPtr type, bool unsigned_):CmpBinaryInst(instruction_stmt, destination, lhs, rhs, type){
     this->unsigned_ = unsigned_;
 }
+std::string IntCmpBinaryInst::to_string_helper(std::string op_name) const{
+    std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
+    if(this->unsigned_){
+        res += " #[unsigned]";
+    }
+    return res;
+}
 bool IntCmpBinaryInst::is_unsigned() const{
     return this->unsigned_;
 }
@@ -53,8 +59,7 @@ CmpBinaryInst::OpType IntEqInst::get_op_type() const{
     return OpType::EQ;
 }
 std::string IntEqInst::to_string() const{
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .int_eq(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
-    return res;
+    return this->to_string_helper("int_eq");
 }
 
 
@@ -64,8 +69,7 @@ CmpBinaryInst::OpType IntNeqInst::get_op_type() const{
     return OpType::NEQ;
 }
 std::string IntNeqInst::to_string() const{
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .int_neq(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
-    return res;
+    return this->to_string_helper("int_neq");
 }
 
 
@@ -75,11 +79,7 @@ CmpBinaryInst::OpType IntLtInst::get_op_type() const{
     return OpType::LT;
 }
 std::string IntLtInst::to_string() const{
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .int_lt(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
-    if(this->unsigned_){
-        res += " #[unsigned]";
-    }
-    return res;
+    return this->to_string_helper("int_lt");
 }
 
 
@@ -89,11 +89,7 @@ CmpBinaryInst::OpType IntGtInst::get_op_type() const{
     return OpType::GT;
 }
 std::string IntGtInst::to_string() const{
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .int_gt(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
-    if(this->unsigned_){
-        res += " #[unsigned]";
-    }
-    return res;
+    return this->to_string_helper("int_gt");
 }
 
 
@@ -103,11 +99,7 @@ CmpBinaryInst::OpType IntLeInst::get_op_type() const{
     return OpType::LE;
 }
 std::string IntLeInst::to_string() const{
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .int_le(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
-    if(this->unsigned_){
-        res += " #[unsigned]";
-    }
-    return res;
+    return this->to_string_helper("int_le");
 }
 
 
@@ -117,11 +109,7 @@ CmpBinaryInst::OpType IntGeInst::get_op_type() const{
     return OpType::GE;
 }
 std::string IntGeInst::to_string() const{
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .int_ge(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
-    if(this->unsigned_){
-        res += " #[unsigned]";
-    }
-    return res;
+    return this->to_string_helper("int_ge");
 }
 
 
@@ -129,6 +117,13 @@ std::string IntGeInst::to_string() const{
 VecIntCmpBinaryInst::VecIntCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                                             bool unsigned_):CmpBinaryInst(instruction_stmt, destination, lhs, rhs, type){
     this->unsigned_ = unsigned_;
+}
+std::string VecIntCmpBinaryInst::to_string_helper(std::string op_name) const{
+    std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
+    if(this->unsigned_){
+        res += " #[unsigned]";
+    }
+    return res;
 }
 bool VecIntCmpBinaryInst::is_unsigned() const{
     return this->unsigned_;
@@ -157,8 +152,7 @@ CmpBinaryInst::OpType VecIntEqInst::get_op_type() const{
     return OpType::EQ;
 }
 std::string VecIntEqInst::to_string() const{
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .vec_int_eq(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
-    return res;
+    return this->to_string_helper("vec_int_eq");
 }
 
 
@@ -168,8 +162,7 @@ CmpBinaryInst::OpType VecIntNeqInst::get_op_type() const{
     return OpType::NEQ;
 }
 std::string VecIntNeqInst::to_string() const{
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .vec_int_neq(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
-    return res;
+    return this->to_string_helper("vec_int_neq");
 }
 
 
@@ -179,11 +172,7 @@ CmpBinaryInst::OpType VecIntLtInst::get_op_type() const{
     return OpType::LT;
 }
 std::string VecIntLtInst::to_string() const{
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .vec_int_lt(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
-    if(this->unsigned_){
-        res += " #[unsigned]";
-    }
-    return res;
+    return this->to_string_helper("vec_int_lt");
 }
 
 
@@ -193,11 +182,7 @@ CmpBinaryInst::OpType VecIntGtInst::get_op_type() const{
     return OpType::GT;
 }
 std::string VecIntGtInst::to_string() const{
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .vec_int_gt(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
-    if(this->unsigned_){
-        res += " #[unsigned]";
-    }
-    return res;
+    return this->to_string_helper("vec_int_gt");
 }
 
 
@@ -207,11 +192,7 @@ CmpBinaryInst::OpType VecIntLeInst::get_op_type() const{
     return OpType::LE;
 }
 std::string VecIntLeInst::to_string() const{
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .vec_int_le(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
-    if(this->unsigned_){
-        res += " #[unsigned]";
-    }
-    return res;
+    return this->to_string_helper("vec_int_le");
 }
 
 
@@ -221,17 +202,17 @@ CmpBinaryInst::OpType VecIntGeInst::get_op_type() const{
     return OpType::GE;
 }
 std::string VecIntGeInst::to_string() const{
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .vec_int_ge(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
-    if(this->unsigned_){
-        res += " #[unsigned]";
-    }
-    return res;
+    return this->to_string_helper("vec_int_ge");
 }
 
 
 // ---------------------------Ptr Comparison Binary operations ---------------------------
 PtrCmpBinaryInst::PtrCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs):
                                     CmpBinaryInst(instruction_stmt, destination, lhs, rhs, std::make_shared<IR::PtrTypeExpr>(IR::Token{.value = "ptr"},std::vector<IR::AttributePtr>{})){}
+std::string PtrCmpBinaryInst::to_string_helper(std::string op_name) const{
+    std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
+    return res;
+}
 std::size_t PtrCmpBinaryInst::get_bitwidth() const{
     return 64;//We support only x86_64 for now but can return diffrent in future if we support more arch. Just a helper function to make life easier
 }
@@ -246,8 +227,7 @@ CmpBinaryInst::OpType PtrEqInst::get_op_type() const{
     return OpType::EQ;
 }
 std::string PtrEqInst::to_string() const{
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .ptr_eq(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
-    return res;
+    return this->to_string_helper("ptr_eq");
 }
 
 
@@ -257,8 +237,7 @@ CmpBinaryInst::OpType PtrNeqInst::get_op_type() const{
     return OpType::NEQ;
 }
 std::string PtrNeqInst::to_string() const{
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .ptr_neq(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
-    return res;
+    return this->to_string_helper("ptr_neq");
 }
 
 
@@ -268,8 +247,7 @@ CmpBinaryInst::OpType PtrGtInst::get_op_type() const{
     return OpType::GT;
 }
 std::string PtrGtInst::to_string() const{
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .ptr_gt(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
-    return res;
+    return this->to_string_helper("ptr_gt");
 }
 
 
@@ -279,8 +257,7 @@ CmpBinaryInst::OpType PtrLtInst::get_op_type() const{
     return OpType::LT;
 }
 std::string PtrLtInst::to_string() const{
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .ptr_lt(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
-    return res;
+    return this->to_string_helper("ptr_lt");
 }
 
 
@@ -290,8 +267,7 @@ CmpBinaryInst::OpType PtrLeInst::get_op_type() const{
     return OpType::LE;
 }
 std::string PtrLeInst::to_string() const{
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .ptr_le(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
-    return res;
+    return this->to_string_helper("ptr_le");
 }
 
 
@@ -301,14 +277,17 @@ CmpBinaryInst::OpType PtrGeInst::get_op_type() const{
     return OpType::GE;
 }
 std::string PtrGeInst::to_string() const{
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .ptr_ge(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
-    return res;
+    return this->to_string_helper("ptr_ge");
 }
 
 
 // ---------------------------Vector ptr Comparison Binary operations ---------------------------
 VecPtrCmpBinaryInst::VecPtrCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type):
                                         CmpBinaryInst(instruction_stmt, destination, lhs, rhs, type){}
+std::string VecPtrCmpBinaryInst::to_string_helper(std::string op_name) const{
+    std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
+    return res;
+}
 std::shared_ptr<IR::SIMDTypeExpr> VecPtrCmpBinaryInst::get_casted_type() const{
     return std::dynamic_pointer_cast<IR::SIMDTypeExpr>(this->type);
 }
@@ -330,8 +309,7 @@ CmpBinaryInst::OpType VecPtrEqInst::get_op_type() const{
     return OpType::EQ;
 }
 std::string VecPtrEqInst::to_string() const{
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .vec_ptr_eq(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
-    return res;
+    return this->to_string_helper("vec_ptr_eq");
 }
 
 
@@ -341,8 +319,7 @@ CmpBinaryInst::OpType VecPtrNeqInst::get_op_type() const{
     return OpType::NEQ;
 }
 std::string VecPtrNeqInst::to_string() const{
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .vec_ptr_neq(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
-    return res;
+    return this->to_string_helper("vec_ptr_neq");
 }
 
 
@@ -352,8 +329,7 @@ CmpBinaryInst::OpType VecPtrLtInst::get_op_type() const{
     return OpType::LT;
 }
 std::string VecPtrLtInst::to_string() const{
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .vec_ptr_lt(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
-    return res;
+    return this->to_string_helper("vec_ptr_lt");
 }
 
 
@@ -363,8 +339,7 @@ CmpBinaryInst::OpType VecPtrGtInst::get_op_type() const{
     return OpType::GT;
 }
 std::string VecPtrGtInst::to_string() const{
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .vec_ptr_gt(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
-    return res;
+    return this->to_string_helper("vec_ptr_gt");
 }
 
 
@@ -374,8 +349,7 @@ CmpBinaryInst::OpType VecPtrLeInst::get_op_type() const{
     return OpType::LE;
 }
 std::string VecPtrLeInst::to_string() const{
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .vec_ptr_le(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
-    return res;
+    return this->to_string_helper("vec_ptr_le");
 }
 
 
@@ -385,8 +359,7 @@ CmpBinaryInst::OpType VecPtrGeInst::get_op_type() const{
     return OpType::GE;
 }
 std::string VecPtrGeInst::to_string() const{
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .vec_ptr_ge(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
-    return res;
+    return this->to_string_helper("vec_ptr_ge");
 }
 
 
@@ -395,6 +368,14 @@ FloatCmpBinaryInst::FloatCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, 
                                         FastMathAttr fast_math_attr, bool unordered):CmpBinaryInst(instruction_stmt, destination, lhs, rhs, type){
     this->fast_math_attr = fast_math_attr;
     this->unordered = unordered;
+}
+std::string FloatCmpBinaryInst::to_string_helper(std::string op_name) const{
+    std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
+    res+= " " + this->fast_math_attr.to_string();
+    if(this->unordered){
+        res += " #[unordered]";
+    }
+    return res;
 }
 FastMathAttr FloatCmpBinaryInst::get_fast_math_attr() const{
     return this->fast_math_attr;
@@ -423,12 +404,7 @@ CmpBinaryInst::OpType FloatEqInst::get_op_type() const{
     return OpType::EQ;
 }
 std::string FloatEqInst::to_string() const{
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .float_eq(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
-    res+= " " + this->fast_math_attr.to_string();
-    if(this->unordered){
-        res += " #[unordered]";
-    }
-    return res;
+    return this->to_string_helper("float_eq");
 }
 
 
@@ -438,12 +414,7 @@ CmpBinaryInst::OpType FloatNeqInst::get_op_type() const{
     return OpType::NEQ;
 }
 std::string FloatNeqInst::to_string() const{
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .float_neq(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
-    res+= " " + this->fast_math_attr.to_string();
-    if(this->unordered){
-        res += " #[unordered]";
-    }
-    return res;
+    return this->to_string_helper("float_neq");
 }
 
 
@@ -453,12 +424,7 @@ CmpBinaryInst::OpType FloatLtInst::get_op_type() const{
     return OpType::LT;
 }
 std::string FloatLtInst::to_string() const{
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .float_lt(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
-    res+= " " + this->fast_math_attr.to_string();
-    if(this->unordered){
-        res += " #[unordered]";
-    }
-    return res;
+    return this->to_string_helper("float_lt");
 }
 
 
@@ -468,12 +434,7 @@ CmpBinaryInst::OpType FloatGtInst::get_op_type() const{
     return OpType::GT;
 }
 std::string FloatGtInst::to_string() const{
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .float_gt(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
-    res+= " " + this->fast_math_attr.to_string();
-    if(this->unordered){
-        res += " #[unordered]";
-    }
-    return res;
+    return this->to_string_helper("float_gt");
 }
 
 
@@ -483,12 +444,7 @@ CmpBinaryInst::OpType FloatLeInst::get_op_type() const{
     return OpType::LE;
 }
 std::string FloatLeInst::to_string() const{
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .float_le(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
-    res+= " " + this->fast_math_attr.to_string();
-    if(this->unordered){
-        res += " #[unordered]";
-    }
-    return res;
+    return this->to_string_helper("float_le");
 }
 
 
@@ -498,12 +454,7 @@ CmpBinaryInst::OpType FloatGeInst::get_op_type() const{
     return OpType::GE;
 }
 std::string FloatGeInst::to_string() const{
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .float_ge(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
-    res+= " " + this->fast_math_attr.to_string();
-    if(this->unordered){
-        res += " #[unordered]";
-    }
-    return res;
+    return this->to_string_helper("float_ge");
 }
 
 
@@ -513,9 +464,7 @@ CmpBinaryInst::OpType FloatEitherNanInst::get_op_type() const{
     return OpType::EITHER_NAN;
 }
 std::string FloatEitherNanInst::to_string() const{
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .float_either_nan(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
-    res+= " " + this->fast_math_attr.to_string();
-    return res;
+    return this->to_string_helper("float_either_nan");
 }
 
 
@@ -525,17 +474,30 @@ CmpBinaryInst::OpType FloatNeitherNanInst::get_op_type() const{
     return OpType::NEITHER_NAN;
 }
 std::string FloatNeitherNanInst::to_string() const{
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .float_neither_nan(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
-    res+= " " + this->fast_math_attr.to_string();
-    return res;
+    return this->to_string_helper("float_neither_nan");
 }
 
-
+FloatBothNanInst::FloatBothNanInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+                                        FastMathAttr fast_math_attr):FloatCmpBinaryInst(instruction_stmt, destination, lhs, rhs, type, fast_math_attr, false){}
+CmpBinaryInst::OpType FloatBothNanInst::get_op_type() const{
+    return OpType::BOTH_NAN;
+}
+std::string FloatBothNanInst::to_string() const{
+    return this->to_string_helper("float_both_nan");
+}
 // --------------------------- Vector Float Comparison Binary operations ---------------------------
 VecFloatCmpBinaryInst::VecFloatCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                                         FastMathAttr fast_math_attr, bool unordered):CmpBinaryInst(instruction_stmt, destination, lhs, rhs, type){
     this->fast_math_attr = fast_math_attr;
     this->unordered = unordered;
+}
+std::string VecFloatCmpBinaryInst::to_string_helper(std::string op_name) const{
+    std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
+    res+= " " + this->fast_math_attr.to_string();
+    if(this->unordered){
+        res += " #[unordered]";
+    }
+    return res;
 }
 FastMathAttr VecFloatCmpBinaryInst::get_fast_math_attr() const{
     return this->fast_math_attr;
@@ -566,12 +528,7 @@ CmpBinaryInst::OpType VecFloatEqInst::get_op_type() const{
     return OpType::EQ;
 }
 std::string VecFloatEqInst::to_string() const{
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .vec_float_eq(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
-    res+= " " + this->fast_math_attr.to_string();
-    if(this->unordered){
-        res += " #[unordered]";
-    }
-    return res;
+    return this->to_string_helper("vec_float_eq");
 }
 
 
@@ -581,12 +538,7 @@ CmpBinaryInst::OpType VecFloatNeqInst::get_op_type() const{
     return OpType::NEQ;
 }
 std::string VecFloatNeqInst::to_string() const{
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .vec_float_neq(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
-    res+= " " + this->fast_math_attr.to_string();
-    if(this->unordered){
-        res += " #[unordered]";
-    }
-    return res;
+    return this->to_string_helper("vec_float_neq");
 }
 
 
@@ -596,12 +548,7 @@ CmpBinaryInst::OpType VecFloatLtInst::get_op_type() const{
     return OpType::LT;
 }
 std::string VecFloatLtInst::to_string() const{
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .vec_float_lt(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
-    res+= " " + this->fast_math_attr.to_string();
-    if(this->unordered){
-        res += " #[unordered]";
-    }
-    return res;
+    return this->to_string_helper("vec_float_lt");
 }
 
 
@@ -611,12 +558,7 @@ CmpBinaryInst::OpType VecFloatGtInst::get_op_type() const{
     return OpType::GT;
 }
 std::string VecFloatGtInst::to_string() const{
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .vec_float_gt(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
-    res+= " " + this->fast_math_attr.to_string();
-    if(this->unordered){
-        res += " #[unordered]";
-    }
-    return res;
+    return this->to_string_helper("vec_float_gt");
 }
 
 
@@ -626,12 +568,7 @@ CmpBinaryInst::OpType VecFloatLeInst::get_op_type() const{
     return OpType::LE;
 }
 std::string VecFloatLeInst::to_string() const{
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .vec_float_le(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
-    res+= " " + this->fast_math_attr.to_string();
-    if(this->unordered){
-        res += " #[unordered]";
-    }
-    return res;
+    return this->to_string_helper("vec_float_le");
 }
 
 
@@ -641,12 +578,7 @@ CmpBinaryInst::OpType VecFloatGeInst::get_op_type() const{
     return OpType::GE;
 }
 std::string VecFloatGeInst::to_string() const{
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .vec_float_ge(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
-    res+= " " + this->fast_math_attr.to_string();
-    if(this->unordered){
-        res += " #[unordered]";
-    }
-    return res;
+    return this->to_string_helper("vec_float_ge");
 }
 
 
@@ -656,9 +588,7 @@ CmpBinaryInst::OpType VecFloatEitherNanInst::get_op_type() const{
     return OpType::EITHER_NAN;
 }
 std::string VecFloatEitherNanInst::to_string() const{
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .vec_float_either_nan(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
-    res+= " " + this->fast_math_attr.to_string();
-    return res;
+    return this->to_string_helper("vec_float_either_nan");
 }
 
 
@@ -668,9 +598,17 @@ CmpBinaryInst::OpType VecFloatNeitherNanInst::get_op_type() const{
     return OpType::NEITHER_NAN;
 }
 std::string VecFloatNeitherNanInst::to_string() const{
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .vec_float_neither_nan(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
-    res+= " " + this->fast_math_attr.to_string();
-    return res;
+    return this->to_string_helper("vec_float_neither_nan");
+}
+
+
+VecFloatBothNanInst::VecFloatBothNanInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+                                        FastMathAttr fast_math_attr):VecFloatCmpBinaryInst(instruction_stmt, destination, lhs, rhs, type, fast_math_attr, false){}
+CmpBinaryInst::OpType VecFloatBothNanInst::get_op_type() const{
+    return OpType::BOTH_NAN;
+}
+std::string VecFloatBothNanInst::to_string() const{
+    return this->to_string_helper("vec_float_both_nan");
 }
 }
 }

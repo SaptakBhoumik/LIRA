@@ -4,8 +4,13 @@
 #include "instruction/arithmetic_tri_inst.hpp"
 //## Fixed-Point Arithmetic Instructions
 #include "instruction/widening_bin_inst.hpp"
-
+// ## Carrying / Borrow Arithmetic Instructions
+// ## Combined Quotient and Remainder (`divmod`)
+// ## Overflow-Wrap (Checked Arithmetic) Instructions
+// ## High-Half Multiply
+// ## N-Bit Carry Shifts
 #include "instruction/bitwise_bin_inst.hpp"
+// ## Bitwise Trinary Instructions
 #include "instruction/cmp_bin_inst.hpp"
 #include "instruction/conv_inst.hpp"
 #include "instruction/unary_inst.hpp"

@@ -348,6 +348,8 @@ These extend the 1-bit carry shift instructions to handle a shift count of more 
 
 - `let T1:%output_var = .neither_nan(T:%input_var1, T:%input_var2)` - Returns true if neither input is NaN. Same type rules and attributes as `.either_nan`.
 
+- `let T1:%output_var = .both_nan(T:%input_var1, T:%input_var2)` - Returns true if both inputs are NaN. Same type rules and attributes as `.either_nan`.
+
 ---
 
 ## Conversion Instructions

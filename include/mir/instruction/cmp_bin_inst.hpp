@@ -19,7 +19,8 @@ class CmpBinaryInst:public Inst {
         LE = 1 << 10,
         GE = 1 << 11,
         NEITHER_NAN = 1 << 12,
-        EITHER_NAN = 1 << 13
+        EITHER_NAN = 1 << 13,
+        BOTH_NAN = 1 << 14
     };
 
     CmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type);
@@ -41,6 +42,8 @@ class IntCmpBinaryInst:public CmpBinaryInst {
     protected:
     bool unsigned_;//Whether it is unsigned comparison or not. Ignored for eq and neq instructions
     //Few instructions dont have all these attributes. For that we return false and in typechecker we make sure unsupported attributes are not used.
+
+    virtual std::string to_string_helper(std::string op_name) const final;
     public:
     IntCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                      bool unsigned_);
@@ -111,6 +114,8 @@ class VecIntCmpBinaryInst:public CmpBinaryInst {
     protected:
     bool unsigned_;//Whether it is unsigned comparison or not. Ignored for eq and neq instructions
     //Few instructions dont have all these attributes. For that we return false and in typechecker we make sure unsupported attributes are not used.
+
+    virtual std::string to_string_helper(std::string op_name) const final;
     public:
     VecIntCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                          bool unsigned_);
@@ -180,6 +185,8 @@ class VecIntGeInst:public VecIntCmpBinaryInst {
 
 // ---------------------------Ptr Comparison Binary operations ---------------------------
 class PtrCmpBinaryInst:public CmpBinaryInst {
+    protected:
+    virtual std::string to_string_helper(std::string op_name) const final;
     public:
     //We already know the in type. No need to get the type again because it is always ptr
     PtrCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
@@ -241,6 +248,8 @@ class PtrGeInst:public PtrCmpBinaryInst {
 
 // ---------------------------Vector ptr Comparison Binary operations ---------------------------
 class VecPtrCmpBinaryInst:public CmpBinaryInst {
+    protected:
+    virtual std::string to_string_helper(std::string op_name) const final;
     public:
     VecPtrCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type);
 
@@ -303,6 +312,8 @@ class FloatCmpBinaryInst:public CmpBinaryInst {
     protected:
     FastMathAttr fast_math_attr;
     bool unordered;//Ignored for either_nan and neither_nan. Says if the op is ordered or unordered
+
+    virtual std::string to_string_helper(std::string op_name) const final;
     public:
     FloatCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                                 FastMathAttr fast_math_attr, bool unordered);
@@ -388,12 +399,21 @@ class FloatNeitherNanInst:public FloatCmpBinaryInst {
     std::string to_string() const override;
 };
 
+class FloatBothNanInst:public FloatCmpBinaryInst {
+    public:
+    FloatBothNanInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+                FastMathAttr fast_math_attr);
 
+    OpType get_op_type() const override final;
+    std::string to_string() const override;
+};
 // --------------------------- Vector Float Comparison Binary operations ---------------------------
 class VecFloatCmpBinaryInst:public CmpBinaryInst {
     protected:
     FastMathAttr fast_math_attr;
     bool unordered;//Ignored for either_nan and neither_nan. Says if the op is ordered or unordered
+    
+    virtual std::string to_string_helper(std::string op_name) const final;
     public:
     VecFloatCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                                 FastMathAttr fast_math_attr, bool unordered);
@@ -473,6 +493,15 @@ class VecFloatEitherNanInst:public VecFloatCmpBinaryInst {
 class VecFloatNeitherNanInst:public VecFloatCmpBinaryInst {
     public:
     VecFloatNeitherNanInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+                      FastMathAttr fast_math_attr);
+
+    OpType get_op_type() const override final;
+    std::string to_string() const override;
+};
+
+class VecFloatBothNanInst:public VecFloatCmpBinaryInst {
+    public:
+    VecFloatBothNanInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                       FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override final;

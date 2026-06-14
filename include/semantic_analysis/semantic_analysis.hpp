@@ -14,7 +14,7 @@ bool type_ge(std::string filename, IR::TypeExprPtr t1, IR::TypeExprPtr t2);//Che
                                                                            //If scaler float/int then return if basetype size is greater or equal. 
                                                                            //If vector then we expect the same number of elements(Error otherwise) and expects the base type to have same InstOperandTypeVarient(Else error)
                                                                            //If same number of element we compare size of basetype
-bool type_compatible(VarSymTablePtr var_sym_table, IR::TypeExprPtr type, IR::ExprPtr literal);//Check if a reduced type is compatible with a literal. This is used to check if a literal can be assigned to a variable of a certain type.
+bool type_compatible(VarSymTablePtr var_symtable, IR::TypeExprPtr type, IR::ExprPtr literal);//Check if a reduced type is compatible with a literal. This is used to check if a literal can be assigned to a variable of a certain type.
 [[noreturn]] void error(std::string filename, IR::Token tok, std::string msg,std::string submsg="",std::string ecode="");
 //extract_flag_attrs and extract_fastmath_attrs may throw error if duplicate of the attribute is found. Like if they are asked to search for "attr_name" and "attr_name"
 //is present twice then error. Note no error if "attr_name" is present twice if we dont ask to search for "attr_name". So we check duplicate only for the attributes asked
@@ -53,6 +53,12 @@ class SemanticAnalyzer {
 
     MIR::InstPtr analyze_widening_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
 
+    // ## Carrying / Borrow Arithmetic Instructions
+    // ## Combined Quotient and Remainder (`divmod`)
+    // ## Overflow-Wrap (Checked Arithmetic) Instructions
+    // ## High-Half Multiply
+    // ## N-Bit Carry Shifts
+
     MIR::InstPtr analyze_bitwise_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
     MIR::InstPtr analyze_and_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::InstOperandTypeVarient type_varient, 
                                       IR::InstructionStmtPtr inst_stmt);
@@ -67,24 +73,10 @@ class SemanticAnalyzer {
     MIR::InstPtr analyze_ashr_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::InstOperandTypeVarient type_varient,
                                       IR::InstructionStmtPtr inst_stmt);
 
+    // ## Bitwise Trinary Instructions
 
     MIR::InstPtr analyze_cmp_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
-    MIR::InstPtr analyze_eq_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                                     IR::TypeExprPtr type, MIR::InstOperandTypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);
-    MIR::InstPtr analyze_neq_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
-                                      IR::TypeExprPtr type, MIR::InstOperandTypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);
-    MIR::InstPtr analyze_gt_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
-                                      IR::TypeExprPtr type, MIR::InstOperandTypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);
-    MIR::InstPtr analyze_lt_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
-                                      IR::TypeExprPtr type, MIR::InstOperandTypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);
-    MIR::InstPtr analyze_ge_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                                      IR::TypeExprPtr type, MIR::InstOperandTypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);
-    MIR::InstPtr analyze_le_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                                      IR::TypeExprPtr type, MIR::InstOperandTypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);
-    MIR::InstPtr analyze_either_nan_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                                            IR::TypeExprPtr type, MIR::InstOperandTypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);
-    MIR::InstPtr analyze_neither_nan_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
-                                             IR::TypeExprPtr type, MIR::InstOperandTypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);
+    
     
     MIR::InstPtr analyze_conv_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
     MIR::InstPtr analyze_unary_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);

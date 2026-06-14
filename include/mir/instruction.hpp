@@ -1,5 +1,8 @@
 #include "instruction/_instruction.hpp"
+
 #include "instruction/arithmetic_bin_inst.hpp"
+#include "instruction/arithmetic_tri_inst.hpp"
+
 #include "instruction/bitwise_bin_inst.hpp"
 #include "instruction/cmp_bin_inst.hpp"
 #include "instruction/conv_inst.hpp"

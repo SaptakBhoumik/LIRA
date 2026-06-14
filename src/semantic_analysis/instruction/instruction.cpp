@@ -6,6 +6,9 @@ bool is_arithmetic_bin_inst(std::string inst_name){
     return inst_name == ".add" || inst_name == ".sub" || inst_name == ".mul" || inst_name == ".div" || inst_name == ".rem" 
             || inst_name == ".copysign" || inst_name == ".min" || inst_name == ".max" || inst_name == ".avg";
 }
+bool is_arithmetic_tri_inst(std::string inst_name){
+    return inst_name == ".fma" || inst_name == ".fms" || inst_name == ".fnma" || inst_name == ".fnms" || inst_name == ".clamp";
+}
 bool is_bitwise_bin_inst(std::string inst_name){
     return inst_name == ".and" || inst_name == ".or" || inst_name == ".xor" || inst_name == ".shl" || inst_name == ".lshr" || inst_name == ".ashr";
 }
@@ -42,6 +45,9 @@ MIR::InstPtr SemanticAnalyzer::analyze_instruction(IR::InstructionStmtPtr inst_s
     IR::Token inst_name = inst_stmt->get_value()->get_token();
     if(is_arithmetic_bin_inst(inst_name.value)){
         return analyze_arithmetic_bin_inst(inst_name,inst_stmt);
+    }
+    else if(is_arithmetic_tri_inst(inst_name.value)){
+        return analyze_arithmetic_tri_inst(inst_name,inst_stmt);
     }
     else if(is_bitwise_bin_inst(inst_name.value)){
         return analyze_bitwise_bin_inst(inst_name,inst_stmt);

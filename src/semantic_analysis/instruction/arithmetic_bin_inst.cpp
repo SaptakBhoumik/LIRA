@@ -1,5 +1,4 @@
 #include "ast/ast.hpp"
-#include "mir/instruction/_instruction.hpp"
 #include "semantic_analysis/semantic_analysis.hpp"
 #include <iostream>
 #include <functional>
@@ -27,6 +26,7 @@ MIR::InstPtr analyze_max_bin_inst(std::string filename, MIR::LocalDestRegisterPt
 MIR::InstPtr analyze_avg_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                   MIR::InstOperandTypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);
 
+//NOTE:Dont use a common templated function for all. The attributes can change in future. It is more code but more maintainable imo+The error messages can be more specific
 const std::unordered_map<std::string, DispatchFuncType> dispatch_map = {
         {".add", analyze_add_bin_inst},
         {".sub", analyze_sub_bin_inst},

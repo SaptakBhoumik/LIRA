@@ -42,6 +42,8 @@ class SemanticAnalyzer {
     
     MIR::InstPtr analyze_arithmetic_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
 
+    MIR::InstPtr analyze_arithmetic_tri_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
+
     MIR::InstPtr analyze_bitwise_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
     MIR::InstPtr analyze_and_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::InstOperandTypeVarient type_varient, 
                                       IR::InstructionStmtPtr inst_stmt);

@@ -1,4 +1,3 @@
-## Trinary Arithmetic Instructions
 ## Fixed-Point Arithmetic Instructions
 ## Widening Arithmetic Instructions
 ## Carrying / Borrow Arithmetic Instructions
@@ -50,7 +49,6 @@
     ### CET Shadow Stack
 
 
-## Trinary Arithmetic Instructions
 ## Fixed-Point Arithmetic Instructions
 ## Widening Arithmetic Instructions
 ## Carrying / Borrow Arithmetic Instructions

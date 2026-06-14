@@ -71,7 +71,7 @@ MIR::InstPtr SemanticAnalyzer::analyze_instruction(IR::InstructionStmtPtr inst_s
         return analyze_other_inst(inst_name,inst_stmt);
     }
     else{
-        error(inst_stmt->get_value()->get_token(),"Unknown instruction: " + inst_name.value);
+        Utils::error(this->filename,inst_stmt->get_value()->get_token(),"Unknown instruction: " + inst_name.value);
     }
 }
 }

@@ -8,6 +8,8 @@ namespace MIR{
 enum class InstType:std::int16_t{
     ArithmeticBinaryInst,
 
+    ArithmeticTrinaryInst,
+
     BitwiseBinaryInst,
 
     CmpBinaryInst,

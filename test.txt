@@ -6,9 +6,10 @@
 ## Overflow-Wrap (Checked Arithmetic) Instructions
 ## High-Half Multiply
 ## N-Bit Carry Shifts
-## Bitwise Instructions
+## Bitwise Binary Instructions
     ### BMI1 Bit Manipulation
     ### Parallel Bit Extract/Deposit
+## Bitwise Trinary Instructions
 ## Comparison Instructions
 ## Conversion Instructions
 ## Unary Instructions
@@ -57,9 +58,10 @@
 ## Overflow-Wrap (Checked Arithmetic) Instructions
 ## High-Half Multiply
 ## N-Bit Carry Shifts
-## Bitwise Instructions
+## Bitwise Binary Instructions
     ### BMI1 Bit Manipulation
     ### Parallel Bit Extract/Deposit
+## Bitwise Trinary Instructions
 ## Comparison Instructions
 ## Conversion Instructions
 ## Unary Instructions
@@ -110,9 +112,10 @@
 ## Overflow-Wrap (Checked Arithmetic) Instructions
 ## High-Half Multiply
 ## N-Bit Carry Shifts
-## Bitwise Instructions
+## Bitwise Binary Instructions
     ### BMI1 Bit Manipulation
     ### Parallel Bit Extract/Deposit
+## Bitwise Trinary Instructions
 ## Comparison Instructions
 ## Conversion Instructions
 ## Unary Instructions

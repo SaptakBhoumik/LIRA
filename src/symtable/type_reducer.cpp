@@ -6,7 +6,9 @@
 
 namespace LIRA {
 namespace Utils {
+
 IR::TypeExprPtr reduce_type_expr(IR::TypeExprPtr type, TypeSymTablePtr symtable){
+    //TODO:IR::TypeExprPtr get_reduced_type(LIRA::Utils::TypeSymTablePtr type_symtable, IR::TypeExprPtr type); is the new function. Remove this after copying the defination there
     //TODO:What if the attribute contains type expression?We have to reduce them also
     switch(type->get_kind()){
         case IR::TypeExprKind::NamedTypeExpr:{

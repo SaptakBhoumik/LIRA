@@ -88,6 +88,7 @@
     If `T0` is integer:
     - `#[nsw]` - poison on signed overflow
     - `#[nuw]` - poison on unsigned overflow
+    - `#[saturating]` - clamp to type range instead of wrapping. Pair with `#[unsigned]` for unsigned saturation; default is signed saturation.
 
     If `T0` is float/bfloat: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
@@ -96,6 +97,7 @@
     If `T0` is integer:
     - `#[nsw]` - poison on signed overflow
     - `#[nuw]` - poison on unsigned overflow
+    - `#[saturating]` - clamp to type range instead of wrapping. Pair with `#[unsigned]` for unsigned saturation; default is signed saturation.
 
     If `T0` is float/bfloat: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
@@ -104,6 +106,7 @@
     If `T0` is integer:
     - `#[nsw]` - poison on signed overflow
     - `#[nuw]` - poison on unsigned overflow
+    - `#[saturating]` - clamp to type range instead of wrapping. Pair with `#[unsigned]` for unsigned saturation; default is signed saturation.
 
     If `T0` is float/bfloat: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
@@ -112,6 +115,7 @@
     If `T0` is integer:
     - `#[nsw]` - poison on signed overflow
     - `#[nuw]` - poison on unsigned overflow
+    - `#[saturating]` - clamp to type range instead of wrapping. Pair with `#[unsigned]` for unsigned saturation; default is signed saturation.
 
     If `T0` is float/bfloat: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
@@ -124,10 +128,6 @@
     - `#[unordered]` - NaN-ignoring clamp (IEEE "minNum/maxNum" semantics). Default propagates NaN.
     - `#[ieee754_2019]` - correct signed-zero ordering on the boundary; when combined with `#[unordered]`, gets 754-2019 `minimumNumber`/`maximumNumber` semantics for the internal min/max operations. Combining with `#[nsz]` is a compile error. Only valid when T0 is float or bfloat.
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
-
-- `let T:%output_var = .fshl(T:%input_var1, T:%input_var2, T:%shift)` - Funnel shift left. Conceptually concatenates `input_var1:input_var2`, shifts left by `shift mod bitwidth`, and returns the high T-sized bits. T must be of the form `T0` or `<T0,M>` where T0 is some integer. No attributes.
-
-- `let T:%output_var = .fshr(T:%input_var1, T:%input_var2, T:%shift)` - Funnel shift right. Conceptually concatenates `input_var1:input_var2`, shifts right by `shift mod bitwidth`, and returns the low T-sized bits. T must be of the form `T0` or `<T0,M>` where T0 is some integer. No attributes.
 
 ---
 
@@ -257,7 +257,7 @@ These extend the 1-bit carry shift instructions to handle a shift count of more 
 
 ---
 
-## Bitwise Instructions
+## Bitwise Binary Instructions
 
 - `let T:%output_var = .and(T:%input_var1, T:%input_var2)` - Bitwise AND. T must be `i<N>` or `<i<N>,M>`. No attributes.
 
@@ -302,6 +302,14 @@ These extend the 1-bit carry shift instructions to handle a shift count of more 
 - `let T:%out = .pext(T:%src, T:%mask)` - Parallel bit extract. Extracts bits from `src` at positions where `mask` has a 1 bit, compacting them into the contiguous low bits of the result. The number of meaningful result bits equals `popcount(mask)`; remaining high bits are zero. Corresponds to x86 BMI2 `PEXT`. `T` must be `i32` or `i64`. No attributes.
 
 - `let T:%out = .pdep(T:%src, T:%mask)` - Parallel bit deposit. Inverse of `.pext`. Deposits bits from the consecutive low bits of `src` into the output at positions where `mask` has a 1 bit. All other output bits are zero. Corresponds to x86 BMI2 `PDEP`. `T` must be `i32` or `i64`. No attributes.
+
+---
+
+## Trinary Bitwise Instructions
+
+- `let T:%output_var = .fshl(T:%input_var1, T:%input_var2, T:%shift)` - Funnel shift left. Conceptually concatenates `input_var1:input_var2`, shifts left by `shift mod bitwidth`, and returns the high T-sized bits. T must be of the form `T0` or `<T0,M>` where T0 is some integer. No attributes.
+
+- `let T:%output_var = .fshr(T:%input_var1, T:%input_var2, T:%shift)` - Funnel shift right. Conceptually concatenates `input_var1:input_var2`, shifts right by `shift mod bitwidth`, and returns the low T-sized bits. T must be of the form `T0` or `<T0,M>` where T0 is some integer. No attributes.
 
 ---
 
@@ -925,7 +933,7 @@ A terminator must be the final instruction of every block. Falling through to th
 
 - `let <T,M>:%output_var = .shufflevector(<T,N2>:%input1, <T,N3>:%input2, <i16,M>:%mask)` - Shuffles elements of two vectors according to a mask(Run time or compile time). No attributes.
 
-- `let <i1,N>:%output_var = .ternlog(<i1,N>:%a, <i1,N>:%b, <i1,N>:%c, i8:imm)` - Ternary logic operation on the bitwise representation of `a`, `b`, and `c`. For each bit position, the result is determined by the corresponding bit in `imm` (0-255). For example, if `imm` is 0b11110000, the result bit will be `a` for input 000, `b` for 001, `c` for 010, `a&b` for 011, `a&c` for 100, `b&c` for 101, `a|b|c` for 110, and `0` for 111. No attributes.
+- `let <i1,N>:%output_var = .ternlog(<i1,N>:%a, <i1,N>:%b, <i1,N>:%c, i8:imm)` - Trinary logic operation on the bitwise representation of `a`, `b`, and `c`. For each bit position, the result is determined by the corresponding bit in `imm` (0-255). For example, if `imm` is 0b11110000, the result bit will be `a` for input 000, `b` for 001, `c` for 010, `a&b` for 011, `a&c` for 100, `b&c` for 101, `a|b|c` for 110, and `0` for 111. No attributes.
 
 - `let T0:%output_var = .reduce_add(<T0,N>:%input_vector [, <i1,N>:%mask])`  
   Sums all elements of the vector where the mask is true (or all elements if no mask); result is scalar.

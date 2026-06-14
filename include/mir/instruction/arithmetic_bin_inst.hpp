@@ -281,6 +281,7 @@ class FloatArithmeticBinaryInst:public ArithmeticBinaryInst {
 
     virtual InstOperandTypeVarient get_operand_type_varient() const override final;
 };
+
 class FloatAddInst:public FloatArithmeticBinaryInst {
     public:
     FloatAddInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 

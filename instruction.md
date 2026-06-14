@@ -144,13 +144,13 @@
 
 ---
 
-## Widening Arithmetic Instructions
+## Widening Binary Instructions
 
 Widening instructions compute `a OP b` at the full precision of the *output* type - the inputs are sign- or zero-extended to the output width before the operation. The output type `T2` must be at least as wide as the input type `T1` (strictly wider is the normal case; equal width is permitted and behaves identically to the non-widening form). Both scalar and vector forms are supported; for vectors, the lane count stays the same and only the element width widens.
 
 - `let T2:%out = .widening_add(T1:%a, T1:%b)` - Adds `a` and `b`, returning the result in the wider type `T2`. For integers, inputs are sign-extended (default) or zero-extended (`#[unsigned]`) to the output width before addition. For floats, inputs are precision-extended before the addition.
 
-    `T1` and `T2` must share the same kind (integer->integer, float->float, bfloat->bfloat, or `<T0,M>`->`<T0,M>`). `bitwidth(T2) >= bitwidth(T1)`.
+    `T1` and `T2` must share the same kind (integer->integer, float/bfloat->float, or `<T0,M>`->`<T0,M>`). `bitwidth(T2) >= bitwidth(T1)`.
 
     **If `T1`/`T2` base type is integer:**
     - `#[unsigned]` - zero-extend inputs; default is sign-extend
@@ -161,7 +161,9 @@ Widening instructions compute `a OP b` at the full precision of the *output* typ
 
 - `let T2:%out = .widening_sub(T1:%a, T1:%b)` - Subtracts `b` from `a`, returning the result in the wider type `T2`. Same extension and attribute rules as `.widening_add`.
 
-- `let T2:%out = .widening_mul(T1:%a, T1:%b)` - Multiplies `a` and `b`, returning the full-width product in `T2`. This is the primary use case for widening: an `i32 x i32 -> i64` multiply without a prior `.ext`, and `f32 x f32 -> f64` without precision loss in the intermediate. Same extension rules as `.widening_add`.
+- `let T2:%out = .widening_mul(T1:%a, T1:%b)` - Multiplies `a` and `b`, returning the full-width product in `T2`. Same extension rules as `.widening_add`.
+
+    `T1` and `T2` must share the same kind (integer->integer, float/bfloat->float, or `<T0,M>`->`<T0,M>`). `bitwidth(T2) >= bitwidth(T1)`.
 
     **If `T1`/`T2` base type is integer:**
     - `#[unsigned]` - treat both inputs as unsigned before extension

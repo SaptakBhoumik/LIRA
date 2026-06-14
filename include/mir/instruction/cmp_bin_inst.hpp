@@ -48,7 +48,7 @@ class IntCmpBinaryInst:public CmpBinaryInst {
     virtual bool is_unsigned() const final;
 
     virtual std::shared_ptr<IR::IntTypeExpr> get_casted_operand_type() const final;//Returns the operand type casted to IntTypeExpr. Just a helper function to make life easier
-    virtual std::size_t get_bit_width() const final;//Returns the bit width of the operand type. Just a helper function to make life easier
+    virtual std::size_t get_bitwidth() const final;//Returns the bit width of the operand type. Just a helper function to make life easier
     virtual InstOperandTypeVarient get_operand_type_varient() const final;
 };
 
@@ -184,7 +184,7 @@ class PtrCmpBinaryInst:public CmpBinaryInst {
     //We already know the in type. No need to get the type again because it is always ptr
     PtrCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
 
-    virtual std::size_t get_bit_width() const final;//Returns the bit width of the operand type. We only support x86_64 so returns 64. I made this function just in case we support more arch in future
+    virtual std::size_t get_bitwidth() const final;//Returns the bit width of the operand type. We only support x86_64 so returns 64. I made this function just in case we support more arch in future
                                                     //Just a helper function to make life easier. 
     virtual InstOperandTypeVarient get_operand_type_varient() const final;
 };
@@ -311,7 +311,7 @@ class FloatCmpBinaryInst:public CmpBinaryInst {
     virtual bool is_unordered() const final;
 
     virtual std::shared_ptr<IR::FloatTypeExpr> get_casted_operand_type() const final;//Returns the operand type casted to SIMDTypeExpr. Just a helper function to make life easier
-    virtual std::size_t get_bit_width() const final;//Returns the bit width of the operand type. Just a helper function to make life easier
+    virtual std::size_t get_bitwidth() const final;//Returns the bit width of the operand type. Just a helper function to make life easier
     virtual bool is_brain_float() const final;
     virtual InstOperandTypeVarient get_operand_type_varient() const final;
 };

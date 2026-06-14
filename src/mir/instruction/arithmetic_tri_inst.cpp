@@ -68,7 +68,7 @@ bool IntArithmeticTrinaryInst::is_saturating() const{
 std::shared_ptr<IR::IntTypeExpr> IntArithmeticTrinaryInst::get_casted_operand_type() const{
     return std::dynamic_pointer_cast<IR::IntTypeExpr>(this->destination->get_type());
 }
-std::size_t IntArithmeticTrinaryInst::get_bit_width() const{
+std::size_t IntArithmeticTrinaryInst::get_bitwidth() const{
     auto type = this->get_casted_operand_type();
     return type->get_bits();
 }
@@ -269,7 +269,7 @@ bool FloatArithmeticTrinaryInst::is_unordered() const{
 std::shared_ptr<IR::FloatTypeExpr> FloatArithmeticTrinaryInst::get_casted_operand_type() const{
     return std::dynamic_pointer_cast<IR::FloatTypeExpr>(this->destination->get_type());
 }
-std::size_t FloatArithmeticTrinaryInst::get_bit_width() const{
+std::size_t FloatArithmeticTrinaryInst::get_bitwidth() const{
     auto type = this->get_casted_operand_type();
     return type->get_bits();
 }

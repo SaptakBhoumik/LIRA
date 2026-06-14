@@ -44,7 +44,7 @@ bool IntBitwiseBinaryInst::is_exact() const {
 std::shared_ptr<IR::IntTypeExpr>IntBitwiseBinaryInst::get_casted_operand_type() const{
     return std::dynamic_pointer_cast<IR::IntTypeExpr>(this->get_operand_type());
 }
-std::size_t IntBitwiseBinaryInst::get_bit_width() const{
+std::size_t IntBitwiseBinaryInst::get_bitwidth() const{
     auto int_type = this->get_casted_operand_type();
     return int_type->get_bits();
 }

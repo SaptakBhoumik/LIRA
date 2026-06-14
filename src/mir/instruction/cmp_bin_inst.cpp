@@ -38,7 +38,7 @@ bool IntCmpBinaryInst::is_unsigned() const{
 std::shared_ptr<IR::IntTypeExpr> IntCmpBinaryInst::get_casted_operand_type() const{
     return std::dynamic_pointer_cast<IR::IntTypeExpr>(this->type);
 }
-std::size_t IntCmpBinaryInst::get_bit_width() const{
+std::size_t IntCmpBinaryInst::get_bitwidth() const{
     auto int_type = this->get_casted_operand_type();
     return int_type->get_bits();
 }
@@ -232,7 +232,7 @@ std::string VecIntGeInst::to_string() const{
 // ---------------------------Ptr Comparison Binary operations ---------------------------
 PtrCmpBinaryInst::PtrCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs):
                                     CmpBinaryInst(instruction_stmt, destination, lhs, rhs, std::make_shared<IR::PtrTypeExpr>(IR::Token{.value = "ptr"},std::vector<IR::AttributePtr>{})){}
-std::size_t PtrCmpBinaryInst::get_bit_width() const{
+std::size_t PtrCmpBinaryInst::get_bitwidth() const{
     return 64;//We support only x86_64 for now but can return diffrent in future if we support more arch. Just a helper function to make life easier
 }
 InstOperandTypeVarient PtrCmpBinaryInst::get_operand_type_varient() const{
@@ -405,7 +405,7 @@ bool FloatCmpBinaryInst::is_unordered() const{
 std::shared_ptr<IR::FloatTypeExpr> FloatCmpBinaryInst::get_casted_operand_type() const{
     return std::dynamic_pointer_cast<IR::FloatTypeExpr>(this->type);
 }
-std::size_t FloatCmpBinaryInst::get_bit_width() const{
+std::size_t FloatCmpBinaryInst::get_bitwidth() const{
     auto float_type = this->get_casted_operand_type();
     return float_type->get_bits();
 }

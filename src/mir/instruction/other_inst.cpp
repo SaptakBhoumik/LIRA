@@ -118,7 +118,7 @@ IR::LiteralExprPtr PtrMaskInst::get_pointer() const{
 IR::LiteralExprPtr PtrMaskInst::get_mask() const{
     return this->mask;
 }
-std::size_t PtrMaskInst::get_mask_bit_width() const{
+std::size_t PtrMaskInst::get_mask_bitwidth() const{
     return 64;
 }
 InstType PtrMaskInst::get_inst_type() const{

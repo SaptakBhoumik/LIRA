@@ -1,4 +1,4 @@
-#include "mir/instruction.hpp"
+#include "mir//instruction/_instruction.hpp"
 
 namespace LIRA {
 namespace MIR {

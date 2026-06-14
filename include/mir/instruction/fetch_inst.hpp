@@ -56,7 +56,7 @@ class IntAtomicRMWInst:public AtomicRMWInst {
                      IR::TypeExprPtr type, std::size_t alignment, bool volatile_, SyncScope syncscope, AtomicOrdering ordering, bool unsigned_);
 
     virtual std::shared_ptr<IR::IntTypeExpr> get_casted_type() const final;//Returns the type casted to IntTypeExpr. Just a helper function to make life easier
-    virtual std::size_t get_bit_width() const final;//Returns the bit width of the type. Calculated automatically
+    virtual std::size_t get_bitwidth() const final;//Returns the bit width of the type. Calculated automatically
 
     virtual InstOperandTypeVarient get_type_varient() const override final;
 };
@@ -167,7 +167,7 @@ class FloatAtomicRMWInst:public AtomicRMWInst {
                         IR::TypeExprPtr type, std::size_t alignment, bool volatile_, SyncScope syncscope, AtomicOrdering ordering);
 
     virtual std::shared_ptr<IR::FloatTypeExpr> get_casted_type() const final;//Returns the type casted to FloatTypeExpr. Just a helper function to make life easier
-    virtual std::size_t get_bit_width() const final;//Returns the bit width of the type. Calculated automatically
+    virtual std::size_t get_bitwidth() const final;//Returns the bit width of the type. Calculated automatically
     virtual bool is_brain_float() const final;//Whether the type is brain float or not. Just a helper function to make life easier
 
     virtual InstOperandTypeVarient get_type_varient() const override final;

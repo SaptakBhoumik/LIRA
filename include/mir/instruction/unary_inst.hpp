@@ -34,7 +34,7 @@ class ScalarUnaryInst:public UnaryInst{
     ScalarUnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr);
 
     virtual bool is_brain_float() const final;//Whether the operand type is brain float or not. Just a helper function to make life easier. False for integer
-    virtual std::size_t get_type_bit_width() const final;//Returns the bit width of the in type. Calculated automatically
+    virtual std::size_t get_type_bitwidth() const final;//Returns the bit width of the in type. Calculated automatically
 };
 
 class IntNegInst:public ScalarUnaryInst{
@@ -76,7 +76,7 @@ class LaneWiseUnaryInst:public UnaryInst{
 
     virtual bool is_brain_float() const final;//Whether the operand base type is brain float or not. Just a helper function to make life easier. False for integer
     virtual std::shared_ptr<IR::SIMDTypeExpr> get_casted_type() const final;//Returns the out type casted to SIMDTypeExpr. 
-    virtual std::size_t get_basetype_bit_width() const final;//Returns the bit width of the type. Calculated automatically
+    virtual std::size_t get_basetype_bitwidth() const final;//Returns the bit width of the type. Calculated automatically
     virtual std::size_t get_num_elements() const final;//Returns the number of elements in the vector. Calculated automatically
 };
 

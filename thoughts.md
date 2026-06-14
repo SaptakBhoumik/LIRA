@@ -1,0 +1,2 @@
+- Should avg instruction support saturating? Like the addition is saturating, so that the average of 255 and 255 is 255 and not an overflowed mess?
+- Should we have a widening average instruction that does the addition in a wider type and then divides by 2, to avoid overflow? This would be similar to the widening add, but with an implicit division by 2 at the end.

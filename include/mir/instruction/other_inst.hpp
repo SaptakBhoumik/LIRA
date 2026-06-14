@@ -77,7 +77,7 @@ class PtrMaskInst:public Inst {
 
     IR::LiteralExprPtr get_pointer() const;
     IR::LiteralExprPtr get_mask() const;
-    std::size_t get_mask_bit_width() const;//Returns the bit width of the mask. We only support x86_64 so return 64
+    std::size_t get_mask_bitwidth() const;//Returns the bit width of the mask. We only support x86_64 so return 64
 
     InstType get_inst_type() const override;
     std::string to_string() const override;

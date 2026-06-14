@@ -154,7 +154,7 @@ class GetAddressInst:public Inst {
     IR::LiteralExprPtr get_offset() const;
     IR::TypeExprPtr get_offset_type() const;
     std::shared_ptr<IR::IntTypeExpr> get_offset_int_type() const;//Returns the type of offset casted to IntTypeExpr. Just a helper function to make life easier
-    std::size_t get_offset_bit_width() const;//Returns the bit width of the offset type. Just a helper function to make life easier
+    std::size_t get_offset_bitwidth() const;//Returns the bit width of the offset type. Just a helper function to make life easier
 
     bool is_unsigned() const;
     bool is_nsw() const;
@@ -182,7 +182,7 @@ class PtrOffsetInst:public Inst {
     IR::LiteralExprPtr get_offset() const;
     IR::TypeExprPtr get_offset_type() const;
     std::shared_ptr<IR::IntTypeExpr> get_offset_int_type() const;//Returns the type of offset casted to IntTypeExpr. Just a helper function to make life easier
-    std::size_t get_offset_bit_width() const;//Returns the bit width of the offset type. Just a helper function to make life easier
+    std::size_t get_offset_bitwidth() const;//Returns the bit width of the offset type. Just a helper function to make life easier
 
     bool is_unsigned() const;
     bool is_nsw() const;

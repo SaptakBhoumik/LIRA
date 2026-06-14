@@ -18,16 +18,16 @@ MIR::InstPtr analyze_fnms_tri_inst(std::string filename, MIR::LocalDestRegisterP
 MIR::InstPtr analyze_clamp_tri_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
                                     IR::LiteralExprPtr arg3, MIR::InstOperandTypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);
 
-//NOTE:Dont use a common templated function for all. The attributes can change in future. It is more code but more maintainable imo+The error messages can be more specific
-const std::unordered_map<std::string, DispatchFuncType> dispatch_map = {
-        {".fma", analyze_fma_tri_inst},
-        {".fms", analyze_fms_tri_inst},
-        {".fnma", analyze_fnma_tri_inst},
-        {".fnms", analyze_fnms_tri_inst},
-        {".clamp", analyze_clamp_tri_inst}
-};
 
 MIR::InstPtr SemanticAnalyzer::analyze_arithmetic_tri_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt){
+    //NOTE:Dont use a common templated function for all. The attributes can change in future. It is more code but more maintainable imo+The error messages can be more specific
+    const std::unordered_map<std::string, DispatchFuncType> dispatch_map = {
+            {".fma", analyze_fma_tri_inst},
+            {".fms", analyze_fms_tri_inst},
+            {".fnma", analyze_fnma_tri_inst},
+            {".fnms", analyze_fnms_tri_inst},
+            {".clamp", analyze_clamp_tri_inst}
+    };
     auto args = inst_stmt->get_value()->get_operands();
     auto _dest = inst_stmt->get_name();
     if(!_dest.has_value()){

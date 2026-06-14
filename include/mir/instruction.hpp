@@ -2,6 +2,8 @@
 
 #include "instruction/arithmetic_bin_inst.hpp"
 #include "instruction/arithmetic_tri_inst.hpp"
+//## Fixed-Point Arithmetic Instructions
+#include "instruction/widening_bin_inst.hpp"
 
 #include "instruction/bitwise_bin_inst.hpp"
 #include "instruction/cmp_bin_inst.hpp"

@@ -1,5 +1,4 @@
 ## Fixed-Point Arithmetic Instructions
-## Widening Arithmetic Instructions
 ## Carrying / Borrow Arithmetic Instructions
 ## Combined Quotient and Remainder (`divmod`)
 ## Overflow-Wrap (Checked Arithmetic) Instructions
@@ -50,7 +49,6 @@
 
 
 ## Fixed-Point Arithmetic Instructions
-## Widening Arithmetic Instructions
 ## Carrying / Borrow Arithmetic Instructions
 ## Combined Quotient and Remainder (`divmod`)
 ## Overflow-Wrap (Checked Arithmetic) Instructions

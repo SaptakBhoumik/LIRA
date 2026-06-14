@@ -48,7 +48,7 @@ class IntBitwiseBinaryInst:public BitwiseBinaryInst {
     virtual bool is_exact() const final;
     
     virtual std::shared_ptr<IR::IntTypeExpr> get_casted_operand_type() const final;//Returns the operand type casted to IntTypeExpr. Just a helper function to make life easier
-    virtual std::size_t get_bit_width() const final;//Returns the bit width of the operand type. Just a helper function to make life easier
+    virtual std::size_t get_bitwidth() const final;//Returns the bit width of the operand type. Just a helper function to make life easier
 
     virtual InstOperandTypeVarient get_operand_type_varient() const override final;
 };

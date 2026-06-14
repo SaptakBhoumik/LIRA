@@ -6,7 +6,7 @@ namespace LIRA {
 namespace Pass {
 using DispatchFuncType = std::function<MIR::InstPtr(std::string, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                                     MIR::InstOperandTypeVarient type_varient, IR::InstructionStmtPtr inst_stmt)>;
-
+ 
 MIR::InstPtr analyze_add_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                   MIR::InstOperandTypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);
 MIR::InstPtr analyze_sub_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
@@ -26,19 +26,20 @@ MIR::InstPtr analyze_max_bin_inst(std::string filename, MIR::LocalDestRegisterPt
 MIR::InstPtr analyze_avg_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                   MIR::InstOperandTypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);
 
-//NOTE:Dont use a common templated function for all. The attributes can change in future. It is more code but more maintainable imo+The error messages can be more specific
-const std::unordered_map<std::string, DispatchFuncType> dispatch_map = {
-        {".add", analyze_add_bin_inst},
-        {".sub", analyze_sub_bin_inst},
-        {".mul", analyze_mul_bin_inst},
-        {".div", analyze_div_bin_inst},
-        {".rem", analyze_rem_bin_inst},
-        {".copysign", analyze_copysign_bin_inst},
-        {".min", analyze_min_bin_inst},
-        {".max", analyze_max_bin_inst},
-        {".avg", analyze_avg_bin_inst}
-};
+
 MIR::InstPtr SemanticAnalyzer::analyze_arithmetic_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt){
+    //NOTE:Dont use a common templated function for all. The attributes can change in future. It is more code but more maintainable imo+The error messages can be more specific
+    const std::unordered_map<std::string, DispatchFuncType> dispatch_map = {
+            {".add", analyze_add_bin_inst},
+            {".sub", analyze_sub_bin_inst},
+            {".mul", analyze_mul_bin_inst},
+            {".div", analyze_div_bin_inst},
+            {".rem", analyze_rem_bin_inst},
+            {".copysign", analyze_copysign_bin_inst},
+            {".min", analyze_min_bin_inst},
+            {".max", analyze_max_bin_inst},
+            {".avg", analyze_avg_bin_inst}
+    };
     auto args = inst_stmt->get_value()->get_operands();
     auto _dest = inst_stmt->get_name();
     if(!_dest.has_value()){

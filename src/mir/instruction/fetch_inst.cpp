@@ -49,7 +49,7 @@ IntAtomicRMWInst::IntAtomicRMWInst(IR::InstructionStmtPtr instruction_stmt, Loca
 std::shared_ptr<IR::IntTypeExpr> IntAtomicRMWInst::get_casted_type() const{
     return std::dynamic_pointer_cast<IR::IntTypeExpr>(this->type);
 }
-std::size_t IntAtomicRMWInst::get_bit_width() const{
+std::size_t IntAtomicRMWInst::get_bitwidth() const{
     return this->get_casted_type()->get_bits();
 }
 InstOperandTypeVarient IntAtomicRMWInst::get_type_varient() const{
@@ -268,7 +268,7 @@ FloatAtomicRMWInst::FloatAtomicRMWInst(IR::InstructionStmtPtr instruction_stmt, 
 std::shared_ptr<IR::FloatTypeExpr> FloatAtomicRMWInst::get_casted_type() const{
     return std::dynamic_pointer_cast<IR::FloatTypeExpr>(this->type);
 }
-std::size_t FloatAtomicRMWInst::get_bit_width() const{
+std::size_t FloatAtomicRMWInst::get_bitwidth() const{
     return this->get_casted_type()->get_bits();
 }
 bool FloatAtomicRMWInst::is_brain_float() const{

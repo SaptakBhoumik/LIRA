@@ -10,8 +10,12 @@ enum class InstType:std::int16_t{
 
     ArithmeticTrinaryInst,
 
-    BitwiseBinaryInst,
+    //## Fixed-Point Arithmetic Instructions
 
+    WideningBinaryInst,
+    
+    BitwiseBinaryInst,
+ 
     CmpBinaryInst,
 
     ConversionInst,

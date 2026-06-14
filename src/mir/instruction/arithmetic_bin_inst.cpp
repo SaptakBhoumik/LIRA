@@ -76,7 +76,7 @@ bool IntArithmeticBinaryInst::is_exact() const{
 std::shared_ptr<IR::IntTypeExpr> IntArithmeticBinaryInst::get_casted_operand_type() const{
     return std::dynamic_pointer_cast<IR::IntTypeExpr>(this->destination->get_type());
 }
-std::size_t IntArithmeticBinaryInst::get_bit_width() const{
+std::size_t IntArithmeticBinaryInst::get_bitwidth() const{
     auto int_type = this->get_casted_operand_type();
     return int_type->get_bits();
 }
@@ -376,7 +376,7 @@ bool FloatArithmeticBinaryInst::is_unordered() const{
 std::shared_ptr<IR::FloatTypeExpr> FloatArithmeticBinaryInst::get_casted_operand_type() const{
     return std::dynamic_pointer_cast<IR::FloatTypeExpr>(this->destination->get_type());
 }
-std::size_t FloatArithmeticBinaryInst::get_bit_width() const{
+std::size_t FloatArithmeticBinaryInst::get_bitwidth() const{
     auto float_type = this->get_casted_operand_type();
     return float_type->get_bits();
 }

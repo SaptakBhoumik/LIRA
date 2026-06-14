@@ -51,8 +51,8 @@ class ScalarConversionInst:public ConversionInst{
     virtual bool is_nsb() const final;
     virtual bool is_unsigned() const final;
 
-    virtual std::size_t get_in_type_bit_width() const final;//Returns the bit width of the in type. Calculated automatically
-    virtual std::size_t get_out_type_bit_width() const final;//Returns the bit width of the out type. Calculated automatically
+    virtual std::size_t get_in_type_bitwidth() const final;//Returns the bit width of the in type. Calculated automatically
+    virtual std::size_t get_out_type_bitwidth() const final;//Returns the bit width of the out type. Calculated automatically
 };
 
 class IntTruncInst:public ScalarConversionInst{
@@ -62,7 +62,7 @@ class IntTruncInst:public ScalarConversionInst{
     IntTruncInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
                  IR::TypeExprPtr out_type, bool nuw, bool nsw);
 
-    //I can implement casted integer type helper here but I doubt it will be useful because we can get the width from get_in_type_bit_width and get_out_type_bit_width anyways
+    //I can implement casted integer type helper here but I doubt it will be useful because we can get the width from get_in_type_bitwidth and get_out_type_bitwidth anyways
     //But I am implementing it just for consistency 
     std::shared_ptr<IR::IntTypeExpr> get_casted_in_type() const;
     std::shared_ptr<IR::IntTypeExpr> get_casted_out_type() const; 
@@ -76,7 +76,7 @@ class FloatTruncInst:public ScalarConversionInst{
     FloatTruncInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
                     IR::TypeExprPtr out_type);
 
-    //I can implement casted integer type helper here but I doubt it will be useful because we can get the width from get_in_type_bit_width and get_out_type_bit_width anyways
+    //I can implement casted integer type helper here but I doubt it will be useful because we can get the width from get_in_type_bitwidth and get_out_type_bitwidth anyways
     //But I am implementing it just for consistency 
     std::shared_ptr<IR::FloatTypeExpr> get_casted_in_type() const;
     std::shared_ptr<IR::FloatTypeExpr> get_casted_out_type() const; 
@@ -190,8 +190,8 @@ class LaneWiseConversionInst:public ConversionInst{
     virtual bool is_nsb() const final;
     virtual bool is_unsigned() const final;
 
-    virtual std::size_t get_in_basetype_bit_width() const final;//Returns the bit width of the in type. Calculated automatically
-    virtual std::size_t get_out_basetype_bit_width() const final;//Returns the bit width of the out type. Calculated automatically
+    virtual std::size_t get_in_basetype_bitwidth() const final;//Returns the bit width of the in type. Calculated automatically
+    virtual std::size_t get_out_basetype_bitwidth() const final;//Returns the bit width of the out type. Calculated automatically
     virtual std::size_t get_num_elements() const final;//Returns the number of elements in the vector. Calculated automatically
     virtual std::shared_ptr<IR::SIMDTypeExpr> get_casted_in_type() const final;//Returns the in type casted to SIMDTypeExpr.
     virtual std::shared_ptr<IR::SIMDTypeExpr> get_casted_out_type() const final;//Returns the out type casted to SIMDTypeExpr. 

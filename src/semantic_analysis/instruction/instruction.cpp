@@ -9,6 +9,11 @@ bool is_arithmetic_bin_inst(std::string inst_name){
 bool is_arithmetic_tri_inst(std::string inst_name){
     return inst_name == ".fma" || inst_name == ".fms" || inst_name == ".fnma" || inst_name == ".fnms" || inst_name == ".clamp";
 }
+//## Fixed-Point Arithmetic Instructions
+bool is_widening_bin_inst(std::string inst_name){
+    return inst_name == ".widening_add" || inst_name == ".widening_sub" || inst_name == ".widening_mul";
+}
+
 bool is_bitwise_bin_inst(std::string inst_name){
     return inst_name == ".and" || inst_name == ".or" || inst_name == ".xor" || inst_name == ".shl" || inst_name == ".lshr" || inst_name == ".ashr";
 }
@@ -49,6 +54,11 @@ MIR::InstPtr SemanticAnalyzer::analyze_instruction(IR::InstructionStmtPtr inst_s
     else if(is_arithmetic_tri_inst(inst_name.value)){
         return analyze_arithmetic_tri_inst(inst_name,inst_stmt);
     }
+    //## Fixed-Point Arithmetic Instructions
+    else if(is_widening_bin_inst(inst_name.value)){
+        return analyze_widening_bin_inst(inst_name,inst_stmt);
+    }
+    //## Fixed-Point Arithmetic Instructions
     else if(is_bitwise_bin_inst(inst_name.value)){
         return analyze_bitwise_bin_inst(inst_name,inst_stmt);
     }

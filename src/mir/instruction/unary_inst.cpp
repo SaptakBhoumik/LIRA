@@ -38,7 +38,7 @@ bool ScalarUnaryInst::is_brain_float() const{
     auto float_type = std::dynamic_pointer_cast<IR::FloatTypeExpr>(this->get_type());
     return float_type->is_brain_float();
 }
-std::size_t ScalarUnaryInst::get_type_bit_width() const{
+std::size_t ScalarUnaryInst::get_type_bitwidth() const{
     if(this->get_type_varient() == InstOperandTypeVarient::Int){
         auto int_type = std::dynamic_pointer_cast<IR::IntTypeExpr>(this->get_type());
         return int_type->get_bits();
@@ -106,7 +106,7 @@ bool LaneWiseUnaryInst::is_brain_float() const{
     auto float_type = std::dynamic_pointer_cast<IR::FloatTypeExpr>(simd_type->get_basetype());
     return float_type->is_brain_float();
 }
-std::size_t LaneWiseUnaryInst::get_basetype_bit_width() const{
+std::size_t LaneWiseUnaryInst::get_basetype_bitwidth() const{
     auto simd_type = this->get_casted_type();
     if(simd_type->get_basetype()->get_kind() == IR::TypeExprKind::IntTypeExpr){
         auto int_type = std::dynamic_pointer_cast<IR::IntTypeExpr>(simd_type->get_basetype());

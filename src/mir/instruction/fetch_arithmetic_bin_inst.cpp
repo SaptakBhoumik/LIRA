@@ -1,5 +1,4 @@
 #include "mir/instruction/fetch_arithmetic_bin_inst.hpp"
-#include "mir/instruction/_instruction.hpp"
 #include <memory>
 
 namespace LIRA {

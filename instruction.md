@@ -777,7 +777,7 @@ Read-modify-write instructions that read a value from memory, apply a binary ope
 
 ---
 
-## Binary Arithmetic Fetch Modify Instructions
+## Binary Bitwise Fetch Modify Instructions
 
 Read-modify-write instructions that read a value from memory, apply a binary operation with a given operand, write the result back, and return the original value. Can optionally be made atomic with `#[atomic](Note:If atomic then max size is limited to 128 bytes)
 

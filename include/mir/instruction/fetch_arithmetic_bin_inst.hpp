@@ -3,7 +3,7 @@
 #include "_instruction.hpp"
 namespace LIRA {
 namespace MIR {
-// --------------------------- Atomic read write modify operations ---------------------------
+// --------------------------- Read write modify operations ---------------------------
 class FetchArithmeticBinInst:public Inst {
     protected:
     std::size_t alignment;//The alignment of the memory access in bytes

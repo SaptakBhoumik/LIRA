@@ -43,7 +43,11 @@ enum class InstType:std::int16_t{
     FenceInst,
     CmpXchgInst,
 
-    AtomicRMWInst,
+    FetchArithmeticBinInst,
+
+    FetchBitwiseBinInst,
+
+    FetchArithmeticUnaryInst,
 
     RetInst,
     UnreachableInst,

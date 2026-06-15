@@ -110,7 +110,7 @@ class IntRemInst:public IntArithmeticBinaryInst {
 
 class IntCopySignInst:public IntArithmeticBinaryInst {
     public:
-    IntCopySignInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
+    IntCopySignInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, bool nsw);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -225,7 +225,7 @@ class VecIntRemInst:public VecIntArithmeticBinaryInst {
 
 class VecIntCopySignInst:public VecIntArithmeticBinaryInst {
     public:
-    VecIntCopySignInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
+    VecIntCopySignInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, bool nsw);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;

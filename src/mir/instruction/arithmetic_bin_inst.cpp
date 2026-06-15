@@ -140,8 +140,8 @@ std::string IntRemInst::to_string() const{
 }
 
 
-IntCopySignInst::IntCopySignInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs)
-                        :IntArithmeticBinaryInst(instruction_stmt, destination, lhs, rhs, false, false, false, false, false, false){}
+IntCopySignInst::IntCopySignInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, bool nsw)
+                        :IntArithmeticBinaryInst(instruction_stmt, destination, lhs, rhs, false, nsw, false, false, false, false){}
 ArithmeticBinaryInst::OpType IntCopySignInst::get_op_type() const{
     return OpType::COPYSIGN;
 }
@@ -303,8 +303,8 @@ std::string VecIntRemInst::to_string() const{
 }
 
 
-VecIntCopySignInst::VecIntCopySignInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs)
-                        :VecIntArithmeticBinaryInst(instruction_stmt, destination, lhs, rhs, false, false, false, false, false, false){}
+VecIntCopySignInst::VecIntCopySignInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, bool nsw)
+                        :VecIntArithmeticBinaryInst(instruction_stmt, destination, lhs, rhs, false, nsw, false, false, false, false){}
 ArithmeticBinaryInst::OpType VecIntCopySignInst::get_op_type() const{
     return OpType::COPYSIGN;
 }

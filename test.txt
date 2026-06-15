@@ -16,9 +16,9 @@
 ## Memory Instructions
     ### Cache Control Instructions
     ### Lifetime and Invariant Scope Instructions
-## Binary Fetch Modify Instructions
+## Binary Arithmetic Fetch Modify Instructions
+## Binary Bitwise Fetch Modify Instructions
 ## Unary Fetch Modify Instructions
-## Terminator Instructions
 ## Call Instruction
 ## SIMD Instructions
     ### Horizontal SIMD Instructions
@@ -71,7 +71,8 @@
 ## Memory Instructions
     ### Cache Control Instructions
     ### Lifetime and Invariant Scope Instructions
-## Binary Fetch Modify Instructions
+## Binary Arithmetic Fetch Modify Instructions
+## Binary Bitwise Fetch Modify Instructions
 ## Unary Fetch Modify Instructions
 ## Terminator Instructions
 ## Call Instruction
@@ -126,7 +127,8 @@
 ## Memory Instructions
     ### Cache Control Instructions
     ### Lifetime and Invariant Scope Instructions
-## Binary Fetch Modify Instructions
+## Binary Arithmetic Fetch Modify Instructions
+## Binary Bitwise Fetch Modify Instructions
 ## Unary Fetch Modify Instructions
 ## Terminator Instructions
 ## Call Instruction

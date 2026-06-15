@@ -46,6 +46,8 @@
 
 - `let T:%output_var = .copysign(T:%input_var1, T:%input_var2)` - Copies the sign of `input_var2` onto `input_var1`. T must be of the form `T0` or `<T0,M>` where T0 is float/bfloat/integer. For integer, signed is assumed (unsigned integers sign bit but make no sense).
 
+    If `T0` is integer: `#[nsw]` - poison if the result overflows (i.e. input is `INT_MIN`)
+
     If `T0` is float/bfloat: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 - `let T:%output_var = .min(T:%input_var1, T:%input_var2)` - Minimum of 2 values. T must be of the form `T0` or `<T0,M>` where T0 is some float/bfloat/integer.
@@ -680,9 +682,9 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
 
 ---
 
-## Binary Fetch Modify Instructions
+## Binary Arithmetic Fetch Modify Instructions
 
-Read-modify-write instructions that read a value from memory, apply a binary operation with a given operand, write the result back, and return the original value. Can optionally be made atomic with `#[atomic]`.
+Read-modify-write instructions that read a value from memory, apply a binary operation with a given operand, write the result back, and return the original value. Can optionally be made atomic with `#[atomic](Note:If atomic then max size is limited to 128 bytes)
 
 **Attributes shared by all fetch instructions:**
 - `#[align(i8:N)]` - alignment of the pointer; must be a power of 2; default is 16
@@ -736,7 +738,9 @@ Read-modify-write instructions that read a value from memory, apply a binary ope
 
     If T is float/bfloat: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
-- `let T:%old = .fetch_copysign(ptr:%ptr, T:%value)` - Copies the sign of `value` onto `*ptr`; returns the original. T must be of the form `T0` or `<T0,M>` where T0 is float/bfloat/integer (signed assumed for integer).
+- `let T:%old = .fetch_copysign(ptr:%ptr, T:%value)` - Copies the sign of `value` onto `*ptr`; returns the original. T can be int or float
+
+    If `T0` is integer: `#[nsw]` - poison if the result overflows (i.e. input is `INT_MIN`)
 
     If T is float/bfloat: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
@@ -759,6 +763,31 @@ Read-modify-write instructions that read a value from memory, apply a binary ope
     - `#[unordered]` - if either operand is NaN, use the other (IEEE "minNum"); default propagates NaN
     - `#[ieee754_2019]` - correct signed-zero ordering; when combined with `#[unordered]`, gets 754-2019 `minimumNumber` semantics. Combining with `#[nsz]` is a compile error. Only valid when T is float or bfloat.
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+    
+- `let T:%old = .fetch_avg(ptr:%ptr, T:%value)` - Fetch and average: reads `*ptr`, computes `avg(*ptr, value)`, writes back, and returns the original. Shared fetch attributes apply.
+
+    **If `T` is integer:** Computes `(a + b + 1) >> 1` (rounds toward positive infinity, matching `PAVGB`/`PAVGW`). Default is signed.
+    - `#[unsigned]` - treat `a` and `b` as unsigned; default is signed
+    - `#[floor]` - round toward negative infinity (`(a + b) >> 1`) instead of the default ceiling
+    - `#[nsw]` - poison if the intermediate sum `a + b` overflows before the shift
+    - `#[nuw]` - poison on unsigned intermediate overflow; only valid with `#[unsigned]`
+
+    **If `T` is float/bfloat:** Computes `(a + b) * 0.5` exactly.
+    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+
+---
+
+## Binary Arithmetic Fetch Modify Instructions
+
+Read-modify-write instructions that read a value from memory, apply a binary operation with a given operand, write the result back, and return the original value. Can optionally be made atomic with `#[atomic](Note:If atomic then max size is limited to 128 bytes)
+
+**Attributes shared by all fetch instructions:**
+- `#[align(i8:N)]` - alignment of the pointer; must be a power of 2; default is 16
+- `#[volatile]` - volatile operation
+- `#[atomic(str:ordering)]` - makes the operation atomic; ordering must be one of: `monotonic`, `acquire`, `release`, `acq_rel`, `seq_cst`. If absent, the operation is not atomic.
+- `#[syncscope("singlethreaded")]` - only valid with `#[atomic]`; synchronizes only within the same thread; default is global
+
+---
 
 - `let T:%old = .fetch_and(ptr:%ptr, T:%value)` - Bitwise AND of `*ptr` and `value`; returns the original. T must be integer. No additional attributes.
 
@@ -788,13 +817,13 @@ Read-modify-write instructions that read a value from memory, apply a binary ope
 
 - `let T:%old = .fetch_rotr(ptr:%ptr, T:%value)` - Rotates `*ptr` right by `value`; returns the original. T must be integer. No additional attributes.
 
-- `let T:%old = .fetch_avg(ptr:%ptr, T:%value)` - Fetch and average: reads `*ptr`, computes `avg(*ptr, value)`, writes back, and returns the original. Shared fetch attributes apply. Type and rounding attributes same as `.avg`.
+
 
 ---
 
 ## Unary Fetch Modify Instructions
 
-Read-modify-write instructions that apply a unary operation to the value at a memory location and return the original value. Can optionally be made atomic with `#[atomic]`.
+Read-modify-write instructions that apply a unary operation to the value at a memory location and return the original value. Can optionally be made atomic with `#[atomic]`(Note:If atomic then max size is limited to 128 bytes)
 
 **Attributes shared by all unary fetch instructions:** same as Binary Fetch - `#[align(i8:N)]` (default is 16), `#[volatile]`, `#[atomic(str:ordering)]`, `#[syncscope("singlethreaded")]`.
 

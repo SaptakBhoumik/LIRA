@@ -235,14 +235,16 @@ MIR::InstPtr analyze_copysign_bin_inst(std::string filename, MIR::LocalDestRegis
         }
     }
     else{
-        if(attributes.size() > 0){
-            Utils::error(filename, attributes[0]->get_token(), "Unsupported attribute for int arithmetic binary instruction: " + attributes[0]->to_string());
+        auto [flag_attrs,remaining_attrs] = Utils::extract_flag_attrs(filename,attributes, {"nsw"});
+
+        if(remaining_attrs.size() > 0){
+            Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for int arithmetic binary instruction: " + remaining_attrs[0]->to_string());
         }
         if(type_varient == MIR::InstOperandTypeVarient::Int){
-            return std::make_shared<MIR::IntCopySignInst>(inst_stmt,dest,lhs,rhs);
+            return std::make_shared<MIR::IntCopySignInst>(inst_stmt,dest,lhs,rhs,flag_attrs["nsw"]);
         }
         else{
-            return std::make_shared<MIR::VecIntCopySignInst>(inst_stmt,dest,lhs,rhs);
+            return std::make_shared<MIR::VecIntCopySignInst>(inst_stmt,dest,lhs,rhs,flag_attrs["nsw"]);
         }
     }
 }

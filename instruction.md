@@ -879,19 +879,19 @@ A terminator must be the final instruction of every block. Falling through to th
 - `.trap` - Emits a hardware trap instruction (`UD2` on x86_64). Observable and guaranteed to halt execution. Distinct from `.unreachable`.
     - `#[breakpoint]` - emits a software breakpoint (`INT3`) instead; useful for debugger integration
 
-- `.br(T0:@dest, T1:{...})` - Unconditional branch to `dest`. `T1:{...}` is the anonymous struct of arguments passed to the destination block. If the block takes no arguments, use `T1:{}`.
+- `.br(T0:@dest, T1:{...})` - Unconditional branch to `dest`. `T1:{...}` is the anonymous struct of arguments passed to the destination block. If the block takes no arguments, use `T1:{}`. ``{}:{}`` can be used to pass no arguments
 
-- `.br(i1:%condition, T0:@true_dest, T1:{...}, T2:@false_dest, T3:{...})` - Conditional branch. Branches to `true_dest` if `condition` is true, else to `false_dest`. `T1:{...}` and `T3:{...}` are arguments for each destination.
+- `.br(i1:%condition, T0:@true_dest, T1:{...}, T2:@false_dest, T3:{...})` - Conditional branch. Branches to `true_dest` if `condition` is true, else to `false_dest`. `T1:{...}` and `T3:{...}` are arguments for each destination. ``{}:{}`` can be used to pass no arguments
     - `#[freq(i32:N, i32:M)]` - hints at relative branching frequencies; used by the optimizer to lay out hot/cold paths. Mutually exclusive with `#[unpredictable]`.
     - `#[unpredictable]` - hints that the branch is unpredictable. Mutually exclusive with `#[freq]`.
     
     TODO: In future have loop and vectorization hint attributes
 
-- `.switch(T:%condition, T0:@default_dest, T1:{...}, T:%case1_value, T2:@case1_dest, T3:{...}, ...)` - Branches to the destination matching `condition`. Falls through to `default_dest` if no case matches. Condition must be integer; case values must be the same type as the condition.
+- `.switch(T:%condition, T0:@default_dest, T1:{...}, T:%case1_value, T2:@case1_dest, T3:{...}, ...)` - Branches to the destination matching `condition`. Falls through to `default_dest` if no case matches. Condition must be integer; case values must be the same type as the condition. ``{}:{}`` can be used to pass no arguments
     - `#[freq(i32:N, i32:M, ...)]` - one frequency per destination in order (default first). Mutually exclusive with `#[unpredictable]`.
     - `#[unpredictable]` - hints that the branch is unpredictable. Mutually exclusive with `#[freq]`.
 
-- `.indirectbr(ptr:%dest_ptr, label:@label1, label:@label2, ...)` - Branches to the address stored in `dest_ptr`. The address must point to one of the listed labels; otherwise UB. Labels listed here cannot take arguments.
+- `.indirectbr(ptr:%dest_ptr, label:@label1, label:@label2, ...)` - Branches to the address stored in `dest_ptr`. The address must point to one of the listed labels; otherwise UB. Labels listed here cannot take arguments. ``{}:{}`` can be used to pass no arguments
     - `#[freq(i32:N, i32:M, ...)]` - one frequency per label in order. Mutually exclusive with `#[unpredictable]`.
     - `#[unpredictable]` - hints that the branch is unpredictable. Mutually exclusive with `#[freq]`.
 

@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <iostream>
 #include <memory>
+#include <string>
 
 namespace LIRA {
 namespace MIR {
@@ -39,6 +40,45 @@ std::string UnreachableInst::to_string() const {
 }
 
 
+TrapInst::TrapInst(IR::InstructionStmtPtr instruction_stmt, bool breakpoint):Inst(instruction_stmt, nullptr) {
+    this->breakpoint = breakpoint;
+}
+bool TrapInst::is_breakpoint() const {
+    return this->breakpoint;
+}
+InstType TrapInst::get_inst_type() const {
+    return InstType::TrapInst;
+}
+std::string TrapInst::to_string() const {
+    std::string res = ".trap";
+    if(breakpoint){
+        res += " #[breakpoint]";
+    }
+    return res;
+}
+
+std::string pretty_print_label_args(const std::vector<std::pair<IR::TypeExprPtr,IR::LiteralExprPtr>>& label_args){
+    if(label_args.empty()){
+        return "";
+    }
+    std::string res = "{";
+    //NOTE:Just using the way we represent label args in IR source
+    for(std::size_t i=0;i<label_args.size();i++){
+        res += label_args[i].first->to_string() ;
+        if(i!=label_args.size()-1){
+            res += ",";
+        }
+    }
+    res += "}:{";
+    for(std::size_t i=0;i<label_args.size();i++){
+        res += label_args[i].second->to_string() ;
+        if(i!=label_args.size()-1){
+            res += ",";
+        }
+    }
+    res += "}";
+    return res;
+}
 JmpInst::JmpInst(IR::InstructionStmtPtr instruction_stmt, std::string target_block_name, IR::TypeExprPtr label_type, 
                 std::vector<std::pair<IR::TypeExprPtr,IR::LiteralExprPtr>> args):Inst(instruction_stmt, nullptr) {
     this->target_block_name = target_block_name;
@@ -56,6 +96,14 @@ std::vector<std::pair<IR::TypeExprPtr,IR::LiteralExprPtr>> JmpInst::get_args() c
 }
 InstType JmpInst::get_inst_type() const {
     return InstType::JmpInst;
+}
+std::string JmpInst::to_string() const {
+    std::string res = ".jmp(" + this->target_block_name;
+    if(!this->args.empty()){
+        res += ", " + pretty_print_label_args(this->args);
+    }
+    res += ")";
+    return res;
 }
 }
 }

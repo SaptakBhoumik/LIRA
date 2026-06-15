@@ -24,6 +24,17 @@ class UnreachableInst:public Inst {
     std::string to_string() const override;
 };
 
+class TrapInst:public Inst {
+    bool breakpoint;//Whether the instruction has the breakpoint attribute or not.
+    public:
+    TrapInst(IR::InstructionStmtPtr instruction_stmt, bool breakpoint);
+    
+    bool is_breakpoint() const;
+
+    InstType get_inst_type() const override;
+    std::string to_string() const override;
+};
+
 
 class JmpInst:public Inst {
     std::string target_block_name;//The name of the target block to jump to

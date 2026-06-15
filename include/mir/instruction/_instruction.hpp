@@ -47,6 +47,7 @@ enum class InstType:std::int16_t{
 
     RetInst,
     UnreachableInst,
+    TrapInst,
     JmpInst,
     ConditionalJmpInst,
     SwitchInst,

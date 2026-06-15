@@ -587,11 +587,13 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
 - `.memcpy(ptr:%dest, ptr:%src, iN:%size)` - Copies `size` bytes from `src` to `dest`. Regions must not overlap; use `.memmove` if they may. The index `0` refers to `src` and `1` refers to `dest` in per-pointer attributes.
 
     - `#[volatile]` - volatile copy
-    - `#[align(i8:N, iN:idx...)]` - alignment of the specified pointer(s); must be a power of 2; at least one index required; default is 16
+    - `#[dest_align(i8:N)]` - alignment of the destination pointer; must be a power of 2; default is 16
+    - `#[src_align(i8:N)]` - alignment of the source pointer; must be a power of 2; default is 16
     - `#[nontemporal(iN:idx...)]` - non-temporal access for the specified pointer(s); at least one index required
     - `#[nonnull(iN:idx...)]` - asserts the specified pointer(s) are not null; at least one index required
     - `#[nopoison(iN:idx...)]` - asserts the memory at the specified pointer(s) contains no poison; at least one index required
-    - `#[dereferenceable(i64:N, iN:idx...)]` - asserts the specified pointer(s) are dereferenceable for N bytes; at least one index required
+    - `#[dest_dereferenceable(i64:N)]` - asserts the destination pointer is dereferenceable for N bytes; default is no assertion
+    - `#[src_dereferenceable(i64:N)]` - asserts the source pointer is dereferenceable for N bytes; default is no assertion
 
 - `.memmove(ptr:%dest, ptr:%src, iN:%size)` - Copies `size` bytes from `src` to `dest`. Correct even if regions overlap. Same attributes as `.memcpy` with the same per-pointer index convention.
 
@@ -607,12 +609,14 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
 - `let i32:%output_var = .memcmp(ptr:%ptr1, ptr:%ptr2, iN:%size)` - Compares `size` bytes at `ptr1` and `ptr2`. Returns a negative, zero, or positive integer if the region at `ptr1` is respectively less than, equal to, or greater than the region at `ptr2`. The index `0` refers to `ptr1` and `1` refers to `ptr2` in per-pointer attributes.
 
     - `#[volatile]` - volatile compare
-    - `#[align(i8:N, iN:idx...)]` - alignment of the specified pointer(s); at least one index required; default is 16
+    - `#[ptr1_align(i8:N)]` - alignment of `ptr1`; must be a power of 2; default is 16
+    - `#[ptr2_align(i8:N)]` - alignment of `ptr2`; must be a power of 2; default is 16
     - `#[nontemporal(iN:idx...)]` - non-temporal access for the specified pointer(s); at least one index required
     - `#[nonnull(iN:idx...)]` - asserts the specified pointer(s) are not null; at least one index required
     - `#[nopoison(iN:idx...)]` - asserts the memory at the specified pointer(s) contains no poison; at least one index required
-    - `#[dereferenceable(i64:N, iN:idx...)]` - asserts the specified pointer(s) are dereferenceable for N bytes; at least one index required
-
+    - `#[ptr1_dereferenceable(i64:N)]` - asserts `ptr1` is dereferenceable for N bytes; default is no assertion
+    - `#[ptr2_dereferenceable(i64:N)]` - asserts `ptr2` is dereferenceable for N bytes; default is no assertion
+    
 - `let ptr:%output_var = .getaddress(T:%var, iN:%offset)` - Returns `&var + offset`. Output must be a pointer. `var` must be a variable (not a literal). Offset is in bytes. Note:-We have no seperate block address. If you want address of label just use this
 
     - `#[unsigned]` - offset is unsigned; default is signed
@@ -870,7 +874,7 @@ Read-modify-write instructions that apply a unary operation to the value at a me
 ## Terminator Instructions
 
 A terminator must be the final instruction of every block. Falling through to the next block without an explicit branch is an error.
-
+ 
 - `.ret` / `.ret(T:%return_value)` - Returns from the function. Use `.ret` with no value for void functions. For non-void functions, the return value must match the function's return type.
     - `#[noreturn]` - indicates the function never actually returns; `.ret` with no value is then permitted even for non-void functions
 
@@ -879,7 +883,7 @@ A terminator must be the final instruction of every block. Falling through to th
 - `.trap` - Emits a hardware trap instruction (`UD2` on x86_64). Observable and guaranteed to halt execution. Distinct from `.unreachable`.
     - `#[breakpoint]` - emits a software breakpoint (`INT3`) instead; useful for debugger integration
 
-- `.br(T0:@dest, T1:{...})` - Unconditional branch to `dest`. `T1:{...}` is the anonymous struct of arguments passed to the destination block. If the block takes no arguments, use `T1:{}`. ``{}:{}`` can be used to pass no arguments
+- `.br(T0:@dest, T1:{...})` - Unconditional branch to `dest`. `T1:{...}` is the anonymous struct of arguments passed to the destination block. If the block takes no arguments, use `{}:{}`. ``{}:{}`` can be used to pass no arguments
 
 - `.br(i1:%condition, T0:@true_dest, T1:{...}, T2:@false_dest, T3:{...})` - Conditional branch. Branches to `true_dest` if `condition` is true, else to `false_dest`. `T1:{...}` and `T3:{...}` are arguments for each destination. ``{}:{}`` can be used to pass no arguments
     - `#[freq(i32:N, i32:M)]` - hints at relative branching frequencies; used by the optimizer to lay out hot/cold paths. Mutually exclusive with `#[unpredictable]`.
@@ -915,7 +919,7 @@ A terminator must be the final instruction of every block. Falling through to th
     - `#[cc(str:calling_convention)]` - calling convention; one of `ccc`, `fastcc`, `coldcc`, `tailcc`; default is `ccc`
     - `#[return_extension(str:extension_type)]` - how the return value is extended; one of `"zero"`, `"sign"`, `"no"`
 
-    **Float return value:**
+    **Float return value:** 
     - If the function returns float/bfloat: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
     **Per-argument attributes** (override function definition for this call site; useful for function pointers where no definition is available):

@@ -1,6 +1,7 @@
 #pragma once
 #include "ast/ast.hpp"
 #include "_instruction.hpp"
+#include <cstddef>
 namespace LIRA {
 namespace MIR {
 class RetInst:public Inst {
@@ -85,7 +86,8 @@ class ConditionalJmpInst:public Inst {
 
 
 class SwitchInst:public Inst {
-    IR::LiteralExprPtr condition;//The condition to check. Must be of integer type
+    IR::LiteralExprPtr value;//The value to check. Must be of integer type
+    IR::TypeExprPtr value_type;
 
     std::vector<std::string> case_block_names;//The name of the target block to jump to for each case
     std::vector<IR::TypeExprPtr> case_label_types;
@@ -100,11 +102,13 @@ class SwitchInst:public Inst {
     std::vector<std::size_t> frequency_profile;//The frequency profile of the switch instruction. It is a vector of integers. Empty if not provided. Note empty dont mean unpredictable. We still try to figure out the most frequent case unless u explicitly set unpredictable to true
     bool unpredictable;//If set then it is unpredictable. We should not try to figure out even if frequency_profile not provided
     public:
-    SwitchInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr condition, std::vector<std::string> case_block_names, std::vector<IR::TypeExprPtr> case_label_types, 
+    SwitchInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr value, IR::TypeExprPtr value_type, std::vector<std::string> case_block_names, std::vector<IR::TypeExprPtr> case_label_types, 
               std::vector<std::vector<std::pair<IR::TypeExprPtr,IR::LiteralExprPtr>>> case_label_args, std::vector<IR::LiteralExprPtr> case_values, std::string default_block_name, 
               IR::TypeExprPtr default_label_type, std::vector<std::pair<IR::TypeExprPtr,IR::LiteralExprPtr>> default_label_args, std::vector<std::size_t> frequency_profile, bool unpredictable);
     
-    IR::LiteralExprPtr get_condition() const;
+    IR::LiteralExprPtr get_value() const;
+    std::shared_ptr<IR::IntTypeExpr> get_casted_value_type() const;
+    std::size_t get_value_bit_width() const;
     std::vector<std::string> get_case_block_names() const;
     std::vector<std::shared_ptr<IR::LabelTypeExpr>> get_casted_case_label_types() const;
     std::vector<std::vector<std::pair<IR::TypeExprPtr,IR::LiteralExprPtr>>> get_case_label_args() const;

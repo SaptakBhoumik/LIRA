@@ -14,13 +14,23 @@ enum class InstType:std::int16_t{
 
     WideningBinaryInst,
     
+    // ## Carrying / Borrow Arithmetic Instructions
+    // ## Combined Quotient and Remainder (`divmod`)
+    // ## Overflow-Wrap (Checked Arithmetic) Instructions
+    // ## High-Half Multiply
+    // ## N-Bit Carry Shifts
+
     BitwiseBinaryInst,
+    
+    // ## Bitwise Trinary Instructions
  
     CmpBinaryInst,
 
     ConversionInst,
 
     UnaryInst,
+    
+    NumericalClassifyInst,
 
     LocalInst,
     AllocaInst,

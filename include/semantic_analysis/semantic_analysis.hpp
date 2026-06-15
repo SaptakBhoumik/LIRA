@@ -44,20 +44,14 @@ class SemanticAnalyzer {
 
     //Instruction analysis. NOTE: The analyze_instruction function analyzes instruction within a label so cant handle stuff like .global and .assign_type which are global 
     MIR::InstPtr analyze_instruction(IR::InstructionStmtPtr inst_stmt);//Analyze an instruction statement, add symbols to the symbol table and return the corresponding MIR instruction.
-    
     MIR::InstPtr analyze_arithmetic_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
-
     MIR::InstPtr analyze_arithmetic_tri_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
-
     //## Fixed-Point Arithmetic Instructions
-
     MIR::InstPtr analyze_widening_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
-
     // ## Carrying / Borrow Arithmetic Instructions
     // ## Combined Quotient and Remainder (`divmod`)
     // ## Overflow-Wrap (Checked Arithmetic) Instructions
     // ## High-Half Multiply
-    // ## N-Bit Carry Shifts
 
     MIR::InstPtr analyze_bitwise_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
     MIR::InstPtr analyze_and_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::InstOperandTypeVarient type_varient, 
@@ -72,14 +66,11 @@ class SemanticAnalyzer {
                                       IR::InstructionStmtPtr inst_stmt);
     MIR::InstPtr analyze_ashr_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::InstOperandTypeVarient type_varient,
                                       IR::InstructionStmtPtr inst_stmt);
-
     // ## Bitwise Trinary Instructions
-
     MIR::InstPtr analyze_cmp_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
-    
-    
     MIR::InstPtr analyze_conv_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
     MIR::InstPtr analyze_unary_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
+    MIR::InstPtr analyze_numerical_classify_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
     MIR::InstPtr analyze_mem_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
     MIR::InstPtr analyze_fetch_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
     MIR::InstPtr analyze_terminator_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);

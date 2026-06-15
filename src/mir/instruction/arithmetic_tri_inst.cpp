@@ -171,7 +171,7 @@ bool VecIntArithmeticTrinaryInst::is_saturating() const{
 std::shared_ptr<IR::SIMDTypeExpr> VecIntArithmeticTrinaryInst::get_casted_operand_type() const{
     return std::dynamic_pointer_cast<IR::SIMDTypeExpr>(this->destination->get_type());
 }
-std::size_t VecIntArithmeticTrinaryInst::get_basetype_width() const{
+std::size_t VecIntArithmeticTrinaryInst::get_basetype_bitwidth() const{
     auto type = this->get_casted_operand_type();
     auto basetype = std::dynamic_pointer_cast<IR::IntTypeExpr>(type->get_basetype());
     return basetype->get_bits();

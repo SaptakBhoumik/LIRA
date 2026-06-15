@@ -13,8 +13,6 @@
 ## Bitwise Trinary Instructions
 
 ## Conversion Instructions
-## Unary Instructions
-## Float Classification Instructions
 ## Memory Instructions
     ### Cache Control Instructions
     ### Lifetime and Invariant Scope Instructions
@@ -51,6 +49,7 @@
     ### CET Shadow Stack
 
 
+
 ## Fixed-Point Arithmetic Instructions
 
 ## Carrying / Borrow Arithmetic Instructions
@@ -67,7 +66,8 @@
 
 ## Conversion Instructions
 ## Unary Instructions
-## Float Classification Instructions
+## Numerical Classification Instructions
+    ### Float Classification Instructions
 ## Memory Instructions
     ### Cache Control Instructions
     ### Lifetime and Invariant Scope Instructions
@@ -121,7 +121,8 @@
 ## Comparison Instructions
 ## Conversion Instructions
 ## Unary Instructions
-## Float Classification Instructions
+## Numerical Classification Instructions
+    ### Float Classification Instructions
 ## Memory Instructions
     ### Cache Control Instructions
     ### Lifetime and Invariant Scope Instructions

@@ -157,7 +157,7 @@ bool VecIntBitwiseBinaryInst::is_exact() const {
 std::shared_ptr<IR::SIMDTypeExpr> VecIntBitwiseBinaryInst::get_casted_operand_type() const {
     return std::dynamic_pointer_cast<IR::SIMDTypeExpr>(this->get_operand_type());
 }
-std::size_t VecIntBitwiseBinaryInst::get_basetype_width() const {
+std::size_t VecIntBitwiseBinaryInst::get_basetype_bitwidth() const {
     auto int_base_type = std::dynamic_pointer_cast<IR::IntTypeExpr>(this->get_casted_operand_type()->get_basetype());
     return int_base_type->get_bits();  
 }

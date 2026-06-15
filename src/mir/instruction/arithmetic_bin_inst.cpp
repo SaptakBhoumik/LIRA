@@ -236,7 +236,7 @@ bool VecIntArithmeticBinaryInst::is_exact() const{
 std::shared_ptr<IR::SIMDTypeExpr> VecIntArithmeticBinaryInst::get_casted_operand_type() const{
     return std::dynamic_pointer_cast<IR::SIMDTypeExpr>(this->destination->get_type());
 }
-std::size_t VecIntArithmeticBinaryInst::get_basetype_width() const{
+std::size_t VecIntArithmeticBinaryInst::get_basetype_bitwidth() const{
     auto basetype = this->get_casted_operand_type()->get_basetype();
     return std::dynamic_pointer_cast<IR::IntTypeExpr>(basetype)->get_bits();
 }

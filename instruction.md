@@ -400,7 +400,6 @@ These extend the 1-bit carry shift instructions to handle a shift count of more 
 
     If `T0` is integer:
     - `#[nsw]` - poison if input is `INT_MIN` (whose absolute value overflows)
-    - `#[nuw]` - poison if input is negative (asserts value was already non-negative)
 
     If `T0` is float/bfloat: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
@@ -454,7 +453,7 @@ These extend the 1-bit carry shift instructions to handle a shift count of more 
 
 - `let T:%output_var = .parity(T:%input_var)` - Parity of an integer. Returns `i1/<i1,M>`: 1 if the number of set bits is odd, 0 if even. T must be of the form `T0` or `<T0,M>` where T0 is some integer. No attributes.
 
-- `let T:%output_var = .bswap(T:%input_var)` - Reverses byte order. T must be of the form `T0` or `<T0,M>` where T0 is integer/float/bfloat. Bitwidth must be a multiple of 8. Float/bfloat is supported because endianness swaps on floats are common; without this you would need a bitcast. No attributes.
+- `let T:%output_var = .bswap(T:%input_var)` - Reverses byte order. T must be of the form `T0` or `<T0,M>` where T0 is integer/float/bfloat. Bitwidth must be a multiple of 8. Float/bfloat is supported because endianness swaps on floats are common; without this you would need a bitcast. Fast math attribute if T is float/bfloat. No attributes if T is integer.
 
 - `let T:%output_var = .bitreverse(T:%input_var)` - Reverses bit order. T must be of the form `T0` or `<T0,M>` where T0 is some integer. No attributes.
 
@@ -462,7 +461,8 @@ These extend the 1-bit carry shift instructions to handle a shift count of more 
 
 ---
 
-## Float Classification Instructions
+## Numerical Classification Instructions
+### Float Classification Instructions
 
 All instructions in this section: T must be of the form `T0` or `<T0,M>` where T0 is float/bfloat. Output is `i1` or `<i1,M>`. All accept: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 

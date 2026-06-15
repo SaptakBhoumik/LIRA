@@ -123,7 +123,7 @@ class VecIntCmpBinaryInst:public CmpBinaryInst {
     virtual bool is_unsigned() const final;
 
     virtual std::shared_ptr<IR::SIMDTypeExpr> get_casted_operand_type() const final;//Returns the operand type casted to SIMDTypeExpr. Just a helper function to make life easier
-    virtual std::size_t get_basetype_width() const final;//Returns the bit width of the operand basetype. Just a helper function to make life easier
+    virtual std::size_t get_basetype_bitwidth() const final;//Returns the bit width of the operand basetype. Just a helper function to make life easier
     virtual std::size_t get_num_elements() const final;//Returns the number of elements in the vector. Just a helper function to make life easier
     virtual InstOperandTypeVarient get_operand_type_varient() const final;
 };
@@ -254,7 +254,7 @@ class VecPtrCmpBinaryInst:public CmpBinaryInst {
     VecPtrCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type);
 
     virtual std::shared_ptr<IR::SIMDTypeExpr> get_casted_type() const final;
-    virtual std::size_t get_basetype_width() const final;//Returns the bit width of the operand basetype. Returns 64 cuz we support only x86_64 but can return diffrent in future if we support more arch. Just a helper function to make life easier
+    virtual std::size_t get_basetype_bitwidth() const final;//Returns the bit width of the operand basetype. Returns 64 cuz we support only x86_64 but can return diffrent in future if we support more arch. Just a helper function to make life easier
     virtual std::size_t get_num_elements() const final;//Returns the number of elements in the vector. Just a helper function to make life easier
     virtual InstOperandTypeVarient get_operand_type_varient() const final;
 };

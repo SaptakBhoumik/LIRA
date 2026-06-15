@@ -31,7 +31,14 @@ bool is_conv_inst(std::string inst_name){
             || inst_name == ".int_to_ptr" || inst_name == ".bitcast";
 }
 bool is_unary_inst(std::string inst_name){
-    return inst_name == ".neg" || inst_name == ".not";
+    return inst_name == ".neg" || inst_name == ".not" || inst_name == ".abs" || inst_name == ".ceil" || inst_name == ".floor" 
+          || inst_name == ".integral_part" || inst_name == ".fractional_part" || inst_name == ".roundnearest" || inst_name == ".roundeven" 
+          || inst_name == ".sqrt" || inst_name == ".reciprocal" || inst_name == ".rsqrt" || inst_name == ".popcount" || inst_name == ".clz"
+          || inst_name == ".ctz" || inst_name == ".parity" || inst_name == ".bswap" || inst_name == ".bitreverse" || inst_name == ".clrsb";
+}
+bool is_numerical_classify_inst(std::string inst_name){
+    return inst_name == ".isnan" || inst_name == ".isinf" || inst_name == ".isfinite" || inst_name == ".isnormal" || inst_name == ".issubnormal"
+            || inst_name == ".iszero" || inst_name == ".isnegative" || inst_name == ".ispositive";
 }
 bool is_mem_inst(std::string inst_name){
     return inst_name == ".local" || inst_name == ".alloca" || inst_name == ".load" || inst_name == ".store" || inst_name == ".getaddress" || inst_name == ".ptroffset"
@@ -80,6 +87,9 @@ MIR::InstPtr SemanticAnalyzer::analyze_instruction(IR::InstructionStmtPtr inst_s
     }
     else if(is_unary_inst(inst_name.value)){
         return analyze_unary_inst(inst_name,inst_stmt);
+    }
+    else if(is_numerical_classify_inst(inst_name.value)){
+        return analyze_numerical_classify_inst(inst_name,inst_stmt);
     }
     else if(is_mem_inst(inst_name.value)){
         return analyze_mem_inst(inst_name,inst_stmt);

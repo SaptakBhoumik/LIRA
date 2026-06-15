@@ -131,7 +131,7 @@ bool VecIntCmpBinaryInst::is_unsigned() const{
 std::shared_ptr<IR::SIMDTypeExpr> VecIntCmpBinaryInst::get_casted_operand_type() const{
     return std::dynamic_pointer_cast<IR::SIMDTypeExpr>(this->type);
 }
-std::size_t VecIntCmpBinaryInst::get_basetype_width() const{
+std::size_t VecIntCmpBinaryInst::get_basetype_bitwidth() const{
     auto simd_type = this->get_casted_operand_type();
     auto basetype = simd_type->get_basetype();
     auto int_basetype = std::dynamic_pointer_cast<IR::IntTypeExpr>(basetype);
@@ -291,7 +291,7 @@ std::string VecPtrCmpBinaryInst::to_string_helper(std::string op_name) const{
 std::shared_ptr<IR::SIMDTypeExpr> VecPtrCmpBinaryInst::get_casted_type() const{
     return std::dynamic_pointer_cast<IR::SIMDTypeExpr>(this->type);
 }
-std::size_t VecPtrCmpBinaryInst::get_basetype_width() const{
+std::size_t VecPtrCmpBinaryInst::get_basetype_bitwidth() const{
     return 64;//We support only x86_64 for now but can return diffrent in future if we support more arch. Just a helper function to make life easier
 }
 std::size_t VecPtrCmpBinaryInst::get_num_elements() const{

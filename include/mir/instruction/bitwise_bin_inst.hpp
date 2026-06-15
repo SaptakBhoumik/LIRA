@@ -8,54 +8,69 @@ class BitwiseBinaryInst:public Inst {
     protected:
     IR::LiteralExprPtr lhs;
     IR::LiteralExprPtr rhs;
+
+    bool nuw;//Whether it has the nsw or nuw attribute. 
+    bool nsw;//Whether it has the nsw or nuw attribute. 
+    bool exact;//Whether it has the exact attribute
+    bool disjoint;//Whether it has the disjoint attribute or not
+
+    std::string to_string_helper(const std::string op_name) const;
     public:
     enum class OpType:std::uint64_t{
         AND = 1 << 6,
-        OR = 1 << 7,
-        XOR = 1 << 8,
-        SHL = 1 << 9,
-        LSHR = 1 << 10,
-        ASHR = 1 << 11
+        NAND = 1 << 7,
+        OR = 1 << 8,
+        NOR = 1 << 9,
+        XOR = 1 << 10,
+        XNOR = 1 << 11,
+        SHL = 1 << 12,
+        LSHR = 1 << 13,
+        ASHR = 1 << 14,
+        ROTL = 1 << 15,
+        ROTR = 1 << 16,
     };
-    BitwiseBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
+    BitwiseBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+                      bool nuw, bool nsw, bool exact, bool disjoint);
 
     virtual ~BitwiseBinaryInst() = default;
 
+    virtual InstOperandTypeVarient get_type_varient() const = 0;
     virtual IR::TypeExprPtr get_operand_type() const final;
     virtual IR::LiteralExprPtr get_lhs() const final;
     virtual IR::LiteralExprPtr get_rhs() const final;
     virtual OpType get_op_type() const = 0;//Whether it is and,or,xor,shl,lshr,ashl.
     
-    virtual InstType get_inst_type() const override final;
-    virtual InstOperandTypeVarient get_operand_type_varient() const = 0;
-};
-
-// ---------------------------Integer Binary Bitwise operations ---------------------------
-class IntBitwiseBinaryInst:public BitwiseBinaryInst {
-    protected:
-    bool disjoint;//Whether it has the disjoint attribute or not
-    bool nuw;//Whether it has the nsw or nuw attribute. 
-    bool nsw;//Whether it has the nsw or nuw attribute. 
-    bool exact;//Whether it has the exact attribute
-    //Few instructions dont have all these attributes. For that we return false and in typechecker we make sure unsupported attributes are not used.
-    public:
-    IntBitwiseBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                         bool disjoint, bool nuw, bool nsw, bool exact);
-
     virtual bool is_disjoint() const final;
     virtual bool is_nuw() const final;
     virtual bool is_nsw() const final;
     virtual bool is_exact() const final;
-    
+
+    virtual InstType get_inst_type() const override final;
+};
+
+// ---------------------------Integer Binary Bitwise operations ---------------------------
+class IntBitwiseBinaryInst:public BitwiseBinaryInst {
+    public:
+    IntBitwiseBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+                         bool nuw, bool nsw, bool exact, bool disjoint);
+
     virtual std::shared_ptr<IR::IntTypeExpr> get_casted_operand_type() const final;//Returns the operand type casted to IntTypeExpr. Just a helper function to make life easier
     virtual std::size_t get_bitwidth() const final;//Returns the bit width of the operand type. Just a helper function to make life easier
 
-    virtual InstOperandTypeVarient get_operand_type_varient() const override final;
+    virtual InstOperandTypeVarient get_type_varient() const override final;
 };
 
 class IntANDInst:public IntBitwiseBinaryInst {
     public:
     IntANDInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
+
+    OpType get_op_type() const override final;
+    std::string to_string() const override;
+};
+
+class IntNANDInst:public IntBitwiseBinaryInst {
+    public:
+    IntNANDInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -70,9 +85,26 @@ class IntORInst:public IntBitwiseBinaryInst {
     std::string to_string() const override;
 };
 
+class IntNorInst:public IntBitwiseBinaryInst {
+    public:
+    IntNorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+              bool disjoint);
+
+    OpType get_op_type() const override final;
+    std::string to_string() const override;
+};
+
 class IntXORInst:public IntBitwiseBinaryInst {
     public:
     IntXORInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
+
+    OpType get_op_type() const override final;
+    std::string to_string() const override;
+};
+
+class IntXNORInst:public IntBitwiseBinaryInst {
+    public:
+    IntXNORInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -108,26 +140,15 @@ class IntASHRInst:public IntBitwiseBinaryInst {
 
 // ---------------------------Vector Integer Binary Bitwise operations ---------------------------
 class VecIntBitwiseBinaryInst:public BitwiseBinaryInst {
-    protected:
-    bool disjoint;//Whether it has the disjoint attribute or not
-    bool nuw;//Whether it has the nsw or nuw attribute. 
-    bool nsw;//Whether it has the nsw or nuw attribute. 
-    bool exact;//Whether it has the exact attribute
-    //Few instructions dont have all these attributes. For that we return false and in typechecker we make sure unsupported attributes are not used
     public:
     VecIntBitwiseBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                          bool disjoint, bool nuw, bool nsw, bool exact);
 
-    virtual bool is_disjoint() const final;
-    virtual bool is_nuw() const final;
-    virtual bool is_nsw() const final;
-    virtual bool is_exact() const final;
-    
     virtual std::shared_ptr<IR::SIMDTypeExpr> get_casted_operand_type() const final;//Returns the operand type casted to SIMDTypeExpr. Just a helper function to make life easier
     virtual std::size_t get_basetype_bitwidth() const final;//Returns the bit width of the operand basetype. Just a helper function to make life easier
     virtual std::size_t get_num_elements() const final;//Returns the number of elements in the vector. Just a helper function to make life easier
 
-    virtual InstOperandTypeVarient get_operand_type_varient() const override final;
+    virtual InstOperandTypeVarient get_type_varient() const override final;
 };
 
 

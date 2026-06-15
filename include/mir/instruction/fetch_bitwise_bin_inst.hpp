@@ -43,6 +43,7 @@ class FetchBitwiseBinInst:public Inst {
     virtual IR::TypeExprPtr get_type() const final;
     virtual IR::LiteralExprPtr get_pointer() const final;
     virtual IR::LiteralExprPtr get_value() const final;
+    
     virtual std::size_t get_alignment() const final;
     virtual bool is_volatile() const final;
     virtual std::optional<std::pair<SyncScope,AtomicOrdering>> get_atomic_info() const final;

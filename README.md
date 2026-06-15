@@ -60,6 +60,9 @@ fn #[nounwind] $main() -> i32 ! "demo.c":10:1 {
  - [x] Ast
  - [x] Parser
  - [x] Test Parser
+ - [ ] MIR classes for all instructions
+ - [ ] Semantic analysis
+ - [ ] Test Semantic analysis
  - [ ] Expand this list when I start working on codegen and optimizations
 
 # Compiling and running

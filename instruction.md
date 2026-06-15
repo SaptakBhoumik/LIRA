@@ -290,7 +290,7 @@ These extend the 1-bit carry shift instructions to handle a shift count of more 
 - `let T:%output_var = .rotl(T:%input_var1, T:%input_var2)` - Rotate left. Bits shifted out on the left are rotated back in on the right. T must be of the form `T0` or `<T0,M>` where T0 is some integer. Shift amount is taken modulo bitwidth. No attributes.
 
 - `let T:%output_var = .rotr(T:%input_var1, T:%input_var2)` - Rotate right. Bits shifted out on the right are rotated back in on the left. T must be of the form `T0` or `<T0,M>` where T0 is some integer. Shift amount is taken modulo bitwidth. No attributes.
-
+TODO:Few of the following belong to unary and few to trinary bitwise. Move them accordingly. Also implement in fetch bitwise. TODO:
 - `let T:%out = .bitblend(T:%mask, T:%a, T:%b)` - Bitwise blend / masked merge. Computes `(a & mask) | (b & ~mask)`. For each bit position: if the mask bit is 1, take from `a`; if 0, take from `b`. `T` must be `i<N>` or `<i<N>,M>`. No attributes.
 
 ### BMI1 Bit Manipulation

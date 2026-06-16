@@ -9,6 +9,15 @@ class ConversionInst:public Inst {
     IR::LiteralExprPtr value;
     IR::TypeExprPtr in_type;//Reduced in type. 
     IR::TypeExprPtr out_type;//Reduced out type. 
+
+    // When the instruction doesnt act lane wise
+    bool nuw;
+    bool nsw;
+    bool nsb;
+    bool unsigned_;
+    bool saturating;
+
+    virtual std::string to_string_helper(std::string op_name) const final;
     public:
     enum class OpType:std::uint64_t{
         TRUNC = 1 << 6,
@@ -19,10 +28,11 @@ class ConversionInst:public Inst {
         INT_TO_PTR = 1 << 11,
         BITCAST = 1 << 12
     };
-    ConversionInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, IR::TypeExprPtr out_type);
+    ConversionInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, IR::TypeExprPtr out_type,
+                    bool nuw, bool nsw, bool nsb, bool unsigned_, bool saturating);
 
     virtual ~ConversionInst() = default;
-
+    
     virtual InstOperandTypeVarient get_in_type_varient() const final;//Can be calculated easily from ``in_type``. Just a helper function
     virtual InstOperandTypeVarient get_out_type_varient() const final;//Can be calculated easily from ``out_type``. Just a helper function
     // NOTE: get_in_type_varient and  get_out_type_varient is ignored for BitCastInst because it can be any type as long as the bit width is same + dont make sense
@@ -31,33 +41,26 @@ class ConversionInst:public Inst {
     virtual IR::LiteralExprPtr get_value() const final;
     virtual OpType get_op_type() const = 0;//Whether it is trunc,ext,float_to_int,int_to_float etc.
 
+    virtual bool is_nuw() const final;
+    virtual bool is_nsw() const final;
+    virtual bool is_nsb() const final;
+    virtual bool is_unsigned() const final;
+    virtual bool is_saturating() const final;
+
     virtual InstType get_inst_type() const override final;
 };
 
 // --------------------------- Scalar conversion operations ---------------------------
 class ScalarConversionInst:public ConversionInst{
-    // When the instruction doesnt act lane wise
-    bool nuw;
-    bool nsw;
-    bool nsb;
-    bool unsigned_;
-    // Few instructions dont have all these attributes. For that we return false and in typechecker we make sure unsupported attributes are not used.
     public:
     ScalarConversionInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
-                         IR::TypeExprPtr out_type, bool nuw, bool nsw, bool nsb, bool unsigned_);
-
-    virtual bool is_nuw() const final;
-    virtual bool is_nsw() const final;
-    virtual bool is_nsb() const final;
-    virtual bool is_unsigned() const final;
+                         IR::TypeExprPtr out_type, bool nuw, bool nsw, bool nsb, bool unsigned_, bool saturating);
 
     virtual std::size_t get_in_type_bitwidth() const final;//Returns the bit width of the in type. Calculated automatically
     virtual std::size_t get_out_type_bitwidth() const final;//Returns the bit width of the out type. Calculated automatically
 };
 
 class IntTruncInst:public ScalarConversionInst{
-    bool nuw;
-    bool nsw;
     public:
     IntTruncInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
                  IR::TypeExprPtr out_type, bool nuw, bool nsw);
@@ -88,8 +91,6 @@ class FloatTruncInst:public ScalarConversionInst{
 };
 
 class IntExtInst:public ScalarConversionInst{
-    bool nsb;
-    bool unsigned_;
     public:
     IntExtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
               IR::TypeExprPtr out_type, bool nsb, bool unsigned_);
@@ -116,7 +117,6 @@ class FloatExtInst:public ScalarConversionInst{
 };
 
 class FloatToIntInst:public ScalarConversionInst{
-    bool unsigned_;
     public:
     FloatToIntInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
                     IR::TypeExprPtr out_type, bool unsigned_);
@@ -130,7 +130,6 @@ class FloatToIntInst:public ScalarConversionInst{
 };
 
 class IntToFloatInst:public ScalarConversionInst{
-    bool unsigned_;
     public:
     IntToFloatInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
                     IR::TypeExprPtr out_type, bool unsigned_);
@@ -174,21 +173,9 @@ class BitCastInst:public ScalarConversionInst{
 
 // --------------------------- Vector conversion operations ---------------------------
 class LaneWiseConversionInst:public ConversionInst{
-    protected:
-    // When the instruction act lanewise
-    bool nuw;
-    bool nsw;
-    bool nsb;
-    bool unsigned_;
-    // Few instructions dont have all these attributes. For that we return false and in typechecker we make sure unsupported attributes are not used.
     public:
     LaneWiseConversionInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
                            IR::TypeExprPtr out_type, bool nuw, bool nsw, bool nsb, bool unsigned_);
-
-    virtual bool is_nuw() const final;
-    virtual bool is_nsw() const final;
-    virtual bool is_nsb() const final;
-    virtual bool is_unsigned() const final;
 
     virtual std::size_t get_in_basetype_bitwidth() const final;//Returns the bit width of the in type. Calculated automatically
     virtual std::size_t get_out_basetype_bitwidth() const final;//Returns the bit width of the out type. Calculated automatically

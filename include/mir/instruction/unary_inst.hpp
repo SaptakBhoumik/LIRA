@@ -28,6 +28,9 @@ class UnaryInst:public Inst {
         BSWAP = 1 << 22,
         BITREVERSE = 1 << 23,
         CLRSB = 1 << 24,
+        BLSI = 1 << 25,
+        BLSR = 1 << 26,
+        BLSMASK = 1 << 27
     };
     UnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value);
 
@@ -142,6 +145,30 @@ class IntCLRSBInst:public IntUnaryInst {
     std::string to_string() const override;
 };
 
+class IntBLSIInst:public IntUnaryInst {
+    public:
+    IntBLSIInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value);
+
+    OpType get_op_type() const override final;
+    std::string to_string() const override;
+};
+
+class IntBLSRInst:public IntUnaryInst {
+    public:
+    IntBLSRInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value);
+
+    OpType get_op_type() const override final;
+    std::string to_string() const override;
+};
+
+class IntBLSMaskInst:public IntUnaryInst {
+    public:
+    IntBLSMaskInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value);
+
+    OpType get_op_type() const override final;
+    std::string to_string() const override;
+};
+
 // --------------------------- Vector Int Unary operations ---------------------------
 class VecIntUnaryInst:public UnaryInst{
     protected:
@@ -239,6 +266,30 @@ class VecIntBitreverseInst:public VecIntUnaryInst {
 class VecIntCLRSBInst:public VecIntUnaryInst {
     public:
     VecIntCLRSBInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value);
+
+    OpType get_op_type() const override final;
+    std::string to_string() const override;
+};
+
+class VecIntBLSIInst:public VecIntUnaryInst {
+    public:
+    VecIntBLSIInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value);
+
+    OpType get_op_type() const override final;
+    std::string to_string() const override;
+};
+
+class VecIntBLSRInst:public VecIntUnaryInst {
+    public:
+    VecIntBLSRInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value);
+
+    OpType get_op_type() const override final;
+    std::string to_string() const override;
+};
+
+class VecIntBLSMaskInst:public VecIntUnaryInst {
+    public:
+    VecIntBLSMaskInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;

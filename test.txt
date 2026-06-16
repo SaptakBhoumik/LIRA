@@ -6,9 +6,6 @@
 ## High-Half Multiply
 ## N-Bit Carry Shifts
 
-## Bitwise Binary Instructions
-    ### BMI1 Bit Manipulation
-    ### Parallel Bit Extract/Deposit
 
 ## Bitwise Trinary Instructions
 
@@ -57,8 +54,6 @@
 ## N-Bit Carry Shifts
 
 ## Bitwise Binary Instructions
-    ### BMI1 Bit Manipulation
-    ### Parallel Bit Extract/Deposit
 
 ## Bitwise Trinary Instructions
 
@@ -114,8 +109,6 @@
 ## High-Half Multiply
 ## N-Bit Carry Shifts
 ## Bitwise Binary Instructions
-    ### BMI1 Bit Manipulation
-    ### Parallel Bit Extract/Deposit
 ## Bitwise Trinary Instructions
 ## Comparison Instructions
 ## Conversion Instructions

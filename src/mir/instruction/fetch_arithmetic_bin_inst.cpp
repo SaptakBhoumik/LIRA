@@ -49,6 +49,16 @@ IntFetchArithmeticBinInst::IntFetchArithmeticBinInst(IR::InstructionStmtPtr inst
 }
 std::string IntFetchArithmeticBinInst::to_string_helper(const std::string op_name) const {
     std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(ptr:" + this->pointer->to_string() + ", " + this->destination->get_type()->to_string() + ":" + this->value->to_string() + ")";
+    if(this->volatile_){
+        res += " #[volatile]";
+    }
+    if(alignment != 0){
+        res += " #[align(i64:" + std::to_string(alignment) + "}]";
+    }
+    if(atomic_info.has_value()){
+        res += " #[atomic(str:\"" + LIRA::MIR::to_string(atomic_info->second) + "\")]";
+        res += " #[syncscope(str:\"" + LIRA::MIR::to_string(atomic_info->first) + "\")]";
+    }
     if(this->nuw){
         res += " #[nuw]";
     }
@@ -227,6 +237,16 @@ FloatFetchArithmeticBinInst::FloatFetchArithmeticBinInst(IR::InstructionStmtPtr 
 }
 std::string FloatFetchArithmeticBinInst::to_string_helper(const std::string op_name) const {
     std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(ptr:" + this->pointer->to_string() + ", " + this->destination->get_type()->to_string() + ":" + this->value->to_string() + ")";
+    if(this->volatile_){
+        res += " #[volatile]";
+    }
+    if(alignment != 0){
+        res += " #[align(i64:" + std::to_string(alignment) + "}]";
+    }
+    if(atomic_info.has_value()){
+        res += " #[atomic(str:\"" + LIRA::MIR::to_string(atomic_info->second) + "\")]";
+        res += " #[syncscope(str:\"" + LIRA::MIR::to_string(atomic_info->first) + "\")]";
+    }
     res += " " + this->fast_math_attr.to_string();
     if(this->unordered){
         res += " #[unordered]";

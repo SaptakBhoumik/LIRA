@@ -32,6 +32,8 @@ class FetchBitwiseBinInst:public Inst {
         FETCH_ASHR = 1 << 14,
         FETCH_ROTL = 1 << 15,
         FETCH_ROTR = 1 << 16,
+        FETCH_PEXT = 1 << 17,
+        FETCH_PDEP = 1 << 18
     };
     FetchBitwiseBinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                         std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info,
@@ -168,6 +170,24 @@ class IntFetchRotlInst:public IntFetchBitwiseBinInst {
 class IntFetchRotrInst:public IntFetchBitwiseBinInst {
     public:
     IntFetchRotrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+                    std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info);
+
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
+class IntFetchPextInst:public IntFetchBitwiseBinInst {
+    public:
+    IntFetchPextInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+                    std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info);
+
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
+class IntFetchPdepInst:public IntFetchBitwiseBinInst {
+    public:
+    IntFetchPdepInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info);
 
     OpType get_op_type() const override;

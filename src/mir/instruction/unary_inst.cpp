@@ -158,6 +158,34 @@ std::string IntCLRSBInst::to_string() const {
 }
 
 
+IntBLSIInst::IntBLSIInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value) 
+                            :IntUnaryInst(instruction_stmt, destination, value, false, false, false){}
+UnaryInst::OpType IntBLSIInst::get_op_type() const {
+    return OpType::BLSI;
+}
+std::string IntBLSIInst::to_string() const {
+    return this->to_string_helper("int_blsi");
+}
+
+
+IntBLSRInst::IntBLSRInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value) 
+                            :IntUnaryInst(instruction_stmt, destination, value, false, false, false){}
+UnaryInst::OpType IntBLSRInst::get_op_type() const {
+    return OpType::BLSR;
+}
+std::string IntBLSRInst::to_string() const {
+    return this->to_string_helper("int_blsr");
+}
+
+
+IntBLSMaskInst::IntBLSMaskInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value) 
+                            :IntUnaryInst(instruction_stmt, destination, value, false, false, false){}
+UnaryInst::OpType IntBLSMaskInst::get_op_type() const {
+    return OpType::BLSMASK;
+}
+std::string IntBLSMaskInst::to_string() const {
+    return this->to_string_helper("int_blsmask");
+}
 // --------------------------- Vector Int Unary operations ---------------------------
 VecIntUnaryInst::VecIntUnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, bool nuw, bool nsw, bool zero_poison)
                     :UnaryInst(instruction_stmt, destination, value){

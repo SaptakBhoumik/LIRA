@@ -290,22 +290,10 @@ These extend the 1-bit carry shift instructions to handle a shift count of more 
 - `let T:%output_var = .rotl(T:%input_var1, T:%input_var2)` - Rotate left. Bits shifted out on the left are rotated back in on the right. T must be of the form `T0` or `<T0,M>` where T0 is some integer. Shift amount is taken modulo bitwidth. No attributes.
 
 - `let T:%output_var = .rotr(T:%input_var1, T:%input_var2)` - Rotate right. Bits shifted out on the right are rotated back in on the left. T must be of the form `T0` or `<T0,M>` where T0 is some integer. Shift amount is taken modulo bitwidth. No attributes.
-TODO:Few of the following belong to unary and few to trinary bitwise. Move them accordingly. Also implement in fetch bitwise. TODO:
-- `let T:%out = .bitblend(T:%mask, T:%a, T:%b)` - Bitwise blend / masked merge. Computes `(a & mask) | (b & ~mask)`. For each bit position: if the mask bit is 1, take from `a`; if 0, take from `b`. `T` must be `i<N>` or `<i<N>,M>`. No attributes.
 
-### BMI1 Bit Manipulation
+- `let T:%out = .pext(T:%src, T:%mask)` - Parallel bit extract. Extracts bits from `src` at positions where `mask` has a 1 bit, compacting them into the contiguous low bits of the result. The number of meaningful result bits equals `popcount(mask)`; remaining high bits are zero. Corresponds to x86 BMI2 `PEXT`. `T` must be `i<N>` or `<i<N>,M>`. No attributes.
 
-- `let T:%out = .blsi(T:%input)` - Isolate lowest set bit. Returns a value with only the lowest set bit of `%input` set; `0` if `%input` is `0`. Equivalent to `x & -x`. `T` must be `i32` or `i64`. No attributes.
-
-- `let T:%out = .blsr(T:%input)` - Reset lowest set bit. Returns `%input` with its lowest set bit cleared; `0` if `%input` is `0`. Equivalent to `x & (x-1)`. `T` must be `i32` or `i64`. No attributes.
-
-- `let T:%out = .blsmsk(T:%input)` - Get mask up to lowest set bit. Returns a mask with all bits set up to and including the lowest set bit of `%input` (e.g. `0b10100 -> 0b00111`); all bits set (`-1`) if `%input` is `0`. Equivalent to `x ^ (x-1)`. `T` must be `i32` or `i64`. No attributes.
-
-### Parallel Bit Extract/Deposit
-
-- `let T:%out = .pext(T:%src, T:%mask)` - Parallel bit extract. Extracts bits from `src` at positions where `mask` has a 1 bit, compacting them into the contiguous low bits of the result. The number of meaningful result bits equals `popcount(mask)`; remaining high bits are zero. Corresponds to x86 BMI2 `PEXT`. `T` must be `i32` or `i64`. No attributes.
-
-- `let T:%out = .pdep(T:%src, T:%mask)` - Parallel bit deposit. Inverse of `.pext`. Deposits bits from the consecutive low bits of `src` into the output at positions where `mask` has a 1 bit. All other output bits are zero. Corresponds to x86 BMI2 `PDEP`. `T` must be `i32` or `i64`. No attributes.
+- `let T:%out = .pdep(T:%src, T:%mask)` - Parallel bit deposit. Inverse of `.pext`. Deposits bits from the consecutive low bits of `src` into the output at positions where `mask` has a 1 bit. All other output bits are zero. Corresponds to x86 BMI2 `PDEP`. `T` must be `i<N>` or `<i<N>,M>`. No attributes.
 
 ---
 
@@ -314,6 +302,9 @@ TODO:Few of the following belong to unary and few to trinary bitwise. Move them 
 - `let T:%output_var = .fshl(T:%input_var1, T:%input_var2, T:%shift)` - Funnel shift left. Conceptually concatenates `input_var1:input_var2`, shifts left by `shift mod bitwidth`, and returns the high T-sized bits. T must be of the form `T0` or `<T0,M>` where T0 is some integer. No attributes.
 
 - `let T:%output_var = .fshr(T:%input_var1, T:%input_var2, T:%shift)` - Funnel shift right. Conceptually concatenates `input_var1:input_var2`, shifts right by `shift mod bitwidth`, and returns the low T-sized bits. T must be of the form `T0` or `<T0,M>` where T0 is some integer. No attributes.
+
+- `let T:%out = .bitblend(T:%mask, T:%a, T:%b)` - Bitwise blend / masked merge. Computes `(a & mask) | (b & ~mask)`. For each bit position: if the mask bit is 1, take from `a`; if 0, take from `b`. `T` must be `i<N>` or `<i<N>,M>`. No attributes.
+
 
 ---
 
@@ -460,6 +451,12 @@ TODO:Few of the following belong to unary and few to trinary bitwise. Move them 
 - `let T:%output_var = .bitreverse(T:%input_var)` - Reverses bit order. T must be of the form `T0` or `<T0,M>` where T0 is some integer. No attributes.
 
 - `let T:%out = .clrsb(T:%input)` - Count leading redundant sign bits. Returns the number of leading bits equal to the sign bit, **not counting the sign bit itself**. Equivalently: `clz(x >= 0 ? x : ~x) - 1`. `T` must be of the form `T0` or `<T0,M>` where `T0` is a **signed** integer. Output type matches input. No attributes.
+
+- `let T:%out = .blsi(T:%input)` - Isolate lowest set bit. Returns a value with only the lowest set bit of `%input` set; `0` if `%input` is `0`. Equivalent to `x & -x`. `T` must be `i<N>` or `<i<N>,M>`. No attributes.
+
+- `let T:%out = .blsr(T:%input)` - Reset lowest set bit. Returns `%input` with its lowest set bit cleared; `0` if `%input` is `0`. Equivalent to `x & (x-1)`. `T` must be `i<N>` or `<i<N>,M>`. No attributes.
+
+- `let T:%out = .blsmask(T:%input)` - Get mask up to lowest set bit. Returns a mask with all bits set up to and including the lowest set bit of `%input` (e.g. `0b10100 -> 0b00111`); all bits set (`-1`) if `%input` is `0`. Equivalent to `x ^ (x-1)`. `T` must be `i<N>` or `<i<N>,M>`. No attributes.
 
 ---
 
@@ -817,7 +814,9 @@ Read-modify-write instructions that read a value from memory, apply a binary ope
 
 - `let T:%old = .fetch_rotr(ptr:%ptr, T:%value)` - Rotates `*ptr` right by `value`; returns the original. T must be integer. No additional attributes.
 
+- `let T:%old = .fetch_pext(ptr:%ptr, T:%mask)` - Does what you would expect.`T` must be `i<N>`. No attributes.
 
+- `let T:%old = .fetch_pdep(ptr:%ptr, T:%mask)` - Does what you would expect.`T` must be `i<N>`. No attributes.
 
 ---
 
@@ -897,6 +896,12 @@ Read-modify-write instructions that apply a unary operation to the value at a me
 - `let T:%old = .fetch_bswap(ptr:%ptr)` - Reverses byte order of `*ptr`; returns the original. T must be integer or float/bfloat. Float/bfloat supported for endianness swaps (avoids needing a bitcast). Bitwidth must be a multiple of 8. No additional attributes.
 
 - `let T:%old = .fetch_bitreverse(ptr:%ptr)` - Reverses bit order of `*ptr`; returns the original. T must be integer. No additional attributes.
+
+- `let T:%old = .fetch_blsi(ptr:%ptr)` - Does what u think it does. `T` must be `i<N>`. No attributes.
+
+- `let T:%old = .fetch_blsr(ptr:%ptr)` - Does what u think it does. `T` must be `i<N>`. No attributes.
+
+- `let T:%old = .fetch_blsmask(ptr:%ptr)` - Does what u think it does. `T` must be `i<N>`. No attributes.
 
 ---
 

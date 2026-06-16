@@ -19,6 +19,16 @@ FetchBitwiseBinInst::FetchBitwiseBinInst(IR::InstructionStmtPtr instruction_stmt
 };
 std::string FetchBitwiseBinInst::to_string_helper(const std::string op_name) const{
     std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(ptr:" + this->pointer->to_string() + ", " + this->destination->get_type()->to_string() + ":" + this->value->to_string() + ")";
+    if(this->volatile_){
+        res += " #[volatile]";
+    }
+    if(alignment != 0){
+        res += " #[align(i64:" + std::to_string(alignment) + "}]";
+    }
+    if(atomic_info.has_value()){
+        res += " #[atomic(str:\"" + LIRA::MIR::to_string(atomic_info->second) + "\")]";
+        res += " #[syncscope(str:\"" + LIRA::MIR::to_string(atomic_info->first) + "\")]";
+    }
     if(this->nuw){
         res += " #[nuw]";
     }
@@ -203,6 +213,28 @@ FetchBitwiseBinInst::OpType IntFetchRotrInst::get_op_type() const {
 }
 std::string IntFetchRotrInst::to_string() const {
     return this->to_string_helper("int_fetch_rotr");
+}
+
+
+IntFetchPextInst::IntFetchPextInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+                    std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info)
+                    :IntFetchBitwiseBinInst(instruction_stmt, destination, pointer, value, alignment, volatile_, atomic_info, false, false, false, false){}
+FetchBitwiseBinInst::OpType IntFetchPextInst::get_op_type() const {
+    return OpType::FETCH_PEXT;
+}
+std::string IntFetchPextInst::to_string() const {
+    return this->to_string_helper("int_fetch_pext");
+}
+
+
+IntFetchPdepInst::IntFetchPdepInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+                    std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info)
+                    :IntFetchBitwiseBinInst(instruction_stmt, destination, pointer, value, alignment, volatile_, atomic_info, false, false, false, false){}
+FetchBitwiseBinInst::OpType IntFetchPdepInst::get_op_type() const {
+    return OpType::FETCH_PDEP;
+}
+std::string IntFetchPdepInst::to_string() const {
+    return this->to_string_helper("int_fetch_pdep");
 }
 }
 }

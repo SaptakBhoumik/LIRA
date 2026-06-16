@@ -1,249 +1,351 @@
-#include "mir/instruction.hpp"
+#include "mir/instruction/bitwise_bin_inst.hpp"
 #include <memory>
 
 namespace LIRA {
 namespace MIR {
-BitwiseBinaryInst::BitwiseBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs)
-                                    : Inst(instruction_stmt, destination){
+BitwiseBinaryInst::BitwiseBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+                                     bool nuw, bool nsw, bool exact, bool disjoint):Inst(instruction_stmt, destination){
     this->lhs = lhs;
     this->rhs = rhs;
-}
-IR::TypeExprPtr BitwiseBinaryInst::get_operand_type() const {
-    return this->destination->get_type();
-}
-IR::LiteralExprPtr BitwiseBinaryInst::get_lhs() const {
-    return this->lhs;
-}
-IR::LiteralExprPtr BitwiseBinaryInst::get_rhs() const {
-    return this->rhs;
-}
-InstType BitwiseBinaryInst::get_inst_type() const {
-    return InstType::BitwiseBinaryInst;
-}
-// ---------------------------Bitwise Integer Binary Bitwise operations ---------------------------
-IntBitwiseBinaryInst::IntBitwiseBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                                            bool disjoint, bool nuw, bool nsw, bool exact)
-                                            : BitwiseBinaryInst(instruction_stmt, destination, lhs, rhs){
-    this->disjoint = disjoint;
     this->nuw = nuw;
     this->nsw = nsw;
     this->exact = exact;
+    this->disjoint = disjoint;
 }
-bool IntBitwiseBinaryInst::is_disjoint() const {
-    return this->disjoint;
-}
-bool IntBitwiseBinaryInst::is_nuw() const {
-    return this->nuw;
-}
-bool IntBitwiseBinaryInst::is_nsw() const {
-    return this->nsw;
-}
-bool IntBitwiseBinaryInst::is_exact() const {
-    return this->exact;
-}
-std::shared_ptr<IR::IntTypeExpr>IntBitwiseBinaryInst::get_casted_operand_type() const{
-    return std::dynamic_pointer_cast<IR::IntTypeExpr>(this->get_operand_type());
-}
-std::size_t IntBitwiseBinaryInst::get_bitwidth() const{
-    auto int_type = this->get_casted_operand_type();
-    return int_type->get_bits();
-}
-InstOperandTypeVarient IntBitwiseBinaryInst::get_operand_type_varient() const {
-    return InstOperandTypeVarient::Int;
-}
-
-
-IntANDInst::IntANDInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs)
-                : IntBitwiseBinaryInst(instruction_stmt, destination, lhs, rhs, false, false, false, false){}
-BitwiseBinaryInst::OpType IntANDInst::get_op_type() const {
-    return OpType::AND;
-}
-std::string IntANDInst::to_string() const {
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .int_and(" + this->lhs->to_string() + ", " + this->rhs->to_string() + ")";
-    return res;
-}
-
-
-IntORInst::IntORInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
-                        bool disjoint):IntBitwiseBinaryInst(instruction_stmt, destination, lhs, rhs, disjoint, false, false, false){}
-BitwiseBinaryInst::OpType IntORInst::get_op_type() const {
-    return OpType::OR;
-}
-std::string IntORInst::to_string() const {
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .int_or(" + this->lhs->to_string() + ", " + this->rhs->to_string() + ")";
-    if(this->disjoint){
-        res += " #[disjoint]";
-    }
-    return res;
-}
-
-
-IntXORInst::IntXORInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs)
-                : IntBitwiseBinaryInst(instruction_stmt, destination, lhs, rhs, false, false, false, false){}
-BitwiseBinaryInst::OpType IntXORInst::get_op_type() const {
-    return OpType::XOR;
-}
-std::string IntXORInst::to_string() const {
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .int_xor(" + this->lhs->to_string() + ", " + this->rhs->to_string() + ")";
-    return res;
-}
-
-
-IntSHLInst::IntSHLInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                        bool nuw, bool nsw):IntBitwiseBinaryInst(instruction_stmt, destination, lhs, rhs, false, nuw, nsw, false){}
-BitwiseBinaryInst::OpType IntSHLInst::get_op_type() const {
-    return OpType::SHL;
-}
-std::string IntSHLInst::to_string() const {
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .int_shl(" + this->lhs->to_string() + ", " + this->rhs->to_string() + ")";
+std::string BitwiseBinaryInst::to_string_helper(const std::string op_name) const{
+    std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(" + this->lhs->to_string() + ", " + this->rhs->to_string() + ")";
     if(this->nuw){
         res += " #[nuw]";
     }
     if(this->nsw){
         res += " #[nsw]";
     }
+    if(this->exact){
+        res += " #[exact]";
+    }
+    if(this->disjoint){
+        res += " #[disjoint]";
+    }
     return res;
+}
+IR::TypeExprPtr BitwiseBinaryInst::get_operand_type() const{
+    return this->destination->get_type();
+}
+IR::LiteralExprPtr BitwiseBinaryInst::get_lhs() const{
+    return this->lhs;
+}
+IR::LiteralExprPtr BitwiseBinaryInst::get_rhs() const{
+    return this->rhs;
+}
+bool BitwiseBinaryInst::is_nuw() const{
+    return this->nuw;
+}
+bool BitwiseBinaryInst::is_nsw() const{
+    return this->nsw;
+}
+bool BitwiseBinaryInst::is_exact() const{
+    return this->exact;
+}
+bool BitwiseBinaryInst::is_disjoint() const{
+    return this->disjoint;
+}
+InstType BitwiseBinaryInst::get_inst_type() const{
+    return InstType::BitwiseBinaryInst;
 }
 
 
-IntLSHRInst::IntLSHRInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                        bool exact):IntBitwiseBinaryInst(instruction_stmt, destination, lhs, rhs, false, false, false, exact){}
-BitwiseBinaryInst::OpType IntLSHRInst::get_op_type() const {
+// ---------------------------Integer Binary Bitwise operations ---------------------------
+IntBitwiseBinaryInst::IntBitwiseBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+                                           bool nuw, bool nsw, bool exact, bool disjoint):BitwiseBinaryInst(instruction_stmt, destination, lhs, rhs, nuw, nsw, exact, disjoint){}
+std::shared_ptr<IR::IntTypeExpr> IntBitwiseBinaryInst::get_casted_operand_type() const{
+    return std::dynamic_pointer_cast<IR::IntTypeExpr>(this->get_operand_type());
+}
+std::size_t IntBitwiseBinaryInst::get_bitwidth() const{
+    return this->get_casted_operand_type()->get_bits();
+}
+InstOperandTypeVarient IntBitwiseBinaryInst::get_type_varient() const{
+    return InstOperandTypeVarient::Int;
+}
+
+
+IntAndInst::IntAndInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs)
+                        :IntBitwiseBinaryInst(instruction_stmt, destination, lhs, rhs, false, false, false, false){}
+BitwiseBinaryInst::OpType IntAndInst::get_op_type() const{
+    return OpType::AND;
+}
+std::string IntAndInst::to_string() const{
+    return this->to_string_helper("int_and");
+}
+
+
+IntNandInst::IntNandInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs)
+                        :IntBitwiseBinaryInst(instruction_stmt, destination, lhs, rhs, false, false, false, false){}
+BitwiseBinaryInst::OpType IntNandInst::get_op_type() const{
+    return OpType::NAND;
+}
+std::string IntNandInst::to_string() const{
+    return this->to_string_helper("int_nand");
+}
+
+
+IntOrInst::IntOrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                       bool disjoint):IntBitwiseBinaryInst(instruction_stmt, destination, lhs, rhs, false, false, false, disjoint){}
+BitwiseBinaryInst::OpType IntOrInst::get_op_type() const{
+    return OpType::OR;
+}
+std::string IntOrInst::to_string() const{
+    return this->to_string_helper("int_or");
+}
+
+
+IntNorInst::IntNorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                       bool disjoint):IntBitwiseBinaryInst(instruction_stmt, destination, lhs, rhs, false, false, false, disjoint){}
+BitwiseBinaryInst::OpType IntNorInst::get_op_type() const{
+    return OpType::NOR;
+}
+std::string IntNorInst::to_string() const{
+    return this->to_string_helper("int_nor");
+}
+
+
+IntXorInst::IntXorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs)
+                        :IntBitwiseBinaryInst(instruction_stmt, destination, lhs, rhs, false, false, false, false){}
+BitwiseBinaryInst::OpType IntXorInst::get_op_type() const{
+    return OpType::XOR;
+}
+std::string IntXorInst::to_string() const{
+    return this->to_string_helper("int_xor");
+}
+
+
+IntXnorInst::IntXnorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs)
+                        :IntBitwiseBinaryInst(instruction_stmt, destination, lhs, rhs, false, false, false, false){}
+BitwiseBinaryInst::OpType IntXnorInst::get_op_type() const{
+    return OpType::XNOR;
+}
+std::string IntXnorInst::to_string() const{
+    return this->to_string_helper("int_xnor");
+}
+
+
+IntShlInst::IntShlInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+                        bool nuw, bool nsw):IntBitwiseBinaryInst(instruction_stmt, destination, lhs, rhs, nuw, nsw, false, false){}
+BitwiseBinaryInst::OpType IntShlInst::get_op_type() const{
+    return OpType::SHL;
+}
+std::string IntShlInst::to_string() const{
+    return this->to_string_helper("int_shl");
+}
+
+
+IntLshrInst::IntLshrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+                        bool exact):IntBitwiseBinaryInst(instruction_stmt, destination, lhs, rhs, false, false, exact, false){}
+BitwiseBinaryInst::OpType IntLshrInst::get_op_type() const{
     return OpType::LSHR;
 }
-std::string IntLSHRInst::to_string() const {
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .int_lshr(" + this->lhs->to_string() + ", " + this->rhs->to_string() + ")";
-    if(this->exact){
-        res += " #[exact]";
-    }
-    return res;
+std::string IntLshrInst::to_string() const{
+    return this->to_string_helper("int_lshr");
 }
 
 
-IntASHRInst::IntASHRInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                        bool exact):IntBitwiseBinaryInst(instruction_stmt, destination, lhs, rhs, false, false, false, exact){}
-BitwiseBinaryInst::OpType IntASHRInst::get_op_type() const {
+IntAshrInst::IntAshrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+                        bool exact):IntBitwiseBinaryInst(instruction_stmt, destination, lhs, rhs, false, false, exact, false){}
+BitwiseBinaryInst::OpType IntAshrInst::get_op_type() const{
     return OpType::ASHR;
 }
-std::string IntASHRInst::to_string() const {
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .int_ashr(" + this->lhs->to_string() + ", " + this->rhs->to_string() + ")";
-    if(this->exact){
-        res += " #[exact]";
-    }
-    return res;
+std::string IntAshrInst::to_string() const{
+    return this->to_string_helper("int_ashr");
+}
+
+
+IntRotlInst::IntRotlInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs)
+                        :IntBitwiseBinaryInst(instruction_stmt, destination, lhs, rhs, false, false, false, false){}
+BitwiseBinaryInst::OpType IntRotlInst::get_op_type() const{
+    return OpType::ROTL;
+}
+std::string IntRotlInst::to_string() const{
+    return this->to_string_helper("int_rotl");
+}
+
+
+IntRotrInst::IntRotrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs)
+                        :IntBitwiseBinaryInst(instruction_stmt, destination, lhs, rhs, false, false, false, false){}
+BitwiseBinaryInst::OpType IntRotrInst::get_op_type() const{
+    return OpType::ROTR;
+}
+std::string IntRotrInst::to_string() const{
+    return this->to_string_helper("int_rotr");
+}
+
+
+IntPextInst::IntPextInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs)
+                        :IntBitwiseBinaryInst(instruction_stmt, destination, lhs, rhs, false, false, false, false){}
+BitwiseBinaryInst::OpType IntPextInst::get_op_type() const{
+    return OpType::PEXT;
+}
+std::string IntPextInst::to_string() const{
+    return this->to_string_helper("int_pext");
+}
+
+
+IntPdepInst::IntPdepInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs)
+                        :IntBitwiseBinaryInst(instruction_stmt, destination, lhs, rhs, false, false, false, false){}
+BitwiseBinaryInst::OpType IntPdepInst::get_op_type() const{
+    return OpType::PDEP;
+}
+std::string IntPdepInst::to_string() const{
+    return this->to_string_helper("int_pdep");
 }
 
 
 // ---------------------------Vector Integer Binary Bitwise operations ---------------------------
 VecIntBitwiseBinaryInst::VecIntBitwiseBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                                                   bool disjoint, bool nuw, bool nsw, bool exact) : BitwiseBinaryInst(instruction_stmt, destination, lhs, rhs){
-    this->disjoint = disjoint;
-    this->nuw = nuw;
-    this->nsw = nsw;
-    this->exact = exact;
-}
-bool VecIntBitwiseBinaryInst::is_disjoint() const {
-    return this->disjoint;
-}
-bool VecIntBitwiseBinaryInst::is_nuw() const {
-    return this->nuw;
-}
-bool VecIntBitwiseBinaryInst::is_nsw() const {
-    return this->nsw;
-}
-bool VecIntBitwiseBinaryInst::is_exact() const {
-    return this->exact;
-}
-std::shared_ptr<IR::SIMDTypeExpr> VecIntBitwiseBinaryInst::get_casted_operand_type() const {
+                                                 bool nuw, bool nsw, bool exact, bool disjoint)
+                                                :BitwiseBinaryInst(instruction_stmt, destination, lhs, rhs, nuw, nsw, exact, disjoint){}
+std::shared_ptr<IR::SIMDTypeExpr> VecIntBitwiseBinaryInst::get_casted_operand_type() const{
     return std::dynamic_pointer_cast<IR::SIMDTypeExpr>(this->get_operand_type());
 }
-std::size_t VecIntBitwiseBinaryInst::get_basetype_bitwidth() const {
-    auto int_base_type = std::dynamic_pointer_cast<IR::IntTypeExpr>(this->get_casted_operand_type()->get_basetype());
-    return int_base_type->get_bits();  
+std::size_t VecIntBitwiseBinaryInst::get_basetype_bitwidth() const{
+    auto simd_type = this->get_casted_operand_type();
+    auto base_type = std::dynamic_pointer_cast<IR::IntTypeExpr>(simd_type->get_basetype());
+    return base_type->get_bits();
 }
-size_t VecIntBitwiseBinaryInst::get_num_elements() const {
-    return this->get_casted_operand_type()->get_size();
+std::size_t VecIntBitwiseBinaryInst::get_num_elements() const{
+    auto simd_type = this->get_casted_operand_type();
+    return simd_type->get_size();
+}
+InstOperandTypeVarient VecIntBitwiseBinaryInst::get_type_varient() const{
+    return InstOperandTypeVarient::VecInt;
 }
 
 
-VecIntANDInst::VecIntANDInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs)
-                                :VecIntBitwiseBinaryInst(instruction_stmt, destination, lhs, rhs, disjoint, false, false, false){}
-BitwiseBinaryInst::OpType VecIntANDInst::get_op_type() const {
+VecIntAndInst::VecIntAndInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs)
+                            :VecIntBitwiseBinaryInst(instruction_stmt, destination, lhs, rhs, false, false, false, false){}
+BitwiseBinaryInst::OpType VecIntAndInst::get_op_type() const{
     return OpType::AND;
 }
-std::string VecIntANDInst::to_string() const {
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .vec_int_and(" + this->lhs->to_string() + ", " + this->rhs->to_string() + ")";
-    return res;
+std::string VecIntAndInst::to_string() const{
+    return this->to_string_helper("vec_int_and");
 }
 
 
-VecIntORInst::VecIntORInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
-                            bool disjoint):VecIntBitwiseBinaryInst(instruction_stmt, destination, lhs, rhs, disjoint, false, false, false){}
-BitwiseBinaryInst::OpType VecIntORInst::get_op_type() const {
+VecIntNandInst::VecIntNandInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs)
+                            :VecIntBitwiseBinaryInst(instruction_stmt, destination, lhs, rhs, false, false, false, false){}
+BitwiseBinaryInst::OpType VecIntNandInst::get_op_type() const{
+    return OpType::NAND;
+}
+std::string VecIntNandInst::to_string() const{
+    return this->to_string_helper("vec_int_nand");
+}
+
+
+VecIntOrInst::VecIntOrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                       bool disjoint):VecIntBitwiseBinaryInst(instruction_stmt, destination, lhs, rhs, false, false, false, disjoint){}
+BitwiseBinaryInst::OpType VecIntOrInst::get_op_type() const{
     return OpType::OR;
 }
-std::string VecIntORInst::to_string() const {
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .vec_int_or(" + this->lhs->to_string() + ", " + this->rhs->to_string() + ")";
-    if(this->disjoint){
-        res += " #[disjoint]";
-    }
-    return res;
+std::string VecIntOrInst::to_string() const{
+    return this->to_string_helper("vec_int_or");
 }
 
 
-VecIntXORInst::VecIntXORInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs)
-                                :VecIntBitwiseBinaryInst(instruction_stmt, destination, lhs, rhs, false, false, false, false){}
-BitwiseBinaryInst::OpType VecIntXORInst::get_op_type() const {
+VecIntNorInst::VecIntNorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                       bool disjoint):VecIntBitwiseBinaryInst(instruction_stmt, destination, lhs, rhs, false, false, false, disjoint){}
+BitwiseBinaryInst::OpType VecIntNorInst::get_op_type() const{
+    return OpType::NOR;
+}
+std::string VecIntNorInst::to_string() const{
+    return this->to_string_helper("vec_int_nor");
+}
+
+
+VecIntXorInst::VecIntXorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs)
+                        :VecIntBitwiseBinaryInst(instruction_stmt, destination, lhs, rhs, false, false, false, false){}
+BitwiseBinaryInst::OpType VecIntXorInst::get_op_type() const{
     return OpType::XOR;
 }
-std::string VecIntXORInst::to_string() const {
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .vec_int_xor(" + this->lhs->to_string() + ", " + this->rhs->to_string() + ")";
-    return res;
+std::string VecIntXorInst::to_string() const{
+    return this->to_string_helper("vec_int_xor");
 }
 
 
-VecIntSHLInst::VecIntSHLInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                                bool nuw, bool nsw):VecIntBitwiseBinaryInst(instruction_stmt, destination, lhs, rhs, false, nuw, nsw, false){}
-BitwiseBinaryInst::OpType VecIntSHLInst::get_op_type() const {
+VecIntXnorInst::VecIntXnorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs)
+                        :VecIntBitwiseBinaryInst(instruction_stmt, destination, lhs, rhs, false, false, false, false){}
+BitwiseBinaryInst::OpType VecIntXnorInst::get_op_type() const{
+    return OpType::XNOR;
+}
+std::string VecIntXnorInst::to_string() const{
+    return this->to_string_helper("vec_int_xnor");
+}
+
+
+VecIntShlInst::VecIntShlInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+                        bool nuw, bool nsw):VecIntBitwiseBinaryInst(instruction_stmt, destination, lhs, rhs, nuw, nsw, false, false){}
+BitwiseBinaryInst::OpType VecIntShlInst::get_op_type() const{
     return OpType::SHL;
 }
-std::string VecIntSHLInst::to_string() const {
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .vec_int_shl(" + this->lhs->to_string() + ", " + this->rhs->to_string() + ")";
-    if(this->nuw){
-        res += " #[nuw]";
-    }
-    if(this->nsw){
-        res += " #[nsw]";
-    }
-    return res;
+std::string VecIntShlInst::to_string() const{
+    return this->to_string_helper("vec_int_shl");
 }
 
 
-VecIntLSHRInst::VecIntLSHRInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                                bool exact):VecIntBitwiseBinaryInst(instruction_stmt, destination, lhs, rhs, false, false, false, exact){}
-BitwiseBinaryInst::OpType VecIntLSHRInst::get_op_type() const {
+VecIntLshrInst::VecIntLshrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+                        bool exact):VecIntBitwiseBinaryInst(instruction_stmt, destination, lhs, rhs, false, false, exact, false){}
+BitwiseBinaryInst::OpType VecIntLshrInst::get_op_type() const{
     return OpType::LSHR;
 }
-std::string VecIntLSHRInst::to_string() const {
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .vec_int_lshr(" + this->lhs->to_string() + ", " + this->rhs->to_string() + ")";
-    if(this->exact){
-        res += " #[exact]";
-    }
-    return res;
+std::string VecIntLshrInst::to_string() const{
+    return this->to_string_helper("vec_int_lshr");
 }
 
 
-VecIntASHRInst::VecIntASHRInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                                bool exact):VecIntBitwiseBinaryInst(instruction_stmt, destination, lhs, rhs, false, false, false, exact){}
-BitwiseBinaryInst::OpType VecIntASHRInst::get_op_type() const {
+VecIntAshrInst::VecIntAshrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+                        bool exact):VecIntBitwiseBinaryInst(instruction_stmt, destination, lhs, rhs, false, false, exact, false){}
+BitwiseBinaryInst::OpType VecIntAshrInst::get_op_type() const{
     return OpType::ASHR;
 }
-std::string VecIntASHRInst::to_string() const {
-    std::string res = "let " + this->destination->get_dest_register_name() + " = .vec_int_ashr(" + this->lhs->to_string() + ", " + this->rhs->to_string() + ")";
-    if(this->exact){
-        res += " #[exact]";
-    }
-    return res;
+std::string VecIntAshrInst::to_string() const{
+    return this->to_string_helper("vec_int_ashr");
+}
+
+
+VecIntRotlInst::VecIntRotlInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs)
+                        :VecIntBitwiseBinaryInst(instruction_stmt, destination, lhs, rhs, false, false, false, false){}
+BitwiseBinaryInst::OpType VecIntRotlInst::get_op_type() const{
+    return OpType::ROTL;
+}
+std::string VecIntRotlInst::to_string() const{
+    return this->to_string_helper("vec_int_rotl");
+}
+
+
+VecIntRotrInst::VecIntRotrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs)
+                        :VecIntBitwiseBinaryInst(instruction_stmt, destination, lhs, rhs, false, false, false, false){}
+BitwiseBinaryInst::OpType VecIntRotrInst::get_op_type() const{
+    return OpType::ROTR;
+}
+std::string VecIntRotrInst::to_string() const{
+    return this->to_string_helper("vec_int_rotr");
+}
+
+
+VecIntPextInst::VecIntPextInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs)
+                        :VecIntBitwiseBinaryInst(instruction_stmt, destination, lhs, rhs, false, false, false, false){}
+BitwiseBinaryInst::OpType VecIntPextInst::get_op_type() const{
+    return OpType::PEXT;
+}
+std::string VecIntPextInst::to_string() const{
+    return this->to_string_helper("vec_int_pext");
+}
+
+
+VecIntPdepInst::VecIntPdepInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs)
+                        :VecIntBitwiseBinaryInst(instruction_stmt, destination, lhs, rhs, false, false, false, false){}
+BitwiseBinaryInst::OpType VecIntPdepInst::get_op_type() const{
+    return OpType::PDEP;
+}
+std::string VecIntPdepInst::to_string() const{
+    return this->to_string_helper("vec_int_pdep");
 }
 }
 }

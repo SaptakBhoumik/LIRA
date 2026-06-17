@@ -352,6 +352,7 @@ These extend the 1-bit carry shift instructions to handle a shift count of more 
     If base type is integer:
     - `#[nsw]` - poison if the truncated value does not sign-extend back to the original
     - `#[nuw]` - poison if the truncated value does not zero-extend back to the original
+    - `#[saturating]` - clamp to the integer type range instead of UB when the float value is out of range or NaN; pair with `#[unsigned]` for unsigned saturation; default is signed saturation when this flag is set
 
 - `let T2:%output_var = .ext(T1:%input_var)` - Extends from a narrower to a wider type. Base type of T1 and T2 must match in kind. Bitwidth of T1's base type must be strictly less than T2's. Both must be vector or both non-vector.
 

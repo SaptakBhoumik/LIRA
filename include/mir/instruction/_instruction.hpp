@@ -28,7 +28,7 @@ enum class InstType:std::int16_t{
  
     CmpBinaryInst,
 
-    ConversionInst,
+    ConvInst,
 
     UnaryInst,
     

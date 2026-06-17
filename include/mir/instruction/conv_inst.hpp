@@ -1,14 +1,14 @@
 #pragma once
 #include "ast/ast.hpp"
 #include "_instruction.hpp"
+#include <memory>
 namespace LIRA {
 namespace MIR {
 // --------------------------- Conversion operations ---------------------------
-class ConversionInst:public Inst {
+class ConvInst:public Inst {
     protected:
     IR::LiteralExprPtr value;
     IR::TypeExprPtr in_type;//Reduced in type. 
-    IR::TypeExprPtr out_type;//Reduced out type. 
 
     // When the instruction doesnt act lane wise
     bool nuw;
@@ -28,13 +28,13 @@ class ConversionInst:public Inst {
         INT_TO_PTR = 1 << 11,
         BITCAST = 1 << 12
     };
-    ConversionInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, IR::TypeExprPtr out_type,
-                    bool nuw, bool nsw, bool nsb, bool unsigned_, bool saturating);
+    ConvInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type,
+             bool nuw, bool nsw, bool nsb, bool unsigned_, bool saturating);
 
-    virtual ~ConversionInst() = default;
+    virtual ~ConvInst() = default;
     
-    virtual InstOperandTypeVarient get_in_type_varient() const final;//Can be calculated easily from ``in_type``. Just a helper function
-    virtual InstOperandTypeVarient get_out_type_varient() const final;//Can be calculated easily from ``out_type``. Just a helper function
+    virtual std::optional<InstOperandTypeVarient> get_in_type_varient() const final;//Can be calculated easily from ``in_type``. Just a helper function
+    virtual std::optional<InstOperandTypeVarient> get_out_type_varient() const final;//Can be calculated easily from ``out_type``. Just a helper function
     // NOTE: get_in_type_varient and  get_out_type_varient is ignored for BitCastInst because it can be any type as long as the bit width is same + dont make sense
     virtual IR::TypeExprPtr get_in_type() const final;
     virtual IR::TypeExprPtr get_out_type() const final;
@@ -51,33 +51,34 @@ class ConversionInst:public Inst {
 };
 
 // --------------------------- Scalar conversion operations ---------------------------
-class ScalarConversionInst:public ConversionInst{
+class ScalarConvInst:public ConvInst{
     public:
-    ScalarConversionInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
-                         IR::TypeExprPtr out_type, bool nuw, bool nsw, bool nsb, bool unsigned_, bool saturating);
+    ScalarConvInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
+                   bool nuw, bool nsw, bool nsb, bool unsigned_, bool saturating);
 
-    virtual std::size_t get_in_type_bitwidth() const final;//Returns the bit width of the in type. Calculated automatically
-    virtual std::size_t get_out_type_bitwidth() const final;//Returns the bit width of the out type. Calculated automatically
+    virtual std::size_t get_in_type_bitwidth() const = 0;
+    virtual std::size_t get_out_type_bitwidth() const = 0;
 };
 
-class IntTruncInst:public ScalarConversionInst{
+class IntTruncInst:public ScalarConvInst{
     public:
     IntTruncInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
-                 IR::TypeExprPtr out_type, bool nuw, bool nsw);
+                 bool nuw, bool nsw, bool unsigned_, bool saturating);
 
     //I can implement casted integer type helper here but I doubt it will be useful because we can get the width from get_in_type_bitwidth and get_out_type_bitwidth anyways
     //But I am implementing it just for consistency 
     std::shared_ptr<IR::IntTypeExpr> get_casted_in_type() const;
     std::shared_ptr<IR::IntTypeExpr> get_casted_out_type() const; 
+    std::size_t get_in_type_bitwidth() const override;
+    std::size_t get_out_type_bitwidth() const override;
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
 };
 
-class FloatTruncInst:public ScalarConversionInst{
+class FloatTruncInst:public ScalarConvInst{
     public:
-    FloatTruncInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
-                    IR::TypeExprPtr out_type);
+    FloatTruncInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type);
 
     //I can implement casted integer type helper here but I doubt it will be useful because we can get the width from get_in_type_bitwidth and get_out_type_bitwidth anyways
     //But I am implementing it just for consistency 
@@ -85,85 +86,105 @@ class FloatTruncInst:public ScalarConversionInst{
     std::shared_ptr<IR::FloatTypeExpr> get_casted_out_type() const; 
     bool is_in_bf16() const;//Whether the in type is bf16 or not. Just a helper function to make life easier
     bool is_out_bf16() const;//Whether the out type is bf16 or not. Just a helper function to make life easier
+    std::size_t get_in_type_bitwidth() const override;
+    std::size_t get_out_type_bitwidth() const override;
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
 };
 
-class IntExtInst:public ScalarConversionInst{
+class IntExtInst:public ScalarConvInst{
     public:
-    IntExtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
-              IR::TypeExprPtr out_type, bool nsb, bool unsigned_);
+    IntExtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type,
+                bool nsb, bool unsigned_);
 
     std::shared_ptr<IR::IntTypeExpr> get_casted_in_type() const;
     std::shared_ptr<IR::IntTypeExpr> get_casted_out_type() const; 
+    std::size_t get_in_type_bitwidth() const override;
+    std::size_t get_out_type_bitwidth() const override;
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
 };
 
-class FloatExtInst:public ScalarConversionInst{
+class FloatExtInst:public ScalarConvInst{
     public:
-    FloatExtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
-                    IR::TypeExprPtr out_type);
+    FloatExtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type);
 
     std::shared_ptr<IR::FloatTypeExpr> get_casted_in_type() const;
     std::shared_ptr<IR::FloatTypeExpr> get_casted_out_type() const; 
     bool is_in_bf16() const;
     bool is_out_bf16() const;
+    std::size_t get_in_type_bitwidth() const override;
+    std::size_t get_out_type_bitwidth() const override;
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
 };
 
-class FloatToIntInst:public ScalarConversionInst{
+class FloatToIntInst:public ScalarConvInst{
     public:
     FloatToIntInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
-                    IR::TypeExprPtr out_type, bool unsigned_);
+                   bool nsb, bool unsigned_, bool saturating);
 
     std::shared_ptr<IR::FloatTypeExpr> get_casted_in_type() const;
     std::shared_ptr<IR::IntTypeExpr> get_casted_out_type() const; 
     bool is_in_bf16() const;
+    std::size_t get_in_type_bitwidth() const override;
+    std::size_t get_out_type_bitwidth() const override;
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
 };
 
-class IntToFloatInst:public ScalarConversionInst{
+class IntToFloatInst:public ScalarConvInst{
     public:
     IntToFloatInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
-                    IR::TypeExprPtr out_type, bool unsigned_);
+                   bool nsb, bool unsigned_);
 
     std::shared_ptr<IR::IntTypeExpr> get_casted_in_type() const;
     std::shared_ptr<IR::FloatTypeExpr> get_casted_out_type() const; 
     bool is_out_bf16() const;
+    std::size_t get_in_type_bitwidth() const override;
+    std::size_t get_out_type_bitwidth() const override;
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
 };
 
-class PtrToIntInst:public ScalarConversionInst{
+class PtrToIntInst:public ScalarConvInst{
     public:
     //We already know the in type(ptr) and out type(i64). No need to store again
     PtrToIntInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value);
 
+    std::shared_ptr<IR::IntTypeExpr> get_casted_out_type() const;
+    std::size_t get_in_type_bitwidth() const override;
+    std::size_t get_out_type_bitwidth() const override;
+
     OpType get_op_type() const override final;
     std::string to_string() const override;
 };
 
-class IntToPtrInst:public ScalarConversionInst{
+class IntToPtrInst:public ScalarConvInst{
     public:
     //We already know the in type(i64) and out type(ptr). No need to store again
-    IntToPtrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value);
+    IntToPtrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type);
+
+    std::shared_ptr<IR::IntTypeExpr> get_casted_in_type() const;
+    std::size_t get_in_type_bitwidth() const override;
+    std::size_t get_out_type_bitwidth() const override;
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
 };
 
-class BitCastInst:public ScalarConversionInst{
+class BitCastInst:public ScalarConvInst{
     public:
     //We already know the in type and out type have same bit width. No need to store again
-    BitCastInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, IR::TypeExprPtr out_type);
+    BitCastInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type);
+
+    std::size_t get_in_type_bitwidth() const override;//Returns 0 as of now but in future must return the actual size. TODO:Implement the size of method for typeexpr
+    std::size_t get_out_type_bitwidth() const override;//Returns 0 as of now but in future must return the actual size. TODO:Implement the size of method for typeexpr
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -172,100 +193,129 @@ class BitCastInst:public ScalarConversionInst{
 
 
 // --------------------------- Vector conversion operations ---------------------------
-class LaneWiseConversionInst:public ConversionInst{
+class VecConvInst:public ConvInst{
     public:
-    LaneWiseConversionInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
-                           IR::TypeExprPtr out_type, bool nuw, bool nsw, bool nsb, bool unsigned_);
+    VecConvInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
+                bool nuw, bool nsw, bool nsb, bool unsigned_, bool saturating);
 
-    virtual std::size_t get_in_basetype_bitwidth() const final;//Returns the bit width of the in type. Calculated automatically
-    virtual std::size_t get_out_basetype_bitwidth() const final;//Returns the bit width of the out type. Calculated automatically
-    virtual std::size_t get_num_elements() const final;//Returns the number of elements in the vector. Calculated automatically
     virtual std::shared_ptr<IR::SIMDTypeExpr> get_casted_in_type() const final;//Returns the in type casted to SIMDTypeExpr.
     virtual std::shared_ptr<IR::SIMDTypeExpr> get_casted_out_type() const final;//Returns the out type casted to SIMDTypeExpr. 
+    virtual std::size_t get_num_elements() const final;//Returns the number of elements in the vector. Calculated automatically
+    virtual std::size_t get_in_basetype_bitwidth() const = 0;
+    virtual std::size_t get_out_basetype_bitwidth() const = 0;
 };
 
-class LaneWiseIntTruncInst:public LaneWiseConversionInst{
+class VecIntTruncInst:public VecConvInst{
     public:
-    LaneWiseIntTruncInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
-                        IR::TypeExprPtr out_type, bool nuw, bool nsw);
+    VecIntTruncInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
+                    bool nuw, bool nsw, bool unsigned_, bool saturating);
 
+    std::shared_ptr<IR::IntTypeExpr> get_casted_in_basetype() const;
+    std::shared_ptr<IR::IntTypeExpr> get_casted_out_basetype() const; 
+    std::size_t get_in_basetype_bitwidth() const override;
+    std::size_t get_out_basetype_bitwidth() const override;
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
 };
 
-class LaneWiseFloatTruncInst:public LaneWiseConversionInst{
+class VecFloatTruncInst:public VecConvInst{
     public:
-    LaneWiseFloatTruncInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
-                        IR::TypeExprPtr out_type);
-
-    bool is_in_bf16() const;//Whether the in type is bf16 or not. Just a helper function to make life easier
-    bool is_out_bf16() const;//Whether the out type is bf16 or not. Just a helper function to make life easier
+    VecFloatTruncInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type);
+    
+    std::shared_ptr<IR::FloatTypeExpr> get_casted_in_basetype() const;
+    std::shared_ptr<IR::FloatTypeExpr> get_casted_out_basetype() const;
+    bool is_in_basetype_bf16() const;//Whether the in type is bf16 or not. Just a helper function to make life easier
+    bool is_out_basetype_bf16() const;//Whether the out type is bf16 or not. Just a helper function to make life easier
+    std::size_t get_in_basetype_bitwidth() const override;
+    std::size_t get_out_basetype_bitwidth() const override;
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
 };
 
-class LaneWiseIntExtInst:public LaneWiseConversionInst{
+class VecIntExtInst:public VecConvInst{
     public:
-    LaneWiseIntExtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
-                    IR::TypeExprPtr out_type, bool nsb, bool unsigned_);
+    VecIntExtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
+                  bool nsb, bool unsigned_);
+
+    std::shared_ptr<IR::IntTypeExpr> get_casted_in_basetype() const;
+    std::shared_ptr<IR::IntTypeExpr> get_casted_out_basetype() const; 
+    std::size_t get_in_basetype_bitwidth() const override;
+    std::size_t get_out_basetype_bitwidth() const override;
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
 };
 
-class LaneWiseFloatExtInst:public LaneWiseConversionInst{
+class VecFloatExtInst:public VecConvInst{
     public:
-    LaneWiseFloatExtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
-                    IR::TypeExprPtr out_type);
+    VecFloatExtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type);
 
-    bool is_in_bf16() const;
-    bool is_out_bf16() const;
+    std::shared_ptr<IR::FloatTypeExpr> get_casted_in_basetype() const;
+    std::shared_ptr<IR::FloatTypeExpr> get_casted_out_basetype() const;
+    bool is_in_basetype_bf16() const;
+    bool is_out_basetype_bf16() const;
+    std::size_t get_in_basetype_bitwidth() const override;
+    std::size_t get_out_basetype_bitwidth() const override;
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
 };
 
-class LaneWiseFloatToIntInst:public LaneWiseConversionInst{
+class VecFloatToIntInst:public VecConvInst{
     public:
-    LaneWiseFloatToIntInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
-                        IR::TypeExprPtr out_type, bool unsigned_);
-
-    bool is_in_bf16() const;
+    VecFloatToIntInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
+                      bool nsb, bool unsigned_, bool saturating);
+    
+    std::shared_ptr<IR::FloatTypeExpr> get_casted_in_basetype() const;
+    std::shared_ptr<IR::IntTypeExpr> get_casted_out_basetype() const; 
+    bool is_in_basetype_bf16() const;
+    std::size_t get_in_basetype_bitwidth() const override;
+    std::size_t get_out_basetype_bitwidth() const override;
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
 };
 
-class LaneWiseIntToFloatInst:public LaneWiseConversionInst{
+class VecIntToFloatInst:public VecConvInst{
     public:
-    LaneWiseIntToFloatInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
-                        IR::TypeExprPtr out_type, bool unsigned_);
-
-    bool is_out_bf16() const;
+    VecIntToFloatInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
+                      bool nsb, bool unsigned_);
+    
+    std::shared_ptr<IR::IntTypeExpr> get_casted_in_basetype() const;
+    std::shared_ptr<IR::FloatTypeExpr> get_casted_out_basetype() const;
+    bool is_out_basetype_bf16() const;
+    std::size_t get_in_basetype_bitwidth() const override;
+    std::size_t get_out_basetype_bitwidth() const override;
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
 };
 
-class LaneWisePtrToIntInst:public LaneWiseConversionInst{
-    public:
-    //We already know the in type(<ptr,N>) and out type(<i64,N>). But we need to know N. That is why we take the type here
-    //Why not just the number? No partiqular reason. It works. Thought it will make the code cleaner(It doesnt. It is the same either way)
-    LaneWisePtrToIntInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
-                        IR::TypeExprPtr out_type);
-
-    OpType get_op_type() const override final;
-    std::string to_string() const override;
-};
-
-class LaneWiseIntToPtrInst:public LaneWiseConversionInst{
+class VecPtrToIntInst:public VecConvInst{
     public:
     //We already know the in type(<i64,N>) and out type(<ptr,N>). But we need to know N. That is why we take the type here
     //Why not just the number? No partiqular reason. It works. Thought it will make the code cleaner(It doesnt. It is the same either way)
-    LaneWiseIntToPtrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
-                        IR::TypeExprPtr out_type);
+    VecPtrToIntInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type);
+    
+    std::shared_ptr<IR::IntTypeExpr> get_casted_out_basetype() const;
+    std::size_t get_in_basetype_bitwidth() const override;
+    std::size_t get_out_basetype_bitwidth() const override;
+
+    OpType get_op_type() const override final;
+    std::string to_string() const override;
+};
+
+class VecIntToPtrInst:public VecConvInst{
+    public:
+    //We already know the in type(<ptr,N>) and out type(<i64,N>). But we need to know N. That is why we take the type here
+    //Why not just the number? No partiqular reason. It works. Thought it will make the code cleaner(It doesnt. It is the same either way)
+    VecIntToPtrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type);
+
+    std::shared_ptr<IR::IntTypeExpr> get_casted_in_basetype() const;
+    std::size_t get_in_basetype_bitwidth() const override;
+    std::size_t get_out_basetype_bitwidth() const override;
 
     OpType get_op_type() const override final;
     std::string to_string() const override;

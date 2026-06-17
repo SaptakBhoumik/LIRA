@@ -10,7 +10,6 @@
 ## Memory Instructions
     ### Cache Control Instructions
     ### Lifetime and Invariant Scope Instructions
-## Unary Fetch Modify Instructions
 ## Call Instruction
 ## SIMD Instructions
     ### Horizontal SIMD Instructions

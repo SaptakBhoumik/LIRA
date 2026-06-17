@@ -49,7 +49,7 @@ enum class InstType:std::int16_t{
 
     FetchBitwiseBinInst,
 
-    FetchArithmeticUnaryInst,
+    FetchUnaryInst,
 
     RetInst,
     UnreachableInst,

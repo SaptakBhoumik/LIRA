@@ -895,15 +895,18 @@ Read-modify-write instructions that apply a unary operation to the value at a me
 - `let T:%old = .fetch_parity(ptr:%ptr)` - Parity of `*ptr` (1 if odd number of set bits, 0 if even); returns the original. T must be integer. No additional attributes.
 
 - `let T:%old = .fetch_bswap(ptr:%ptr)` - Reverses byte order of `*ptr`; returns the original. T must be integer or float/bfloat. Float/bfloat supported for endianness swaps (avoids needing a bitcast). Bitwidth must be a multiple of 8. No additional attributes.
+clrsb
 
 - `let T:%old = .fetch_bitreverse(ptr:%ptr)` - Reverses bit order of `*ptr`; returns the original. T must be integer. No additional attributes.
+
+- `let T:%old = .fetch_clrsb(ptr:%ptr)` - Does what u think it does. T must be integer. No additional attributes.
 
 - `let T:%old = .fetch_blsi(ptr:%ptr)` - Does what u think it does. `T` must be `i<N>`. No attributes.
 
 - `let T:%old = .fetch_blsr(ptr:%ptr)` - Does what u think it does. `T` must be `i<N>`. No attributes.
 
 - `let T:%old = .fetch_blsmask(ptr:%ptr)` - Does what u think it does. `T` must be `i<N>`. No attributes.
-
+ 
 ---
 
 ## Terminator Instructions

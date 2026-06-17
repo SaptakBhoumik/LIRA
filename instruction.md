@@ -1213,27 +1213,39 @@ Note: `.reduce_sub`, `.reduce_nand`, `.reduce_nor`, `.reduce_div`, `.reduce_rem`
 
 ### Optimizer Hint Instructions
 
-#### Binding Assumptions (UB if violated)
-- `.assume(T:%var, T:compile_time_value)` - Tells the optimizer that `%var` holds `compile_time_value` at this program point. The compiler may propagate this as a known value. Undefined behavior if the assumption is false. `T` can be any scalar integer, float, bfloat, or `ptr`. `compile_time_value` must be a literal.
+#### Binding Assumptions (May cause UB if violated)
+- `.assume(T:%var, T:compile_time_value)` - Tells the optimizer that `%var` holds `compile_time_value` at this program point. The compiler may propagate this as a known value. Undefined behavior if the assumption is false. `T` can be any type as long as represented as compile time value. `compile_time_value` must be a literal.
     - `#[noundef]` - additionally asserts that `%var` is not poison or undef
 
 - `.assume_range(T:%var, T:compile_time_lo, T:compile_time_hi)` - Asserts that `%var` lies in the closed interval `[lo, hi]`. Undefined behavior if wrong. `T` must be integer or float scalar; `lo` and `hi` must be compile-time literals.
     - `#[unsigned]` - interval interpreted as unsigned (integer only); default is signed
     - `#[noundef]` - additionally asserts the value is not poison
 
-- `.assume_values(T:%var, T:v0, T:v1, ...)` - Asserts that `%var` is one of the listed compile-time values. Undefined behavior if wrong. `T` can be any scalar integer, float, bfloat, or `ptr`. At least one value required.
+- `.assume_values(T:%var, T:v0, T:v1, ...)` - Asserts that `%var` is one of the listed compile-time values. Undefined behavior if wrong. `T` can be any type as long as represented as compile time value. At least one value required.
     - `#[noundef]` - additionally asserts `%var` is not poison
 
-#### Non-Binding Expectation Hints
-- `.expect(T:%var, T:compile_time_value)` - Hints that `%var` most commonly holds `compile_time_value`. No UB if wrong. Analogous to `__builtin_expect`. `T` any scalar integer, float, bfloat, or `ptr`.
+- `.assume_not(T:%var, T:compile_time_value)` - Tells the optimizer that `%var` does not hold `compile_time_value` at this program point. Undefined behavior if the assumption is false. `T` can be any type as long as represented as compile time value. `compile_time_value` must be a literal.
+    - `#[noundef]` - additionally asserts that `%var` is not poison or undef
+
+- `.assume_not_range(T:%var, T:compile_time_lo, T:compile_time_hi)` - Asserts that `%var` does not lie in the closed interval `[lo, hi]`. Undefined behavior if wrong. `T` must be integer or float scalar; `lo` and `hi` must be compile-time literals.
+    - `#[unsigned]` - interval interpreted as unsigned (integer only); default is signed
+    - `#[noundef]` - additionally asserts the value is not poison
+
+- `.assume_not_values(T:%var, T:v0, T:v1, ...)` - Asserts that `%var` is not any of the listed compile-time values. Undefined behavior if wrong. `T` can be any type as long as represented as compile time value. At least one value required.
+    - `#[noundef]` - additionally asserts `%var` is not poison
+
+#### Non-Binding Expectation Hints(No UB if violated. Even if the prob is 100%, the optimizer may still generate code for other cases.)
+- `.expect(T:%var, T:compile_time_value)` - Hints that `%var` most commonly holds `compile_time_value`. No UB if wrong. Analogous to `__builtin_expect`. `T` can be any type as long as represented as compile time value.
     - `#[probability(f32:P)]` - probability the value matches (0.0–1.0); default unspecified
 
-- `.expect_range(T:%var, T:compile_time_lo, T:compile_time_hi)` - Hints that `%var` most commonly falls in `[lo, hi]`. `T` integer or float scalar. No UB if wrong.
+- `.expect_range(T:%var, T:compile_time_lo, T:compile_time_hi)` - Hints that `%var` most commonly falls in `[lo, hi]`. T is integer or float. No UB if wrong.
     - `#[unsigned]` - interval unsigned
     - `#[probability(f32:P)]` - probability the value is in range
 
-- `.expect_values(T:%var, T:v0, T:v1, ...)` - Hints that `%var` is most likely one of the listed values. No UB if wrong.
+- `.expect_values(T:%var, T:v0, T:v1, ...)` - Hints that `%var` is most likely one of the listed values. `T` can be any type as long as represented as compile time value. No UB if wrong.
     - `#[probability(f32:P)]` - probability the value is in the list
+
+There are no expect_not variants, since they are equivalent to the corresponding expect variant with the probability inverted (1 - P).
 
 ### Metadata and Machine Instructions
 

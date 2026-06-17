@@ -194,6 +194,14 @@ FloatFetchUnaryInst::FloatFetchUnaryInst(IR::InstructionStmtPtr instruction_stmt
     this->fast_math_attr = fast_math_attr;
     this->approx = approx;
 }
+std::string FloatFetchUnaryInst::to_string_helper(const std::string op_name) const{
+    std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(ptr:" + this->value->to_string() + ")";
+    res+= " " + this->fast_math_attr.to_string();
+    if(this->approx){
+        res += " #[approx]";
+    }
+    return res;
+}
 FastMathAttr FloatFetchUnaryInst::get_fast_math_attr() const{
     return fast_math_attr;
 }

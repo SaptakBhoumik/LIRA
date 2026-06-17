@@ -83,23 +83,5 @@ class PtrMaskInst:public Inst {
     std::string to_string() const override;
 };
 
-class ShuffleVectorInst:public Inst {
-    std::pair<IR::LiteralExprPtr,IR::TypeExprPtr> input1;//The first input vector and its type
-    std::pair<IR::LiteralExprPtr,IR::TypeExprPtr> input2;//The second input vector and its type
-    std::vector<std::int16_t> mask;//The shuffle mask. It is a vector of integers. -1 mean poison value
-    public:
-    ShuffleVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, std::pair<IR::LiteralExprPtr,IR::TypeExprPtr> input1, 
-                      std::pair<IR::LiteralExprPtr,IR::TypeExprPtr> input2, std::vector<std::int16_t> mask);
-    
-    std::pair<IR::LiteralExprPtr,IR::TypeExprPtr> get_input1() const;
-    std::pair<IR::LiteralExprPtr,IR::TypeExprPtr> get_input2() const;
-    std::pair<std::shared_ptr<IR::SIMDTypeExpr>,std::shared_ptr<IR::SIMDTypeExpr>> get_casted_input_types() const;
-    std::pair<std::size_t,std::size_t> get_input_vector_size() const;
-    IR::TypeExprPtr get_input_basetype() const;
-    std::vector<std::int16_t> get_mask() const;
-
-    InstType get_inst_type() const override;
-    std::string to_string() const override;
-};
 }
 }

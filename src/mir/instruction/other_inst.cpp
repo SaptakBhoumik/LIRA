@@ -129,48 +129,5 @@ std::string PtrMaskInst::to_string() const{
 }
 
 
-ShuffleVectorInst::ShuffleVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, std::pair<IR::LiteralExprPtr,IR::TypeExprPtr> input1, 
-                                     std::pair<IR::LiteralExprPtr,IR::TypeExprPtr> input2, std::vector<std::int16_t> mask)
-                    :Inst(instruction_stmt, destination){
-    this->input1 = input1;
-    this->input2 = input2;
-    this->mask = mask;
-}
-std::pair<IR::LiteralExprPtr,IR::TypeExprPtr> ShuffleVectorInst::get_input1() const{
-    return this->input1;
-}
-std::pair<IR::LiteralExprPtr,IR::TypeExprPtr> ShuffleVectorInst::get_input2() const{
-    return this->input2;
-}
-std::pair<std::shared_ptr<IR::SIMDTypeExpr>,std::shared_ptr<IR::SIMDTypeExpr>> ShuffleVectorInst::get_casted_input_types() const{
-    return std::make_pair(std::dynamic_pointer_cast<IR::SIMDTypeExpr>(this->input1.second), std::dynamic_pointer_cast<IR::SIMDTypeExpr>(this->input2.second));
-}
-std::pair<std::size_t,std::size_t> ShuffleVectorInst::get_input_vector_size() const{
-    auto casted_types = get_casted_input_types();
-    return std::make_pair(casted_types.first->get_size(), casted_types.second->get_size());
-}
-IR::TypeExprPtr ShuffleVectorInst::get_input_basetype() const{
-    auto casted_types = get_casted_input_types();
-    return casted_types.first->get_basetype();
-}
-std::vector<std::int16_t> ShuffleVectorInst::get_mask() const{
-    return this->mask;
-}
-InstType ShuffleVectorInst::get_inst_type() const{
-    return InstType::ShuffleVectorInst;
-}
-std::string ShuffleVectorInst::to_string() const{
-    std::string res = "let " + this->destination->to_string() + " = .shuffle_vector("
-                    +  input1.second->to_string() + ":" + input1.first->to_string() + ", " + input2.second->to_string() + ":" + input2.first->to_string() +
-            ", <i64" + std::to_string(this->mask.size()) + ">:<";
-    for(std::size_t i = 0; i < this->mask.size(); i++){
-        res += std::to_string(this->mask[i]);
-        if(i != this->mask.size() - 1){
-            res += ", ";
-        }
-    }
-    res += ">)";
-    return res; 
-}
 }
 }

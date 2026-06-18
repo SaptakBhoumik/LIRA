@@ -1,9 +1,4 @@
-#include "ast/ast.hpp"
-#include "mir/instruction/_instruction.hpp"
 #include "mir/instruction/fetch_unary_inst.hpp"
-#include <iostream>
-#include <memory>
-#include <optional>
 
 namespace LIRA {
 namespace MIR {

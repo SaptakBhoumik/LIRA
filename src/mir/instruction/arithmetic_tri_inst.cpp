@@ -1,6 +1,4 @@
 #include "mir/instruction/arithmetic_tri_inst.hpp"
-#include "ast/ast.hpp"
-#include <memory>
 
 namespace LIRA {
 namespace MIR {

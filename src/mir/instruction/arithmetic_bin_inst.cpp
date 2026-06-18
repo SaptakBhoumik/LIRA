@@ -1,5 +1,4 @@
 #include "mir/instruction/arithmetic_bin_inst.hpp"
-#include <optional>
 
 namespace LIRA {
 namespace MIR {

@@ -1,5 +1,4 @@
 #include "mir/instruction/fetch_bitwise_bin_inst.hpp"
-#include <memory>
 
 namespace LIRA {
 namespace MIR {

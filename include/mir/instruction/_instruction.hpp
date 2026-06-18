@@ -80,7 +80,7 @@ enum class InstType:std::int16_t{
     AnnotationInst,
     Endbr64Inst,
     LaunderInst,
-    StripInvariantInst,
+    StripInvariantGroupInst,
 };
 
 struct FastMathAttr {

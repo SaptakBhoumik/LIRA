@@ -1,14 +1,8 @@
 #include "mir/instruction/other_inst.hpp"
-#include "ast/ast.hpp"
-#include "mir/instruction.hpp"
-#include "mir/instruction/_instruction.hpp"
-#include <cstddef>
-#include <iostream>
-#include <memory>
-#include <string>
 
 namespace LIRA {
 namespace MIR {
+// --------------------------Unclassified other instructions-------------------------------
 ScalarSelectInst::ScalarSelectInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr condition, 
                                     IR::LiteralExprPtr true_value, IR::LiteralExprPtr false_value, std::optional<FastMathAttr> fast_math_attr):
                                     Inst(instruction_stmt, destination, fast_math_attr){
@@ -198,6 +192,7 @@ std::string PauseInst::to_string() const{
 }
 
 
+// --------------------------Binding Assumptions-------------------------------
 AssumeInst::AssumeInst(IR::InstructionStmtPtr instruction_stmt, std::string varname, std::vector<IR::LiteralExprPtr> assumed_values, IR::TypeExprPtr type, 
                       std::optional<FastMathAttr> fast_math_attr):
                        Inst(instruction_stmt, nullptr, fast_math_attr){
@@ -328,6 +323,7 @@ std::string AssumeNotRangeInst::to_string() const{
 }
 
 
+// --------------------------Non-Binding Expectation Hints-------------------------------
 ExpectInst::ExpectInst(IR::InstructionStmtPtr instruction_stmt, std::string varname, std::vector<IR::LiteralExprPtr> assumed_values, IR::TypeExprPtr type, 
                        std::optional<double> probability, std::optional<FastMathAttr> fast_math_attr):
                        Inst(instruction_stmt, nullptr, fast_math_attr){
@@ -407,6 +403,7 @@ std::string ExpectRangeInst::to_string() const{
 }
 
 
+// --------------------------Metadata and Machine Instructions-------------------------------
 NopInst::NopInst(IR::InstructionStmtPtr instruction_stmt, std::uint8_t size, bool multi_byte):Inst(instruction_stmt, nullptr, std::nullopt){
     this->size = size;
     this->multi_byte = multi_byte;
@@ -452,6 +449,7 @@ std::string Endbr64Inst::to_string() const{
 }
 
 
+// --------------------------Pointer Provenance Instructions-------------------------------
 LaunderInst::LaunderInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr ptr):Inst(instruction_stmt, destination, std::nullopt){
     this->ptr = ptr;
 }
@@ -466,16 +464,16 @@ std::string LaunderInst::to_string() const{
 }
 
 
-StripInvariantInst::StripInvariantInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr ptr):Inst(instruction_stmt, destination, std::nullopt){
+StripInvariantGroupInst::StripInvariantGroupInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr ptr):Inst(instruction_stmt, destination, std::nullopt){
     this->ptr = ptr;
 }
-IR::LiteralExprPtr StripInvariantInst::get_ptr() const{
+IR::LiteralExprPtr StripInvariantGroupInst::get_ptr() const{
     return this->ptr;
 }
-InstType StripInvariantInst::get_inst_type() const{
-    return InstType::StripInvariantInst;
+InstType StripInvariantGroupInst::get_inst_type() const{
+    return InstType::StripInvariantGroupInst;
 }
-std::string StripInvariantInst::to_string() const{
+std::string StripInvariantGroupInst::to_string() const{
     return "let " + this->destination->to_string() + " = .strip_invariant(ptr:" + this->ptr->to_string() + ")";
 }
 }

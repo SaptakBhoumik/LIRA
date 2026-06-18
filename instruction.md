@@ -137,7 +137,7 @@
 
 - `let T:%out = .mulfix(T:%a, T:%b, i32:%scale)` - Fixed-point multiply. Multiplies `a` and `b` as if they were fixed-point values with `scale` fractional bits, returning the correctly rounded result in the same type. Concretely: computes `(a * b) >> scale` with the intermediate product computed at double width to avoid overflow. Scale must be a compile-time constant.
 
-    T must be of the form `T0` or `<T0,M>` where T0 is an integer type. `i32:%scale` must be a compile-time literal; must satisfy `0 <= scale <= bitwidth(T0)`.
+    T must be of the form `T0` or `<T0,M>` where T0 is an integer type. `i32:%scale` must be a compile-time/run-time; must satisfy `0 <= scale <= bitwidth(T0)`.
 
     - `#[unsigned]` - treat `a` and `b` as unsigned fixed-point values; default is signed
     - `#[saturating]` - if the shifted result does not fit in T, clamp to the type range instead of producing poison; pair with `#[unsigned]` for unsigned saturation; default is signed saturation when this flag is set
@@ -1123,7 +1123,7 @@ Note: `.reduce_sub`, `.reduce_nand`, `.reduce_nor`, `.reduce_div`, `.reduce_rem`
 
     - `<T,N>:%vec` - the destination vector; T can be any integer, float, or bfloat; N is the total lane count
     - `<T,M>:%sub` - the subvector to insert; same element type T; M < N; M must divide N
-    - `i64:%index` - the starting lane index in `vec` where insertion begins; must be a compile-time integer literal; must be a multiple of M (i.e. aligned to subvector boundaries); must satisfy `index + M <= N`
+    - `i64:%index` - the starting lane index in `vec` where insertion begins; must be a compile-time/run-time integer; must be a multiple of M (i.e. aligned to subvector boundaries); must satisfy `index + M <= N`
 
     Output type: `<T,N>` - same type as `vec`
 
@@ -1133,7 +1133,7 @@ Note: `.reduce_sub`, `.reduce_nand`, `.reduce_nor`, `.reduce_div`, `.reduce_rem`
 - `let <T,M>:%out = .extract_subvector(<T,N>:%vec, i64:%index)` - Extracts a contiguous slice of lanes from a vector into a shorter vector. 
 
     - `<T,N>:%vec` - the source vector; T can be any integer, float, or bfloat
-    - `i64:%index` - the starting lane index; must be a compile-time integer literal; must be a multiple of M; must satisfy `index + M <= N`
+    - `i64:%index` - the starting lane index; must be a compile-time/run-time integer; must be a multiple of M; must satisfy `index + M <= N`
 
     Output type: `<T,M>` - the element type is the same T; M is determined by the declared output type; M < N; M must divide N
 
@@ -1240,7 +1240,7 @@ The following are defined only on integer
 - `let <T,N3>:%out = .interleave3(<T,N>:%a, <T,N>:%b, <T,N>:%c)` - Interleave three channels. `N3 = 3*N`. Same rules.
 - `let <T,N4>:%out = .interleave4(<T,N>:%a, <T,N>:%b, <T,N>:%c, <T,N>:%d)` - Interleave four channels. `N4 = 4*N`. Same rules.
 
-- `let <T,N>:%out = .deinterleave2(<T,N2>:%v, i8:channel)` - Extracts one channel from an interleaved vector. `channel` must be a compile-time literal in `[0, 1]`. Extracts elements at positions `channel, channel+2, channel+4, ...`. Output length `N = N2/2`.
+- `let <T,N>:%out = .deinterleave2(<T,N2>:%v, i8:channel)` - Extracts one channel from an interleaved vector. `channel` must be a compile-time/run-time in `[0, 1]`. Extracts elements at positions `channel, channel+2, channel+4, ...`. Output length `N = N2/2`.
 
     If T is float:
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
@@ -1397,13 +1397,14 @@ There are no expect_not variants, since they are equivalent to the corresponding
 
 ### Floating-Point Environment (SSE)
 
-These instructions read/write `MXCSR` only and have no effect on `f80` arithmetic; rounding mode, precision, and exception state for `f80` operations are controlled exclusively via the x87 FP environment instructions.
+These instructions read/write `MXCSR` only and have no effect on `f80`(or `f128`. Will think for the `f128` during impl to see if possible but probable not) arithmetic; rounding mode, precision, and exception state for `f80` operations are controlled exclusively via the x87 FP environment instructions.
 
 - `let i32:%out = .get_fpenv()` - Reads the processor's `MXCSR` register. Returns an opaque `i32` bit-pattern. No attributes.
 
 - `.set_fpenv(i32:%env)` - Writes `%env` to `MXCSR`. `%env` should be a value obtained from `.get_fpenv` (possibly modified via field accessors); writing arbitrary bit patterns with reserved bits set incorrectly is undefined behavior.
     - `#[volatile]` - prevents the optimizer from eliminating, reordering across other FP ops, or merging redundant calls. Use when the side effect on FP exception trapping matters.
 
+TODO:Check with claude what are the possible field value. Maybe create an enum for representing that field. Or something like that
 - `let i32:%out = .fpenv_get_field(i32:%env, str:field)` - Extracts a named field from an opaque FP environment value. `field` must be a compile-time string literal: `"round"` (0=nearest-even, 1=neg inf, 2=pos inf, 3=zero), `"ftz"`, `"daz"`, `"except_mask"` (6-bit packed: bits 0–5 invalid, denorm, divzero, overflow, underflow, inexact; 1=masked), `"except_status"` (same 6-bit order for sticky flags). No attributes.
 
 - `let i32:%out = .fpenv_set_field(i32:%env, str:field, i32:%value)` - Returns a copy of `%env` with the named field replaced by `%value`. For `"except_status"`, setting a bit clears the corresponding sticky exception flag. Does not modify processor state; pass the result to `.set_fpenv` to take effect. No attributes.
@@ -1432,13 +1433,13 @@ All instructions are pure functions of their operands; constant-foldable, CSE-ab
 - `let <i8,16>:%out = .aesdec(<i8,16>:%state, <i8,16>:%roundkey)` - AES decrypt round. No attributes.
 - `let <i8,16>:%out = .aesdeclast(<i8,16>:%state, <i8,16>:%roundkey)` - AES decrypt last round (no InvMixColumns). No attributes.
 - `let <i8,16>:%out = .aesimc(<i8,16>:%roundkey)` - AES inverse mix columns on a round key. No attributes.
-- `let <i8,16>:%out = .aeskeygenassist(<i8,16>:%a, i8:rcon)` - AES key generation assist. `rcon` must be a compile-time integer literal. No attributes.
+- `let <i8,16>:%out = .aeskeygenassist(<i8,16>:%a, i8:rcon)` - AES key generation assist. `rcon` must be a compile-time/run-time integer literal. No attributes.
 
 #### Carry-less Multiply
 - `let i128:%out = .clmul(i64:%a, i64:%b)` - Carry-less (GF(2)) multiply, 64x64->128. No attributes.
 
 #### SHA (operate on `<i32,4>` state)
-- `let <i32,4>:%out = .sha1rnds4(<i32,4>:%abcd, <i32,4>:%msg, i8:func)` - SHA-1 four rounds. `func` compile-time literal 0–3. No attributes.
+- `let <i32,4>:%out = .sha1rnds4(<i32,4>:%abcd, <i32,4>:%msg, i8:func)` - SHA-1 four rounds. `func` compile-time/run-time literal 0–3. No attributes.
 - `let <i32,4>:%out = .sha1nexte(<i32,4>:%abcd, <i32,4>:%e)` - SHA-1 next E. No attributes.
 - `let <i32,4>:%out = .sha1msg1(<i32,4>:%a, <i32,4>:%b)` - SHA-1 message schedule step 1. No attributes.
 - `let <i32,4>:%out = .sha1msg2(<i32,4>:%a, <i32,4>:%b)` - SHA-1 message schedule step 2. No attributes.

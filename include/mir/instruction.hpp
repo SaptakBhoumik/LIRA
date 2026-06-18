@@ -23,3 +23,4 @@
 #include "instruction/terminator_inst.hpp"
 #include "instruction/call_inst.hpp"
 #include "instruction/other_inst.hpp"
+#include "instruction/hardware_inst.hpp"

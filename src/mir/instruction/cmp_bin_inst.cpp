@@ -1,8 +1,4 @@
 #include "mir/instruction/cmp_bin_inst.hpp"
-#include "ast/ast.hpp"
-#include <memory>
-#include <string>
-#include <memory>
 
 namespace LIRA {
 namespace MIR {

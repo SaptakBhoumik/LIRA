@@ -1,5 +1,4 @@
 #include "mir/instruction/widening_bin_inst.hpp"
-#include <memory>
 
 namespace LIRA {
 namespace MIR {

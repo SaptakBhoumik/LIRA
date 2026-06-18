@@ -1,7 +1,4 @@
 #include "mir/instruction/bitwise_tri_inst.hpp"
-#include "ast/ast.hpp"
-#include <memory>
-#include <optional>
 
 namespace LIRA {
 namespace MIR {

@@ -1,8 +1,4 @@
 #include "mir/instruction/conv_inst.hpp"
-#include "ast/ast.hpp"
-#include "mir/instruction/_instruction.hpp"
-#include <cstddef>
-#include <memory>
 
 namespace LIRA {
 namespace MIR {

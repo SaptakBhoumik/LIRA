@@ -1,5 +1,4 @@
 #include "mir/instruction/terminator_inst.hpp"
-#include "ast/ast.hpp"
 
 namespace LIRA {
 namespace MIR {

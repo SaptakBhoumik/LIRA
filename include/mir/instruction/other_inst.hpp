@@ -4,6 +4,7 @@
 #include <cstddef>
 namespace LIRA {
 namespace MIR {
+// --------------------------Unclassified other instructions-------------------------------
 class ScalarSelectInst:public Inst {
     IR::LiteralExprPtr condition;//The condition to check. Must be of i1
     IR::LiteralExprPtr true_value;//Same type as output
@@ -123,6 +124,8 @@ class PauseInst:public Inst {
     std::string to_string() const override;
 };
 
+
+// --------------------------Binding Assumptions-------------------------------
 class AssumeInst:public Inst {
     std::vector<IR::LiteralExprPtr> assumed_values;
     IR::TypeExprPtr type;
@@ -192,6 +195,7 @@ class AssumeNotRangeInst:public Inst {
 };
 
 
+// --------------------------Non-Binding Expectation Hints-------------------------------
 class ExpectInst:public Inst {
     std::vector<IR::LiteralExprPtr> assumed_values;
     IR::TypeExprPtr type;
@@ -230,6 +234,8 @@ class ExpectRangeInst:public Inst {
     std::string to_string() const override;
 };
 
+
+// --------------------------Metadata and Machine Instructions-------------------------------
 class NopInst:public Inst {
     std::uint8_t size;
     bool multi_byte;
@@ -262,6 +268,8 @@ class Endbr64Inst:public Inst {
     std::string to_string() const override;
 };
 
+
+// --------------------------Pointer Provenance Instructions-------------------------------
 class LaunderInst:public Inst {
     IR::LiteralExprPtr ptr;
     public:
@@ -273,10 +281,10 @@ class LaunderInst:public Inst {
     std::string to_string() const override;
 };
 
-class StripInvariantInst:public Inst {
+class StripInvariantGroupInst:public Inst {
     IR::LiteralExprPtr ptr;
     public:
-    StripInvariantInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr ptr);
+    StripInvariantGroupInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr ptr);
 
     IR::LiteralExprPtr get_ptr() const;
 

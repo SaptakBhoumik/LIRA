@@ -1,7 +1,4 @@
-#include "ast/ast.hpp"
 #include "mir/instruction/numerical_classify_inst.hpp"
-#include <iostream>
-#include <memory>
 
 namespace LIRA {
 namespace MIR {

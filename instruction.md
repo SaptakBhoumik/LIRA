@@ -661,6 +661,9 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
     - `#[nuw]` - poison if the offset causes unsigned overflow
     - `#[inbounds]` - asserts the result pointer is within the bounds of the underlying object
 
+    If T is float/vec of float:
+    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+
 - `let ptr:%output_var = .ptroffset(ptr:%input_var, T:%offset)` - Returns `input_var + offset`. Output and input must be pointers. Offset can be any integer type. Offset is in bytes.
 
     - `#[unsigned]` - offset is unsigned; default is signed
@@ -943,8 +946,10 @@ Read-modify-write instructions that apply a unary operation to the value at a me
 
 - `let T:%old = .fetch_parity(ptr:%ptr)` - Parity of `*ptr` (1 if odd number of set bits, 0 if even); returns the original. T must be integer. No additional attributes.
 
-- `let T:%old = .fetch_bswap(ptr:%ptr)` - Reverses byte order of `*ptr`; returns the original. T must be integer or float/bfloat. Float/bfloat supported for endianness swaps (avoids needing a bitcast). Bitwidth must be a multiple of 8. No additional attributes.
-clrsb
+- `let T:%old = .fetch_bswap(ptr:%ptr)` - Reverses byte order of `*ptr`; returns the original. T must be integer or float/bfloat. Float/bfloat supported for endianness swaps (avoids needing a bitcast). Bitwidth must be a multiple of 8.
+
+    If T is float/bfloat:
+    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 - `let T:%old = .fetch_bitreverse(ptr:%ptr)` - Reverses bit order of `*ptr`; returns the original. T must be integer. No additional attributes.
 
@@ -1038,7 +1043,7 @@ A terminator must be the final instruction of every block. Falling through to th
 
 ## SIMD Instructions
 
-- `let <T,M>:%output_var = .shufflevector(<T,N2>:%input1, <T,N3>:%input2, <i16,M>:%mask)` - Shuffles elements of two vectors according to a mask(Run time or compile time). No attributes.
+- `let <T,M>:%output_var = .shufflevector(<T,N2>:%input1, <T,N3>:%input2, <i16,M>:%mask)` - Shuffles elements of two vectors according to a mask(Run time or compile time).
 
     If T is float:
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
@@ -1193,6 +1198,8 @@ Note: `.reduce_sub`, `.reduce_nand`, `.reduce_nor`, `.reduce_div`, `.reduce_rem`
 
 ### Pack / Unpack Instructions
 
+The following are defined only on integer
+
 - `let <T2,N2>:%out = .pack_sat(<T1,N>:%a, <T1,N>:%b)` - Narrows both input vectors and concatenates them into one output vector. `bitwidth(T2) < bitwidth(T1)`; `N2 = 2*N`. Each element is clamped to the *signed* range of `T2` before truncation, even if the inputs are unsigned. Mirrors `PACKSSWB`, `PACKSSDW`.
     - `#[unsigned]` - clamp to the *unsigned* range of `T2` instead (e.g., `[0, 255]` for `i8`); mirrors `PACKUSWB`, `PACKUSDW`
 
@@ -1238,8 +1245,8 @@ Note: `.reduce_sub`, `.reduce_nand`, `.reduce_nor`, `.reduce_div`, `.reduce_rem`
     If T is float:
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
     
-- `let <T,N>:%out = .deinterleave3(<T,N3>:%v, i8:channel)` - Same for 3-channel interleaving, `channel` in `[0, 2]`. Output length `N = N3/3`.
-- `let <T,N>:%out = .deinterleave4(<T,N4>:%v, i8:channel)` - Same for 4-channel interleaving, `channel` in `[0, 3]`. Output length `N = N4/4`.
+- `let <T,N>:%out = .deinterleave3(<T,N3>:%v, i8:channel)` - Same for 3-channel interleaving, `channel` in `[0, 2]`. Output length `N = N3/3`. Allows fast math attribute for float/bfloat T.
+- `let <T,N>:%out = .deinterleave4(<T,N4>:%v, i8:channel)` - Same for 4-channel interleaving, `channel` in `[0, 3]`. Output length `N = N4/4`. Allows fast math attribute for float/bfloat T
 
 - `let <T0,N>:%out = .addsub(<T0,N>:%a, <T0,N>:%b)` - Alternates subtraction and addition on adjacent lanes: even-indexed lanes compute `a[i] - b[i]`; odd-indexed lanes compute `a[i] + b[i]`. `N` must be even. Mirrors `ADDSUBPS`/`ADDSUBPD`. Primary use case: complex number multiplication. `T0` can be integer or float/bfloat.
 
@@ -1291,7 +1298,7 @@ Note: `.reduce_sub`, `.reduce_nand`, `.reduce_nor`, `.reduce_div`, `.reduce_rem`
 
     If T0 is float/bfloat/vector of float: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
-- `let T:%output_var = .freeze(T:%input_var)` - Freezes a poison or otherwise indeterminate value. The result is an arbitrary but fixed value of type T; the compiler may not make assumptions about which value. Prevents optimizations that rely on poison semantics from propagating through this point. T can be any type. No attributes.
+- `let T:%output_var = .freeze(T:%input_var)` - Freezes a poison or otherwise indeterminate value. The result is an arbitrary but fixed value of type T; the compiler may not make assumptions about which value. Prevents optimizations that rely on poison semantics from propagating through this point. T can be any type. 
 
     If T is float/bfloat/vector of float: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
@@ -1301,7 +1308,7 @@ Note: `.reduce_sub`, `.reduce_nand`, `.reduce_nor`, `.reduce_div`, `.reduce_rem`
 
 - `.va_copy(ptr:%dest, ptr:%src)` - Copies a variable-argument list from `src` to `dest`. Both must be `va_list` pointers.
 
-- `let T:%output_var = .va_arg(ptr:%input_var)` - Retrieves the next variadic argument of type T from the `va_list` pointed to by `input_var`. No attributes.
+- `let T:%output_var = .va_arg(ptr:%input_var)` - Retrieves the next variadic argument of type T from the `va_list` pointed to by `input_var`
 
     If T is float/bfloat/vector of float: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
@@ -1320,22 +1327,22 @@ For the following if T is float/bfloat/vector of float: `#[fast]`, `#[nnan]`, `#
 - `.assume(T:%var, T:compile_time_value)` - Tells the optimizer that `%var` holds `compile_time_value` at this program point. The compiler may propagate this as a known value. Undefined behavior if the assumption is false. `T` can be any type as long as represented as compile time value. `compile_time_value` must be a literal.
     - `#[noundef]` - additionally asserts that `%var` is not poison or undef
 
+- `.assume(T:%var, T:v0, T:v1, ...)` - Asserts that `%var` is one of the listed compile-time values. Undefined behavior if wrong. `T` can be any type as long as represented as compile time value. At least one value required.
+    - `#[noundef]` - additionally asserts `%var` is not poison
+
 - `.assume_range(T:%var, T:compile_time_lo, T:compile_time_hi)` - Asserts that `%var` lies in the closed interval `[lo, hi]`. Undefined behavior if wrong. `T` must be integer or float scalar; `lo` and `hi` must be compile-time literals.
     - `#[unsigned]` - interval interpreted as unsigned (integer only); default is signed
     - `#[noundef]` - additionally asserts the value is not poison
 
-- `.assume_values(T:%var, T:v0, T:v1, ...)` - Asserts that `%var` is one of the listed compile-time values. Undefined behavior if wrong. `T` can be any type as long as represented as compile time value. At least one value required.
-    - `#[noundef]` - additionally asserts `%var` is not poison
-
 - `.assume_not(T:%var, T:compile_time_value)` - Tells the optimizer that `%var` does not hold `compile_time_value` at this program point. Undefined behavior if the assumption is false. `T` can be any type as long as represented as compile time value. `compile_time_value` must be a literal.
     - `#[noundef]` - additionally asserts that `%var` is not poison or undef
+
+- `.assume_not(T:%var, T:v0, T:v1, ...)` - Asserts that `%var` is not any of the listed compile-time values. Undefined behavior if wrong. `T` can be any type as long as represented as compile time value. At least one value required.
+    - `#[noundef]` - additionally asserts `%var` is not poison
 
 - `.assume_not_range(T:%var, T:compile_time_lo, T:compile_time_hi)` - Asserts that `%var` does not lie in the closed interval `[lo, hi]`. Undefined behavior if wrong. `T` must be integer or float scalar; `lo` and `hi` must be compile-time literals.
     - `#[unsigned]` - interval interpreted as unsigned (integer only); default is signed
     - `#[noundef]` - additionally asserts the value is not poison
-
-- `.assume_not_values(T:%var, T:v0, T:v1, ...)` - Asserts that `%var` is not any of the listed compile-time values. Undefined behavior if wrong. `T` can be any type as long as represented as compile time value. At least one value required.
-    - `#[noundef]` - additionally asserts `%var` is not poison
 
 #### Non-Binding Expectation Hints(No UB if violated. Even if the prob is 100%, the optimizer may still generate code for other cases.)
 
@@ -1344,12 +1351,12 @@ For the following if T is float/bfloat/vector of float: `#[fast]`, `#[nnan]`, `#
 - `.expect(T:%var, T:compile_time_value)` - Hints that `%var` most commonly holds `compile_time_value`. No UB if wrong. Analogous to `__builtin_expect`. `T` can be any type as long as represented as compile time value.
     - `#[probability(f32:P)]` - probability the value matches (0.0–1.0); default unspecified
 
+- `.expect(T:%var, T:v0, T:v1, ...)` - Hints that `%var` is most likely one of the listed values. `T` can be any type as long as represented as compile time value. No UB if wrong.
+    - `#[probability(f32:P)]` - probability the value is in the list
+
 - `.expect_range(T:%var, T:compile_time_lo, T:compile_time_hi)` - Hints that `%var` most commonly falls in `[lo, hi]`. T is integer or float. No UB if wrong.
     - `#[unsigned]` - interval unsigned
     - `#[probability(f32:P)]` - probability the value is in range
-
-- `.expect_values(T:%var, T:v0, T:v1, ...)` - Hints that `%var` is most likely one of the listed values. `T` can be any type as long as represented as compile time value. No UB if wrong.
-    - `#[probability(f32:P)]` - probability the value is in the list
 
 There are no expect_not variants, since they are equivalent to the corresponding expect variant with the probability inverted (1 - P).
 

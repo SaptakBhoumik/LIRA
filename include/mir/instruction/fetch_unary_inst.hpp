@@ -191,7 +191,7 @@ class FloatFetchUnaryInst:public FetchUnaryInst{
 class FloatFetchNegInst:public FloatFetchUnaryInst {
     public:
     FloatFetchNegInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
-                    FastMathAttr fast_math_attr);
+                      FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -200,7 +200,7 @@ class FloatFetchNegInst:public FloatFetchUnaryInst {
 class FloatFetchAbsInst:public FloatFetchUnaryInst {
     public:
     FloatFetchAbsInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
-                    FastMathAttr fast_math_attr);
+                      FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -218,7 +218,7 @@ class FloatFetchCeilInst:public FloatFetchUnaryInst {
 class FloatFetchFloorInst:public FloatFetchUnaryInst {
     public:
     FloatFetchFloorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
-                    FastMathAttr fast_math_attr);
+                        FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -227,7 +227,7 @@ class FloatFetchFloorInst:public FloatFetchUnaryInst {
 class FloatFetchIntregralPartInst:public FloatFetchUnaryInst {
     public:
     FloatFetchIntregralPartInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
-                    FastMathAttr fast_math_attr);
+                                FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -236,7 +236,7 @@ class FloatFetchIntregralPartInst:public FloatFetchUnaryInst {
 class FloatFetchFractionalPartInst:public FloatFetchUnaryInst {
     public:
     FloatFetchFractionalPartInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
-                    FastMathAttr fast_math_attr);
+                                FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -245,7 +245,7 @@ class FloatFetchFractionalPartInst:public FloatFetchUnaryInst {
 class FloatFetchRoundNearestInst:public FloatFetchUnaryInst {
     public:
     FloatFetchRoundNearestInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
-                    FastMathAttr fast_math_attr);
+                                FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -254,7 +254,7 @@ class FloatFetchRoundNearestInst:public FloatFetchUnaryInst {
 class FloatFetchRoundEvenInst:public FloatFetchUnaryInst {
     public:
     FloatFetchRoundEvenInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
-                    FastMathAttr fast_math_attr);
+                            FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -263,7 +263,7 @@ class FloatFetchRoundEvenInst:public FloatFetchUnaryInst {
 class FloatFetchSqrtInst:public FloatFetchUnaryInst {
     public:
     FloatFetchSqrtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
-                    FastMathAttr fast_math_attr);
+                        FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -272,7 +272,7 @@ class FloatFetchSqrtInst:public FloatFetchUnaryInst {
 class FloatFetchReciprocalInst:public FloatFetchUnaryInst {
     public:
     FloatFetchReciprocalInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
-                    FastMathAttr fast_math_attr, bool approx);
+                            FastMathAttr fast_math_attr, bool approx);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -281,7 +281,7 @@ class FloatFetchReciprocalInst:public FloatFetchUnaryInst {
 class FloatFetchRsqrtInst:public FloatFetchUnaryInst {
     public:
     FloatFetchRsqrtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
-                    FastMathAttr fast_math_attr, bool approx);
+                        FastMathAttr fast_math_attr, bool approx);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -290,7 +290,7 @@ class FloatFetchRsqrtInst:public FloatFetchUnaryInst {
 class FloatFetchBswapInst:public FloatFetchUnaryInst {
     public:
     FloatFetchBswapInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
-                    FastMathAttr fast_math_attr);
+                        FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;

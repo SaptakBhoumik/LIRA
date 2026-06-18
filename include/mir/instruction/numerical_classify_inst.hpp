@@ -21,7 +21,8 @@ class NumericalClassifyInst:public Inst {
         ISNEGATIVE = 1 << 12,
         ISPOSITIVE = 1 << 13,
     };
-    NumericalClassifyInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type);
+    NumericalClassifyInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
+                          std::optional<FastMathAttr> fast_math_attr);
 
     virtual ~NumericalClassifyInst() = default;
 
@@ -37,14 +38,10 @@ class NumericalClassifyInst:public Inst {
 // --------------------------- Float Classification operations ---------------------------
 class FloatClassifyInst:public NumericalClassifyInst{
     protected:
-    FastMathAttr fast_math_attr;
-
     virtual std::string to_string_helper(const std::string op_name) const final;
     public:
     FloatClassifyInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                     FastMathAttr fast_math_attr);
-
-    virtual FastMathAttr get_fast_math_attr() const final;
 
     virtual std::shared_ptr<IR::FloatTypeExpr> get_casted_operand_type() const final;
     virtual std::size_t get_bitwidth() const final;
@@ -127,15 +124,11 @@ class FloatIsPositiveInst:public FloatClassifyInst {
 //--------------------------- Vector Float Classification operations ---------------------------
 class VecFloatClassifyInst:public NumericalClassifyInst{
     protected:
-    FastMathAttr fast_math_attr;
-
     virtual std::string to_string_helper(const std::string op_name) const final;
     public:
     VecFloatClassifyInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                             FastMathAttr fast_math_attr);
-
-    virtual FastMathAttr get_fast_math_attr() const final;
-
+                            
     virtual std::shared_ptr<IR::SIMDTypeExpr> get_casted_operand_type() const final;
     virtual std::shared_ptr<IR::FloatTypeExpr> get_basetype() const final;
     virtual std::size_t get_num_elements() const final;

@@ -5,8 +5,9 @@
 
 namespace LIRA {
 namespace MIR {
-NumericalClassifyInst::NumericalClassifyInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type)
-                                            :Inst(instruction_stmt, destination){
+NumericalClassifyInst::NumericalClassifyInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
+                                             IR::TypeExprPtr value_type, std::optional<FastMathAttr> fast_math_attr)
+                                            :Inst(instruction_stmt, destination, fast_math_attr){
     this->value = value;
     this->value_type = value_type;
 }
@@ -23,16 +24,13 @@ InstType NumericalClassifyInst::get_inst_type() const {
 
 // --------------------------- Float Classification operations ---------------------------
 FloatClassifyInst::FloatClassifyInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
-                                     FastMathAttr fast_math_attr):NumericalClassifyInst(instruction_stmt, destination, value, value_type){
-    this->fast_math_attr = fast_math_attr;
-}
+                                     FastMathAttr fast_math_attr):NumericalClassifyInst(instruction_stmt, destination, value, value_type, fast_math_attr){}
 std::string FloatClassifyInst::to_string_helper(const std::string op_name) const{
     std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(" + this->value_type->to_string() + ":" + this->value->to_string() + ")";
-    res+= " " + this->fast_math_attr.to_string();
+    if(this->fast_math_attr.has_value()){
+        res+= " " + this->fast_math_attr.value().to_string();
+    }
     return res;
-}
-FastMathAttr FloatClassifyInst::get_fast_math_attr() const {
-    return this->fast_math_attr;
 }
 std::shared_ptr<IR::FloatTypeExpr> FloatClassifyInst::get_casted_operand_type() const {
     return std::dynamic_pointer_cast<IR::FloatTypeExpr>(this->destination->get_type());
@@ -132,16 +130,13 @@ std::string FloatIsPositiveInst::to_string() const {
 
 //--------------------------- Vector Float Classification operations ---------------------------
 VecFloatClassifyInst::VecFloatClassifyInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
-                                           FastMathAttr fast_math_attr):NumericalClassifyInst(instruction_stmt, destination, value, value_type){
-    this->fast_math_attr = fast_math_attr;
-}
+                                           FastMathAttr fast_math_attr):NumericalClassifyInst(instruction_stmt, destination, value, value_type, fast_math_attr){}
 std::string VecFloatClassifyInst::to_string_helper(const std::string op_name) const{
     std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(" + this->value_type->to_string() + ":" + this->value->to_string() + ")";
-    res+= " " + this->fast_math_attr.to_string();
+    if(this->fast_math_attr.has_value()){
+        res+= " " + this->fast_math_attr.value().to_string();
+    }
     return res;
-}
-FastMathAttr VecFloatClassifyInst::get_fast_math_attr() const {
-    return this->fast_math_attr;
 }
 std::shared_ptr<IR::SIMDTypeExpr> VecFloatClassifyInst::get_casted_operand_type() const {
     return std::dynamic_pointer_cast<IR::SIMDTypeExpr>(this->destination->get_type());

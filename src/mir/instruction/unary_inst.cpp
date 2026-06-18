@@ -2,11 +2,12 @@
 #include "mir/instruction/unary_inst.hpp"
 #include <iostream>
 #include <memory>
+#include <optional>
 
 namespace LIRA {
 namespace MIR {
-UnaryInst::UnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value)
-                    :Inst(instruction_stmt,destination){
+UnaryInst::UnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, std::optional<FastMathAttr> fast_math_attr)
+                    :Inst(instruction_stmt,destination, fast_math_attr){
     this->value = value;
 }
 IR::TypeExprPtr UnaryInst::get_type() const {
@@ -21,7 +22,7 @@ InstType UnaryInst::get_inst_type() const {
 
 // --------------------------- Int Unary operations ---------------------------
 IntUnaryInst::IntUnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, bool nuw, bool nsw, bool zero_poison)
-                    :UnaryInst(instruction_stmt, destination, value){
+                    :UnaryInst(instruction_stmt, destination, value, std::nullopt){
     this->nuw = nuw;
     this->nsw = nsw;
     this->zero_poison = zero_poison;
@@ -188,7 +189,7 @@ std::string IntBLSMaskInst::to_string() const {
 }
 // --------------------------- Vector Int Unary operations ---------------------------
 VecIntUnaryInst::VecIntUnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, bool nuw, bool nsw, bool zero_poison)
-                    :UnaryInst(instruction_stmt, destination, value){
+                                :UnaryInst(instruction_stmt, destination, value, std::nullopt){
     this->nuw = nuw;
     this->nsw = nsw;
     this->zero_poison = zero_poison;
@@ -331,20 +332,18 @@ std::string VecIntCLRSBInst::to_string() const {
 
 // --------------------------- Float Unary operations ---------------------------
 FloatUnaryInst::FloatUnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr, bool approx)
-                    :UnaryInst(instruction_stmt, destination, value){
-    this->fast_math_attr = fast_math_attr;
+                    :UnaryInst(instruction_stmt, destination, value, fast_math_attr){
     this->approx = approx;
 }
 std::string FloatUnaryInst::to_string_helper(const std::string op_name) const {
     std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(" + this->value->to_string() + ")";
-    res+= " " + this->fast_math_attr.to_string();
+    if (this->fast_math_attr) {
+        res += " " + this->fast_math_attr.value().to_string();
+    }
     if(this->approx){
         res += " #[approx]";
     }
     return res;
-}
-FastMathAttr FloatUnaryInst::get_fast_math_attr() const {
-    return this->fast_math_attr;
 }
 bool FloatUnaryInst::is_approx() const {
     return this->approx;
@@ -487,20 +486,18 @@ std::string FloatBswapInst::to_string() const {
 
 // --------------------------- Vector Float Unary operations ---------------------------
 VecFloatUnaryInst::VecFloatUnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr, bool approx)
-                    :UnaryInst(instruction_stmt, destination, value){
-    this->fast_math_attr = fast_math_attr;
+                                    :UnaryInst(instruction_stmt, destination, value, fast_math_attr){
     this->approx = approx;
 }
 std::string VecFloatUnaryInst::to_string_helper(const std::string op_name) const {
     std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(" + this->value->to_string() + ")";
-    res+= " " + this->fast_math_attr.to_string();
+    if (this->fast_math_attr) {
+        res += " " + this->fast_math_attr.value().to_string();
+    }
     if(this->approx){
         res += " #[approx]";
     }
     return res;
-}
-FastMathAttr VecFloatUnaryInst::get_fast_math_attr() const {
-    return this->fast_math_attr;
 }
 bool VecFloatUnaryInst::is_approx() const {
     return this->approx;

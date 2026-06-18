@@ -23,7 +23,8 @@ class CmpBinaryInst:public Inst {
         BOTH_NAN = 1 << 14
     };
 
-    CmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type);
+    CmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                  IR::TypeExprPtr type, std::optional<FastMathAttr> fast_math_attr);
 
     virtual ~CmpBinaryInst() = default;
 
@@ -310,7 +311,6 @@ class VecPtrGeInst:public VecPtrCmpBinaryInst {
 // ---------------------------Float Comparison Binary operations ---------------------------
 class FloatCmpBinaryInst:public CmpBinaryInst {
     protected:
-    FastMathAttr fast_math_attr;
     bool unordered;//Ignored for either_nan and neither_nan. Says if the op is ordered or unordered
 
     virtual std::string to_string_helper(std::string op_name) const final;
@@ -318,7 +318,6 @@ class FloatCmpBinaryInst:public CmpBinaryInst {
     FloatCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                                 FastMathAttr fast_math_attr, bool unordered);
 
-    virtual FastMathAttr get_fast_math_attr() const final;
     virtual bool is_unordered() const final;
 
     virtual std::shared_ptr<IR::FloatTypeExpr> get_casted_operand_type() const final;//Returns the operand type casted to SIMDTypeExpr. Just a helper function to make life easier
@@ -410,15 +409,13 @@ class FloatBothNanInst:public FloatCmpBinaryInst {
 // --------------------------- Vector Float Comparison Binary operations ---------------------------
 class VecFloatCmpBinaryInst:public CmpBinaryInst {
     protected:
-    FastMathAttr fast_math_attr;
     bool unordered;//Ignored for either_nan and neither_nan. Says if the op is ordered or unordered
     
     virtual std::string to_string_helper(std::string op_name) const final;
     public:
     VecFloatCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
-                                FastMathAttr fast_math_attr, bool unordered);
+                          FastMathAttr fast_math_attr, bool unordered);
 
-    virtual FastMathAttr get_fast_math_attr() const final;
     virtual bool is_unordered() const final;
 
     virtual std::shared_ptr<IR::SIMDTypeExpr> get_casted_operand_type() const final;//Returns the operand type casted to SIMDTypeExpr. Just a helper function to make life easier
@@ -448,7 +445,7 @@ class VecFloatNeqInst:public VecFloatCmpBinaryInst {
 class VecFloatLtInst:public VecFloatCmpBinaryInst {
     public:
     VecFloatLtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
-                FastMathAttr fast_math_attr, bool unordered);
+                   FastMathAttr fast_math_attr, bool unordered);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -484,7 +481,7 @@ class VecFloatGeInst:public VecFloatCmpBinaryInst {
 class VecFloatEitherNanInst:public VecFloatCmpBinaryInst {
     public:
     VecFloatEitherNanInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
-                     FastMathAttr fast_math_attr);
+                          FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -493,7 +490,7 @@ class VecFloatEitherNanInst:public VecFloatCmpBinaryInst {
 class VecFloatNeitherNanInst:public VecFloatCmpBinaryInst {
     public:
     VecFloatNeitherNanInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
-                      FastMathAttr fast_math_attr);
+                            FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -502,7 +499,7 @@ class VecFloatNeitherNanInst:public VecFloatCmpBinaryInst {
 class VecFloatBothNanInst:public VecFloatCmpBinaryInst {
     public:
     VecFloatBothNanInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
-                      FastMathAttr fast_math_attr);
+                        FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;

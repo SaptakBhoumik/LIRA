@@ -6,7 +6,7 @@ namespace MIR {
 FetchBitwiseBinInst::FetchBitwiseBinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                            std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info,
                            bool nuw, bool nsw, bool exact, bool disjoint)
-                           :Inst(instruction_stmt, destination){
+                           :Inst(instruction_stmt, destination, std::nullopt){
     this->pointer = pointer;
     this->value = value;
     this->alignment = alignment;
@@ -40,6 +40,9 @@ std::string FetchBitwiseBinInst::to_string_helper(const std::string op_name) con
     }
     if(this->disjoint){
         res += " #[disjoint]";
+    }
+    if(this->fast_math_attr.has_value()){
+        res += " " + this->fast_math_attr.value().to_string();
     }
     return res;
 }

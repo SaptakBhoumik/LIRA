@@ -1,10 +1,11 @@
 #include "mir/instruction/bitwise_bin_inst.hpp"
 #include <memory>
+#include <optional>
 
 namespace LIRA {
 namespace MIR {
 BitwiseBinaryInst::BitwiseBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                                     bool nuw, bool nsw, bool exact, bool disjoint):Inst(instruction_stmt, destination){
+                                     bool nuw, bool nsw, bool exact, bool disjoint):Inst(instruction_stmt, destination, std::nullopt){
     this->lhs = lhs;
     this->rhs = rhs;
     this->nuw = nuw;
@@ -25,6 +26,9 @@ std::string BitwiseBinaryInst::to_string_helper(const std::string op_name) const
     }
     if(this->disjoint){
         res += " #[disjoint]";
+    }
+    if(this->fast_math_attr.has_value()){
+        res += " " + this->fast_math_attr.value().to_string();
     }
     return res;
 }

@@ -6,29 +6,30 @@ namespace LIRA {
 namespace MIR {
 class ScalarSelectInst:public Inst {
     IR::LiteralExprPtr condition;//The condition to check. Must be of i1
-    IR::LiteralExprPtr true_value;//The value and its type to return if condition is true
-    IR::LiteralExprPtr false_value;//The value and its type to return if condition is false
+    IR::LiteralExprPtr true_value;
+    IR::LiteralExprPtr false_value;
+    std::optional<FastMathAttr> fast_math_attr;
     public:
     ScalarSelectInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr condition, 
-                     IR::LiteralExprPtr true_value, IR::LiteralExprPtr false_value);
+                     IR::LiteralExprPtr true_value, IR::LiteralExprPtr false_value, std::optional<FastMathAttr> fast_math_attr);
 
     IR::LiteralExprPtr get_condition() const;
     IR::LiteralExprPtr get_true_value() const;
     IR::LiteralExprPtr get_false_value() const;
-    IR::TypeExprPtr get_type() const;
+    IR::TypeExprPtr get_type() const;//From the destination
 
     InstType get_inst_type() const override;
     std::string to_string() const override;
 };
 
 class LanewiseSelectInst:public Inst {
-    IR::LiteralExprPtr condition;//The condition to check. Must be of i1
-    IR::LiteralExprPtr true_value;//The value and its type to return if condition is true
-    IR::LiteralExprPtr false_value;//The value and its type to return if condition is false
-
+    IR::LiteralExprPtr condition;//The condition to check. Must be of <i1,N>
+    IR::LiteralExprPtr true_value;
+    IR::LiteralExprPtr false_value;
+    std::optional<FastMathAttr> fast_math_attr;
     public:
     LanewiseSelectInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr condition, 
-                       IR::LiteralExprPtr true_value, IR::LiteralExprPtr false_value);
+                       IR::LiteralExprPtr true_value, IR::LiteralExprPtr false_value, std::optional<FastMathAttr> fast_math_attr);
         
     IR::LiteralExprPtr get_condition() const;
     IR::LiteralExprPtr get_true_value() const;

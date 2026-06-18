@@ -4,8 +4,8 @@
 namespace LIRA {
 namespace MIR {
 FetchArithmeticBinInst::FetchArithmeticBinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                           std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info)
-                           :Inst(instruction_stmt, destination){
+                           std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info, std::optional<FastMathAttr> fast_math_attr)
+                           :Inst(instruction_stmt, destination, fast_math_attr){
     this->pointer = pointer;
     this->value = value;
     this->alignment = alignment;
@@ -39,7 +39,7 @@ InstType FetchArithmeticBinInst::get_inst_type() const {
 IntFetchArithmeticBinInst::IntFetchArithmeticBinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                      std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info,
                      bool nuw, bool nsw, bool saturating, bool exact, bool unsigned_, bool floor)
-                     :FetchArithmeticBinInst(instruction_stmt, destination, pointer, value, alignment, volatile_, atomic_info){
+                     :FetchArithmeticBinInst(instruction_stmt, destination, pointer, value, alignment, volatile_, atomic_info, std::nullopt){
     this->nuw = nuw;
     this->nsw = nsw;
     this->saturating = saturating;
@@ -230,8 +230,7 @@ std::string IntFetchAvgInst::to_string() const {
 FloatFetchArithmeticBinInst::FloatFetchArithmeticBinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info,
                     FastMathAttr fast_math_attr, bool unordered, bool ieee754_2019)
-                    :FetchArithmeticBinInst(instruction_stmt, destination, pointer, value, alignment, volatile_, atomic_info){
-    this->fast_math_attr = fast_math_attr;
+                    :FetchArithmeticBinInst(instruction_stmt, destination, pointer, value, alignment, volatile_, atomic_info, fast_math_attr){
     this->unordered = unordered;
     this->ieee754_2019 = ieee754_2019;
 }
@@ -247,7 +246,9 @@ std::string FloatFetchArithmeticBinInst::to_string_helper(const std::string op_n
         res += " #[atomic(str:\"" + LIRA::MIR::to_string(atomic_info->second) + "\")]";
         res += " #[syncscope(str:\"" + LIRA::MIR::to_string(atomic_info->first) + "\")]";
     }
-    res += " " + this->fast_math_attr.to_string();
+    if(this->fast_math_attr.has_value()){
+        res += " " + this->fast_math_attr->to_string();
+    }
     if(this->unordered){
         res += " #[unordered]";
     }
@@ -259,8 +260,8 @@ std::string FloatFetchArithmeticBinInst::to_string_helper(const std::string op_n
 
 
 FloatXchgInst::FloatXchgInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                    std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info)
-                    :FloatFetchArithmeticBinInst(instruction_stmt, destination, pointer, value, alignment, volatile_, atomic_info, FastMathAttr{}, false, false){}
+                    std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info, FastMathAttr fast_math_attr)
+                    :FloatFetchArithmeticBinInst(instruction_stmt, destination, pointer, value, alignment, volatile_, atomic_info, fast_math_attr, false, false){}
 FetchArithmeticBinInst::OpType FloatXchgInst::get_op_type() const {
     return OpType::FETCH_XCHG;
 }

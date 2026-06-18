@@ -6,8 +6,9 @@
 
 namespace LIRA {
 namespace MIR {
-CmpBinaryInst::CmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type):
-                                            Inst(instruction_stmt, destination){
+CmpBinaryInst::CmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                             IR::TypeExprPtr type, std::optional<FastMathAttr> fast_math_attr):
+                             Inst(instruction_stmt, destination, fast_math_attr){
     this->lhs = lhs;
     this->rhs = rhs;
     this->type = type;
@@ -28,7 +29,7 @@ InstType CmpBinaryInst::get_inst_type() const{
 
 // ---------------------------- Integer Comparison Binary operations ---------------------------
 IntCmpBinaryInst::IntCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
-                                    IR::TypeExprPtr type, bool unsigned_):CmpBinaryInst(instruction_stmt, destination, lhs, rhs, type){
+                                    IR::TypeExprPtr type, bool unsigned_):CmpBinaryInst(instruction_stmt, destination, lhs, rhs, type, std::nullopt){
     this->unsigned_ = unsigned_;
 }
 std::string IntCmpBinaryInst::to_string_helper(std::string op_name) const{
@@ -115,7 +116,7 @@ std::string IntGeInst::to_string() const{
 
 // ---------------------------Vector integer Comparison Binary operations ---------------------------
 VecIntCmpBinaryInst::VecIntCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
-                                            bool unsigned_):CmpBinaryInst(instruction_stmt, destination, lhs, rhs, type){
+                                            bool unsigned_):CmpBinaryInst(instruction_stmt, destination, lhs, rhs, type,std::nullopt){
     this->unsigned_ = unsigned_;
 }
 std::string VecIntCmpBinaryInst::to_string_helper(std::string op_name) const{
@@ -208,7 +209,7 @@ std::string VecIntGeInst::to_string() const{
 
 // ---------------------------Ptr Comparison Binary operations ---------------------------
 PtrCmpBinaryInst::PtrCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs):
-                                    CmpBinaryInst(instruction_stmt, destination, lhs, rhs, std::make_shared<IR::PtrTypeExpr>(IR::Token{.value = "ptr"},std::vector<IR::AttributePtr>{})){}
+                                    CmpBinaryInst(instruction_stmt, destination, lhs, rhs, std::make_shared<IR::PtrTypeExpr>(IR::Token{.value = "ptr"},std::vector<IR::AttributePtr>{}), std::nullopt){}
 std::string PtrCmpBinaryInst::to_string_helper(std::string op_name) const{
     std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
     return res;
@@ -283,7 +284,7 @@ std::string PtrGeInst::to_string() const{
 
 // ---------------------------Vector ptr Comparison Binary operations ---------------------------
 VecPtrCmpBinaryInst::VecPtrCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type):
-                                        CmpBinaryInst(instruction_stmt, destination, lhs, rhs, type){}
+                                        CmpBinaryInst(instruction_stmt, destination, lhs, rhs, type, std::nullopt){}
 std::string VecPtrCmpBinaryInst::to_string_helper(std::string op_name) const{
     std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
     return res;
@@ -365,20 +366,18 @@ std::string VecPtrGeInst::to_string() const{
 
 // ---------------------------Float Comparison Binary operations ---------------------------
 FloatCmpBinaryInst::FloatCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
-                                        FastMathAttr fast_math_attr, bool unordered):CmpBinaryInst(instruction_stmt, destination, lhs, rhs, type){
-    this->fast_math_attr = fast_math_attr;
+                                        FastMathAttr fast_math_attr, bool unordered):CmpBinaryInst(instruction_stmt, destination, lhs, rhs, type, fast_math_attr){
     this->unordered = unordered;
 }
 std::string FloatCmpBinaryInst::to_string_helper(std::string op_name) const{
     std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
-    res+= " " + this->fast_math_attr.to_string();
+    if(this->fast_math_attr.has_value()){
+        res+= " " + this->fast_math_attr.value().to_string();
+    }
     if(this->unordered){
         res += " #[unordered]";
     }
     return res;
-}
-FastMathAttr FloatCmpBinaryInst::get_fast_math_attr() const{
-    return this->fast_math_attr;
 }
 bool FloatCmpBinaryInst::is_unordered() const{
     return this->unordered;
@@ -487,20 +486,18 @@ std::string FloatBothNanInst::to_string() const{
 }
 // --------------------------- Vector Float Comparison Binary operations ---------------------------
 VecFloatCmpBinaryInst::VecFloatCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
-                                        FastMathAttr fast_math_attr, bool unordered):CmpBinaryInst(instruction_stmt, destination, lhs, rhs, type){
-    this->fast_math_attr = fast_math_attr;
+                                        FastMathAttr fast_math_attr, bool unordered):CmpBinaryInst(instruction_stmt, destination, lhs, rhs, type, fast_math_attr){
     this->unordered = unordered;
 }
 std::string VecFloatCmpBinaryInst::to_string_helper(std::string op_name) const{
     std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
-    res+= " " + this->fast_math_attr.to_string();
+    if(this->fast_math_attr.has_value()){
+        res+= " " + this->fast_math_attr.value().to_string();
+    }
     if(this->unordered){
         res += " #[unordered]";
     }
     return res;
-}
-FastMathAttr VecFloatCmpBinaryInst::get_fast_math_attr() const{
-    return this->fast_math_attr;
 }
 bool VecFloatCmpBinaryInst::is_unordered() const{
     return this->unordered;

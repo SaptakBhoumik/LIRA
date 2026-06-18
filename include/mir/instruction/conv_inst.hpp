@@ -29,13 +29,13 @@ class ConvInst:public Inst {
         BITCAST = 1 << 12
     };
     ConvInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type,
-             bool nuw, bool nsw, bool nsb, bool unsigned_, bool saturating);
+             bool nuw, bool nsw, bool nsb, bool unsigned_, bool saturating, std::optional<FastMathAttr> fast_math_attr);
 
     virtual ~ConvInst() = default;
     
     virtual std::optional<InstOperandTypeVarient> get_in_type_varient() const final;//Can be calculated easily from ``in_type``. Just a helper function
     virtual std::optional<InstOperandTypeVarient> get_out_type_varient() const final;//Can be calculated easily from ``out_type``. Just a helper function
-    // NOTE: get_in_type_varient and  get_out_type_varient is ignored for BitCastInst because it can be any type as long as the bit width is same + dont make sense
+    // NOTE: get_in_type_varient and  get_out_type_varient is ignored for BitcastInst because it can be any type as long as the bit width is same + dont make sense
     virtual IR::TypeExprPtr get_in_type() const final;
     virtual IR::TypeExprPtr get_out_type() const final;
     virtual IR::LiteralExprPtr get_value() const final;
@@ -54,7 +54,7 @@ class ConvInst:public Inst {
 class ScalarConvInst:public ConvInst{
     public:
     ScalarConvInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
-                   bool nuw, bool nsw, bool nsb, bool unsigned_, bool saturating);
+                   bool nuw, bool nsw, bool nsb, bool unsigned_, bool saturating, std::optional<FastMathAttr> fast_math_attr);
 
     virtual std::size_t get_in_type_bitwidth() const = 0;
     virtual std::size_t get_out_type_bitwidth() const = 0;
@@ -78,7 +78,7 @@ class IntTruncInst:public ScalarConvInst{
 
 class FloatTruncInst:public ScalarConvInst{
     public:
-    FloatTruncInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type);
+    FloatTruncInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, FastMathAttr fast_math_attr);
 
     //I can implement casted integer type helper here but I doubt it will be useful because we can get the width from get_in_type_bitwidth and get_out_type_bitwidth anyways
     //But I am implementing it just for consistency 
@@ -109,7 +109,7 @@ class IntExtInst:public ScalarConvInst{
 
 class FloatExtInst:public ScalarConvInst{
     public:
-    FloatExtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type);
+    FloatExtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, FastMathAttr fast_math_attr);
 
     std::shared_ptr<IR::FloatTypeExpr> get_casted_in_type() const;
     std::shared_ptr<IR::FloatTypeExpr> get_casted_out_type() const; 
@@ -125,7 +125,7 @@ class FloatExtInst:public ScalarConvInst{
 class FloatToIntInst:public ScalarConvInst{
     public:
     FloatToIntInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
-                   bool nsb, bool unsigned_, bool saturating);
+                   bool nsb, bool unsigned_, bool saturating, FastMathAttr fast_math_attr);
 
     std::shared_ptr<IR::FloatTypeExpr> get_casted_in_type() const;
     std::shared_ptr<IR::IntTypeExpr> get_casted_out_type() const; 
@@ -140,7 +140,7 @@ class FloatToIntInst:public ScalarConvInst{
 class IntToFloatInst:public ScalarConvInst{
     public:
     IntToFloatInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
-                   bool nsb, bool unsigned_);
+                   bool nsb, bool unsigned_, FastMathAttr fast_math_attr);
 
     std::shared_ptr<IR::IntTypeExpr> get_casted_in_type() const;
     std::shared_ptr<IR::FloatTypeExpr> get_casted_out_type() const; 
@@ -178,10 +178,10 @@ class IntToPtrInst:public ScalarConvInst{
     std::string to_string() const override;
 };
 
-class BitCastInst:public ScalarConvInst{
+class BitcastInst:public ScalarConvInst{
     public:
     //We already know the in type and out type have same bit width. No need to store again
-    BitCastInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type);
+    BitcastInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, std::optional<FastMathAttr> fast_math_attr);
 
     std::size_t get_in_type_bitwidth() const override;//Returns 0 as of now but in future must return the actual size. TODO:Implement the size of method for typeexpr
     std::size_t get_out_type_bitwidth() const override;//Returns 0 as of now but in future must return the actual size. TODO:Implement the size of method for typeexpr
@@ -196,7 +196,7 @@ class BitCastInst:public ScalarConvInst{
 class VecConvInst:public ConvInst{
     public:
     VecConvInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
-                bool nuw, bool nsw, bool nsb, bool unsigned_, bool saturating);
+                bool nuw, bool nsw, bool nsb, bool unsigned_, bool saturating, std::optional<FastMathAttr> fast_math_attr);
 
     virtual std::shared_ptr<IR::SIMDTypeExpr> get_casted_in_type() const final;//Returns the in type casted to SIMDTypeExpr.
     virtual std::shared_ptr<IR::SIMDTypeExpr> get_casted_out_type() const final;//Returns the out type casted to SIMDTypeExpr. 
@@ -221,7 +221,7 @@ class VecIntTruncInst:public VecConvInst{
 
 class VecFloatTruncInst:public VecConvInst{
     public:
-    VecFloatTruncInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type);
+    VecFloatTruncInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, FastMathAttr fast_math_attr);
     
     std::shared_ptr<IR::FloatTypeExpr> get_casted_in_basetype() const;
     std::shared_ptr<IR::FloatTypeExpr> get_casted_out_basetype() const;
@@ -250,7 +250,7 @@ class VecIntExtInst:public VecConvInst{
 
 class VecFloatExtInst:public VecConvInst{
     public:
-    VecFloatExtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type);
+    VecFloatExtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, FastMathAttr fast_math_attr);
 
     std::shared_ptr<IR::FloatTypeExpr> get_casted_in_basetype() const;
     std::shared_ptr<IR::FloatTypeExpr> get_casted_out_basetype() const;
@@ -266,7 +266,7 @@ class VecFloatExtInst:public VecConvInst{
 class VecFloatToIntInst:public VecConvInst{
     public:
     VecFloatToIntInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
-                      bool nsb, bool unsigned_, bool saturating);
+                      bool nsb, bool unsigned_, bool saturating, FastMathAttr fast_math_attr);
     
     std::shared_ptr<IR::FloatTypeExpr> get_casted_in_basetype() const;
     std::shared_ptr<IR::IntTypeExpr> get_casted_out_basetype() const; 
@@ -281,7 +281,7 @@ class VecFloatToIntInst:public VecConvInst{
 class VecIntToFloatInst:public VecConvInst{
     public:
     VecIntToFloatInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
-                      bool nsb, bool unsigned_);
+                      bool nsb, bool unsigned_, FastMathAttr fast_math_attr);
     
     std::shared_ptr<IR::IntTypeExpr> get_casted_in_basetype() const;
     std::shared_ptr<IR::FloatTypeExpr> get_casted_out_basetype() const;

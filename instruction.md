@@ -178,7 +178,7 @@ Widening instructions compute `a OP b` at the full precision of the *output* typ
 
 ## Carrying / Borrow Arithmetic Instructions
 
-These instructions thread a carry or borrow bit in and out, enabling multi-word arithmetic. All inputs and outputs are scalar; the carry/borrow is always `i1`. There are no direct vector forms - carry semantics are inherently sequential across words, so a carry chain over a vector is expressed as a loop over scalar words. Lanewise application is valid and expected: apply the instruction to one lane (word) per loop iteration, feeding the carry-out of iteration `i` as the carry-in of iteration `i+1`. The carry-in `%cin` must be `i1`; typically `0i1` for the least-significant word and the carry-out of the previous word for higher words.
+These instructions thread a carry or borrow bit in and out, enabling multi-word arithmetic. All inputs and outputs are scalar; the carry/borrow is always `i1`. There are no direct vector forms - carry semantics are inherently sequential across words, so a carry chain over a vector is expressed as a loop over scalar words. Lanewise application is valid and expected: apply the instruction to one lane (word) per loop iteration, feeding the carry-out of iteration `i` as the carry-in of iteration `i+1`. The carry-in `%cin` must be `i1`; typically `0i1` for the least-significant word and the carry-out of the previous word for higher words. NOTE: You can use vector types also. We just convert it to a loop of scalar ops or to unrolled loops of scalar ops under the hood. This allows you to write more natural code when dealing with vectors of multi-word integers
 
 - `let {T, i1}:%out = .carry_add(T:%a, T:%b, i1:%cin)` - Add with carry. Computes `a + b + cin`, returning the sum and carry-out as a struct `{T, i1}`. `T` must be `i<N>`. No overflow attributes - the carry-out is the mechanism for propagating overflow.
 
@@ -247,7 +247,7 @@ These return `{T, i1}` - the wrapped result paired with an overflow flag (`1` if
 
 These extend the 1-bit carry shift instructions to handle a shift count of more than one bit at a time, enabling multi-word arbitrary-amount shifts without a loop of single-bit steps. Each instruction shifts one word by `shift` bits and threads the displaced bits as a full-word carry between words. Only the low `shift` bits of the carry operands are meaningful.
 
-`T` must be `i<N>`. No vector form - chain these in a loop over scalar words, exactly like the 1-bit carry shifts.
+`T` must be `i<N>`. Vector form is allowed and is equivalent to a loop of scalar or unrolled loop of scalar ops
 
 - `let {T, T}:%out = .shl_carry_n(T:%a, T:%shift, T:%carry_in)` - Left shift by N with carry. Shifts `a` left by `shift` bits. The low `shift` bits of `carry_in` fill the vacated LSBs. Returns `{result, carry_out}` where `carry_out` holds the `shift` MSBs that were displaced, positioned in the low bits (ready to pass as `carry_in` to the next word).
 
@@ -354,11 +354,17 @@ These extend the 1-bit carry shift instructions to handle a shift count of more 
     - `#[nuw]` - poison if the truncated value does not zero-extend back to the original
     - `#[saturating]` - clamp to the integer type range instead of UB when the float value is out of range or NaN; pair with `#[unsigned]` for unsigned saturation; default is signed saturation when this flag is set
 
+    If base type is float:
+    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+
 - `let T2:%output_var = .ext(T1:%input_var)` - Extends from a narrower to a wider type. Base type of T1 and T2 must match in kind. Bitwidth of T1's base type must be strictly less than T2's. Both must be vector or both non-vector.
 
     If base type is integer:
     - `#[unsigned]` - zero-extension (equivalent to LLVM `zext`); default is sign-extension
     - `#[nsb]` - only valid with `#[unsigned]`; asserts the source value's sign bit is 0, giving a tighter range (e.g. `i8` range becomes `[0,127]` instead of `[0,255]`)
+
+    If base type is float:
+    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 - `let T2:%output_var = .float_to_int(T1:%input_var)` - Converts float/bfloat (or vector thereof) T1 to integer (or vector thereof) T2. Output type determines the target integer width and kind.
 
@@ -366,16 +372,25 @@ These extend the 1-bit carry shift instructions to handle a shift count of more 
     - `#[nsb]` - only valid with `#[unsigned]`; asserts the result's sign bit is 0
     - `#[saturating]` - clamp to the integer type range instead of UB when the float value is out of range or NaN; pair with `#[unsigned]` for unsigned saturation; default is signed saturation when this flag is set
 
+    If base type is float:
+    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+
 - `let T2:%output_var = .int_to_float(T1:%input_var)` - Converts integer (or vector thereof) T1 to float/bfloat (or vector thereof) T2. Output type determines the target float kind.
 
     - `#[unsigned]` - treat the source integer as unsigned; default is signed
     - `#[nsb]` - only valid with `#[unsigned]`; asserts the source integer's sign bit is 0
 
+    If base type is float:
+    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+
 - `let T2:%output_var = .ptr_to_int(T1:%input_var)` - Converts pointer/vector-of-pointer T1 to `i64`/`<i64,M>` T2. Only `i64` is valid (64-bit systems only). Use `.trunc` after if a narrower integer is needed. No attributes.
 
 - `let T2:%output_var = .int_to_ptr(T1:%input_var)` - Converts `i64`/`<i64,M>` T1 to pointer/vector-of-pointer T2. Only `i64` is valid (64-bit systems only). Use `.ext` before if the source is a narrower integer. No attributes.
 
-- `let T2:%output_var = .bitcast(T1:%input_var)` - Reinterprets the bits of T1 as type T2. T1 and T2 must have the same bitwidth. Cannot bitcast between `i64` and `ptr`. No attributes.
+- `let T2:%output_var = .bitcast(T1:%input_var)` - Reinterprets the bits of T1 as type T2. T1 and T2 must have the same bitwidth. Cannot bitcast between `i64` and `ptr`.
+
+    If type is float/vector of float:
+    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 ---
 
@@ -482,8 +497,12 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
 - `let ptr:$global_var = .global(T:value)` - Defines a global variable. Output must be a pointer type; `$global_var` holds the address. Value must be a constant expression (not a variable). Not part of MIR; stored in the module's global section.
 
     - `#[align(i8:N)]` - alignment of the global in bytes; must be a power of 2; default is 16
+    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination if T is float/vec of float
 
-- `let T:%local_var = .local(T:initial_value)` - Defines and initializes a local variable. Value can be anything. Present for parser simplicity; does little in MIR. T can be any type. No attributes.
+- `let T:%local_var = .local(T:initial_value)` - Defines and initializes a local variable. Value can be anything. Present for parser simplicity; does little in MIR. T can be any type. 
+
+    If T is float/vec of float:
+    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 - `let ptr:%local_var = .alloca(iN:%size)` - Allocates `size` bytes on the stack. Returns a pointer to the allocation.
 
@@ -502,6 +521,9 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
     - `#[atomic(str:ordering)]` - atomic load; ordering must be one of: `acquire`, `monotonic`, `unordered`, `seq_cst`
     - `#[syncscope("singlethreaded")]` - only valid with `#[atomic]`; synchronizes only with atomic ops in the same thread; default is global
 
+    If T is float/vec of float:
+    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+
 - `.store(T:%value, ptr:%ptr)` - Stores a value to memory.
 
     - `#[align(i8:N)]` - alignment of the pointer; must be a power of 2; required if atomic; default is 16
@@ -512,6 +534,9 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
     - `#[dereferenceable(i64:N)]` - asserts the pointer is dereferenceable for N bytes
     - `#[atomic(str:ordering)]` - atomic store; ordering must be one of: `release`, `monotonic`, `unordered`, `seq_cst`
     - `#[syncscope("singlethreaded")]` - only valid with `#[atomic]`; default is global
+
+    If T is float/vec of float:
+    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 - `let <T,N>:%out = .masked_load(ptr:%ptr, <i1,N>:%mask, <T,N>:%passthru)` - Loads elements from memory into a vector, but only for lanes where the mask is true. Lanes where the mask is false take their value from `passthru` instead.
 
@@ -526,6 +551,9 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
     - `#[nonnull]` - asserts `ptr` is not null
     - `#[dereferenceable(i64:N)]` - asserts `ptr` is dereferenceable for N bytes across the entire vector range (not just active lanes)
     - `#[zeropassthru]` - shorthand: inactive lanes are zeroed; equivalent to passing a zero vector as passthru but allows the backend to emit a zeroing-masked instruction directly rather than materializing a zero vector
+
+    If T is float:
+    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 - `.masked_store(<T,N>:%val, ptr:%ptr, <i1,N>:%mask)` - Stores elements to memory only for lanes where the mask is true. Inactive lanes do not produce any memory write - not even to a padding location.
 
@@ -542,6 +570,9 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
     - `#[nonnull]` - asserts `ptr` is not null
     - `#[dereferenceable(i64:N)]` - asserts `ptr` is dereferenceable for the full vector range
 
+    If T is float:
+    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+
 - `let <T,N>:%out = .gather(<ptr,N>:%ptrs, <i1,N>:%mask, <T,N>:%passthru)` - Loads one scalar element per lane from a distinct pointer. Each lane `i` loads from `ptrs[i]`. Inactive lanes (where mask is false) take their value from `passthru`.
 
     - `<ptr,N>:%ptrs` - vector of N pointers, one per lane
@@ -554,6 +585,9 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
     - `#[nonnull]` - asserts all active pointers are non-null
     - `#[dereferenceable(i64:N)]` - asserts all active pointers are dereferenceable for N bytes
     - `#[zeropassthru]` - inactive lanes are zeroed; allows the backend to emit a zeroing-masked instruction directly rather than materializing a zero vector
+
+    If T is float:
+    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 - `.scatter(<T,N>:%val, <ptr,N>:%ptrs, <i1,N>:%mask)` - Stores one scalar element per lane to a distinct pointer. Each lane `i` stores `val[i]` to `ptrs[i]`. Inactive lanes produce no write. If two active lanes write to the same address, the result is undefined (no ordering guarantee). 
 
@@ -568,6 +602,9 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
     - `#[volatile]` - volatile scatter
     - `#[nonnull]` - asserts all active pointers are non-null
     - `#[dereferenceable(i64:N)]` - asserts all active pointers are dereferenceable for N bytes
+
+    If T is float:
+    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 - `.prefetch(ptr:%addr)` - Emits a prefetch hint to bring a cache line into the specified cache level before it is needed. Not a memory operation - has no effect on program semantics, cannot fault, and may be ignored by the hardware.
 
@@ -639,9 +676,15 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
 
     - `#[inbounds]` - valid for array and vector only; asserts index is within bounds; not valid for struct (struct access is always in bounds)
 
+    If T3 is float/vec of float:
+    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+
 - `let T1:%output_var = .insertelement(T1:%input, T2:%element, T3:%index)` - Returns a copy of the aggregate with the element at `index` replaced by `element`. Output type equals input aggregate type. `T3` is integer index type `iN`. For structs, index must be an integer literal. For arrays and vectors, index can be a literal or variable.
 
     - `#[inbounds]` - valid for array and vector only; not valid for struct
+
+    If T2 is float/vec of float:
+    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 - `.fence(str:ordering)` - Memory fence. Ordering and syncscope must be constant expressions. Valid orderings: `acquire`, `release`, `acq_rel`, `seq_cst`. Has no input or output; acts purely as a barrier.
 
@@ -655,6 +698,9 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
     - `#[volatile]` - volatile operation
     - `#[weak]` - weak CAS; permitted to spuriously fail even when `*ptr == expected`
     - `#[syncscope("singlethreaded")]` - synchronizes only with atomic ops in the same thread; default is global
+
+    If T is float/vec of float:
+    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 ### Cache Control Instructions
 
@@ -692,7 +738,10 @@ Read-modify-write instructions that read a value from memory, apply a binary ope
 
 ---
 
-- `let T:%old = .fetch_xchg(ptr:%ptr, T:%value)` - Replaces `*ptr` with `value`; returns the original. T can be integer or float. No additional attributes beyond the shared set.
+- `let T:%old = .fetch_xchg(ptr:%ptr, T:%value)` - Replaces `*ptr` with `value`; returns the original. T can be integer or float.
+
+    If T is float
+    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 - `let T:%old = .fetch_add(ptr:%ptr, T:%value)` - Adds `value` to `*ptr`; returns the original. T can be integer or float.
 
@@ -916,6 +965,9 @@ A terminator must be the final instruction of every block. Falling through to th
 - `.ret` / `.ret(T:%return_value)` - Returns from the function. Use `.ret` with no value for void functions. For non-void functions, the return value must match the function's return type.
     - `#[noreturn]` - indicates the function never actually returns; `.ret` with no value is then permitted even for non-void functions
 
+    If T is float/vec of float:
+    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+
 - `.unreachable` - Marks a point in the code that is statically known to never be reached. A hint to the compiler; has no guaranteed runtime effect. Use after calls to functions like `exit()` that never return.
 
 - `.trap` - Emits a hardware trap instruction (`UD2` on x86_64). Observable and guaranteed to halt execution. Distinct from `.unreachable`.
@@ -923,15 +975,24 @@ A terminator must be the final instruction of every block. Falling through to th
 
 - `.br(T0:@dest, T1:{...})` - Unconditional branch to `dest`. `T1:{...}` is the anonymous struct of arguments passed to the destination block. If the block takes no arguments, use `{}:{}`. ``{}:{}`` can be used to pass no arguments
 
+    If any argument of the label is float/vec of float:
+    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+
 - `.br(i1:%condition, T0:@true_dest, T1:{...}, T2:@false_dest, T3:{...})` - Conditional branch. Branches to `true_dest` if `condition` is true, else to `false_dest`. `T1:{...}` and `T3:{...}` are arguments for each destination. ``{}:{}`` can be used to pass no arguments
     - `#[freq(i32:N, i32:M)]` - hints at relative branching frequencies; used by the optimizer to lay out hot/cold paths. Mutually exclusive with `#[unpredictable]`.
     - `#[unpredictable]` - hints that the branch is unpredictable. Mutually exclusive with `#[freq]`.
     
+    If any argument of the label is float/vec of float:
+    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+
     TODO: In future have loop and vectorization hint attributes
 
 - `.switch(T:%condition, T0:@default_dest, T1:{...}, T:%case1_value, T2:@case1_dest, T3:{...}, ...)` - Branches to the destination matching `condition`. Falls through to `default_dest` if no case matches. Condition must be integer; case values must be the same type as the condition. ``{}:{}`` can be used to pass no arguments
     - `#[freq(i32:N, i32:M, ...)]` - one frequency per destination in order (default first). Mutually exclusive with `#[unpredictable]`.
     - `#[unpredictable]` - hints that the branch is unpredictable. Mutually exclusive with `#[freq]`.
+
+    If any argument of the label is float/vec of float:
+    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 - `.indirectbr(ptr:%dest_ptr, label:@label1, label:@label2, ...)` - Branches to the address stored in `dest_ptr`. The address must point to one of the listed labels; otherwise UB. Labels listed here cannot take arguments. ``{}:{}`` can be used to pass no arguments
     - `#[freq(i32:N, i32:M, ...)]` - one frequency per label in order. Mutually exclusive with `#[unpredictable]`.
@@ -957,8 +1018,8 @@ A terminator must be the final instruction of every block. Falling through to th
     - `#[cc(str:calling_convention)]` - calling convention; one of `ccc`, `fastcc`, `coldcc`, `tailcc`; default is `ccc`
     - `#[return_extension(str:extension_type)]` - how the return value is extended; one of `"zero"`, `"sign"`, `"no"`
 
-    **Float return value:** 
-    - If the function returns float/bfloat: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+    **Float return value/argument value:** 
+    - If the function returns or takes in float/bfloat: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
     **Per-argument attributes** (override function definition for this call site; useful for function pointers where no definition is available):
     - `#[noalias(i64:idx...)]`, `#[readonly(i64:idx...)]`, `#[nonnull(i64:idx...)]`, `#[align(i64:N, i64:idx...)]`, `#[dereferenceable(i64:N, i64:idx...)]`, `#[nopoison(i64:idx...)]`, `#[readnone(i64:idx...)]`, `#[writeonly(i64:idx...)]`, `#[writable(i64:idx...)]`, `#[returned(i64:idx...)]`, `#[nocapture(i64:idx...)]`
@@ -978,6 +1039,9 @@ A terminator must be the final instruction of every block. Falling through to th
 ## SIMD Instructions
 
 - `let <T,M>:%output_var = .shufflevector(<T,N2>:%input1, <T,N3>:%input2, <i16,M>:%mask)` - Shuffles elements of two vectors according to a mask(Run time or compile time). No attributes.
+
+    If T is float:
+    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 - `let <i1,N>:%output_var = .ternlog(<i1,N>:%a, <i1,N>:%b, <i1,N>:%c, i8:imm)` - Trinary logic operation on the bitwise representation of `a`, `b`, and `c`. For each bit position, the result is determined by the corresponding bit in `imm` (0-255). For example, if `imm` is 0b11110000, the result bit will be `a` for input 000, `b` for 001, `c` for 010, `a&b` for 011, `a&c` for 100, `b&c` for 101, `a|b|c` for 110, and `0` for 111. No attributes.
 
@@ -1045,7 +1109,10 @@ Note: `.reduce_sub`, `.reduce_nand`, `.reduce_nor`, `.reduce_div`, `.reduce_rem`
 
     If T is float/bfloat: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
-- `let <T,N>:%output_var = .step_vector(T:%start, T:%step)` - Creates a vector `[start, start+step, start+2*step, ...]`. T can be integer or float. No attributes.
+- `let <T,N>:%output_var = .step_vector(T:%start, T:%step)` - Creates a vector `[start, start+step, start+2*step, ...]`. T can be integer or float. 
+
+    If T is float:
+    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 - `let <T,N>:%out = .insert_subvector(<T,N>:%vec, <T,M>:%sub, i64:%index)` - Inserts a shorter vector into a lane-aligned position within a longer vector, returning the updated longer vector. The other lanes are unchanged. 
 
@@ -1053,14 +1120,20 @@ Note: `.reduce_sub`, `.reduce_nand`, `.reduce_nor`, `.reduce_div`, `.reduce_rem`
     - `<T,M>:%sub` - the subvector to insert; same element type T; M < N; M must divide N
     - `i64:%index` - the starting lane index in `vec` where insertion begins; must be a compile-time integer literal; must be a multiple of M (i.e. aligned to subvector boundaries); must satisfy `index + M <= N`
 
-    Output type: `<T,N>` - same type as `vec`. No attributes.
+    Output type: `<T,N>` - same type as `vec`
+
+    If T is float:
+    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 - `let <T,M>:%out = .extract_subvector(<T,N>:%vec, i64:%index)` - Extracts a contiguous slice of lanes from a vector into a shorter vector. 
 
     - `<T,N>:%vec` - the source vector; T can be any integer, float, or bfloat
     - `i64:%index` - the starting lane index; must be a compile-time integer literal; must be a multiple of M; must satisfy `index + M <= N`
 
-    Output type: `<T,M>` - the element type is the same T; M is determined by the declared output type; M < N; M must divide N. No attributes.
+    Output type: `<T,M>` - the element type is the same T; M is determined by the declared output type; M < N; M must divide N
+
+    If T is float:
+    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 - `let <i1,N>:%mask = .active_lane_mask(T:%base, T:%count)` - Generates a boolean vector mask where lane `i` is true if and only if `base + i < count`. Used to safely handle loop tail iterations in vectorized loops without out-of-bounds memory access - the mask is passed directly to `.masked_load` / `.masked_store`. 
 
@@ -1134,6 +1207,9 @@ Note: `.reduce_sub`, `.reduce_nand`, `.reduce_nor`, `.reduce_div`, `.reduce_rem`
 - `let <T,N>:%out = .compress(<T,N>:%src, <i1,N>:%mask)` - Packs active lanes (where `mask` is true) contiguously into the low lanes of the output. Inactive output lanes are zeroed unless `#[undef_inactive]` is set. Mirrors `VPCOMPRESSPS`/`VPCOMPRESSQ`/`VPCOMPRESSB`. `T` can be any integer, float, or bfloat.
     - `#[undef_inactive]` - inactive output lanes are undefined (allows the backend to skip zeroing)
 
+    If T is float:
+    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+
 - `let <T,N>:%out = .expand(<T,N>:%src, <i1,N>:%mask, <T,N>:%passthru)` - Inverse of `.compress`. Reads elements from the consecutive low lanes of `src` and scatters them into the active (mask=true) lanes of the output. Inactive lanes take their value from `passthru`. Mirrors `VPEXPANDPS`/`VPEXPANDQ`/`VPEXPANDB`.
     - `#[zeropassthru]` - inactive lanes are zeroed; avoids materialising a zero `passthru` vector
 
@@ -1193,7 +1269,7 @@ Note: `.reduce_sub`, `.reduce_nand`, `.reduce_nor`, `.reduce_div`, `.reduce_rem`
 
 - `let T0:%output_var = .select(T1:%condition, T0:%true_value, T0:%false_value)` - Selects between two values. If `T1` is `i1`: returns `true_value` if condition is true, else `false_value`. T0 can be any type. If `T1` is `<i1,M>`: selects element-wise; T0 must be a vector of size M.
 
-    If T0 is float/bfloat: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+    If T0 is float/bfloat/vector of float: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 - `let T:%output_var = .freeze(T:%input_var)` - Freezes a poison or otherwise indeterminate value. The result is an arbitrary but fixed value of type T; the compiler may not make assumptions about which value. Prevents optimizations that rely on poison semantics from propagating through this point. T can be any type. No attributes.
 

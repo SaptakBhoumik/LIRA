@@ -1,17 +1,21 @@
 #include "mir/instruction/bitwise_tri_inst.hpp"
 #include "ast/ast.hpp"
 #include <memory>
+#include <optional>
 
 namespace LIRA {
 namespace MIR {
 BitwiseTrinaryInst::BitwiseTrinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3)
-                                        :Inst(instruction_stmt, destination){
+                                        :Inst(instruction_stmt, destination, std::nullopt){
     this->arg1 = arg1;
     this->arg2 = arg2;
     this->arg3 = arg3;
 }
 std::string BitwiseTrinaryInst::to_string_helper(const std::string op_name) const{
     std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(" + this->arg1->to_string() + ", " + this->arg2->to_string() + ", " + this->arg3->to_string() + ")";
+    if(this->fast_math_attr.has_value()){
+        res += " " + this->fast_math_attr.value().to_string();
+    }
     return res;
 }
 IR::TypeExprPtr BitwiseTrinaryInst::get_operand_type() const{

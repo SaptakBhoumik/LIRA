@@ -3,8 +3,8 @@
 
 namespace LIRA {
 namespace MIR {
-RetInst::RetInst(IR::InstructionStmtPtr instruction_stmt, std::optional<std::pair<IR::TypeExprPtr,IR::LiteralExprPtr>> ret_value, bool noreturn)
-                :Inst(instruction_stmt, nullptr) {
+RetInst::RetInst(IR::InstructionStmtPtr instruction_stmt, std::optional<std::pair<IR::TypeExprPtr,IR::LiteralExprPtr>> ret_value, bool noreturn, std::optional<FastMathAttr> fast_math_attr)
+                :Inst(instruction_stmt, nullptr, fast_math_attr) {
     this->ret_value = ret_value;
     this->noreturn = noreturn;
 }
@@ -19,6 +19,9 @@ InstType RetInst::get_inst_type() const {
 }
 std::string RetInst::to_string() const {
     std::string res = ".ret" + (ret_value.has_value() ? "(" + ret_value.value().first->to_string() + ":" + ret_value.value().second->to_string() + ")" : "");
+    if (this->fast_math_attr) {
+        res += " " + this->fast_math_attr.value().to_string();
+    }
     if(noreturn){
         res += " #[noreturn]";
     }
@@ -26,7 +29,7 @@ std::string RetInst::to_string() const {
 }
 
 
-UnreachableInst::UnreachableInst(IR::InstructionStmtPtr instruction_stmt):Inst(instruction_stmt, nullptr) {}
+UnreachableInst::UnreachableInst(IR::InstructionStmtPtr instruction_stmt):Inst(instruction_stmt, nullptr, std::nullopt) {}
 InstType UnreachableInst::get_inst_type() const {
     return InstType::UnreachableInst;
 }
@@ -35,7 +38,7 @@ std::string UnreachableInst::to_string() const {
 }
 
 
-TrapInst::TrapInst(IR::InstructionStmtPtr instruction_stmt, bool breakpoint):Inst(instruction_stmt, nullptr) {
+TrapInst::TrapInst(IR::InstructionStmtPtr instruction_stmt, bool breakpoint):Inst(instruction_stmt, nullptr, std::nullopt) {
     this->breakpoint = breakpoint;
 }
 bool TrapInst::is_breakpoint() const {
@@ -75,7 +78,8 @@ std::string pretty_print_label_args(const std::vector<std::pair<IR::TypeExprPtr,
     return res;
 }
 JmpInst::JmpInst(IR::InstructionStmtPtr instruction_stmt, std::string target_block_name, IR::TypeExprPtr label_type, 
-                std::vector<std::pair<IR::TypeExprPtr,IR::LiteralExprPtr>> args):Inst(instruction_stmt, nullptr) {
+                std::vector<std::pair<IR::TypeExprPtr,IR::LiteralExprPtr>> args, std::optional<FastMathAttr> fast_math_attr)
+                :Inst(instruction_stmt, nullptr, fast_math_attr) {
     this->target_block_name = target_block_name;
     this->label_type = label_type;
     this->args = args;
@@ -94,6 +98,9 @@ InstType JmpInst::get_inst_type() const {
 }
 std::string JmpInst::to_string() const {
     std::string res = ".jmp(" + this->target_block_name;
+    if (this->fast_math_attr) {
+        res += " " + this->fast_math_attr.value().to_string();
+    }
     if(!this->args.empty()){
         res += ", " + pretty_print_label_args(this->args);
     }
@@ -105,7 +112,8 @@ std::string JmpInst::to_string() const {
 ConditionalJmpInst::ConditionalJmpInst(IR::InstructionStmtPtr instruction_stmt, std::string true_block_name, std::string false_block_name, 
                        IR::TypeExprPtr true_label_type, IR::TypeExprPtr false_label_type,
                        std::vector<std::pair<IR::TypeExprPtr,IR::LiteralExprPtr>> true_label_args, std::vector<std::pair<IR::TypeExprPtr,IR::LiteralExprPtr>> false_label_args, 
-                       IR::LiteralExprPtr condition, std::vector<std::size_t> frequency_profile, bool unpredictable):Inst(instruction_stmt, nullptr) {
+                       IR::LiteralExprPtr condition, std::vector<std::size_t> frequency_profile, bool unpredictable, std::optional<FastMathAttr> fast_math_attr)
+                       :Inst(instruction_stmt, nullptr, fast_math_attr) {
     this->true_block_name = true_block_name;
     this->false_block_name = false_block_name;
     this->true_label_type = true_label_type;
@@ -150,6 +158,9 @@ std::string ConditionalJmpInst::to_string() const {
     std::string res = ".cond_jmp(i1:" + this->condition->to_string() + ", ";
     res += this->true_label_type->to_string() + ":" + this->true_block_name + ", " + pretty_print_label_args(this->true_label_args) + ", ";
     res += this->false_label_type->to_string() + ":" + this->false_block_name + ", " + pretty_print_label_args(this->false_label_args) + ")";
+    if (this->fast_math_attr) {
+        res += " " + this->fast_math_attr.value().to_string();
+    }
     if(!this->frequency_profile.empty()){
         res += " #[freq(";
         for(std::size_t i=0;i<this->frequency_profile.size();i++){
@@ -169,8 +180,9 @@ std::string ConditionalJmpInst::to_string() const {
 
 SwitchInst::SwitchInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr value, IR::TypeExprPtr value_type, std::vector<std::string> case_block_names, std::vector<IR::TypeExprPtr> case_label_types, 
               std::vector<std::vector<std::pair<IR::TypeExprPtr,IR::LiteralExprPtr>>> case_label_args, std::vector<IR::LiteralExprPtr> case_values, std::string default_block_name,
-              IR::TypeExprPtr default_label_type, std::vector<std::pair<IR::TypeExprPtr,IR::LiteralExprPtr>> default_label_args, std::vector<std::size_t> frequency_profile, bool unpredictable)
-              :Inst(instruction_stmt, nullptr) {
+              IR::TypeExprPtr default_label_type, std::vector<std::pair<IR::TypeExprPtr,IR::LiteralExprPtr>> default_label_args, std::vector<std::size_t> frequency_profile, bool unpredictable,
+              std::optional<FastMathAttr> fast_math_attr)
+              :Inst(instruction_stmt, nullptr, fast_math_attr) {
     this->value = value;
     this->value_type = value_type;
     this->case_block_names = case_block_names;
@@ -242,6 +254,9 @@ std::string SwitchInst::to_string() const{
         }
     }
     res+= ")";
+    if (this->fast_math_attr) {
+        res += " " + this->fast_math_attr.value().to_string();
+    }
     if(!this->frequency_profile.empty()){
         res += " #[freq(";
         for(std::size_t i=0;i<this->frequency_profile.size();i++){
@@ -261,7 +276,7 @@ std::string SwitchInst::to_string() const{
 
 IndirectJmpInst::IndirectJmpInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr target_block_address, std::vector<std::string> possible_target_blocks, 
                                  std::vector<std::size_t> frequency_profile, bool unpredictable)
-                                 :Inst(instruction_stmt, nullptr) {
+                                 :Inst(instruction_stmt, nullptr, std::nullopt) {
     this->target_block_address = target_block_address;
     this->possible_target_blocks = possible_target_blocks;
     this->frequency_profile = frequency_profile;

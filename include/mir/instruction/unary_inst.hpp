@@ -32,7 +32,7 @@ class UnaryInst:public Inst {
         BLSR = 1 << 26,
         BLSMASK = 1 << 27
     };
-    UnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value);
+    UnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, std::optional<FastMathAttr> fast_math_attr);
 
     virtual ~UnaryInst() = default;
 
@@ -297,7 +297,6 @@ class VecIntBLSMaskInst:public VecIntUnaryInst {
 // --------------------------- Float Unary operations ---------------------------
 class FloatUnaryInst:public UnaryInst{
     protected:
-    FastMathAttr fast_math_attr;
     bool approx;
 
     virtual std::string to_string_helper(const std::string op_name) const final;
@@ -305,7 +304,6 @@ class FloatUnaryInst:public UnaryInst{
     FloatUnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
                     FastMathAttr fast_math_attr,bool approx);
 
-    virtual FastMathAttr get_fast_math_attr() const final;
     virtual bool is_approx() const final;
 
     virtual std::shared_ptr<IR::FloatTypeExpr> get_casted_operand_type() const final;
@@ -426,7 +424,6 @@ class FloatBswapInst:public FloatUnaryInst {
 // --------------------------- Vector Float Unary operations ---------------------------
 class VecFloatUnaryInst:public UnaryInst{
     protected:
-    FastMathAttr fast_math_attr;
     bool approx;
 
     virtual std::string to_string_helper(const std::string op_name) const final;
@@ -434,7 +431,6 @@ class VecFloatUnaryInst:public UnaryInst{
     VecFloatUnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
                       FastMathAttr fast_math_attr,bool approx);
 
-    virtual FastMathAttr get_fast_math_attr() const final;
     virtual bool is_approx() const final;
 
     virtual std::shared_ptr<IR::SIMDTypeExpr> get_casted_operand_type() const final;

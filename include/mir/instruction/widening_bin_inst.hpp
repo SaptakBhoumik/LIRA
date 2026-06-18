@@ -15,7 +15,8 @@ class WideningBinaryInst:public Inst {
         WIDENING_SUB = 1 << 7,
         WIDENING_MUL = 1 << 8,
     };
-    WideningBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr input_type);
+    WideningBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                        IR::TypeExprPtr input_type, std::optional<FastMathAttr> fast_math_attr);
 
     virtual ~WideningBinaryInst() = default;
 
@@ -137,14 +138,10 @@ class VecIntWideningMulInst:public VecIntWideningBinaryInst {
 // ---------------------------- Float Widening Binary operations ---------------------------
 class FloatWideningBinaryInst:public WideningBinaryInst {
     protected:
-    FastMathAttr fast_math_attr;
-
     virtual std::string to_string_helper(const std::string op_name) const final;
     public:
     FloatWideningBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                             IR::TypeExprPtr input_type, FastMathAttr fast_math_attr);
-
-    virtual FastMathAttr get_fast_math_attr() const final;
 
     virtual std::shared_ptr<IR::FloatTypeExpr> get_casted_input_type() const final;
     virtual std::shared_ptr<IR::FloatTypeExpr> get_casted_result_type() const final;
@@ -185,14 +182,10 @@ class FloatWideningMulInst:public FloatWideningBinaryInst {
 // ---------------------------- Vector Float Widening Binary operations ---------------------------
 class VecFloatWideningBinaryInst:public WideningBinaryInst {
     protected:
-    FastMathAttr fast_math_attr;
-
     virtual std::string to_string_helper(const std::string op_name) const final;
     public:
     VecFloatWideningBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                             IR::TypeExprPtr input_type, FastMathAttr fast_math_attr);
-
-    virtual FastMathAttr get_fast_math_attr() const final;
 
     virtual std::shared_ptr<IR::SIMDTypeExpr> get_casted_input_type() const final;
     virtual std::shared_ptr<IR::SIMDTypeExpr> get_casted_result_type() const final;

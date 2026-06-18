@@ -68,26 +68,6 @@ enum class InstType:std::int16_t{
     PtrMaskInst,
     ShuffleVectorInst,
 };
-// I am going to define the instruction set of LIRA. A lot of the instructions are lot lowered. Like .add is lowered to .fadd, .iadd, .vadd and so on. It is done
-// to make my life easier in the codegen phase. Although it is possible to merge a few of these instructions but I want to keep them separate because I think it will be better
-// Although I admit I may be wrong and it may be better to merge some of these instructions but I will keep them separate for now 
-class Inst {
-    protected:
-    LocalDestRegisterPtr destination;
-    IR::InstructionStmtPtr instruction_stmt;
-    public:
-    Inst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination);
-    
-    virtual ~Inst() = default;
-
-    virtual LocalDestRegisterPtr get_destination() const final;//For faster access if needed. Return nullptr if no destination
-    virtual InstType get_inst_type() const = 0;
-    virtual IR::InstructionStmtPtr get_instruction_stmt() const final;//For error reporting
-    virtual std::string to_string() const = 0;
-    virtual IR::DebugInfoPtr get_debug_info() const final;//Return get_instruction_stmt()->get_value()->get_debug_info() if get_value() is not empty else nullptr.
-};
-
-using InstPtr = std::shared_ptr<Inst>;
 
 struct FastMathAttr {
     bool nnans = false;
@@ -100,6 +80,29 @@ struct FastMathAttr {
 
     std::string to_string() const;
 };
+
+// I am going to define the instruction set of LIRA. A lot of the instructions are lot lowered. Like .add is lowered to .fadd, .iadd, .vadd and so on. It is done
+// to make my life easier in the codegen phase. Although it is possible to merge a few of these instructions but I want to keep them separate because I think it will be better
+// Although I admit I may be wrong and it may be better to merge some of these instructions but I will keep them separate for now 
+class Inst {
+    protected:
+    LocalDestRegisterPtr destination;
+    IR::InstructionStmtPtr instruction_stmt;
+    std::optional<FastMathAttr> fast_math_attr;//Only used for floating point instructions.
+    public:
+    Inst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, std::optional<FastMathAttr> fast_math_attr);
+    
+    virtual ~Inst() = default;
+
+    virtual LocalDestRegisterPtr get_destination() const final;//For faster access if needed. Return nullptr if no destination
+    virtual std::optional<FastMathAttr> get_fast_math_attr() const final;
+    virtual InstType get_inst_type() const = 0;
+    virtual IR::InstructionStmtPtr get_instruction_stmt() const final;//For error reporting
+    virtual std::string to_string() const = 0;
+    virtual IR::DebugInfoPtr get_debug_info() const final;//Return get_instruction_stmt()->get_value()->get_debug_info() if get_value() is not empty else nullptr.
+};
+
+using InstPtr = std::shared_ptr<Inst>;
 
 enum class InstOperandTypeVarient:std::uint64_t{
     // A lot of operands are divided into int,float,ptr,vector etc based on the type they operate on. Not every instruction show this property but a lot do. It is for them

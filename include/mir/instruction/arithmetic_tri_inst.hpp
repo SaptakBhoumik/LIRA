@@ -17,7 +17,8 @@ class ArithmeticTrinaryInst:public Inst {
         FNMS = 1 << 9,
         CLAMP = 1 << 10,
     };
-    ArithmeticTrinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3);
+    ArithmeticTrinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
+                          IR::LiteralExprPtr arg3, std::optional<FastMathAttr> fast_math_attr);
 
     virtual ~ArithmeticTrinaryInst() = default;
 
@@ -175,7 +176,6 @@ class VecIntClampInst:public VecIntArithmeticTrinaryInst {
 // ---------------------------- Float Trinary operations ---------------------------
 class FloatArithmeticTrinaryInst:public ArithmeticTrinaryInst {
     protected:
-    FastMathAttr fast_math_attr;
     bool ieee754_2019;
     bool unordered;
 
@@ -184,7 +184,6 @@ class FloatArithmeticTrinaryInst:public ArithmeticTrinaryInst {
     FloatArithmeticTrinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
                                 IR::LiteralExprPtr arg3, FastMathAttr fast_math_attr,bool ieee754_2019, bool unordered);
 
-    virtual FastMathAttr get_fast_math_attr() const final;
     virtual bool is_ieee754_2019() const final;
     virtual bool is_unordered() const final;
 
@@ -242,7 +241,6 @@ class FloatClampInst:public FloatArithmeticTrinaryInst {
 // ---------------------------- Vector Float Trinary operations ---------------------------
 class VecFloatArithmeticTrinaryInst:public ArithmeticTrinaryInst {
     protected:
-    FastMathAttr fast_math_attr;
     bool ieee754_2019;
     bool unordered;
 
@@ -251,7 +249,6 @@ class VecFloatArithmeticTrinaryInst:public ArithmeticTrinaryInst {
     VecFloatArithmeticTrinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
                                   IR::LiteralExprPtr arg3, FastMathAttr fast_math_attr,bool ieee754_2019, bool unordered);
 
-    virtual FastMathAttr get_fast_math_attr() const final;
     virtual bool is_ieee754_2019() const final;
     virtual bool is_unordered() const final;
 

@@ -8,7 +8,7 @@ class RetInst:public Inst {
     bool noreturn;//Whether the instruction has the noreturn attribute or not. 
     std::optional<std::pair<IR::TypeExprPtr,IR::LiteralExprPtr>> ret_value;//The first input vector and its type
     public:
-    RetInst(IR::InstructionStmtPtr instruction_stmt, std::optional<std::pair<IR::TypeExprPtr,IR::LiteralExprPtr>> ret_value, bool noreturn);
+    RetInst(IR::InstructionStmtPtr instruction_stmt, std::optional<std::pair<IR::TypeExprPtr,IR::LiteralExprPtr>> ret_value, bool noreturn, std::optional<FastMathAttr> fast_math_attr);
 
     std::optional<std::pair<IR::TypeExprPtr,IR::LiteralExprPtr>> get_ret_value() const;
     bool is_noreturn() const;
@@ -43,7 +43,7 @@ class JmpInst:public Inst {
     std::vector<std::pair<IR::TypeExprPtr,IR::LiteralExprPtr>> args;//The arguments to pass to the target block. The type of each argument must match the corresponding parameter type of the target block
     public:
     JmpInst(IR::InstructionStmtPtr instruction_stmt, std::string target_block_name, IR::TypeExprPtr label_type, 
-            std::vector<std::pair<IR::TypeExprPtr,IR::LiteralExprPtr>> args);
+            std::vector<std::pair<IR::TypeExprPtr,IR::LiteralExprPtr>> args, std::optional<FastMathAttr> fast_math_attr);
     
     std::string get_target_block_name() const;
     std::shared_ptr<IR::LabelTypeExpr> get_casted_label_type() const;
@@ -68,7 +68,8 @@ class ConditionalJmpInst:public Inst {
     ConditionalJmpInst(IR::InstructionStmtPtr instruction_stmt, std::string true_block_name, std::string false_block_name, 
                        IR::TypeExprPtr true_label_type, IR::TypeExprPtr false_label_type,
                        std::vector<std::pair<IR::TypeExprPtr,IR::LiteralExprPtr>> true_label_args, std::vector<std::pair<IR::TypeExprPtr,IR::LiteralExprPtr>> false_label_args, 
-                       IR::LiteralExprPtr condition, std::vector<std::size_t> frequency_profile, bool unpredictable);
+                       IR::LiteralExprPtr condition, std::vector<std::size_t> frequency_profile, bool unpredictable,
+                       std::optional<FastMathAttr> fast_math_attr);
     
     std::string get_true_block_name() const;
     std::string get_false_block_name() const;
@@ -104,7 +105,8 @@ class SwitchInst:public Inst {
     public:
     SwitchInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr value, IR::TypeExprPtr value_type, std::vector<std::string> case_block_names, std::vector<IR::TypeExprPtr> case_label_types, 
               std::vector<std::vector<std::pair<IR::TypeExprPtr,IR::LiteralExprPtr>>> case_label_args, std::vector<IR::LiteralExprPtr> case_values, std::string default_block_name, 
-              IR::TypeExprPtr default_label_type, std::vector<std::pair<IR::TypeExprPtr,IR::LiteralExprPtr>> default_label_args, std::vector<std::size_t> frequency_profile, bool unpredictable);
+              IR::TypeExprPtr default_label_type, std::vector<std::pair<IR::TypeExprPtr,IR::LiteralExprPtr>> default_label_args, std::vector<std::size_t> frequency_profile, bool unpredictable,
+              std::optional<FastMathAttr> fast_math_attr);
     
     IR::LiteralExprPtr get_value() const;
     std::shared_ptr<IR::IntTypeExpr> get_casted_value_type() const;

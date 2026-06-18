@@ -32,7 +32,7 @@ class FetchUnaryInst:public Inst {
         FETCH_BLSR = 1 << 26,
         FETCH_BLSMASK = 1 << 27
     };
-    FetchUnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value);
+    FetchUnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, std::optional<FastMathAttr> fast_math_attr);
 
     virtual ~FetchUnaryInst() = default;
 
@@ -172,7 +172,6 @@ class IntFetchBLSMaskInst:public IntFetchUnaryInst {
 // --------------------------- Float Fetch Unary operations ---------------------------
 class FloatFetchUnaryInst:public FetchUnaryInst{
     protected:
-    FastMathAttr fast_math_attr;
     bool approx;
 
     virtual std::string to_string_helper(const std::string op_name) const final;
@@ -180,7 +179,6 @@ class FloatFetchUnaryInst:public FetchUnaryInst{
     FloatFetchUnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
                     FastMathAttr fast_math_attr,bool approx);
 
-    virtual FastMathAttr get_fast_math_attr() const final;
     virtual bool is_approx() const final;
 
     virtual std::shared_ptr<IR::FloatTypeExpr> get_casted_operand_type() const final;

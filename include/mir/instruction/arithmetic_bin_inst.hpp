@@ -20,7 +20,8 @@ class ArithmeticBinaryInst:public Inst {
         MAX = 1 << 13,
         AVG = 1 << 14,
     };
-    ArithmeticBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
+    ArithmeticBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                         std::optional<FastMathAttr> fast_math_attr);
 
     virtual ~ArithmeticBinaryInst() = default;
 
@@ -262,7 +263,6 @@ class VecIntAvgInst:public VecIntArithmeticBinaryInst {
 // ---------------------------- Float binary operations ---------------------------
 class FloatArithmeticBinaryInst:public ArithmeticBinaryInst {
     protected:
-    FastMathAttr fast_math_attr;
     bool ieee754_2019;
     bool unordered;
 
@@ -271,7 +271,6 @@ class FloatArithmeticBinaryInst:public ArithmeticBinaryInst {
     FloatArithmeticBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                 FastMathAttr fast_math_attr,bool ieee754_2019, bool unordered);
 
-    virtual FastMathAttr get_fast_math_attr() const final;
     virtual bool is_ieee754_2019() const final;
     virtual bool is_unordered() const final;
 
@@ -367,7 +366,6 @@ class FloatAvgInst:public FloatArithmeticBinaryInst {
 // ---------------------------- Vector Float binary operations ---------------------------
 class VecFloatArithmeticBinaryInst:public ArithmeticBinaryInst {
     protected:
-    FastMathAttr fast_math_attr;
     bool ieee754_2019;
     bool unordered;
 
@@ -376,7 +374,6 @@ class VecFloatArithmeticBinaryInst:public ArithmeticBinaryInst {
     VecFloatArithmeticBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                 FastMathAttr fast_math_attr,bool ieee754_2019, bool unordered);
 
-    virtual FastMathAttr get_fast_math_attr() const final;
     virtual bool is_ieee754_2019() const final;
     virtual bool is_unordered() const final;
 

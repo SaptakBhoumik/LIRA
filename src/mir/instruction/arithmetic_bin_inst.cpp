@@ -1,9 +1,11 @@
 #include "mir/instruction/arithmetic_bin_inst.hpp"
+#include <optional>
 
 namespace LIRA {
 namespace MIR {
 ArithmeticBinaryInst::ArithmeticBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, 
-                                           IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs):Inst(instruction_stmt, destination){
+                                           IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,std::optional<FastMathAttr> fast_math_attr)
+                                           :Inst(instruction_stmt, destination, fast_math_attr){
     this->lhs = lhs;
     this->rhs = rhs;
 }
@@ -25,7 +27,7 @@ InstType ArithmeticBinaryInst::get_inst_type() const{
 // ---------------------------- Integer binary operations ---------------------------
 IntArithmeticBinaryInst::IntArithmeticBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                                 bool nuw, bool nsw, bool unsigned_, bool saturating, bool floor, bool exact):
-                                                ArithmeticBinaryInst(instruction_stmt, destination, lhs, rhs){
+                                                ArithmeticBinaryInst(instruction_stmt, destination, lhs, rhs, std::nullopt){
     this->nuw = nuw;
     this->nsw = nsw;
     this->unsigned_ = unsigned_;
@@ -185,7 +187,7 @@ std::string IntAvgInst::to_string() const{
 // ----------------------------- Vector integer binary operations ---------------------------
 VecIntArithmeticBinaryInst::VecIntArithmeticBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                                         bool nuw, bool nsw, bool unsigned_, bool saturating, bool floor, bool exact)
-                                                        :ArithmeticBinaryInst(instruction_stmt, destination, lhs, rhs){
+                                                        :ArithmeticBinaryInst(instruction_stmt, destination, lhs, rhs, std::nullopt){
     this->nuw = nuw;
     this->nsw = nsw;
     this->unsigned_ = unsigned_;
@@ -348,14 +350,16 @@ std::string VecIntAvgInst::to_string() const{
 
 // ---------------------------- Float binary operations ---------------------------
 FloatArithmeticBinaryInst::FloatArithmeticBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                                FastMathAttr fast_math_attr,bool ieee754_2019, bool unordered):ArithmeticBinaryInst(instruction_stmt, destination, lhs, rhs){
-    this->fast_math_attr = fast_math_attr;
+                                                    FastMathAttr fast_math_attr,bool ieee754_2019, bool unordered)
+                                                    :ArithmeticBinaryInst(instruction_stmt, destination, lhs, rhs, fast_math_attr){
     this->ieee754_2019 = ieee754_2019;
     this->unordered = unordered;
 }
 std::string FloatArithmeticBinaryInst::to_string_helper(const std::string op_name) const{
     std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(" + this->lhs->to_string() + ", " + this->rhs->to_string() + ")";
-    res+= " " + this->fast_math_attr.to_string();
+    if(this->fast_math_attr.has_value()){
+        res+= " " + this->fast_math_attr.value().to_string();
+    }
     if(this->ieee754_2019){
         res += " #[ieee754_2019]";
     }
@@ -363,9 +367,6 @@ std::string FloatArithmeticBinaryInst::to_string_helper(const std::string op_nam
         res += " #[unordered]";
     }
     return res;
-}
-FastMathAttr FloatArithmeticBinaryInst::get_fast_math_attr() const{
-    return this->fast_math_attr;
 }
 bool FloatArithmeticBinaryInst::is_ieee754_2019() const{
     return this->ieee754_2019;
@@ -489,17 +490,15 @@ std::string FloatAvgInst::to_string() const{
 // ---------------------------- Vector Float binary operations ---------------------------
 VecFloatArithmeticBinaryInst::VecFloatArithmeticBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                                             FastMathAttr fast_math_attr, bool ieee754_2019, bool unordered)
-                                                            :ArithmeticBinaryInst(instruction_stmt, destination, lhs, rhs){
-    this->fast_math_attr = fast_math_attr;
+                                                            :ArithmeticBinaryInst(instruction_stmt, destination, lhs, rhs, fast_math_attr){
     this->ieee754_2019 = ieee754_2019;
     this->unordered = unordered;
 }
-FastMathAttr VecFloatArithmeticBinaryInst::get_fast_math_attr() const{
-    return this->fast_math_attr;
-}
 std::string VecFloatArithmeticBinaryInst::to_string_helper(const std::string op_name) const{
     std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(" + this->lhs->to_string() + ", " + this->rhs->to_string() + ")";
-    res+= " " + this->fast_math_attr.to_string();
+    if(this->fast_math_attr.has_value()){
+        res+= " " + this->fast_math_attr.value().to_string();
+    }
     if(this->ieee754_2019){
         res += " #[ieee754_2019]";
     }

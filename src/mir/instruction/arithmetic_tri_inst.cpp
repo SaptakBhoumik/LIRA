@@ -5,8 +5,9 @@
 namespace LIRA {
 namespace MIR {
 ArithmeticTrinaryInst::ArithmeticTrinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, 
-                                             IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3)
-                                             :Inst(instruction_stmt, destination){
+                                             IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3,
+                                             std::optional<FastMathAttr> fast_math_attr)
+                                             :Inst(instruction_stmt, destination,fast_math_attr){
     this->arg1 = arg1;
     this->arg2 = arg2;
     this->arg3 = arg3;
@@ -31,7 +32,7 @@ InstType ArithmeticTrinaryInst::get_inst_type() const{
 // ---------------------------- Integer Trinary operations ---------------------------
 IntArithmeticTrinaryInst::IntArithmeticTrinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                                                      IR::LiteralExprPtr arg3, bool nuw, bool nsw, bool unsigned_, bool saturating)
-                                                     :ArithmeticTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3){
+                                                     :ArithmeticTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3,std::nullopt){
     this->nuw = nuw;
     this->nsw = nsw;
     this->unsigned_ = unsigned_;
@@ -134,7 +135,7 @@ std::string IntClampInst::to_string() const{
 // ----------------------------- Vector integer Trinary operations ---------------------------
 VecIntArithmeticTrinaryInst::VecIntArithmeticTrinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                                                      IR::LiteralExprPtr arg3, bool nuw, bool nsw, bool unsigned_, bool saturating)
-                                                     :ArithmeticTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3){
+                                                     :ArithmeticTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3, std::nullopt){
     this->nuw = nuw;
     this->nsw = nsw;
     this->unsigned_ = unsigned_;
@@ -241,14 +242,15 @@ std::string VecIntClampInst::to_string() const{
 // ---------------------------- Float Trinary operations ---------------------------
 FloatArithmeticTrinaryInst::FloatArithmeticTrinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
                                                         IR::LiteralExprPtr arg3, FastMathAttr fast_math_attr,bool ieee754_2019, bool unordered)
-                                                        :ArithmeticTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3){
-    this->fast_math_attr = fast_math_attr;
+                                                        :ArithmeticTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3, fast_math_attr){
     this->ieee754_2019 = ieee754_2019;
     this->unordered = unordered;
 }
 std::string FloatArithmeticTrinaryInst::to_string_helper(const std::string op_name) const{
     std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(" + this->arg1->to_string() + ", " + this->arg2->to_string() + ", " + this->arg3->to_string() + ")";
-    res+= " " + this->fast_math_attr.to_string();
+    if(this->get_fast_math_attr().has_value()){
+        res += " " + this->get_fast_math_attr()->to_string();
+    }
     if(this->ieee754_2019){
         res += " #[ieee754_2019]";
     }
@@ -256,9 +258,6 @@ std::string FloatArithmeticTrinaryInst::to_string_helper(const std::string op_na
         res += " #[unordered]";
     }
     return res;
-}
-FastMathAttr FloatArithmeticTrinaryInst::get_fast_math_attr() const{
-    return this->fast_math_attr;
 }
 bool FloatArithmeticTrinaryInst::is_ieee754_2019() const{
     return this->ieee754_2019;
@@ -338,14 +337,15 @@ std::string FloatClampInst::to_string() const{
 // ---------------------------- Vector Float Trinary operations ---------------------------
 VecFloatArithmeticTrinaryInst::VecFloatArithmeticTrinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
                                                         IR::LiteralExprPtr arg3, FastMathAttr fast_math_attr,bool ieee754_2019, bool unordered)
-                                                        :ArithmeticTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3){
-    this->fast_math_attr = fast_math_attr;
+                                                        :ArithmeticTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3, fast_math_attr){
     this->ieee754_2019 = ieee754_2019;
     this->unordered = unordered;
 }
 std::string VecFloatArithmeticTrinaryInst::to_string_helper(const std::string op_name) const{
     std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(" + this->arg1->to_string() + ", " + this->arg2->to_string() + ", " + this->arg3->to_string() + ")";
-    res+= " " + this->fast_math_attr.to_string();
+    if(this->fast_math_attr.has_value()){
+        res+= " " + this->fast_math_attr.value().to_string();
+    }
     if(this->ieee754_2019){
         res += " #[ieee754_2019]";
     }
@@ -353,9 +353,6 @@ std::string VecFloatArithmeticTrinaryInst::to_string_helper(const std::string op
         res += " #[unordered]";
     }
     return res;
-}
-FastMathAttr VecFloatArithmeticTrinaryInst::get_fast_math_attr() const{
-    return this->fast_math_attr;
 }
 bool VecFloatArithmeticTrinaryInst::is_ieee754_2019() const{
     return this->ieee754_2019;

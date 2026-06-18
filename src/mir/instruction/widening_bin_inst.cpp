@@ -4,7 +4,7 @@
 namespace LIRA {
 namespace MIR {
 WideningBinaryInst::WideningBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                                       IR::TypeExprPtr input_type):Inst(instruction_stmt, destination){
+                                       IR::TypeExprPtr input_type, std::optional<FastMathAttr> fast_math_attr):Inst(instruction_stmt, destination, fast_math_attr){
     this->lhs = lhs;
     this->rhs = rhs;
     this->input_type = input_type;
@@ -29,7 +29,7 @@ InstType WideningBinaryInst::get_inst_type() const {
 // ---------------------------- Integer Widening Binary operations ---------------------------
 IntWideningBinaryInst::IntWideningBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                              IR::TypeExprPtr input_type, bool nuw, bool nsw, bool unsigned_)
-                                             :WideningBinaryInst(instruction_stmt, destination, lhs, rhs, input_type){
+                                             :WideningBinaryInst(instruction_stmt, destination, lhs, rhs, input_type, std::nullopt){
     this->nuw = nuw;
     this->nsw = nsw;
     this->unsigned_ = unsigned_;
@@ -110,7 +110,7 @@ std::string IntWideningMulInst::to_string() const{
 // ---------------------------- Integer Widening Binary operations ---------------------------
 VecIntWideningBinaryInst::VecIntWideningBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                              IR::TypeExprPtr input_type, bool nuw, bool nsw, bool unsigned_)
-                                             :WideningBinaryInst(instruction_stmt, destination, lhs, rhs, input_type){
+                                             :WideningBinaryInst(instruction_stmt, destination, lhs, rhs, input_type, std::nullopt){
     this->nuw = nuw;
     this->nsw = nsw;
     this->unsigned_ = unsigned_;
@@ -197,16 +197,13 @@ std::string VecIntWideningMulInst::to_string() const{
 // ---------------------------- Float Widening Binary operations ---------------------------
 FloatWideningBinaryInst::FloatWideningBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs,
                                                  IR::LiteralExprPtr rhs, IR::TypeExprPtr input_type, FastMathAttr fast_math_attr)
-                                                 :WideningBinaryInst(instruction_stmt, destination, lhs, rhs, input_type){
-    this->fast_math_attr = fast_math_attr;  
-}
+                                                 :WideningBinaryInst(instruction_stmt, destination, lhs, rhs, input_type, fast_math_attr){}
 std::string FloatWideningBinaryInst::to_string_helper(const std::string op_name) const {
     std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(" + this->lhs->to_string() + ", " + this->rhs->to_string() + ")";
-    res+= " " + this->fast_math_attr.to_string();
+    if(this->fast_math_attr.has_value()){
+        res+= " " + this->fast_math_attr.value().to_string();
+    }
     return res;
-}
-FastMathAttr FloatWideningBinaryInst::get_fast_math_attr() const {
-    return this->fast_math_attr;
 }
 std::shared_ptr<IR::FloatTypeExpr> FloatWideningBinaryInst::get_casted_input_type() const {
     return std::dynamic_pointer_cast<IR::FloatTypeExpr>(this->input_type);
@@ -267,16 +264,13 @@ std::string FloatWideningMulInst::to_string() const{
 // ---------------------------- Vector Float Widening Binary operations ---------------------------
 VecFloatWideningBinaryInst::VecFloatWideningBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs,
                                                  IR::LiteralExprPtr rhs, IR::TypeExprPtr input_type, FastMathAttr fast_math_attr)
-                                                 :WideningBinaryInst(instruction_stmt, destination, lhs, rhs, input_type){
-    this->fast_math_attr = fast_math_attr;  
-}
+                                                 :WideningBinaryInst(instruction_stmt, destination, lhs, rhs, input_type, fast_math_attr){}
 std::string VecFloatWideningBinaryInst::to_string_helper(const std::string op_name) const {
     std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(" + this->lhs->to_string() + ", " + this->rhs->to_string() + ")";
-    res+= " " + this->fast_math_attr.to_string();
+    if(this->fast_math_attr.has_value()){
+        res+= " " + this->fast_math_attr.value().to_string();
+    }
     return res;
-}
-FastMathAttr VecFloatWideningBinaryInst::get_fast_math_attr() const {
-    return this->fast_math_attr;
 }
 std::shared_ptr<IR::SIMDTypeExpr> VecFloatWideningBinaryInst::get_casted_input_type() const {
     return std::dynamic_pointer_cast<IR::SIMDTypeExpr>(this->input_type);

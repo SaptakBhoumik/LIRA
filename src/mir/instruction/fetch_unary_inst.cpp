@@ -1,12 +1,14 @@
 #include "ast/ast.hpp"
+#include "mir/instruction/_instruction.hpp"
 #include "mir/instruction/fetch_unary_inst.hpp"
 #include <iostream>
 #include <memory>
+#include <optional>
 
 namespace LIRA {
 namespace MIR {
-FetchUnaryInst::FetchUnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value)
-                    :Inst(instruction_stmt,destination){
+FetchUnaryInst::FetchUnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, std::optional<FastMathAttr> fast_math_attr)
+                    :Inst(instruction_stmt, destination, fast_math_attr){
     this->value = value;
 }
 IR::TypeExprPtr FetchUnaryInst::get_type() const{
@@ -20,7 +22,7 @@ InstType FetchUnaryInst::get_inst_type() const{
 }
 // --------------------------- Int Fetch Unary operations ---------------------------
 IntFetchUnaryInst::IntFetchUnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, bool nuw, bool nsw, bool zero_poison)
-                                    :FetchUnaryInst(instruction_stmt, destination, value){
+                                    :FetchUnaryInst(instruction_stmt, destination, value, std::nullopt){
     this->nuw = nuw;
     this->nsw = nsw;
     this->zero_poison = zero_poison;
@@ -190,20 +192,18 @@ std::string IntFetchBLSMaskInst::to_string() const{
 
 // --------------------------- Float Fetch Unary operations ---------------------------
 FloatFetchUnaryInst::FloatFetchUnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
-                                         FastMathAttr fast_math_attr,bool approx):FetchUnaryInst(instruction_stmt, destination, value){
-    this->fast_math_attr = fast_math_attr;
+                                         FastMathAttr fast_math_attr,bool approx):FetchUnaryInst(instruction_stmt, destination, value, fast_math_attr){
     this->approx = approx;
 }
 std::string FloatFetchUnaryInst::to_string_helper(const std::string op_name) const{
     std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(ptr:" + this->value->to_string() + ")";
-    res+= " " + this->fast_math_attr.to_string();
+    if(this->fast_math_attr.has_value()){
+        res+= " " + this->fast_math_attr.value().to_string();
+    }
     if(this->approx){
         res += " #[approx]";
     }
     return res;
-}
-FastMathAttr FloatFetchUnaryInst::get_fast_math_attr() const{
-    return fast_math_attr;
 }
 bool FloatFetchUnaryInst::is_approx() const{
     return this->approx;

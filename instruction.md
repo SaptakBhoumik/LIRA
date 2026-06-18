@@ -1213,17 +1213,31 @@ Note: `.reduce_sub`, `.reduce_nand`, `.reduce_nor`, `.reduce_div`, `.reduce_rem`
 - `let <T,N>:%out = .expand(<T,N>:%src, <i1,N>:%mask, <T,N>:%passthru)` - Inverse of `.compress`. Reads elements from the consecutive low lanes of `src` and scatters them into the active (mask=true) lanes of the output. Inactive lanes take their value from `passthru`. Mirrors `VPEXPANDPS`/`VPEXPANDQ`/`VPEXPANDB`.
     - `#[zeropassthru]` - inactive lanes are zeroed; avoids materialising a zero `passthru` vector
 
+    If T is float:
+    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+
 - `let <T,N>:%out = .broadcast_load(ptr:%ptr)` - Loads a single scalar of type `T` from memory and broadcasts it to every lane. A single instruction on x86 (`VBROADCASTSS`, `VBROADCASTSD`, etc.); the backend guarantees the fusion that a `.load` + `.splat` pair might not. `T` must be a scalar integer, float, or bfloat (not a vector).
     - `#[align(i8:N)]` - alignment of `ptr`; must be a power of 2; default is natural alignment of `T`
     - `#[volatile]` - volatile load
     - `#[nonnull]` - asserts `ptr` is not null
     - `#[nontemporal]` - non-temporal (cache-bypassing) load
 
-- `let <T,N2>:%out = .interleave2(<T,N>:%a, <T,N>:%b)` - Interleaves channels into a single packed vector. `N2 = 2*N`. Output element at position `i*2 + j` equals input `vj[i]` (channel `j`, element `i`). `T` can be any integer, float, or bfloat. No attributes.
+    If T is float:
+    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+
+- `let <T,N2>:%out = .interleave2(<T,N>:%a, <T,N>:%b)` - Interleaves channels into a single packed vector. `N2 = 2*N`. Output element at position `i*2 + j` equals input `vj[i]` (channel `j`, element `i`). `T` can be any integer, float, or bfloat. 
+
+    If T is float:
+    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+
 - `let <T,N3>:%out = .interleave3(<T,N>:%a, <T,N>:%b, <T,N>:%c)` - Interleave three channels. `N3 = 3*N`. Same rules.
 - `let <T,N4>:%out = .interleave4(<T,N>:%a, <T,N>:%b, <T,N>:%c, <T,N>:%d)` - Interleave four channels. `N4 = 4*N`. Same rules.
 
 - `let <T,N>:%out = .deinterleave2(<T,N2>:%v, i8:channel)` - Extracts one channel from an interleaved vector. `channel` must be a compile-time literal in `[0, 1]`. Extracts elements at positions `channel, channel+2, channel+4, ...`. Output length `N = N2/2`.
+
+    If T is float:
+    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+    
 - `let <T,N>:%out = .deinterleave3(<T,N3>:%v, i8:channel)` - Same for 3-channel interleaving, `channel` in `[0, 2]`. Output length `N = N3/3`.
 - `let <T,N>:%out = .deinterleave4(<T,N4>:%v, i8:channel)` - Same for 4-channel interleaving, `channel` in `[0, 3]`. Output length `N = N4/4`.
 
@@ -1245,23 +1259,29 @@ Note: `.reduce_sub`, `.reduce_nand`, `.reduce_nor`, `.reduce_div`, `.reduce_rem`
 
 ### Widening Reductions
 
-- `let T2:%out = .reduce_add_wide(<T1,N>:%v [, <i1,N>:%mask])`  
-  Sums all lanes where the mask is true (or all lanes if no mask), accumulating in `T2`.  
-  `T1` must be integer; `T2` must be integer with `bitwidth(T2) >= bitwidth(T1)`.
+- `let T2:%out = .reduce_add_wide(<T1,N>:%v [, <i1,N>:%mask])` - Sums all lanes where the mask is true (or all lanes if no mask), accumulating in `T2`.  
+    `T1` must be integer/float/bfloat; `T2` must be integer with `bitwidth(T2) >= bitwidth(T1)`.
     - `#[unsigned]` – treat lanes as unsigned; default is signed
     - `#[saturating]` – clamp accumulator to `T2` range instead of wrapping; pair with `#[unsigned]` for unsigned saturation
 
-- `let T2:%out = .reduce_mul_wide(<T1,N>:%v [, <i1,N>:%mask])`  
-  Multiplies all lanes where the mask is true (or all lanes if no mask), accumulating in `T2`.  
-  `T1` must be integer; `T2` must be integer with `bitwidth(T2) >= 2 * bitwidth(T1)`.
-    - `#[unsigned]` – treat lanes as unsigned; default is signed
-    - `#[saturating]` – clamp accumulator to `T2` range
+    If T1 is float:
+    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
-- `let T2:%out = .reduce_avg_wide(<T1,N>:%v [, <i1,N>:%mask])`  
-  Computes the arithmetic mean of all lanes where the mask is true (or all lanes if no mask) with intermediate accumulation in `T2`.  
-  `T1` must be integer; `T2` must be integer wide enough to hold the full sum before the final divide.
+- `let T2:%out = .reduce_mul_wide(<T1,N>:%v [, <i1,N>:%mask])` - Multiplies all lanes where the mask is true (or all lanes if no mask), accumulating in `T2`.  
+    `T1` must be integer/float/bfloat; `T2` must be integer with `bitwidth(T2) >= bitwidth(T1)`.
     - `#[unsigned]` – treat lanes as unsigned; default is signed
-    - `#[floor]` – round toward negative infinity; default rounds toward positive infinity
+    - `#[saturating]` – clamp accumulator to `T2` range instead of wrapping; pair with `#[unsigned]` for unsigned saturation
+
+    If T1 is float:
+    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+
+- `let T2:%out = .reduce_avg_wide(<T1,N>:%v [, <i1,N>:%mask])` - Computes the arithmetic mean of all lanes where the mask is true (or all lanes if no mask) with intermediate accumulation in `T2`.  
+    `T1` must be integer/float/bfloat; `T2` must be integer with `bitwidth(T2) >= bitwidth(T1)`.
+    - `#[unsigned]` – treat lanes as unsigned; default is signed
+    - `#[saturating]` – clamp accumulator to `T2` range instead of wrapping; pair with `#[unsigned]` for unsigned saturation
+    
+    If T1 is float:
+    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 ---
 
@@ -1273,6 +1293,8 @@ Note: `.reduce_sub`, `.reduce_nand`, `.reduce_nor`, `.reduce_div`, `.reduce_rem`
 
 - `let T:%output_var = .freeze(T:%input_var)` - Freezes a poison or otherwise indeterminate value. The result is an arbitrary but fixed value of type T; the compiler may not make assumptions about which value. Prevents optimizations that rely on poison semantics from propagating through this point. T can be any type. No attributes.
 
+    If T is float/bfloat/vector of float: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+
 - `.va_start(ptr:%input_var)` - Initializes a variable-argument list. `input_var` must point to an allocated `{i32,i32,ptr,ptr}` struct (the `va_list`). Separated from allocation so the caller can allocate and optionally inspect the struct before initialization.
 
 - `.va_end(ptr:%input_var)` - Cleans up a variable-argument list. `input_var` must be the same `va_list` pointer that was passed to `.va_start`.
@@ -1280,6 +1302,8 @@ Note: `.reduce_sub`, `.reduce_nand`, `.reduce_nor`, `.reduce_div`, `.reduce_rem`
 - `.va_copy(ptr:%dest, ptr:%src)` - Copies a variable-argument list from `src` to `dest`. Both must be `va_list` pointers.
 
 - `let T:%output_var = .va_arg(ptr:%input_var)` - Retrieves the next variadic argument of type T from the `va_list` pointed to by `input_var`. No attributes.
+
+    If T is float/bfloat/vector of float: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 - `let T:%output_var = .ptrmask(T:%input_var, T1:%mask)` - Masks a pointer with an integer mask. T must be `ptr` or `<ptr,M>`. T1 must be an integer or vector of integer. If T1 is a vector, T must be a vector of the same size. No attributes.
 
@@ -1290,6 +1314,9 @@ Note: `.reduce_sub`, `.reduce_nand`, `.reduce_nor`, `.reduce_div`, `.reduce_rem`
 ### Optimizer Hint Instructions
 
 #### Binding Assumptions (May cause UB if violated)
+
+For the following if T is float/bfloat/vector of float: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+
 - `.assume(T:%var, T:compile_time_value)` - Tells the optimizer that `%var` holds `compile_time_value` at this program point. The compiler may propagate this as a known value. Undefined behavior if the assumption is false. `T` can be any type as long as represented as compile time value. `compile_time_value` must be a literal.
     - `#[noundef]` - additionally asserts that `%var` is not poison or undef
 
@@ -1311,6 +1338,9 @@ Note: `.reduce_sub`, `.reduce_nand`, `.reduce_nor`, `.reduce_div`, `.reduce_rem`
     - `#[noundef]` - additionally asserts `%var` is not poison
 
 #### Non-Binding Expectation Hints(No UB if violated. Even if the prob is 100%, the optimizer may still generate code for other cases.)
+
+For the following if T is float/bfloat/vector of float: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+
 - `.expect(T:%var, T:compile_time_value)` - Hints that `%var` most commonly holds `compile_time_value`. No UB if wrong. Analogous to `__builtin_expect`. `T` can be any type as long as represented as compile time value.
     - `#[probability(f32:P)]` - probability the value matches (0.0–1.0); default unspecified
 

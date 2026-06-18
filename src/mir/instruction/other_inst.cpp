@@ -1,6 +1,7 @@
 #include "mir/instruction/other_inst.hpp"
 #include "ast/ast.hpp"
 #include "mir/instruction.hpp"
+#include "mir/instruction/_instruction.hpp"
 #include <cstddef>
 #include <iostream>
 #include <memory>
@@ -194,6 +195,288 @@ InstType PauseInst::get_inst_type() const{
 }
 std::string PauseInst::to_string() const{
     return ".pause";
+}
+
+
+AssumeInst::AssumeInst(IR::InstructionStmtPtr instruction_stmt, std::string varname, std::vector<IR::LiteralExprPtr> assumed_values, IR::TypeExprPtr type, 
+                      std::optional<FastMathAttr> fast_math_attr):
+                       Inst(instruction_stmt, nullptr, fast_math_attr){
+    this->assumed_values = assumed_values;
+    this->type = type;
+    this->varname = varname;    
+}
+std::string AssumeInst::get_varname() const{
+    return this->varname;
+}
+std::vector<IR::LiteralExprPtr> AssumeInst::get_assumed_values() const{
+    return this->assumed_values;
+}
+IR::TypeExprPtr AssumeInst::get_type() const{
+    return this->type;
+}
+InstType AssumeInst::get_inst_type() const{
+    return InstType::AssumeInst;
+}
+std::string AssumeInst::to_string() const{
+    std::string res = ".assume(" + this->type->to_string() + ":" + this->varname;
+    for(auto& val: this->assumed_values){
+        res += ", " + this->type->to_string() + ":" + val->to_string();
+    }
+    res += ")";
+    if(this->fast_math_attr.has_value()){
+        res += " " + this->fast_math_attr.value().to_string();
+    }
+    return res;
+}
+
+
+AssumeRangeInst::AssumeRangeInst(IR::InstructionStmtPtr instruction_stmt, std::string varname, IR::LiteralExprPtr min_value, IR::LiteralExprPtr max_value, 
+                                 IR::TypeExprPtr type, std::optional<FastMathAttr> fast_math_attr):
+                                  Inst(instruction_stmt, nullptr, fast_math_attr){
+    this->min_value = min_value;
+    this->max_value = max_value;
+    this->type = type;
+    this->varname = varname;
+}
+std::string AssumeRangeInst::get_varname() const{
+    return this->varname;
+}
+IR::LiteralExprPtr AssumeRangeInst::get_min_value() const{
+    return this->min_value;
+}
+IR::LiteralExprPtr AssumeRangeInst::get_max_value() const{
+    return this->max_value;
+}
+IR::TypeExprPtr AssumeRangeInst::get_type() const{
+    return this->type;
+}
+InstType AssumeRangeInst::get_inst_type() const{
+    return InstType::AssumeRangeInst;
+}
+std::string AssumeRangeInst::to_string() const{
+    std::string res = ".assume(" + this->type->to_string() + ":" + this->varname + ", " + this->type->to_string() + ":" + this->min_value->to_string() + ", " +
+                      this->type->to_string() + ":" + this->max_value->to_string() + ")";
+    if(this->fast_math_attr.has_value()){
+        res += " " + this->fast_math_attr.value().to_string();
+    }
+    return res;
+}
+
+
+AssumeNotInst::AssumeNotInst(IR::InstructionStmtPtr instruction_stmt, std::string varname, std::vector<IR::LiteralExprPtr> assumed_values, IR::TypeExprPtr type, 
+                      std::optional<FastMathAttr> fast_math_attr):
+                       Inst(instruction_stmt, nullptr, fast_math_attr){
+    this->assumed_values = assumed_values;
+    this->type = type;
+    this->varname = varname;    
+}
+std::string AssumeNotInst::get_varname() const{
+    return this->varname;
+}
+std::vector<IR::LiteralExprPtr> AssumeNotInst::get_assumed_values() const{
+    return this->assumed_values;
+}
+IR::TypeExprPtr AssumeNotInst::get_type() const{
+    return this->type;
+}
+InstType AssumeNotInst::get_inst_type() const{
+    return InstType::AssumeNotInst;
+}
+std::string AssumeNotInst::to_string() const{
+    std::string res = ".assume_not(" + this->type->to_string() + ":" + this->varname;
+    for(auto& val: this->assumed_values){
+        res += ", " + this->type->to_string() + ":" + val->to_string();
+    }
+    res += ")";
+    if(this->fast_math_attr.has_value()){
+        res += " " + this->fast_math_attr.value().to_string();
+    }
+    return res;
+}
+
+
+AssumeNotRangeInst::AssumeNotRangeInst(IR::InstructionStmtPtr instruction_stmt, std::string varname, IR::LiteralExprPtr min_value, IR::LiteralExprPtr max_value, 
+                                        IR::TypeExprPtr type, std::optional<FastMathAttr> fast_math_attr):
+                                        Inst(instruction_stmt, nullptr, fast_math_attr){
+    this->min_value = min_value;
+    this->max_value = max_value;
+    this->type = type;
+    this->varname = varname;
+}
+std::string AssumeNotRangeInst::get_varname() const{
+    return this->varname;
+}
+IR::LiteralExprPtr AssumeNotRangeInst::get_min_value() const{
+    return this->min_value;
+}
+IR::LiteralExprPtr AssumeNotRangeInst::get_max_value() const{
+    return this->max_value;
+}
+IR::TypeExprPtr AssumeNotRangeInst::get_type() const{
+    return this->type;
+}
+InstType AssumeNotRangeInst::get_inst_type() const{
+    return InstType::AssumeNotRangeInst;
+}
+std::string AssumeNotRangeInst::to_string() const{
+    std::string res = ".assume_not_range(" + this->type->to_string() + ":" + this->varname + ", " + this->type->to_string() + ":" + this->min_value->to_string() + ", " +
+                      this->type->to_string() + ":" + this->max_value->to_string() + ")";
+    if(this->fast_math_attr.has_value()){
+        res += " " + this->fast_math_attr.value().to_string();
+    }
+    return res;
+}
+
+
+ExpectInst::ExpectInst(IR::InstructionStmtPtr instruction_stmt, std::string varname, std::vector<IR::LiteralExprPtr> assumed_values, IR::TypeExprPtr type, 
+                       std::optional<double> probability, std::optional<FastMathAttr> fast_math_attr):
+                       Inst(instruction_stmt, nullptr, fast_math_attr){
+    this->assumed_values = assumed_values;
+    this->type = type;
+    this->varname = varname;
+    this->probability = probability;
+}
+std::string ExpectInst::get_varname() const{
+    return this->varname;
+}
+std::vector<IR::LiteralExprPtr> ExpectInst::get_assumed_values() const{
+    return this->assumed_values;
+}
+std::optional<double> ExpectInst::get_probability() const{
+    return this->probability;
+}
+IR::TypeExprPtr ExpectInst::get_type() const{
+    return this->type;
+}
+InstType ExpectInst::get_inst_type() const{
+    return InstType::ExpectInst;
+}
+std::string ExpectInst::to_string() const{
+    std::string res = ".expect(" + this->type->to_string() + ":" + this->varname;
+    for(auto& val: this->assumed_values){
+        res += ", " + this->type->to_string() + ":" + val->to_string();
+    }
+    res += ")";
+    if(this->fast_math_attr.has_value()){
+        res += " " + this->fast_math_attr.value().to_string();
+    }
+    if(this->probability.has_value()){
+        res += " #[probability(f64:" + std::to_string(this->probability.value()) + ")]";
+    }
+    return res;
+}
+
+
+ExpectRangeInst::ExpectRangeInst(IR::InstructionStmtPtr instruction_stmt, std::string varname, IR::LiteralExprPtr min_value, IR::LiteralExprPtr max_value, 
+                                 IR::TypeExprPtr type, std::optional<double> probability, std::optional<FastMathAttr> fast_math_attr):
+                                  Inst(instruction_stmt, nullptr, fast_math_attr){
+    this->min_value = min_value;
+    this->max_value = max_value;
+    this->type = type;
+    this->varname = varname;
+    this->probability = probability;
+}
+std::string ExpectRangeInst::get_varname() const{
+    return this->varname;
+}
+IR::LiteralExprPtr ExpectRangeInst::get_min_value() const{
+    return this->min_value;
+}
+IR::LiteralExprPtr ExpectRangeInst::get_max_value() const{
+    return this->max_value;
+}
+std::optional<double> ExpectRangeInst::get_probability() const{
+    return this->probability;
+}
+IR::TypeExprPtr ExpectRangeInst::get_type() const{
+    return this->type;
+}
+InstType ExpectRangeInst::get_inst_type() const{
+    return InstType::ExpectRangeInst;
+}
+std::string ExpectRangeInst::to_string() const{
+    std::string res = ".expect_range(" + this->type->to_string() + ":" + this->varname + ", " + this->type->to_string() + ":" + this->min_value->to_string() + ", " +
+                      this->type->to_string() + ":" + this->max_value->to_string() + ")";
+    if(this->fast_math_attr.has_value()){
+        res += " " + this->fast_math_attr.value().to_string();
+    }
+    if(this->probability.has_value()){
+        res += " #[probability(f64:" + std::to_string(this->probability.value()) + ")]";
+    }
+    return res;
+}
+
+
+NopInst::NopInst(IR::InstructionStmtPtr instruction_stmt, std::uint8_t size, bool multi_byte):Inst(instruction_stmt, nullptr, std::nullopt){
+    this->size = size;
+    this->multi_byte = multi_byte;
+}
+std::uint8_t NopInst::get_size() const{
+    return this->size;
+}
+bool NopInst::is_multi_byte() const{
+    return this->multi_byte;
+}
+InstType NopInst::get_inst_type() const{
+    return InstType::NopInst;
+}
+std::string NopInst::to_string() const{
+    std::string res = ".nop(i8:" + std::to_string(this->size)+ ")";
+    if(this->multi_byte){
+        res += " #[multi_byte]";
+    }
+    return res;
+}
+
+
+AnnotationInst::AnnotationInst(IR::InstructionStmtPtr instruction_stmt, std::string message):Inst(instruction_stmt, nullptr, std::nullopt){
+    this->message = message;
+}
+std::string AnnotationInst::get_message() const{
+    return this->message;
+}
+InstType AnnotationInst::get_inst_type() const{
+    return InstType::AnnotationInst;
+}
+std::string AnnotationInst::to_string() const{
+    return ".annotation(str:\"" + this->message + "\")";
+}
+
+
+Endbr64Inst::Endbr64Inst(IR::InstructionStmtPtr instruction_stmt):Inst(instruction_stmt, nullptr, std::nullopt){}
+InstType Endbr64Inst::get_inst_type() const{
+    return InstType::Endbr64Inst;
+}
+std::string Endbr64Inst::to_string() const{
+    return ".endbr64";
+}
+
+
+LaunderInst::LaunderInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr ptr):Inst(instruction_stmt, destination, std::nullopt){
+    this->ptr = ptr;
+}
+IR::LiteralExprPtr LaunderInst::get_ptr() const{
+    return this->ptr;
+}
+InstType LaunderInst::get_inst_type() const{
+    return InstType::LaunderInst;
+}
+std::string LaunderInst::to_string() const{
+    return "let " + this->destination->to_string() + " = .launder(ptr:" + this->ptr->to_string() + ")";
+}
+
+
+StripInvariantInst::StripInvariantInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr ptr):Inst(instruction_stmt, destination, std::nullopt){
+    this->ptr = ptr;
+}
+IR::LiteralExprPtr StripInvariantInst::get_ptr() const{
+    return this->ptr;
+}
+InstType StripInvariantInst::get_inst_type() const{
+    return InstType::StripInvariantInst;
+}
+std::string StripInvariantInst::to_string() const{
+    return "let " + this->destination->to_string() + " = .strip_invariant(ptr:" + this->ptr->to_string() + ")";
 }
 }
 }

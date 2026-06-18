@@ -126,10 +126,12 @@ class PauseInst:public Inst {
 class AssumeInst:public Inst {
     std::vector<IR::LiteralExprPtr> assumed_values;
     IR::TypeExprPtr type;
+    std::string varname;
     public:
-    AssumeInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, std::vector<IR::LiteralExprPtr> assumed_values, IR::TypeExprPtr type, 
+    AssumeInst(IR::InstructionStmtPtr instruction_stmt, std::string varname, std::vector<IR::LiteralExprPtr> assumed_values, IR::TypeExprPtr type, 
                std::optional<FastMathAttr> fast_math_attr);    
     
+    std::string get_varname() const;
     std::vector<IR::LiteralExprPtr> get_assumed_values() const;
     IR::TypeExprPtr get_type() const;
 
@@ -140,10 +142,13 @@ class AssumeInst:public Inst {
 class AssumeRangeInst:public Inst {
     IR::LiteralExprPtr min_value;
     IR::LiteralExprPtr max_value;
+    IR::TypeExprPtr type;
+    std::string varname;
     public:
-    AssumeRangeInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr min_value, IR::LiteralExprPtr max_value, 
+    AssumeRangeInst(IR::InstructionStmtPtr instruction_stmt, std::string varname, IR::LiteralExprPtr min_value, IR::LiteralExprPtr max_value, 
                     IR::TypeExprPtr type, std::optional<FastMathAttr> fast_math_attr);  
 
+    std::string get_varname() const;
     IR::LiteralExprPtr get_min_value() const;
     IR::LiteralExprPtr get_max_value() const;
     IR::TypeExprPtr get_type() const;
@@ -155,10 +160,12 @@ class AssumeRangeInst:public Inst {
 class AssumeNotInst:public Inst {
     std::vector<IR::LiteralExprPtr> assumed_values;
     IR::TypeExprPtr type;
+    std::string varname;
     public:
-    AssumeNotInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, std::vector<IR::LiteralExprPtr> assumed_values, IR::TypeExprPtr type, 
+    AssumeNotInst(IR::InstructionStmtPtr instruction_stmt, std::string varname, std::vector<IR::LiteralExprPtr> assumed_values, IR::TypeExprPtr type, 
                std::optional<FastMathAttr> fast_math_attr);    
     
+    std::string get_varname() const;
     std::vector<IR::LiteralExprPtr> get_assumed_values() const;
     IR::TypeExprPtr get_type() const;
 
@@ -169,10 +176,13 @@ class AssumeNotInst:public Inst {
 class AssumeNotRangeInst:public Inst {
     IR::LiteralExprPtr min_value;
     IR::LiteralExprPtr max_value;
+    IR::TypeExprPtr type;
+    std::string varname;
     public:
-    AssumeNotRangeInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr min_value, IR::LiteralExprPtr max_value, 
+    AssumeNotRangeInst(IR::InstructionStmtPtr instruction_stmt, std::string varname, IR::LiteralExprPtr min_value, IR::LiteralExprPtr max_value, 
                        IR::TypeExprPtr type, std::optional<FastMathAttr> fast_math_attr);  
 
+    std::string get_varname() const;
     IR::LiteralExprPtr get_min_value() const;
     IR::LiteralExprPtr get_max_value() const;
     IR::TypeExprPtr get_type() const;
@@ -186,10 +196,12 @@ class ExpectInst:public Inst {
     std::vector<IR::LiteralExprPtr> assumed_values;
     IR::TypeExprPtr type;
     std::optional<double> probability;
+    std::string varname;
     public:
-    ExpectInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, std::vector<IR::LiteralExprPtr> assumed_values, IR::TypeExprPtr type, 
+    ExpectInst(IR::InstructionStmtPtr instruction_stmt, std::string varname, std::vector<IR::LiteralExprPtr> assumed_values, IR::TypeExprPtr type, 
                std::optional<double> probability, std::optional<FastMathAttr> fast_math_attr);    
     
+    std::string get_varname() const;
     std::vector<IR::LiteralExprPtr> get_assumed_values() const;
     std::optional<double> get_probability() const;
     IR::TypeExprPtr get_type() const;
@@ -201,11 +213,14 @@ class ExpectInst:public Inst {
 class ExpectRangeInst:public Inst {
     IR::LiteralExprPtr min_value;
     IR::LiteralExprPtr max_value;
+    IR::TypeExprPtr type;
     std::optional<double> probability;
+    std::string varname;
     public:
-    ExpectRangeInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr min_value, IR::LiteralExprPtr max_value, 
+    ExpectRangeInst(IR::InstructionStmtPtr instruction_stmt, std::string varname, IR::LiteralExprPtr min_value, IR::LiteralExprPtr max_value, 
                     IR::TypeExprPtr type, std::optional<double> probability, std::optional<FastMathAttr> fast_math_attr);  
 
+    std::string get_varname() const;
     IR::LiteralExprPtr get_min_value() const;
     IR::LiteralExprPtr get_max_value() const;
     std::optional<double> get_probability() const;
@@ -250,7 +265,7 @@ class Endbr64Inst:public Inst {
 class LaunderInst:public Inst {
     IR::LiteralExprPtr ptr;
     public:
-    LaunderInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr ptr, std::optional<FastMathAttr> fast_math_attr);
+    LaunderInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr ptr);
 
     IR::LiteralExprPtr get_ptr() const;
 
@@ -261,7 +276,7 @@ class LaunderInst:public Inst {
 class StripInvariantInst:public Inst {
     IR::LiteralExprPtr ptr;
     public:
-    StripInvariantInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr ptr, std::optional<FastMathAttr> fast_math_attr);
+    StripInvariantInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr ptr);
 
     IR::LiteralExprPtr get_ptr() const;
 

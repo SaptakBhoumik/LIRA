@@ -19,12 +19,6 @@
     ### Vector Layout Instructions
     ### Lane Mask Conversion Instructions
     ### Widening Reductions
-## Other Instructions
-    ### Optimizer Hint Instructions
-        #### Binding Assumptions (UB if violated)
-        #### Non-Binding Expectation Hints
-    ### Metadata and Machine Instructions
-    ### Pointer Provenance Instructions
 ## Hardware-Specific Instructions
     ### Processor Identification
     ### Timestamp Counter Instructions

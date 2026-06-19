@@ -135,7 +135,7 @@
 
 ## Fixed-Point Arithmetic Instructions
 
-- `let T:%out = .mulfix(T:%a, T:%b, i32:%scale)` - Fixed-point multiply. Multiplies `a` and `b` as if they were fixed-point values with `scale` fractional bits, returning the correctly rounded result in the same type. Concretely: computes `(a * b) >> scale` with the intermediate product computed at double width to avoid overflow. Scale must be a compile-time constant.
+- `let T:%out = .mulfix(T:%a, T:%b, i32:%scale)` - Fixed-point multiply. Multiplies `a` and `b` as if they were fixed-point values with `scale` fractional bits, returning the correctly rounded result in the same type. Concretely: computes `(a * b) >> scale` with the intermediate product computed at double width to avoid overflow. Scale must be a compile-time/run-time constant.
 
     T must be of the form `T0` or `<T0,M>` where T0 is an integer type. `i32:%scale` must be a compile-time/run-time; must satisfy `0 <= scale <= bitwidth(T0)`.
 
@@ -1394,35 +1394,51 @@ There are no expect_not variants, since they are equivalent to the corresponding
 - `let {T, i1}:%out = .rdrand()` - Returns `{value: T, success: i1}`. `value` is a hardware-generated random number from the CSPRNG. `success` indicates whether a valid value was produced; if false, retry. `T` must be `i16`, `i32`, or `i64`. No attributes.
 
 - `let {T, i1}:%out = .rdseed()` - Returns `{value: T, success: i1}` from the true hardware entropy source (lower throughput). `T` must be `i16`, `i32`, or `i64`. Retry semantics same as `.rdrand`. No attributes.
+### Floating-Point Environment
 
-### Floating-Point Environment (SSE)
+These instructions manage the processor's floating-point control and status state. The intrinsics are overloaded on the env token type `T`: `T=i32` selects the SSE `MXCSR` path, `T=i16` selects the x87 `FCW`/`FSW` path. Where a `%env` parameter is present, the type annotation is mandatory
+and serves as the overload discriminator - omitting or mismatching it is a compile error. For parameterless intrinsics (`.get_fpenv`, `.get_fpstatus`, `.clear_fpstatus`) where no token is passed in, `#[x87]` must be given explicitly since there is nothing to infer from. `f128` support is TBD.
 
-These instructions read/write `MXCSR` only and have no effect on `f80`(or `f128`. Will think for the `f128` during impl to see if possible but probable not) arithmetic; rounding mode, precision, and exception state for `f80` operations are controlled exclusively via the x87 FP environment instructions.
+---
 
-- `let i32:%out = .get_fpenv()` - Reads the processor's `MXCSR` register. Returns an opaque `i32` bit-pattern. No attributes.
+- `let T:%out = .get_fpenv()` - Reads the floating-point control register. Returns an opaque env token of type `T`. No attributes.
+    - `T=i32` (default) - reads `MXCSR`.
+    - `T=i16` - requires `#[x87]`; reads `FCW` via `FNSTCW`.
 
-- `.set_fpenv(i32:%env)` - Writes `%env` to `MXCSR`. `%env` should be a value obtained from `.get_fpenv` (possibly modified via field accessors); writing arbitrary bit patterns with reserved bits set incorrectly is undefined behavior.
-    - `#[volatile]` - prevents the optimizer from eliminating, reordering across other FP ops, or merging redundant calls. Use when the side effect on FP exception trapping matters.
+- `.set_fpenv(T:%env)` - Writes `%env` to the floating-point control register. The type annotation on `%env` is mandatory and selects the overload. `%env` must be a value obtained from `.get_fpenv` (possibly modified via field accessors); writing arbitrary bit patterns with reserved bits set incorrectly is undefined behavior.
+    - `T=i32` (default) - writes `MXCSR`.
+    - `T=i16` - writes `FCW` via `FLDCW`. `#[x87]` is not required and is ignored if provided
+      since `T` already selects the overload.
+    - `#[volatile]` - prevents the optimizer from eliminating, reordering across other FP ops,
+      or merging redundant calls. Applies to both overloads.
 
-TODO:Check with claude what are the possible field value. Maybe create an enum for representing that field. Or something like that
-- `let i32:%out = .fpenv_get_field(i32:%env, str:field)` - Extracts a named field from an opaque FP environment value. `field` must be a compile-time string literal: `"round"` (0=nearest-even, 1=neg inf, 2=pos inf, 3=zero), `"ftz"`, `"daz"`, `"except_mask"` (6-bit packed: bits 0–5 invalid, denorm, divzero, overflow, underflow, inexact; 1=masked), `"except_status"` (same 6-bit order for sticky flags). No attributes.
+- `let i32:%out = .fpenv_get_field(T:%env, str:field)` - Extracts a named field from an opaque env token. The type annotation on `%env` is mandatory and selects the overload. `field` must be a compile-time string literal. No attributes.
+    - `T=i32` (default) - SSE overload. Valid fields: `"round"` (0=nearest-even, 1=neg-inf,
+      2=pos-inf, 3=zero), `"ftz"`, `"daz"`, `"except_mask"` (6-bit packed: bits 0–5 invalid,
+      denorm, divzero, overflow, underflow, inexact; 1=masked), `"except_status"` (same 6-bit
+      order for sticky flags).
+    - `T=i16` - x87 overload. Valid fields: `"round"` (same 4-value encoding), `"precision"`
+      (0=single, 2=double, 3=extended; 1=UB), `"except_mask"` (same 6-bit layout). Passing
+      `"ftz"`, `"daz"`, or `"except_status"` is a compile error.
 
-- `let i32:%out = .fpenv_set_field(i32:%env, str:field, i32:%value)` - Returns a copy of `%env` with the named field replaced by `%value`. For `"except_status"`, setting a bit clears the corresponding sticky exception flag. Does not modify processor state; pass the result to `.set_fpenv` to take effect. No attributes.
+- `let T:%out = .fpenv_set_field(T:%env, str:field, i32:%value)` - Returns a copy of `%env` with the named field replaced by `%value`. Return type matches `T`. The type annotation on `%env` is mandatory and selects the overload. Same field restrictions as `.fpenv_get_field` apply. Does not modify processor state; pass the result to `.set_fpenv` to take effect. No attributes.
+    - `T=i32` (default) - SSE overload. For `"except_status"`, setting a bit clears the
+      corresponding sticky flag (write-1-to-clear semantics).
+    - `T=i16` - x87 overload. `"except_status"`, `"ftz"`, and `"daz"` are compile errors; x87
+      exception status lives in `FSW` and is not writable via `FCW`. Use `.clear_fpstatus#[x87]`
+      instead.
 
-### x87 FP Environment
+- `let T:%out = .get_fpstatus()` - Reads sticky exception flags. No attributes.
+    - `T=i32` (default) - reads `MXCSR` bits 0–5 as a 6-bit value in the same layout as
+      `"except_status"`. Equivalent to `.fpenv_get_field(i32:.get_fpenv(), "except_status")`.
+    - `T=i16` - requires `#[x87]`; reads `FSW` via `FNSTSW`. Note: `FSW` contains more than
+      exception bits (condition codes, stack top pointer, etc.).
 
-- `let i16:%out = .get_fpenv87()` - Reads the x87 FPU control word (`FCW`) via `FNSTCW`. Returns an opaque `i16` token. No attributes.
-
-- `.set_fpenv87(i16:%env)` - Writes `%env` to `FCW` via `FLDCW`. Requires `#[volatile]` for the same reason as `.set_fpenv` (suppresses reordering when side effects on subsequent f80 ops matter).
-
-- `let i32:%out = .fpenv87_get_field(i16:%env, str:field)` - Extracts a named field from an x87 control word. Fields: `"round"` (same 4-value encoding), `"precision"` (0=single, 2=double, 3=extended; 1 is undefined/UB), `"except_mask"` (same 6-bit layout). `"ftz"`/`"daz"` are compile errors (x87 has no equivalent). No attributes.
-
-- `let i16:%out = .fpenv87_set_field(i16:%env, str:field, i32:%value)` - Returns a copy of `%env` with the named field replaced. `"except_status"` is not a settable field (x87 status is separate). No attributes.
-
-- `let i16:%out = .get_fpstatus87()` - Reads the x87 status word (`FSW`) via `FNSTSW`. No attributes.
-
-- `.clear_fpstatus87()` - Clears all sticky exception flags in `FSW` via `FNCLEX`. `#[volatile]` implicitly. No inputs/outputs.
-
+- `.clear_fpstatus()` - Clears all sticky exception flags. `#[volatile]` implicit. No inputs/outputs.
+    - default - reads-modifies-writes `MXCSR`. Equivalent to
+      `.set_fpenv(i32:.fpenv_set_field(i32:.get_fpenv(), "except_status", 0))`.
+    - `#[x87]` - issues `FNCLEX` to clear `FSW`.
+    
 ### Crypto Extensions
 
 All instructions are pure functions of their operands; constant-foldable, CSE-able, reorderable freely. They operate on register values and do not fault.
@@ -1439,7 +1455,7 @@ All instructions are pure functions of their operands; constant-foldable, CSE-ab
 - `let i128:%out = .clmul(i64:%a, i64:%b)` - Carry-less (GF(2)) multiply, 64x64->128. No attributes.
 
 #### SHA (operate on `<i32,4>` state)
-- `let <i32,4>:%out = .sha1rnds4(<i32,4>:%abcd, <i32,4>:%msg, i8:func)` - SHA-1 four rounds. `func` compile-time/run-time literal 0–3. No attributes.
+- `let <i32,4>:%out = .sha1rnds4(<i32,4>:%abcd, <i32,4>:%msg, i8:func)` - SHA-1 four rounds. `func` compile-time/run-time literal 0–3(For runtime u get UB if func not in range). No attributes. 
 - `let <i32,4>:%out = .sha1nexte(<i32,4>:%abcd, <i32,4>:%e)` - SHA-1 next E. No attributes.
 - `let <i32,4>:%out = .sha1msg1(<i32,4>:%a, <i32,4>:%b)` - SHA-1 message schedule step 1. No attributes.
 - `let <i32,4>:%out = .sha1msg2(<i32,4>:%a, <i32,4>:%b)` - SHA-1 message schedule step 2. No attributes.
@@ -1453,7 +1469,7 @@ All instructions are pure functions of their operands; constant-foldable, CSE-ab
 ### System Call
 
 - `let i64:%out = .syscall(i64:%nr, i64:%arg1, i64:%arg2, i64:%arg3, i64:%arg4, i64:%arg5, i64:%arg6)` - Issues the x86_64 Linux `SYSCALL` instruction. Arguments map to `rax, rdi, rsi, rdx, r10, r8, r9` in order. The argument list is variadic with 0–6 arguments; unused trailing args are omitted. All operands and the result must be `i64`. Treated as an arbitrary external call with unknown side effects; the optimizer must not reorder relative to memory ops, must not CSE identical calls, and must not eliminate if `%out` is unused, unless `#[nosideeffect]` is given.
-    - `#[noreturn]` - for syscalls that never return on success; `.syscall` with no output variable is then permitted.
+    - `#[noreturn]` - for syscalls that never return on success; `.syscall` with no output variable is then permitted. You must use #[noreturn] if syscalls dont return. You cant just skip the ``let i64:%out`` part without it
     - `#[nosideeffect]` - opt-in assertion that this call has no side effects beyond its return value, allowing DCE/CSE.
 
 ### CET Shadow Stack

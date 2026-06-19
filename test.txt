@@ -19,19 +19,6 @@
     ### Vector Layout Instructions
     ### Lane Mask Conversion Instructions
     ### Widening Reductions
-## Hardware-Specific Instructions
-    ### Processor Identification
-    ### Timestamp Counter Instructions
-    ### Hardware Random Number Instructions
-    ### Floating-Point Environment (SSE)
-    ### x87 FP Environment
-    ### Crypto Extensions
-        #### AES (operate on `<i8,16>` blocks)
-        #### Carry-less Multiply
-        #### SHA (operate on `<i32,4>` state)
-        #### CRC32
-    ### System Call
-    ### CET Shadow Stack
 
 
 

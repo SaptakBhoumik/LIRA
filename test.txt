@@ -1,8 +1,9 @@
 ## Fixed-Point Arithmetic Instructions
 
+NOTE:-Implement Call Inst at the end of everything
+
 ## Carry/Borrowing instructions
 ## Combined Quotient and Remainder (`divmod`)
-## Overflow-Wrap (Checked Arithmetic) Instructions
 ## High-Half Multiply
 
 

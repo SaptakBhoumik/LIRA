@@ -174,62 +174,13 @@ enum class InstOperandTypeVarient:std::uint64_t{
     */
 };
 
-__always_inline bool is_vector_typevarient(const InstOperandTypeVarient var) {
-    return var == InstOperandTypeVarient::VecInt || var == InstOperandTypeVarient::VecFloat || var == InstOperandTypeVarient::VecPtr;
-}
+bool is_vector_typevarient(const InstOperandTypeVarient var);
+bool is_scalar_typevarient(const InstOperandTypeVarient var);
+bool is_ptr_typevarient(const InstOperandTypeVarient var);
+bool is_float_typevarient(const InstOperandTypeVarient var);
+bool is_int_typevarient(const InstOperandTypeVarient var);
 
-__always_inline bool is_scalar_typevarient(const InstOperandTypeVarient var) {
-    return var == InstOperandTypeVarient::Int || var == InstOperandTypeVarient::Float || var == InstOperandTypeVarient::Ptr;
-}
-
-__always_inline bool is_ptr_typevarient(const InstOperandTypeVarient var) {
-    return var == InstOperandTypeVarient::Ptr || var == InstOperandTypeVarient::VecPtr;
-}
-
-__always_inline bool is_float_typevarient(const InstOperandTypeVarient var) {
-    return var == InstOperandTypeVarient::Float || var == InstOperandTypeVarient::VecFloat;
-}
-
-__always_inline bool is_int_typevarient(const InstOperandTypeVarient var) {
-    return var == InstOperandTypeVarient::Int || var == InstOperandTypeVarient::VecInt;
-}
-
-inline std::optional<InstOperandTypeVarient> get_type_varient_from_type(const IR::TypeExprPtr type){
-    //DOnt __always_inline this
-    switch(type->get_kind()){
-        case IR::TypeExprKind::IntTypeExpr:{
-            return InstOperandTypeVarient::Int;
-        }
-        case IR::TypeExprKind::FloatTypeExpr:{
-            return InstOperandTypeVarient::Float;
-        }
-        case IR::TypeExprKind::PtrTypeExpr:{
-            return InstOperandTypeVarient::Ptr;
-        }
-        case IR::TypeExprKind::SIMDTypeExpr:{
-                auto simd_type = std::dynamic_pointer_cast<IR::SIMDTypeExpr>(type);
-                if(simd_type == nullptr) return std::nullopt;
-                auto element_type = simd_type->get_basetype();
-                switch(element_type->get_kind()){
-                    case IR::TypeExprKind::IntTypeExpr:{
-                        return InstOperandTypeVarient::VecInt;
-                    }
-                    case IR::TypeExprKind::FloatTypeExpr:{  
-                        return InstOperandTypeVarient::VecFloat;
-                    }
-                    case IR::TypeExprKind::PtrTypeExpr:{
-                        return InstOperandTypeVarient::VecPtr;
-                    }
-                    default:{
-                        return std::nullopt;
-                    }
-                }
-        }
-        default:{
-            return std::nullopt;
-        }
-    }
-}
+std::optional<InstOperandTypeVarient> get_type_varient_from_type(const IR::TypeExprPtr type);
 
 template<typename E>
     requires (std::is_enum_v<E> && (!std::is_same_v<E, InstOperandTypeVarient>))

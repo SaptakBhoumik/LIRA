@@ -1471,6 +1471,7 @@ All instructions are pure functions of their operands; constant-foldable, CSE-ab
 - `let i64:%out = .syscall(i64:%nr, i64:%arg1, i64:%arg2, i64:%arg3, i64:%arg4, i64:%arg5, i64:%arg6)` - Issues the x86_64 Linux `SYSCALL` instruction. Arguments map to `rax, rdi, rsi, rdx, r10, r8, r9` in order. The argument list is variadic with 0–6 arguments; unused trailing args are omitted. All operands and the result must be `i64`. Treated as an arbitrary external call with unknown side effects; the optimizer must not reorder relative to memory ops, must not CSE identical calls, and must not eliminate if `%out` is unused, unless `#[nosideeffect]` is given.
     - `#[noreturn]` - for syscalls that never return on success; `.syscall` with no output variable is then permitted. You must use #[noreturn] if syscalls dont return. You cant just skip the ``let i64:%out`` part without it
     - `#[nosideeffect]` - opt-in assertion that this call has no side effects beyond its return value, allowing DCE/CSE.
+    - `#[pure]` - opt-in assertion that this call has no side effects and its return value depends only on its inputs, allowing DCE/CSE and reordering.
 
 ### CET Shadow Stack
 

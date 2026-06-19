@@ -109,6 +109,14 @@ enum class InstType:std::int16_t{
     Sha256Rnds2Inst,
     Sha256Msg1Inst,
     Sha256Msg2Inst,
+    Crc32Inst,
+    SyscallInst,
+    RdsspInst,
+    IncsspInst,
+    SavePrevSspInst,
+    RstorSspInst,
+    SetssbsyInst,
+    WrssInst
 };
 
 struct FastMathAttr {

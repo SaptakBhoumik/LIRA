@@ -387,8 +387,8 @@ class Crc32Inst : public Inst {
     IR::LiteralExprPtr get_data() const;
     std::shared_ptr<IR::IntTypeExpr> get_casted_acc_type() const;
     std::shared_ptr<IR::IntTypeExpr> get_casted_data_type() const;
-    IR::TypeExprPtr get_acc_type_bitwidth() const;
-    IR::TypeExprPtr get_data_type_bitwidth() const;
+    std::size_t get_acc_type_bitwidth() const;
+    std::size_t get_data_type_bitwidth() const;
 
     InstType get_inst_type() const override;
     std::string to_string() const override;
@@ -400,16 +400,18 @@ class SyscallInst : public Inst {
     std::vector<IR::LiteralExprPtr> args; // 0-6 entries
     bool noreturn_;
     bool nosideeffect;
+    bool pure;
     public:
     //destination is nullptr if no return
     SyscallInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
                 IR::LiteralExprPtr nr, std::vector<IR::LiteralExprPtr> args,
-                bool noreturn_, bool nosideeffect);
+                bool noreturn_, bool nosideeffect, bool pure);
 
     IR::LiteralExprPtr get_nr() const;
     std::vector<IR::LiteralExprPtr> get_args() const;
     bool is_noreturn() const;
     bool is_nosideeffect() const;
+    bool is_pure() const;
 
     InstType get_inst_type() const override;
     std::string to_string() const override;

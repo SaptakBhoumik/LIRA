@@ -1,4 +1,6 @@
 #include "mir/instruction/hardware_inst.hpp"
+#include <cstddef>
+#include <memory>
 #include <optional>
 
 namespace LIRA {
@@ -448,6 +450,229 @@ Sha256Rnds2Inst::Sha256Rnds2Inst(IR::InstructionStmtPtr instruction_stmt, LocalD
     this->abef = abef;
     this->cdgh = cdgh;
     this->wk = wk;
+}
+IR::LiteralExprPtr Sha256Rnds2Inst::get_abef() const{
+    return this->abef;
+}
+IR::LiteralExprPtr Sha256Rnds2Inst::get_cdgh() const{
+    return this->cdgh;
+}
+IR::LiteralExprPtr Sha256Rnds2Inst::get_wk() const{
+    return this->wk;
+}
+InstType Sha256Rnds2Inst::get_inst_type() const{
+    return InstType::Sha256Rnds2Inst;
+}
+std::string Sha256Rnds2Inst::to_string() const{
+    return "let " + this->destination->to_string() + " = .sha256rnds2(<i32,4>:" + this->abef->to_string() + ", <i32,4>:" + this->cdgh->to_string() + ", <i32,4>:" + this->wk->to_string() + ")";
+}
+
+
+Sha256Msg1Inst::Sha256Msg1Inst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+                             IR::LiteralExprPtr a, IR::LiteralExprPtr b):Inst(instruction_stmt,destination,std::nullopt){
+    this->a = a;
+    this->b = b;
+}
+IR::LiteralExprPtr Sha256Msg1Inst::get_a() const{
+    return this->a;
+}
+IR::LiteralExprPtr Sha256Msg1Inst::get_b() const{
+    return this->b;
+}
+InstType Sha256Msg1Inst::get_inst_type() const{
+    return InstType::Sha256Msg1Inst;
+}
+std::string Sha256Msg1Inst::to_string() const{
+    return "let " + this->destination->to_string() + " = .sha256_msg1(<i32,4>:" + this->a->to_string() + ", <i32,4>:" + this->b->to_string() + ")";
+}
+
+
+Sha256Msg2Inst::Sha256Msg2Inst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+                             IR::LiteralExprPtr a, IR::LiteralExprPtr b):Inst(instruction_stmt,destination,std::nullopt){
+    this->a = a;
+    this->b = b;
+}
+IR::LiteralExprPtr Sha256Msg2Inst::get_a() const{
+    return this->a;
+}
+IR::LiteralExprPtr Sha256Msg2Inst::get_b() const{
+    return this->b;
+}
+InstType Sha256Msg2Inst::get_inst_type() const{
+    return InstType::Sha256Msg2Inst;
+}
+std::string Sha256Msg2Inst::to_string() const{
+    return "let " + this->destination->to_string() + " = .sha256_msg2(<i32,4>:" + this->a->to_string() + ", <i32,4>:" + this->b->to_string() + ")";
+}
+
+
+// ---- CRC32 ----
+Crc32Inst::Crc32Inst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+                     IR::LiteralExprPtr acc, IR::LiteralExprPtr data, IR::TypeExprPtr acc_type, IR::TypeExprPtr data_type):
+                     Inst(instruction_stmt, destination, std::nullopt){
+    this->acc = acc;
+    this->data = data;
+    this->acc_type = acc_type;
+    this->data_type = data_type;
+}
+IR::LiteralExprPtr Crc32Inst::get_acc() const{
+    return this->acc;
+}
+IR::LiteralExprPtr Crc32Inst::get_data() const{
+    return this->data;
+}
+std::shared_ptr<IR::IntTypeExpr> Crc32Inst::get_casted_acc_type() const{
+    return std::dynamic_pointer_cast<IR::IntTypeExpr>(this->acc_type);
+}
+std::shared_ptr<IR::IntTypeExpr> Crc32Inst::get_casted_data_type() const{
+    return std::dynamic_pointer_cast<IR::IntTypeExpr>(this->data_type);
+}
+std::size_t Crc32Inst::get_acc_type_bitwidth() const{
+    return get_casted_acc_type()->get_bits();
+}
+std::size_t Crc32Inst::get_data_type_bitwidth() const{
+    return get_casted_data_type()->get_bits();
+}
+InstType Crc32Inst::get_inst_type() const{
+    return InstType::Crc32Inst;
+}
+std::string Crc32Inst::to_string() const{
+    return "let " + this->destination->to_string() + " = .crc32("+ this->acc_type->to_string() + ":" + this->acc->to_string() + ", " 
+                                                                 + this->data_type->to_string() + ":" + this->data->to_string() + ")";
+}
+
+
+//---------------------------------System Call---------------------------------
+SyscallInst::SyscallInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+                         IR::LiteralExprPtr nr, std::vector<IR::LiteralExprPtr> args,
+                         bool noreturn_, bool nosideeffect, bool pure):Inst(instruction_stmt, destination, std::nullopt){
+    this->nr = nr;
+    this->args = args;
+    this->noreturn_ = noreturn_;
+    this->nosideeffect = nosideeffect;
+    this->pure = pure;
+}
+IR::LiteralExprPtr SyscallInst::get_nr() const{
+    return this->nr;
+}
+std::vector<IR::LiteralExprPtr> SyscallInst::get_args() const{
+    return this->args;
+}
+bool SyscallInst::is_noreturn() const{
+    return this->noreturn_;
+}
+bool SyscallInst::is_nosideeffect() const{
+    return this->nosideeffect;
+}
+bool SyscallInst::is_pure() const{
+    return this->pure;
+}
+InstType SyscallInst::get_inst_type() const{
+    return InstType::SyscallInst;
+}
+std::string SyscallInst::to_string() const{
+    std::string res = "let " + this->destination->to_string() + " = .syscall(i64:" + this->nr->to_string();
+    for (const auto& arg : this->args) {
+        res += ", i64:" + arg->to_string();
+    }
+    res += ")";
+    if (this->noreturn_) {
+        res += " #[noreturn]";
+    }
+    if (this->nosideeffect) {
+        res += " #[nosideeffect]";
+    }
+    if (this->pure) {
+        res += " #[pure]";
+    }
+    return res;
+}
+
+
+//---------------------------------CET Shadow Stack---------------------------------
+RdsspInst::RdsspInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination):
+                     Inst(instruction_stmt, destination, std::nullopt){}
+InstType RdsspInst::get_inst_type() const{
+    return InstType::RdsspInst;
+}
+std::string RdsspInst::to_string() const{
+    return "let " + this->destination->to_string() + " = .rdssp()";
+}
+
+
+IncsspInst::IncsspInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr count):
+                     Inst(instruction_stmt, nullptr, std::nullopt){
+    this->count = count;
+}
+IR::LiteralExprPtr IncsspInst::get_count() const{
+    return this->count;
+}
+InstType IncsspInst::get_inst_type() const{
+    return InstType::IncsspInst;
+}
+std::string IncsspInst::to_string() const{
+    return "let " + this->destination->to_string() + " = .incssp(i64:" + this->count->to_string() + ")";
+}
+
+
+SavePrevSspInst::SavePrevSspInst(IR::InstructionStmtPtr instruction_stmt):
+                                Inst(instruction_stmt, nullptr, std::nullopt){}
+InstType SavePrevSspInst::get_inst_type() const{
+    return InstType::SavePrevSspInst;
+}
+std::string SavePrevSspInst::to_string() const{
+    return ".save_prev_ssp()";
+}
+
+
+RstorSspInst::RstorSspInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr token_addr):
+                                Inst(instruction_stmt, nullptr, std::nullopt){
+    this->token_addr = token_addr;
+}
+IR::LiteralExprPtr RstorSspInst::get_token_addr() const{
+    return this->token_addr;
+}
+InstType RstorSspInst::get_inst_type() const{
+    return InstType::RstorSspInst;
+}
+std::string RstorSspInst::to_string() const{
+    return ".rstor_ssp(ptr:" + this->token_addr->to_string() + ")";
+}
+
+
+SetssbsyInst::SetssbsyInst(IR::InstructionStmtPtr instruction_stmt):
+                                Inst(instruction_stmt, nullptr, std::nullopt){}
+InstType SetssbsyInst::get_inst_type() const{
+    return InstType::SetssbsyInst;
+}
+std::string SetssbsyInst::to_string() const{
+    return ".setssbsy()";
+}
+
+
+WrssInst::WrssInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr value, IR::LiteralExprPtr addr, IR::TypeExprPtr value_type):
+                    Inst(instruction_stmt, nullptr, std::nullopt){
+    this->value = value;
+    this->addr = addr;
+    this->value_type = value_type;
+}
+IR::LiteralExprPtr WrssInst::get_value() const{
+    return this->value;
+}
+IR::LiteralExprPtr WrssInst::get_addr() const{
+    return this->addr;
+}
+std::shared_ptr<IR::IntTypeExpr> WrssInst::get_casted_value_type() const{
+    return std::dynamic_pointer_cast<IR::IntTypeExpr>(this->value_type);
+}
+std::size_t WrssInst::get_value_type_bitwidth() const{
+    return this->get_casted_value_type()->get_bits();
+}
+InstType WrssInst::get_inst_type() const{
+    return InstType::WrssInst;
+}
+std::string WrssInst::to_string() const{
+    return ".wrss("+ this->value_type->to_string() + ":" + this->value->to_string() + ", ptr:" + this->addr->to_string() + ")";
 }
 }
 }

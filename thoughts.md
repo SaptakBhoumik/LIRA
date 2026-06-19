@@ -2,3 +2,4 @@
 - Should we have a widening average instruction that does the addition in a wider type and then divides by 2, to avoid overflow? This would be similar to the widening add, but with an implicit division by 2 at the end.
 - Should we allow fetch operation(The non atomic version) to act on SIMD vectors?
 - Should we allow clmul to act on any bit integer i.e allow i<N> -> i<2N> carryless multiply? This would be more general and allow for future extensions. But should I allow it?. Similar question for crc32. Also should I allow it on vector?
+- Should I allow wrap and carrying/borrowing instructions to unary method also? Like right now only neg and abs can have it but is it worth it? The phylosophy  /of uniformity we are following allows it but do we need it

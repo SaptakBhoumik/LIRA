@@ -5,11 +5,10 @@
 #include "instruction/bitwise_tri_inst.hpp"
 //## Fixed-Point Arithmetic Instructions
 #include "instruction/widening_bin_inst.hpp"
-// ## Carrying / Borrow Arithmetic Instructions
+// ## Carry/Borrowing instructions
 // ## Combined Quotient and Remainder (`divmod`)
-// ## Overflow-Wrap (Checked Arithmetic) Instructions
+#include "instruction/wrap_binary_inst.hpp"
 // ## High-Half Multiply
-// ## N-Bit Carry Shifts
 #include "instruction/bitwise_bin_inst.hpp"
 // ## Bitwise Trinary Instructions
 #include "instruction/cmp_bin_inst.hpp"

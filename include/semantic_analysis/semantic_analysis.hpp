@@ -48,7 +48,7 @@ class SemanticAnalyzer {
     MIR::InstPtr analyze_arithmetic_tri_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
     //## Fixed-Point Arithmetic Instructions
     MIR::InstPtr analyze_widening_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
-    // ## Carrying / Borrow Arithmetic Instructions
+    // ## Carry/Borrowing instructions
     // ## Combined Quotient and Remainder (`divmod`)
     // ## Overflow-Wrap (Checked Arithmetic) Instructions
     // ## High-Half Multiply

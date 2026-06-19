@@ -1,10 +1,9 @@
 ## Fixed-Point Arithmetic Instructions
 
-## Carrying / Borrow Arithmetic Instructions
+## Carry/Borrowing instructions
 ## Combined Quotient and Remainder (`divmod`)
 ## Overflow-Wrap (Checked Arithmetic) Instructions
 ## High-Half Multiply
-## N-Bit Carry Shifts
 
 
 ## Memory Instructions
@@ -24,11 +23,10 @@
 
 ## Fixed-Point Arithmetic Instructions
 
-## Carrying / Borrow Arithmetic Instructions
+## Carry/Borrowing instructions
 ## Combined Quotient and Remainder (`divmod`)
 ## Overflow-Wrap (Checked Arithmetic) Instructions
 ## High-Half Multiply
-## N-Bit Carry Shifts
 
 ## Bitwise Binary Instructions
 
@@ -80,11 +78,10 @@
 ## Trinary Arithmetic Instructions
 ## Fixed-Point Arithmetic Instructions
 ## Widening Arithmetic Instructions
-## Carrying / Borrow Arithmetic Instructions
+## Carry/Borrowing instructions
 ## Combined Quotient and Remainder (`divmod`)
 ## Overflow-Wrap (Checked Arithmetic) Instructions
 ## High-Half Multiply
-## N-Bit Carry Shifts
 ## Bitwise Binary Instructions
 ## Bitwise Trinary Instructions
 ## Comparison Instructions

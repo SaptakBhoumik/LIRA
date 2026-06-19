@@ -44,7 +44,7 @@
 
     If `T0` is float/bfloat: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
-- `let T:%output_var = .copysign(T:%input_var1, T:%input_var2)` - Copies the sign of `input_var2` onto `input_var1`. T must be of the form `T0` or `<T0,M>` where T0 is float/bfloat/integer. For integer, signed is assumed (unsigned integers sign bit but make no sense).
+- `let T:%output_var = .copysign(T:%input_var1, T:%input_var2)` - Copies the sign of `input_var2` onto `input_var1`. T must be of the form `T0` or `<T0,M>` where T0 is float/bfloat/integer. For integer, signed is assumed (unsigned integers work but make no sense).
 
     If `T0` is integer: `#[nsw]` - poison if the result overflows (i.e. input is `INT_MIN`)
 
@@ -176,7 +176,8 @@ Widening instructions compute `a OP b` at the full precision of the *output* typ
 
 ---
 
-## Carrying / Borrow Arithmetic Instructions
+## Carry/Borrowing instructions
+### Carrying / Borrow Arithmetic Instructions
 
 These instructions thread a carry or borrow bit in and out, enabling multi-word arithmetic. All inputs and outputs are scalar; the carry/borrow is always `i1`. There are no direct vector forms - carry semantics are inherently sequential across words, so a carry chain over a vector is expressed as a loop over scalar words. Lanewise application is valid and expected: apply the instruction to one lane (word) per loop iteration, feeding the carry-out of iteration `i` as the carry-in of iteration `i+1`. The carry-in `%cin` must be `i1`; typically `0i1` for the least-significant word and the carry-out of the previous word for higher words. NOTE: You can use vector types also. We just convert it to a loop of scalar ops or to unrolled loops of scalar ops under the hood. This allows you to write more natural code when dealing with vectors of multi-word integers
 
@@ -205,6 +206,24 @@ These instructions thread a carry or borrow bit in and out, enabling multi-word 
 
 ---
 
+### N-Bit Carry Shifts
+
+These extend the 1-bit carry shift instructions to handle a shift count of more than one bit at a time, enabling multi-word arbitrary-amount shifts without a loop of single-bit steps. Each instruction shifts one word by `shift` bits and threads the displaced bits as a full-word carry between words. Only the low `shift` bits of the carry operands are meaningful.
+
+`T` must be `i<N>`. Vector form is allowed and is equivalent to a loop of scalar or unrolled loop of scalar ops
+
+- `let {T, T}:%out = .shl_carry_n(T:%a, T:%shift, T:%carry_in)` - Left shift by N with carry. Shifts `a` left by `shift` bits. The low `shift` bits of `carry_in` fill the vacated LSBs. Returns `{result, carry_out}` where `carry_out` holds the `shift` MSBs that were displaced, positioned in the low bits (ready to pass as `carry_in` to the next word). For vector input, it returns {<T,N>,<T,N>}
+
+    Formally: `result = (a << shift) | (carry_in & mask(shift))`, `carry_out = a >> (bitwidth(T) - shift)`. No attributes.
+
+- `let {T, T}:%out = .lshr_carry_n(T:%a, T:%shift, T:%carry_in)` - Logical right shift by N with carry. Shifts `a` right by `shift` bits logically. The low `shift` bits of `carry_in` fill the vacated MSBs (shifted into the top). Returns `{result, carry_out}` where `carry_out` holds the `shift` LSBs that were displaced, in the low positions. For vector input, it returns {<T,N>,<T,N>}
+
+    Formally: `result = (a >> shift) | (carry_in << (bitwidth(T) - shift))`, `carry_out = a & mask(shift)`. Process words high-to-low, feeding carry-out of word `i` as carry-in of word `i-1`. No attributes.
+
+- `let {T, T}:%out = .ashr_carry_n(T:%a, T:%shift, T:%carry_in)` - Arithmetic right shift by N with carry. Same as `.lshr_carry_n` but the sign bit of `a` propagates into the `shift` vacated MSBs of the **most significant word only**. For all other words in the chain, pass the carry-out of the word above as `carry_in`, just as with `.lshr_carry_n`. Carry-out is the `shift` displaced LSBs in low positions. No attributes.  For vector input, it returns {<T,N>,<T,N>}
+
+---
+
 ## Combined Quotient and Remainder (`divmod`)
 
 - `let {T, T}:%out = .divmod(T:%a, T:%b)` - Returns both quotient and remainder from a single division, avoiding two separate hardware divides. `T` must be of the form `T0` or `<T0,M>` where `T0` is an integer. For vectors, the operation is lanewise. For vector input, it returns {<T,N>,<T,N>}
@@ -221,17 +240,46 @@ These instructions thread a carry or borrow bit in and out, enabling multi-word 
 
 These return `{T, i1}` - the wrapped result paired with an overflow flag (`1` if overflow occurred, `0` if not). Useful for implementing checked arithmetic in safe languages. `T` must be `i<N>` or `<i<N>,M>` (vector form is lanewise; each lane produces its own flag bit). For vectors the return type is `{<T,M>, <i1,M>}`.
 
-- `let {T, i1}:%out = .add_wrap(T:%a, T:%b)` - Adds `a` and `b` with wrapping, returning the wrapped result and an overflow flag.
+- `let {T, i1}:%out = .wrap_add(T:%a, T:%b)` - Adds `a` and `b` with wrapping, returning the wrapped result and an overflow flag.
 
     - `#[unsigned]` - detect unsigned overflow; default detects signed overflow
+    - `#[saturating]` - Saturate instead of wrap
 
-- `let {T, i1}:%out = .sub_wrap(T:%a, T:%b)` - Subtracts `b` from `a` with wrapping, returning the wrapped result and an underflow/overflow flag.
+- `let {T, i1}:%out = .wrap_sub(T:%a, T:%b)` - Subtracts `b` from `a` with wrapping, returning the wrapped result and an underflow/overflow flag.
 
     - `#[unsigned]` - detect unsigned underflow; default detects signed overflow
+    - `#[saturating]` - Saturate instead of wrap
 
-- `let {T, i1}:%out = .mul_wrap(T:%a, T:%b)` - Multiplies `a` and `b` with wrapping, returning the wrapped result and an overflow flag.
+- `let {T, i1}:%out = .wrap_mul(T:%a, T:%b)` - Multiplies `a` and `b` with wrapping, returning the wrapped result and an overflow flag.
 
     - `#[unsigned]` - detect unsigned overflow; default detects signed overflow
+    - `#[saturating]` - Saturate instead of wrap
+
+- `let {T, i1}:%out = .wrap_div(T:%a, T:%b)` - Divides `a` by `b` with wrapping, returning the wrapped result and an overflow flag.
+
+    - `#[unsigned]` - detect unsigned overflow; default detects signed overflow
+    - `#[saturating]` - Saturate instead of wrap
+
+- `let {T, i1}:%out = .wrap_rem(T:%a, T:%b)` - Remainder of division with wrapping, returning the wrapped result and an overflow flag.
+
+    - `#[unsigned]` - detect unsigned overflow; default detects signed overflow
+    - `#[saturating]` - Saturate instead of wrap
+    
+- `let {T, i1}:%out = .wrap_copysign(T:%a, T:%b)` - Copies the sign of `b` onto `a`, returning the result and an overflow flag. Overflow occurs if `a` is `INT_MIN` and `b` is negative (i.e. the result would be `-INT_MIN`). T must be of the form `T0` or `<T0,M>` where T0 is integer. For vectors, the operation is lanewise. No #[unsigned] because dont make sense for #[unsigned] given copysign makes sense only for signed int
+
+    - `#[saturating]` - Saturate instead of wrap
+
+- `let {T, i1}:%out = .wrap_shl(T:%a, T:%b)` - Shift left with wrapping, returning the wrapped result and an overflow flag. Overflow occurs if you shift more than the bit width of T. T must be of the form `T0` or `<T0,M>` where T0 is integer. For vectors, the operation is lanewise. No #[unsigned] because dont make sense for #[unsigned]
+
+    - `#[saturating]` - Saturate instead of wrap
+
+- `let {T, i1}:%out = .wrap_lshr(T:%a, T:%b)` - Logical shift right with wrapping, returning the wrapped result and an overflow flag. Overflow occurs if you shift more than the bit width of T. T must be of the form `T0` or `<T0,M>` where T0 is integer. For vectors, the operation is lanewise. No #[unsigned] because dont make sense for #[unsigned]
+
+    - `#[saturating]` - Saturate instead of wrap
+
+- `let {T, i1}:%out = .wrap_ashr(T:%a, T:%b)` - Arithmetic shift right with wrapping, returning the wrapped result and an overflow flag. Overflow occurs if you shift more than the bit width of T. T must be of the form `T0` or `<T0,M>` where T0 is integer. For vectors, the operation is lanewise. No #[unsigned] because dont make sense for #[unsigned]
+
+    - `#[saturating]` - Saturate instead of wrap
 
 ---
 
@@ -240,24 +288,6 @@ These return `{T, i1}` - the wrapped result paired with an overflow flag (`1` if
 - `let T:%out = .mulhi(T:%a, T:%b)` - Returns the **high half** of the full `NxN->2N` product of `a` and `b`. Equivalent to `widening_mul(a, b) >> bitwidth(T)` but does not require a `2xbitwidth(T)` output type - useful when `T` is `i64` and no `i128` type exists(I mean we do emulate i128 but why bother). `T` must be of the form `T0` or `<T0,M>` where `T0` is an integer. For vectors, the operation is lanewise.
 
     - `#[unsigned]` - unsigned multiply; default is signed
-
----
-
-## N-Bit Carry Shifts
-
-These extend the 1-bit carry shift instructions to handle a shift count of more than one bit at a time, enabling multi-word arbitrary-amount shifts without a loop of single-bit steps. Each instruction shifts one word by `shift` bits and threads the displaced bits as a full-word carry between words. Only the low `shift` bits of the carry operands are meaningful.
-
-`T` must be `i<N>`. Vector form is allowed and is equivalent to a loop of scalar or unrolled loop of scalar ops
-
-- `let {T, T}:%out = .shl_carry_n(T:%a, T:%shift, T:%carry_in)` - Left shift by N with carry. Shifts `a` left by `shift` bits. The low `shift` bits of `carry_in` fill the vacated LSBs. Returns `{result, carry_out}` where `carry_out` holds the `shift` MSBs that were displaced, positioned in the low bits (ready to pass as `carry_in` to the next word). For vector input, it returns {<T,N>,<T,N>}
-
-    Formally: `result = (a << shift) | (carry_in & mask(shift))`, `carry_out = a >> (bitwidth(T) - shift)`. No attributes.
-
-- `let {T, T}:%out = .lshr_carry_n(T:%a, T:%shift, T:%carry_in)` - Logical right shift by N with carry. Shifts `a` right by `shift` bits logically. The low `shift` bits of `carry_in` fill the vacated MSBs (shifted into the top). Returns `{result, carry_out}` where `carry_out` holds the `shift` LSBs that were displaced, in the low positions. For vector input, it returns {<T,N>,<T,N>}
-
-    Formally: `result = (a >> shift) | (carry_in << (bitwidth(T) - shift))`, `carry_out = a & mask(shift)`. Process words high-to-low, feeding carry-out of word `i` as carry-in of word `i-1`. No attributes.
-
-- `let {T, T}:%out = .ashr_carry_n(T:%a, T:%shift, T:%carry_in)` - Arithmetic right shift by N with carry. Same as `.lshr_carry_n` but the sign bit of `a` propagates into the `shift` vacated MSBs of the **most significant word only**. For all other words in the chain, pass the carry-out of the word above as `carry_in`, just as with `.lshr_carry_n`. Carry-out is the `shift` displaced LSBs in low positions. No attributes.  For vector input, it returns {<T,N>,<T,N>}
 
 ---
 

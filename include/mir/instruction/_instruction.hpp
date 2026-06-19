@@ -16,11 +16,10 @@ enum class InstType:std::int16_t{
 
     WideningBinaryInst,
     
-    // ## Carrying / Borrow Arithmetic Instructions
+    // ## Carry/Borrowing instructions
     // ## Combined Quotient and Remainder (`divmod`)
-    // ## Overflow-Wrap (Checked Arithmetic) Instructions
+    WrapBinaryInst,
     // ## High-Half Multiply
-    // ## N-Bit Carry Shifts
 
     BitwiseBinaryInst,
     

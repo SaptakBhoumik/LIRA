@@ -59,6 +59,8 @@ class GetFpEnvInst : public Inst {
     public:
     GetFpEnvInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, bool x87);
 
+    bool is_x87() const;
+    
     InstType get_inst_type() const override;
     std::string to_string() const override;
 };
@@ -70,19 +72,12 @@ class SetFpEnvInst : public Inst {
     public:
     SetFpEnvInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr env, bool volatile_, bool x87);
 
+    bool is_x87() const;
     IR::LiteralExprPtr get_env() const;
     bool is_volatile() const;
 
     InstType get_inst_type() const override;
     std::string to_string() const override;
-};
-
-enum class FPEnvField:uint8_t {
-    Round,
-    FlushToZero,        // "ftz"
-    DenormalsAreZero,   // "daz"
-    ExceptMask,
-    ExceptStatus,
 };
 
 class FpenvGetFieldInst : public Inst {
@@ -92,6 +87,7 @@ class FpenvGetFieldInst : public Inst {
     public:
     FpenvGetFieldInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr env, FPEnvField field, bool x87);
 
+    bool is_x87() const;
     IR::LiteralExprPtr get_env() const;
     FPEnvField get_field() const;
 
@@ -109,6 +105,7 @@ class FpenvSetFieldInst : public Inst {
     FpenvSetFieldInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr env, FPEnvField field, 
                       IR::LiteralExprPtr value, bool x87);
 
+    bool is_x87() const;
     IR::LiteralExprPtr get_env() const;
     FPEnvField get_field() const;
     IR::LiteralExprPtr get_value() const;
@@ -118,10 +115,23 @@ class FpenvSetFieldInst : public Inst {
 };
 
 
+class GetFpStatusInst : public Inst {
+    bool x87;
+    public:
+    GetFpStatusInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, bool x87);
+
+    bool is_x87() const;
+
+    InstType get_inst_type() const override;
+    std::string to_string() const override;
+};
+
 class ClearFpStatusInst : public Inst {
     bool x87;
     public:
     ClearFpStatusInst(IR::InstructionStmtPtr instruction_stmt, bool x87);
+
+    bool is_x87() const;
 
     InstType get_inst_type() const override;
     std::string to_string() const override;
@@ -198,26 +208,26 @@ class AesImcInst : public Inst {
 };
 
 // Compile-time rcon variant: rcon is a known immediate, lowers directly to AESKEYGENASSIST xmm, xmm, imm8.
-class CompileTimeAesKeyGenAssistInst : public Inst {
+class CTAesKeyGenAssistInst : public Inst {
     IR::LiteralExprPtr a;
-    uint8_t rcon;
+    std::uint8_t rcon;
     public:
-    CompileTimeAesKeyGenAssistInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
-                                    IR::LiteralExprPtr a, uint8_t rcon);
+    CTAesKeyGenAssistInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+                          IR::LiteralExprPtr a, std::uint8_t rcon);
 
     IR::LiteralExprPtr get_a() const;
-    uint8_t get_rcon() const;
+    std::uint8_t get_rcon() const;
 
     InstType get_inst_type() const override;
     std::string to_string() const override;
 };
 
 // Run-time rcon variant: rcon is a runtime value; lowered via runtime dispatch (e.g. switch/table).
-class RunTimeAesKeyGenAssistInst : public Inst {
+class RTAesKeyGenAssistInst : public Inst {
     IR::LiteralExprPtr a;
     IR::LiteralExprPtr rcon;
     public:
-    RunTimeAesKeyGenAssistInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+    RTAesKeyGenAssistInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
                                IR::LiteralExprPtr a, IR::LiteralExprPtr rcon);
 
     IR::LiteralExprPtr get_a() const;
@@ -244,29 +254,29 @@ class ClmulInst : public Inst {
 
 // ---- SHA (all operate on <i32,4> state) ----
 // Compile-time func variant: func is a known immediate 0-3, lowers directly to SHA1RNDS4 xmm, xmm, imm8.
-class CompileTimeSha1Rnds4Inst : public Inst {
+class CTSha1Rnds4Inst : public Inst {
     IR::LiteralExprPtr abcd;
     IR::LiteralExprPtr msg;
-    uint8_t func; // 0-3
+    std::uint8_t func; // 0-3
     public:
-    CompileTimeSha1Rnds4Inst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
-                  IR::LiteralExprPtr abcd, IR::LiteralExprPtr msg, uint8_t func);
+    CTSha1Rnds4Inst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+                  IR::LiteralExprPtr abcd, IR::LiteralExprPtr msg, std::uint8_t func);
 
     IR::LiteralExprPtr get_abcd() const;
     IR::LiteralExprPtr get_msg() const;
-    uint8_t get_func() const;
+    std::uint8_t get_func() const;
 
     InstType get_inst_type() const override;
     std::string to_string() const override;
 };
 
 // Run-time func variant: func is a runtime value; lowered via runtime dispatch.
-class RunTimeSha1Rnds4Inst : public Inst {
+class RTSha1Rnds4Inst : public Inst {
     IR::LiteralExprPtr abcd;
     IR::LiteralExprPtr msg;
     IR::LiteralExprPtr func;
     public:
-    RunTimeSha1Rnds4Inst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+    RTSha1Rnds4Inst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
                     IR::LiteralExprPtr abcd, IR::LiteralExprPtr msg, IR::LiteralExprPtr func);
 
     IR::LiteralExprPtr get_abcd() const;

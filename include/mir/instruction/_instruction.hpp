@@ -81,6 +81,34 @@ enum class InstType:std::int16_t{
     Endbr64Inst,
     LaunderInst,
     StripInvariantGroupInst,
+
+    CpuIdInst,
+    RdTscInst,
+    RdTscpInst,
+    RdrandInst,
+    RdseedInst,
+    GetFpEnvInst,
+    SetFpEnvInst,
+    FpenvGetFieldInst,
+    FpenvSetFieldInst,
+    GetFpStatusInst,
+    ClearFpStatusInst,
+    AesEncInst,
+    AesEncLastInst,
+    AesDecInst,
+    AesDecLastInst,
+    AesImcInst,
+    CTAesKeyGenAssistInst,
+    RTAesKeyGenAssistInst,
+    ClmulInst,
+    CTSha1Rnds4Inst,
+    RTSha1Rnds4Inst,
+    Sha1NextEInst,
+    Sha1Msg1Inst,
+    Sha1Msg2Inst,
+    Sha256Rnds2Inst,
+    Sha256Msg1Inst,
+    Sha256Msg2Inst,
 };
 
 struct FastMathAttr {
@@ -227,5 +255,15 @@ enum class CallingConv:std::uint64_t{
 };
 std::string to_string(CallingConv ordering);
 
+
+
+enum class FPEnvField:uint8_t {
+    Round,
+    FlushToZero,        // "ftz"
+    DenormalsAreZero,   // "daz"
+    ExceptMask,
+    ExceptStatus,
+};
+std::string to_string(FPEnvField field);
 }
 }

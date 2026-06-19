@@ -1452,7 +1452,7 @@ All instructions are pure functions of their operands; constant-foldable, CSE-ab
 - `let <i8,16>:%out = .aeskeygenassist(<i8,16>:%a, i8:rcon)` - AES key generation assist. `rcon` must be a compile-time/run-time integer literal. No attributes.
 
 #### Carry-less Multiply
-- `let i128:%out = .clmul(i64:%a, i64:%b)` - Carry-less (GF(2)) multiply, 64x64->128. No attributes.
+- `let <i64,i64>:%out = .clmul(i64:%a, i64:%b)` - Carry-less (GF(2)) multiply, 64x64->128 split int {i64,i64} with {high bits,low bits}. No attributes.
 
 #### SHA (operate on `<i32,4>` state)
 - `let <i32,4>:%out = .sha1rnds4(<i32,4>:%abcd, <i32,4>:%msg, i8:func)` - SHA-1 four rounds. `func` compile-time/run-time literal 0–3(For runtime u get UB if func not in range). No attributes. 

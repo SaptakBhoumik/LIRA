@@ -180,25 +180,25 @@ Widening instructions compute `a OP b` at the full precision of the *output* typ
 
 These instructions thread a carry or borrow bit in and out, enabling multi-word arithmetic. All inputs and outputs are scalar; the carry/borrow is always `i1`. There are no direct vector forms - carry semantics are inherently sequential across words, so a carry chain over a vector is expressed as a loop over scalar words. Lanewise application is valid and expected: apply the instruction to one lane (word) per loop iteration, feeding the carry-out of iteration `i` as the carry-in of iteration `i+1`. The carry-in `%cin` must be `i1`; typically `0i1` for the least-significant word and the carry-out of the previous word for higher words. NOTE: You can use vector types also. We just convert it to a loop of scalar ops or to unrolled loops of scalar ops under the hood. This allows you to write more natural code when dealing with vectors of multi-word integers
 
-- `let {T, i1}:%out = .carry_add(T:%a, T:%b, i1:%cin)` - Add with carry. Computes `a + b + cin`, returning the sum and carry-out as a struct `{T, i1}`. `T` must be `i<N>`. No overflow attributes - the carry-out is the mechanism for propagating overflow.
+- `let {T, i1}:%out = .carry_add(T:%a, T:%b, i1:%cin)` - Add with carry. Computes `a + b + cin`, returning the sum and carry-out as a struct `{T, i1}`. `T` must be `i<N>`. No overflow attributes - the carry-out is the mechanism for propagating overflow. For vector input, it returns {<T,N>,<i1,N>}
 
     - `#[unsigned]` - carry-out reflects unsigned overflow; default is signed carry semantics
 
-- `let {T, i1}:%out = .carry_sub(T:%a, T:%b, i1:%bin)` - Subtract with borrow. Computes `a - b - bin`, returning the difference and borrow-out as a struct `{T, i1}`. `T` must be `i<N>`. Borrow-out is `1` if the subtraction underflowed (i.e., borrowed from the next word).
+- `let {T, i1}:%out = .carry_sub(T:%a, T:%b, i1:%bin)` - Subtract with borrow. Computes `a - b - bin`, returning the difference and borrow-out as a struct `{T, i1}`. `T` must be `i<N>`. Borrow-out is `1` if the subtraction underflowed (i.e., borrowed from the next word). For vector input, it returns {<T,N>,<i1,N>}
 
     - `#[unsigned]` - borrow-out reflects unsigned underflow; default is signed
 
-- `let {T, i1}:%out = .carry_shl(T:%a, i1:%cin)` - Shift left by one bit with carry in/out. The incoming carry (`%cin`) fills the vacated LSB; the outgoing carry is the bit shifted out of the MSB. Equivalent to `(a << 1) | cin` with carry-out = `a >> (bitwidth-1)`. `T` must be `i<N>`. No attributes.
+- `let {T, i1}:%out = .carry_shl(T:%a, i1:%cin)` - Shift left by one bit with carry in/out. The incoming carry (`%cin`) fills the vacated LSB; the outgoing carry is the bit shifted out of the MSB. Equivalent to `(a << 1) | cin` with carry-out = `a >> (bitwidth-1)`. `T` must be `i<N>`. No attributes. For vector input, it returns {<T,N>,<i1,N>}
 
-- `let {T, i1}:%out = .carry_lshr(T:%a, i1:%cin)` - Logical shift right by one bit with carry in/out. The incoming carry fills the vacated MSB; the outgoing carry is the bit shifted out of the LSB. `T` must be `i<N>`. No attributes.
+- `let {T, i1}:%out = .carry_lshr(T:%a, i1:%cin)` - Logical shift right by one bit with carry in/out. The incoming carry fills the vacated MSB; the outgoing carry is the bit shifted out of the LSB. `T` must be `i<N>`. No attributes. For vector input, it returns {<T,N>,<i1,N>}
 
-- `let {T, i1}:%out = .carry_ashr(T:%a, i1:%cin)` - Arithmetic shift right by one bit with carry out. The MSB is filled by the sign bit; `%cin` is unused for the fill but included for API uniformity. Carry-out is the bit shifted out of the LSB. `T` must be `i<N>`. No attributes.
+- `let {T, i1}:%out = .carry_ashr(T:%a, i1:%cin)` - Arithmetic shift right by one bit with carry out. The MSB is filled by the sign bit; `%cin` is unused for the fill but included for API uniformity. Carry-out is the bit shifted out of the LSB. `T` must be `i<N>`. No attributes. For vector input, it returns {<T,N>,<i1,N>}
 
-- `let {T, T}:%out = .mac_wide(T:%a, T:%b, T:%acc)` - Widening multiply-accumulate. Computes `(a * b) + acc` at double width, returning a struct `{high_word: T, low_word: T}`. `T` must be `i<N>`.
+- `let {T, T}:%out = .mac_wide(T:%a, T:%b, T:%acc)` - Widening multiply-accumulate. Computes `(a * b) + acc` at double width, returning a struct `{high_word: T, low_word: T}`. `T` must be `i<N>`. For vector input, it returns {<T,N>,<T,N>}
 
     - `#[unsigned]` - unsigned widening multiply; default is signed
 
-- `let {T, T}:%out = .widening_div(T:%dividend_hi, T:%dividend_lo, T:%divisor)` - Widening division. Divides a double-width dividend `(dividend_hi:dividend_lo)` by `divisor`, returning `{quotient: T, remainder: T}`. Equivalent to x86 `DIV`/`IDIV` with a `2N`-bit dividend. `T` must be `i<N>`. Poison if divisor is zero or if the quotient overflows `T`.
+- `let {T, T}:%out = .widening_div(T:%dividend_hi, T:%dividend_lo, T:%divisor)` - Widening division. Divides a double-width dividend `(dividend_hi:dividend_lo)` by `divisor`, returning `{quotient: T, remainder: T}`. Equivalent to x86 `DIV`/`IDIV` with a `2N`-bit dividend. `T` must be `i<N>`. Poison if divisor is zero or if the quotient overflows `T`. For vector input, it returns {<T,N>,<T,N>}
 
     - `#[unsigned]` - unsigned division; default is signed
     - `#[exact]` - poison if the remainder is non-zero
@@ -207,11 +207,11 @@ These instructions thread a carry or borrow bit in and out, enabling multi-word 
 
 ## Combined Quotient and Remainder (`divmod`)
 
-- `let {T, T}:%out = .divmod(T:%a, T:%b)` - Returns both quotient and remainder from a single division, avoiding two separate hardware divides. `T` must be of the form `T0` or `<T0,M>` where `T0` is an integer. For vectors, the operation is lanewise.
+- `let {T, T}:%out = .divmod(T:%a, T:%b)` - Returns both quotient and remainder from a single division, avoiding two separate hardware divides. `T` must be of the form `T0` or `<T0,M>` where `T0` is an integer. For vectors, the operation is lanewise. For vector input, it returns {<T,N>,<T,N>}
 
     - `#[unsigned]` - unsigned division and remainder; default is signed
 
-- `let {T, T}:%out = .divmod(T:%a, T:%b)` - Float variant: returns `{quotient: T, remainder: T}` where `quotient = integral_part(a / b)` and `remainder = a - quotient * b` (i.e. IEEE 754 remainder with truncation toward zero). `T` must be of the form `T0` or `<T0,M>` where `T0` is float/bfloat. For vectors, the operation is lanewise.
+- `let {T, T}:%out = .divmod(T:%a, T:%b)` - Float variant: returns `{quotient: T, remainder: T}` where `quotient = integral_part(a / b)` and `remainder = a - quotient * b` (i.e. IEEE 754 remainder with truncation toward zero). `T` must be of the form `T0` or `<T0,M>` where `T0` is float/bfloat. For vectors, the operation is lanewise. For vector input, it returns {<T,N>,<T,N>}
 
     Float-specific attributes: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
@@ -249,15 +249,15 @@ These extend the 1-bit carry shift instructions to handle a shift count of more 
 
 `T` must be `i<N>`. Vector form is allowed and is equivalent to a loop of scalar or unrolled loop of scalar ops
 
-- `let {T, T}:%out = .shl_carry_n(T:%a, T:%shift, T:%carry_in)` - Left shift by N with carry. Shifts `a` left by `shift` bits. The low `shift` bits of `carry_in` fill the vacated LSBs. Returns `{result, carry_out}` where `carry_out` holds the `shift` MSBs that were displaced, positioned in the low bits (ready to pass as `carry_in` to the next word).
+- `let {T, T}:%out = .shl_carry_n(T:%a, T:%shift, T:%carry_in)` - Left shift by N with carry. Shifts `a` left by `shift` bits. The low `shift` bits of `carry_in` fill the vacated LSBs. Returns `{result, carry_out}` where `carry_out` holds the `shift` MSBs that were displaced, positioned in the low bits (ready to pass as `carry_in` to the next word). For vector input, it returns {<T,N>,<T,N>}
 
     Formally: `result = (a << shift) | (carry_in & mask(shift))`, `carry_out = a >> (bitwidth(T) - shift)`. No attributes.
 
-- `let {T, T}:%out = .lshr_carry_n(T:%a, T:%shift, T:%carry_in)` - Logical right shift by N with carry. Shifts `a` right by `shift` bits logically. The low `shift` bits of `carry_in` fill the vacated MSBs (shifted into the top). Returns `{result, carry_out}` where `carry_out` holds the `shift` LSBs that were displaced, in the low positions.
+- `let {T, T}:%out = .lshr_carry_n(T:%a, T:%shift, T:%carry_in)` - Logical right shift by N with carry. Shifts `a` right by `shift` bits logically. The low `shift` bits of `carry_in` fill the vacated MSBs (shifted into the top). Returns `{result, carry_out}` where `carry_out` holds the `shift` LSBs that were displaced, in the low positions. For vector input, it returns {<T,N>,<T,N>}
 
     Formally: `result = (a >> shift) | (carry_in << (bitwidth(T) - shift))`, `carry_out = a & mask(shift)`. Process words high-to-low, feeding carry-out of word `i` as carry-in of word `i-1`. No attributes.
 
-- `let {T, T}:%out = .ashr_carry_n(T:%a, T:%shift, T:%carry_in)` - Arithmetic right shift by N with carry. Same as `.lshr_carry_n` but the sign bit of `a` propagates into the `shift` vacated MSBs of the **most significant word only**. For all other words in the chain, pass the carry-out of the word above as `carry_in`, just as with `.lshr_carry_n`. Carry-out is the `shift` displaced LSBs in low positions. No attributes.
+- `let {T, T}:%out = .ashr_carry_n(T:%a, T:%shift, T:%carry_in)` - Arithmetic right shift by N with carry. Same as `.lshr_carry_n` but the sign bit of `a` propagates into the `shift` vacated MSBs of the **most significant word only**. For all other words in the chain, pass the carry-out of the word above as `carry_in`, just as with `.lshr_carry_n`. Carry-out is the `shift` displaced LSBs in low positions. No attributes.  For vector input, it returns {<T,N>,<T,N>}
 
 ---
 
@@ -1452,7 +1452,7 @@ All instructions are pure functions of their operands; constant-foldable, CSE-ab
 - `let <i8,16>:%out = .aeskeygenassist(<i8,16>:%a, i8:rcon)` - AES key generation assist. `rcon` must be a compile-time/run-time integer literal. No attributes.
 
 #### Carry-less Multiply
-- `let <i64,i64>:%out = .clmul(i64:%a, i64:%b)` - Carry-less (GF(2)) multiply, 64x64->128 split int {i64,i64} with {high bits,low bits}. No attributes.
+- `let <i64,2>:%out = .clmul(i64:%a, i64:%b)` - Carry-less (GF(2)) multiply, 64x64->128 split int <high bits,low bits>. No attributes.
 
 #### SHA (operate on `<i32,4>` state)
 - `let <i32,4>:%out = .sha1rnds4(<i32,4>:%abcd, <i32,4>:%msg, i8:func)` - SHA-1 four rounds. `func` compile-time/run-time literal 0–3(For runtime u get UB if func not in range). No attributes. 

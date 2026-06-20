@@ -28,8 +28,6 @@ class FetchArithmeticBinInst:public Inst {
     FetchArithmeticBinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                             std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info, std::optional<FastMathAttr> fast_math_attr);
 
-    virtual ~FetchArithmeticBinInst() = default;
-
     virtual InstOperandTypeVarient get_type_varient() const = 0;
     virtual IR::TypeExprPtr get_type() const final;
     virtual IR::LiteralExprPtr get_pointer() const final;

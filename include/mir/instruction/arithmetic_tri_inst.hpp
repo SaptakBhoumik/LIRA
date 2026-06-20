@@ -20,8 +20,6 @@ class ArithmeticTrinaryInst:public Inst {
     ArithmeticTrinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                           IR::LiteralExprPtr arg3, std::optional<FastMathAttr> fast_math_attr);
 
-    virtual ~ArithmeticTrinaryInst() = default;
-
     virtual InstOperandTypeVarient get_operand_type_varient() const = 0;
     virtual IR::TypeExprPtr get_operand_type() const final;
     virtual IR::LiteralExprPtr get_arg1() const final;

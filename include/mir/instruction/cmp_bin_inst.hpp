@@ -26,8 +26,6 @@ class CmpBinaryInst:public Inst {
     CmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                   IR::TypeExprPtr type, std::optional<FastMathAttr> fast_math_attr);
 
-    virtual ~CmpBinaryInst() = default;
-
     virtual InstOperandTypeVarient get_operand_type_varient() const = 0;//Can be calculated easily from ``type``. Just a helper function
     virtual IR::TypeExprPtr get_operand_type() const final;
     virtual IR::LiteralExprPtr get_lhs() const final;

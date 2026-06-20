@@ -23,8 +23,6 @@ class ArithmeticBinaryInst:public Inst {
     ArithmeticBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                          std::optional<FastMathAttr> fast_math_attr);
 
-    virtual ~ArithmeticBinaryInst() = default;
-
     virtual InstOperandTypeVarient get_operand_type_varient() const = 0;
     virtual IR::TypeExprPtr get_operand_type() const final;
     virtual IR::LiteralExprPtr get_lhs() const final;

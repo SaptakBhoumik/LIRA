@@ -34,8 +34,6 @@ class BitwiseBinaryInst:public Inst {
     BitwiseBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                       bool nuw, bool nsw, bool exact, bool disjoint);
 
-    virtual ~BitwiseBinaryInst() = default;
-
     virtual InstOperandTypeVarient get_type_varient() const = 0;
     virtual IR::TypeExprPtr get_operand_type() const final;
     virtual IR::LiteralExprPtr get_lhs() const final;

@@ -39,8 +39,6 @@ class FetchBitwiseBinInst:public Inst {
                         std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info,
                         bool nuw, bool nsw, bool exact, bool disjoint);
 
-    virtual ~FetchBitwiseBinInst() = default;
-
     virtual InstOperandTypeVarient get_type_varient() const = 0;
     virtual IR::TypeExprPtr get_type() const final;
     virtual IR::LiteralExprPtr get_pointer() const final;

@@ -24,17 +24,37 @@ class CarrBorrType1Inst:public Inst {
     CarrBorrType1Inst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                       IR::LiteralExprPtr carr_borr_val, bool unsigned_);
 
-    virtual ~CarrBorrType1Inst() = default;
-    
     virtual bool is_unsigned() const final;
 
     virtual InstOperandTypeVarient get_operand_type_varient() const = 0;
     virtual IR::TypeExprPtr get_operand_type() const final;
-    virtual IR::LiteralExprPtr get_arg1() const final;
-    virtual IR::LiteralExprPtr get_arg2() const final;
-    virtual IR::LiteralExprPtr get_arg3() const final;
+    virtual IR::LiteralExprPtr get_lhs() const final;
+    virtual IR::LiteralExprPtr get_rhs() const final;
+    virtual IR::LiteralExprPtr get_carr_borr_val() const final;
     virtual OpType get_op_type() const = 0;
     virtual InstType get_inst_type() const override final;
+};
+
+
+// ---------------------------- Int Carry/Borrowing instructions ---------------------------
+class IntCarrBorrType1Inst:public CarrBorrType1Inst {
+    protected:
+    public:
+    IntCarrBorrType1Inst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+                         IR::LiteralExprPtr carr_borr_val, bool unsigned_);
+
+    virtual std::shared_ptr<IR::IntTypeExpr> get_casted_operand_type() const final;
+    virtual std::size_t get_bitwidth() const final;
+    
+    virtual InstOperandTypeVarient get_operand_type_varient() const override final;
+};
+
+
+class IntCarrAddInst:public IntCarrBorrType1Inst {
+    public:
+    IntCarrAddInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+                   IR::LiteralExprPtr carr_borr_val, bool unsigned_);
+
 };
 }
 }

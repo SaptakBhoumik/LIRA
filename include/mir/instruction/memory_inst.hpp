@@ -50,8 +50,6 @@ class LoadInst:public Inst {
     LoadInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::TypeExprPtr type, 
              bool volatile_, bool nontemporal, bool invariant_load, bool nonull, bool nopoison, std::size_t alignment, std::size_t dereferenceable_bytes);
 
-    virtual ~LoadInst() = default;
-
     virtual IR::LiteralExprPtr get_pointer() const final;
     virtual IR::TypeExprPtr get_type() const final;
     virtual bool is_volatile() const final;
@@ -99,8 +97,6 @@ class StoreInst:public Inst {
     public:
     StoreInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, IR::TypeExprPtr type, 
               bool volatile_, bool nontemporal, bool nonull, bool nopoison, std::size_t alignment, std::size_t dereferenceable_bytes);
-
-    virtual ~StoreInst() = default;
 
     virtual IR::LiteralExprPtr get_pointer() const final;
     virtual IR::LiteralExprPtr get_value() const final;

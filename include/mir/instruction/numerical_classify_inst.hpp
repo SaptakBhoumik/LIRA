@@ -24,8 +24,6 @@ class NumericalClassifyInst:public Inst {
     NumericalClassifyInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                           std::optional<FastMathAttr> fast_math_attr);
 
-    virtual ~NumericalClassifyInst() = default;
-
     virtual InstOperandTypeVarient get_type_varient() const = 0;
     virtual IR::TypeExprPtr get_value_type() const final;
     virtual IR::LiteralExprPtr get_value() const final;
@@ -55,7 +53,7 @@ class FloatIsNanInst:public FloatClassifyInst {
     FloatIsNanInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                     FastMathAttr fast_math_attr);
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -64,7 +62,7 @@ class FloatIsInfInst:public FloatClassifyInst {
     FloatIsInfInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                     FastMathAttr fast_math_attr);
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -73,7 +71,7 @@ class FloatIsFiniteInst:public FloatClassifyInst {
     FloatIsFiniteInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                     FastMathAttr fast_math_attr);
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -82,7 +80,7 @@ class FloatIsNormalInst:public FloatClassifyInst {
     FloatIsNormalInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                     FastMathAttr fast_math_attr);
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -91,7 +89,7 @@ class FloatIsSubnormalInst:public FloatClassifyInst {
     FloatIsSubnormalInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type, 
                     FastMathAttr fast_math_attr);
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -100,7 +98,7 @@ class FloatIsZeroInst:public FloatClassifyInst {
     FloatIsZeroInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                     FastMathAttr fast_math_attr);
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -109,7 +107,7 @@ class FloatIsNegativeInst:public FloatClassifyInst {
     FloatIsNegativeInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                     FastMathAttr fast_math_attr);
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -118,7 +116,7 @@ class FloatIsPositiveInst:public FloatClassifyInst {
     FloatIsPositiveInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                     FastMathAttr fast_math_attr);
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 //--------------------------- Vector Float Classification operations ---------------------------
@@ -141,7 +139,7 @@ class VecFloatIsNanInst:public VecFloatClassifyInst {
     VecFloatIsNanInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                     FastMathAttr fast_math_attr);
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -150,7 +148,7 @@ class VecFloatIsInfInst:public VecFloatClassifyInst {
     VecFloatIsInfInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                     FastMathAttr fast_math_attr);
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -159,7 +157,7 @@ class VecFloatIsFiniteInst:public VecFloatClassifyInst {
     VecFloatIsFiniteInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                     FastMathAttr fast_math_attr);
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -168,7 +166,7 @@ class VecFloatIsNormalInst:public VecFloatClassifyInst {
     VecFloatIsNormalInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                     FastMathAttr fast_math_attr);
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -177,7 +175,7 @@ class VecFloatIsSubnormalInst:public VecFloatClassifyInst {
     VecFloatIsSubnormalInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                     FastMathAttr fast_math_attr);
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -186,7 +184,7 @@ class VecFloatIsZeroInst:public VecFloatClassifyInst {
     VecFloatIsZeroInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                     FastMathAttr fast_math_attr);
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -195,7 +193,7 @@ class VecFloatIsNegativeInst:public VecFloatClassifyInst {
     VecFloatIsNegativeInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                     FastMathAttr fast_math_attr);
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -204,7 +202,7 @@ class VecFloatIsPositiveInst:public VecFloatClassifyInst {
     VecFloatIsPositiveInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                     FastMathAttr fast_math_attr);
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 }

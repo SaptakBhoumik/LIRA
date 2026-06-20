@@ -31,8 +31,6 @@ class ConvInst:public Inst {
     ConvInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type,
              bool nuw, bool nsw, bool nsb, bool unsigned_, bool saturating, std::optional<FastMathAttr> fast_math_attr);
 
-    virtual ~ConvInst() = default;
-    
     virtual std::optional<InstOperandTypeVarient> get_in_type_varient() const final;//Can be calculated easily from ``in_type``. Just a helper function
     virtual std::optional<InstOperandTypeVarient> get_out_type_varient() const final;//Can be calculated easily from ``out_type``. Just a helper function
     // NOTE: get_in_type_varient and  get_out_type_varient is ignored for BitcastInst because it can be any type as long as the bit width is same + dont make sense
@@ -186,7 +184,7 @@ class BitcastInst:public ScalarConvInst{
     std::size_t get_in_type_bitwidth() const override;//Returns 0 as of now but in future must return the actual size. TODO:Implement the size of method for typeexpr
     std::size_t get_out_type_bitwidth() const override;//Returns 0 as of now but in future must return the actual size. TODO:Implement the size of method for typeexpr
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -215,7 +213,7 @@ class VecIntTruncInst:public VecConvInst{
     std::size_t get_in_basetype_bitwidth() const override;
     std::size_t get_out_basetype_bitwidth() const override;
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -230,7 +228,7 @@ class VecFloatTruncInst:public VecConvInst{
     std::size_t get_in_basetype_bitwidth() const override;
     std::size_t get_out_basetype_bitwidth() const override;
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -244,7 +242,7 @@ class VecIntExtInst:public VecConvInst{
     std::size_t get_in_basetype_bitwidth() const override;
     std::size_t get_out_basetype_bitwidth() const override;
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -259,7 +257,7 @@ class VecFloatExtInst:public VecConvInst{
     std::size_t get_in_basetype_bitwidth() const override;
     std::size_t get_out_basetype_bitwidth() const override;
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -274,7 +272,7 @@ class VecFloatToIntInst:public VecConvInst{
     std::size_t get_in_basetype_bitwidth() const override;
     std::size_t get_out_basetype_bitwidth() const override;
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -289,7 +287,7 @@ class VecIntToFloatInst:public VecConvInst{
     std::size_t get_in_basetype_bitwidth() const override;
     std::size_t get_out_basetype_bitwidth() const override;
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -303,7 +301,7 @@ class VecPtrToIntInst:public VecConvInst{
     std::size_t get_in_basetype_bitwidth() const override;
     std::size_t get_out_basetype_bitwidth() const override;
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -317,7 +315,7 @@ class VecIntToPtrInst:public VecConvInst{
     std::size_t get_in_basetype_bitwidth() const override;
     std::size_t get_out_basetype_bitwidth() const override;
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 }

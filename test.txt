@@ -1,7 +1,6 @@
 NOTE:-Implement Call Inst at the end of everything
 ## Fixed-Point Arithmetic Instructions
 
-## Carry/Borrowing instructions
 ## Combined Quotient and Remainder (`divmod`)
 ## High-Half Multiply
 

@@ -12,12 +12,6 @@ WrapBinaryInst::WrapBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDes
     this->unsigned_ = unsigned_;
     this->saturating = saturating;
 }
-bool WrapBinaryInst::is_unsigned() const{
-    return this->unsigned_;
-}
-bool WrapBinaryInst::is_saturating() const{
-    return this->saturating;
-}
 std::string WrapBinaryInst::to_string_helper(const std::string op_name) const{
     std::string type_str = this->get_operand_type()->to_string();
     std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(" + type_str + ":" + this->lhs->to_string() + ", " + type_str + ":" + this->rhs->to_string() + ")";
@@ -28,6 +22,12 @@ std::string WrapBinaryInst::to_string_helper(const std::string op_name) const{
         res += " #[saturating]";
     }
     return res;
+}
+bool WrapBinaryInst::is_unsigned() const{
+    return this->unsigned_;
+}
+bool WrapBinaryInst::is_saturating() const{
+    return this->saturating;
 }
 IR::TypeExprPtr WrapBinaryInst::get_operand_type() const{
     auto struct_type = std::dynamic_pointer_cast<IR::StructTypeExpr>(this->destination->get_type());

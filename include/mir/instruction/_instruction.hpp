@@ -16,7 +16,9 @@ enum class InstType:std::int16_t{
 
     WideningBinaryInst,
     
-    // ## Carry/Borrowing instructions
+    CarrBorrType1Inst,
+    CarrBorrType2Inst,
+
     // ## Combined Quotient and Remainder (`divmod`)
     WrapBinaryInst,
     // ## High-Half Multiply

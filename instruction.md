@@ -199,11 +199,6 @@ These instructions thread a carry or borrow bit in and out, enabling multi-word 
 
     - `#[unsigned]` - unsigned widening multiply; default is signed
 
-- `let {T, T}:%out = .widening_div(T:%dividend_hi, T:%dividend_lo, T:%divisor)` - Widening division. Divides a double-width dividend `(dividend_hi:dividend_lo)` by `divisor`, returning `{quotient: T, remainder: T}`. Equivalent to x86 `DIV`/`IDIV` with a `2N`-bit dividend. `T` must be `i<N>`. Poison if divisor is zero or if the quotient overflows `T`. For vector input, it returns {<T,N>,<T,N>}
-
-    - `#[unsigned]` - unsigned division; default is signed
-    - `#[exact]` - poison if the remainder is non-zero
-
 ---
 
 ### N-Bit Carry Shifts
@@ -212,15 +207,14 @@ These extend the 1-bit carry shift instructions to handle a shift count of more 
 
 `T` must be `i<N>`. Vector form is allowed and is equivalent to a loop of scalar or unrolled loop of scalar ops
 
-- `let {T, T}:%out = .shl_carry_n(T:%a, T:%shift, T:%carry_in)` - Left shift by N with carry. Shifts `a` left by `shift` bits. The low `shift` bits of `carry_in` fill the vacated LSBs. Returns `{result, carry_out}` where `carry_out` holds the `shift` MSBs that were displaced, positioned in the low bits (ready to pass as `carry_in` to the next word). For vector input, it returns {<T,N>,<T,N>}
+- `let {T, T}:%out = .carry_shl_n(T:%a, T:%shift, T:%carry_in)` - Left shift by N with carry. Shifts `a` left by `shift` bits. The low `shift` bits of `carry_in` fill the vacated LSBs. Returns `{result, carry_out}` where `carry_out` holds the `shift` MSBs that were displaced, positioned in the low bits (ready to pass as `carry_in` to the next word). For vector input, it returns {<T,N>,<T,N>}
 
     Formally: `result = (a << shift) | (carry_in & mask(shift))`, `carry_out = a >> (bitwidth(T) - shift)`. No attributes.
 
-- `let {T, T}:%out = .lshr_carry_n(T:%a, T:%shift, T:%carry_in)` - Logical right shift by N with carry. Shifts `a` right by `shift` bits logically. The low `shift` bits of `carry_in` fill the vacated MSBs (shifted into the top). Returns `{result, carry_out}` where `carry_out` holds the `shift` LSBs that were displaced, in the low positions. For vector input, it returns {<T,N>,<T,N>}
-
+- `let {T, T}:%out = .carry_lshr_n(T:%a, T:%shift, T:%carry_in)` - Logical right shift by N with carry. Shifts `a` right by `shift` bits logically. The low `shift` bits of `carry_in` fill the vacated MSBs (shifted into the top). Returns `{result, carry_out}` where `carry_out` holds the `shift` LSBs that were displaced, in the low positions. For vector input, it returns {<T,N>,<T,N>}
     Formally: `result = (a >> shift) | (carry_in << (bitwidth(T) - shift))`, `carry_out = a & mask(shift)`. Process words high-to-low, feeding carry-out of word `i` as carry-in of word `i-1`. No attributes.
 
-- `let {T, T}:%out = .ashr_carry_n(T:%a, T:%shift, T:%carry_in)` - Arithmetic right shift by N with carry. Same as `.lshr_carry_n` but the sign bit of `a` propagates into the `shift` vacated MSBs of the **most significant word only**. For all other words in the chain, pass the carry-out of the word above as `carry_in`, just as with `.lshr_carry_n`. Carry-out is the `shift` displaced LSBs in low positions. No attributes.  For vector input, it returns {<T,N>,<T,N>}
+- `let {T, T}:%out = .carry_ashr_n(T:%a, T:%shift, T:%carry_in)` - Arithmetic right shift by N with carry. Same as `.carry_lshr_n` but the sign bit of `a` propagates into the `shift` vacated MSBs of the **most significant word only**. For all other words in the chain, pass the carry-out of the word above as `carry_in`, just as with `.carry_lshr_n`. Carry-out is the `shift` displaced LSBs in low positions. No attributes.  For vector input, it returns {<T,N>,<T,N>}
 
 ---
 
@@ -233,6 +227,11 @@ These extend the 1-bit carry shift instructions to handle a shift count of more 
 - `let {T, T}:%out = .divmod(T:%a, T:%b)` - Float variant: returns `{quotient: T, remainder: T}` where `quotient = integral_part(a / b)` and `remainder = a - quotient * b` (i.e. IEEE 754 remainder with truncation toward zero). `T` must be of the form `T0` or `<T0,M>` where `T0` is float/bfloat. For vectors, the operation is lanewise. For vector input, it returns {<T,N>,<T,N>}
 
     Float-specific attributes: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+
+- `let {T, T}:%out = .widening_divmod(T:%dividend_hi, T:%dividend_lo, T:%divisor)` - Widening division. Divides a double-width dividend `(dividend_hi:dividend_lo)` by `divisor`, returning `{quotient: T, remainder: T}`. Equivalent to x86 `DIV`/`IDIV` with a `2N`-bit dividend. `T` must be `i<N>`. Poison if divisor is zero or if the quotient overflows `T`. For vector input, it returns {<T,N>,<T,N>}
+
+    - `#[unsigned]` - unsigned division; default is signed
+    - `#[exact]` - poison if the remainder is non-zero
 
 ---
 

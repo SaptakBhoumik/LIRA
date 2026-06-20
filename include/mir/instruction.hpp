@@ -5,7 +5,7 @@
 #include "instruction/bitwise_tri_inst.hpp"
 //## Fixed-Point Arithmetic Instructions
 #include "instruction/widening_bin_inst.hpp"
-// ## Carry/Borrowing instructions
+#include "instruction/carr_borr_inst.hpp"
 // ## Combined Quotient and Remainder (`divmod`)
 #include "instruction/wrap_binary_inst.hpp"
 // ## High-Half Multiply

@@ -6,6 +6,10 @@ namespace MIR {
 // --------------------------- Fetch Unary operations ---------------------------
 class FetchUnaryInst:public Inst {
     protected:
+    std::size_t alignment;//The alignment of the memory access in bytes
+    bool volatile_;//Whether the memory access is volatile or not
+    std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info;//If the instruction is atomic, then this field contains the sync scope and atomic ordering of the instruction. Otherwise, it is std::nullopt
+    
     IR::LiteralExprPtr value;
     public:
     enum class OpType:std::uint64_t{
@@ -32,13 +36,18 @@ class FetchUnaryInst:public Inst {
         FETCH_BLSR = 1 << 26,
         FETCH_BLSMASK = 1 << 27
     };
-    FetchUnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, std::optional<FastMathAttr> fast_math_attr);
+    FetchUnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
+                  std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info, std::optional<FastMathAttr> fast_math_attr);
 
     virtual ~FetchUnaryInst() = default;
 
     virtual InstOperandTypeVarient get_type_varient() const = 0;
     virtual IR::TypeExprPtr get_type() const final;
     virtual IR::LiteralExprPtr get_value() const final;
+
+    virtual std::size_t get_alignment() const final;
+    virtual bool is_volatile() const final;
+    virtual std::optional<std::pair<SyncScope,AtomicOrdering>> get_atomic_info() const final;
     virtual OpType get_op_type() const = 0;
 
     virtual InstType get_inst_type() const override final;
@@ -53,7 +62,8 @@ class IntFetchUnaryInst:public FetchUnaryInst{
     
     virtual std::string to_string_helper(const std::string op_name) const final;
     public:
-    IntFetchUnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, bool nuw, bool nsw, bool zero_poison);
+    IntFetchUnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
+                      std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info, bool nuw, bool nsw, bool zero_poison);
 
     virtual bool is_nuw() const final;
     virtual bool is_nsw() const final;
@@ -67,7 +77,8 @@ class IntFetchUnaryInst:public FetchUnaryInst{
 
 class IntFetchNegInst:public IntFetchUnaryInst {
     public:
-    IntFetchNegInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, bool nsw);
+    IntFetchNegInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
+                    std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info, bool nsw);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -75,7 +86,8 @@ class IntFetchNegInst:public IntFetchUnaryInst {
 
 class IntFetchNotInst:public IntFetchUnaryInst {
     public:
-    IntFetchNotInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value);
+    IntFetchNotInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value,
+                    std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -83,7 +95,8 @@ class IntFetchNotInst:public IntFetchUnaryInst {
 
 class IntFetchAbsInst:public IntFetchUnaryInst {
     public:
-    IntFetchAbsInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, bool nsw);
+    IntFetchAbsInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value,
+                    std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info, bool nsw);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -91,7 +104,8 @@ class IntFetchAbsInst:public IntFetchUnaryInst {
 
 class IntFetchPopcountInst:public IntFetchUnaryInst {
     public:
-    IntFetchPopcountInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value);
+    IntFetchPopcountInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value,
+                         std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -99,7 +113,8 @@ class IntFetchPopcountInst:public IntFetchUnaryInst {
 
 class IntFetchCLZInst:public IntFetchUnaryInst {
     public:
-    IntFetchCLZInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, bool zero_poison);
+    IntFetchCLZInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
+                    std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info, bool zero_poison);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -107,7 +122,8 @@ class IntFetchCLZInst:public IntFetchUnaryInst {
 
 class IntFetchCTZInst:public IntFetchUnaryInst {
     public:
-    IntFetchCTZInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, bool zero_poison);
+    IntFetchCTZInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
+                    std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info, bool zero_poison);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -115,7 +131,8 @@ class IntFetchCTZInst:public IntFetchUnaryInst {
 
 class IntFetchParityInst:public IntFetchUnaryInst {
     public:
-    IntFetchParityInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value);
+    IntFetchParityInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value,
+                       std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -123,7 +140,8 @@ class IntFetchParityInst:public IntFetchUnaryInst {
 
 class IntFetchBswapInst:public IntFetchUnaryInst {
     public:
-    IntFetchBswapInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value);
+    IntFetchBswapInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value,
+                      std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -131,7 +149,8 @@ class IntFetchBswapInst:public IntFetchUnaryInst {
 
 class IntFetchBitreverseInst:public IntFetchUnaryInst {
     public:
-    IntFetchBitreverseInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value);
+    IntFetchBitreverseInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value,
+                          std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -139,7 +158,8 @@ class IntFetchBitreverseInst:public IntFetchUnaryInst {
 
 class IntFetchCLRSBInst:public IntFetchUnaryInst {
     public:
-    IntFetchCLRSBInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value);
+    IntFetchCLRSBInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value,
+                      std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -147,7 +167,8 @@ class IntFetchCLRSBInst:public IntFetchUnaryInst {
 
 class IntFetchBLSIInst:public IntFetchUnaryInst {
     public:
-    IntFetchBLSIInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value);
+    IntFetchBLSIInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value,
+                     std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -155,7 +176,8 @@ class IntFetchBLSIInst:public IntFetchUnaryInst {
 
 class IntFetchBLSRInst:public IntFetchUnaryInst {
     public:
-    IntFetchBLSRInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value);
+    IntFetchBLSRInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value,
+                     std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -163,7 +185,8 @@ class IntFetchBLSRInst:public IntFetchUnaryInst {
 
 class IntFetchBLSMaskInst:public IntFetchUnaryInst {
     public:
-    IntFetchBLSMaskInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value);
+    IntFetchBLSMaskInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value,
+                        std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -177,7 +200,8 @@ class FloatFetchUnaryInst:public FetchUnaryInst{
     virtual std::string to_string_helper(const std::string op_name) const final;
     public:
     FloatFetchUnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
-                    FastMathAttr fast_math_attr,bool approx);
+                        std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info, 
+                        FastMathAttr fast_math_attr,bool approx);
 
     virtual bool is_approx() const final;
 
@@ -191,6 +215,7 @@ class FloatFetchUnaryInst:public FetchUnaryInst{
 class FloatFetchNegInst:public FloatFetchUnaryInst {
     public:
     FloatFetchNegInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
+                      std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info,
                       FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override final;
@@ -200,6 +225,7 @@ class FloatFetchNegInst:public FloatFetchUnaryInst {
 class FloatFetchAbsInst:public FloatFetchUnaryInst {
     public:
     FloatFetchAbsInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
+                      std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info,
                       FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override final;
@@ -209,7 +235,8 @@ class FloatFetchAbsInst:public FloatFetchUnaryInst {
 class FloatFetchCeilInst:public FloatFetchUnaryInst {
     public:
     FloatFetchCeilInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
-                    FastMathAttr fast_math_attr);
+                       std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info,
+                       FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -218,6 +245,7 @@ class FloatFetchCeilInst:public FloatFetchUnaryInst {
 class FloatFetchFloorInst:public FloatFetchUnaryInst {
     public:
     FloatFetchFloorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
+                        std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info,
                         FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override final;
@@ -227,6 +255,7 @@ class FloatFetchFloorInst:public FloatFetchUnaryInst {
 class FloatFetchIntregralPartInst:public FloatFetchUnaryInst {
     public:
     FloatFetchIntregralPartInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
+                                std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info,
                                 FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override final;
@@ -236,6 +265,7 @@ class FloatFetchIntregralPartInst:public FloatFetchUnaryInst {
 class FloatFetchFractionalPartInst:public FloatFetchUnaryInst {
     public:
     FloatFetchFractionalPartInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
+                                std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info,
                                 FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override final;
@@ -245,6 +275,7 @@ class FloatFetchFractionalPartInst:public FloatFetchUnaryInst {
 class FloatFetchRoundNearestInst:public FloatFetchUnaryInst {
     public:
     FloatFetchRoundNearestInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
+                                std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info,
                                 FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override final;
@@ -254,6 +285,7 @@ class FloatFetchRoundNearestInst:public FloatFetchUnaryInst {
 class FloatFetchRoundEvenInst:public FloatFetchUnaryInst {
     public:
     FloatFetchRoundEvenInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
+                            std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info,
                             FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override final;
@@ -263,7 +295,8 @@ class FloatFetchRoundEvenInst:public FloatFetchUnaryInst {
 class FloatFetchSqrtInst:public FloatFetchUnaryInst {
     public:
     FloatFetchSqrtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
-                        FastMathAttr fast_math_attr);
+                       std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info,
+                       FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -272,7 +305,8 @@ class FloatFetchSqrtInst:public FloatFetchUnaryInst {
 class FloatFetchReciprocalInst:public FloatFetchUnaryInst {
     public:
     FloatFetchReciprocalInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
-                            FastMathAttr fast_math_attr, bool approx);
+                             std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info,
+                             FastMathAttr fast_math_attr, bool approx);
 
     OpType get_op_type() const override final;
     std::string to_string() const override;
@@ -281,6 +315,7 @@ class FloatFetchReciprocalInst:public FloatFetchUnaryInst {
 class FloatFetchRsqrtInst:public FloatFetchUnaryInst {
     public:
     FloatFetchRsqrtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
+                        std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info,
                         FastMathAttr fast_math_attr, bool approx);
 
     OpType get_op_type() const override final;
@@ -290,6 +325,7 @@ class FloatFetchRsqrtInst:public FloatFetchUnaryInst {
 class FloatFetchBswapInst:public FloatFetchUnaryInst {
     public:
     FloatFetchBswapInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
+                        std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info,
                         FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override final;

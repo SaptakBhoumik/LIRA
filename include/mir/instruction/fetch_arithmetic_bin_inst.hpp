@@ -26,7 +26,7 @@ class FetchArithmeticBinInst:public Inst {
         FETCH_AVG = 1 << 15,
     };
     FetchArithmeticBinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                  std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info, std::optional<FastMathAttr> fast_math_attr);
+                            std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info, std::optional<FastMathAttr> fast_math_attr);
 
     virtual ~FetchArithmeticBinInst() = default;
 
@@ -34,6 +34,7 @@ class FetchArithmeticBinInst:public Inst {
     virtual IR::TypeExprPtr get_type() const final;
     virtual IR::LiteralExprPtr get_pointer() const final;
     virtual IR::LiteralExprPtr get_value() const final;
+
     virtual std::size_t get_alignment() const final;
     virtual bool is_volatile() const final;
     virtual std::optional<std::pair<SyncScope,AtomicOrdering>> get_atomic_info() const final;

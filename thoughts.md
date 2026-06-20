@@ -3,3 +3,5 @@
 - Should we allow fetch operation(The non atomic version) to act on SIMD vectors?
 - Should we allow clmul to act on any bit integer i.e allow i<N> -> i<2N> carryless multiply? This would be more general and allow for future extensions. But should I allow it?. Similar question for crc32. Also should I allow it on vector?
 - Should I allow wrap and carrying/borrowing instructions to unary method also? Like right now only neg and abs can have it but is it worth it? The phylosophy  /of uniformity we are following allows it but do we need it
+- Should I allow other arithmetic operation for Fixed-Point Arithmetic Instructions and High-Half Arithmetic Instructions
+- Should I allow i<N> for any N for mulhi scale?

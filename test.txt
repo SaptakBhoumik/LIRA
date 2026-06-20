@@ -1,8 +1,9 @@
 NOTE:-Implement Call Inst at the end of everything
-## Fixed-Point Arithmetic Instructions
 
-## Combined Quotient and Remainder (`divmod`)
-## High-Half Multiply
+
+    ### Combined Quotient and Remainder (`divmod`)
+    ### High-Half Arithmetic Instructions
+    ### Fixed-Point Arithmetic Instructions
 
 
 ## Memory Instructions
@@ -19,13 +20,13 @@ NOTE:-Implement Call Inst at the end of everything
     ### Widening Reductions
 
 
-
-## Fixed-Point Arithmetic Instructions
+## Other Arithmetic Instructions
+    ### Combined Quotient and Remainder (`divmod`)
+    ### High-Half Arithmetic Instructions
+    ### Fixed-Point Arithmetic Instructions
 
 ## Carry/Borrowing instructions
-## Combined Quotient and Remainder (`divmod`)
 ## Overflow-Wrap (Checked Arithmetic) Instructions
-## High-Half Multiply
 
 ## Bitwise Binary Instructions
 
@@ -75,12 +76,13 @@ NOTE:-Implement Call Inst at the end of everything
 
 ## Binary Arithmetic Instructions
 ## Trinary Arithmetic Instructions
-## Fixed-Point Arithmetic Instructions
+## Other Arithmetic Instructions
+    ### Combined Quotient and Remainder (`divmod`)
+    ### High-Half Arithmetic Instructions
+    ### Fixed-Point Arithmetic Instructions
 ## Widening Arithmetic Instructions
 ## Carry/Borrowing instructions
-## Combined Quotient and Remainder (`divmod`)
 ## Overflow-Wrap (Checked Arithmetic) Instructions
-## High-Half Multiply
 ## Bitwise Binary Instructions
 ## Bitwise Trinary Instructions
 ## Comparison Instructions

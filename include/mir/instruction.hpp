@@ -2,15 +2,14 @@
 
 #include "instruction/arithmetic_bin_inst.hpp"
 #include "instruction/arithmetic_tri_inst.hpp"
-#include "instruction/bitwise_tri_inst.hpp"
-//## Fixed-Point Arithmetic Instructions
+#include "instruction/other_arithmetic_inst.hpp"
 #include "instruction/widening_bin_inst.hpp"
 #include "instruction/carr_borr_inst.hpp"
 // ## Combined Quotient and Remainder (`divmod`)
 #include "instruction/wrap_binary_inst.hpp"
 // ## High-Half Multiply
 #include "instruction/bitwise_bin_inst.hpp"
-// ## Bitwise Trinary Instructions
+#include "instruction/bitwise_tri_inst.hpp"
 #include "instruction/cmp_bin_inst.hpp"
 #include "instruction/conv_inst.hpp"
 #include "instruction/unary_inst.hpp"

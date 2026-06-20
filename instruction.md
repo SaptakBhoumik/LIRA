@@ -133,8 +133,35 @@
 
 ---
 
-## Fixed-Point Arithmetic Instructions
+## Other Arithmetic Instructions
 
+### Combined Quotient and Remainder (`divmod`)
+
+- `let {T, T}:%out = .divmod(T:%a, T:%b)` - Returns both quotient and remainder from a single division, avoiding two separate hardware divides. `T` must be of the form `T0` or `<T0,M>` where `T0` is an integer. For vectors, the operation is lanewise. For vector input, it returns {<T,N>,<T,N>}
+
+    - `#[unsigned]` - unsigned division and remainder; default is signed
+
+- `let {T, T}:%out = .divmod(T:%a, T:%b)` - Float variant: returns `{quotient: T, remainder: T}` where `quotient = integral_part(a / b)` and `remainder = a - quotient * b` (i.e. IEEE 754 remainder with truncation toward zero). `T` must be of the form `T0` or `<T0,M>` where `T0` is float/bfloat. For vectors, the operation is lanewise. For vector input, it returns {<T,N>,<T,N>}
+
+    Float-specific attributes: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+
+- `let {T, T}:%out = .widening_divmod(T:%dividend_hi, T:%dividend_lo, T:%divisor)` - Widening division. Divides a double-width dividend `(dividend_hi:dividend_lo)` by `divisor`, returning `{quotient: T, remainder: T}`. Equivalent to x86 `DIV`/`IDIV` with a `2N`-bit dividend. `T` must be `i<N>`. Poison if divisor is zero or if the quotient overflows `T`. For vector input, it returns {<T,N>,<T,N>}
+
+    - `#[unsigned]` - unsigned division; default is signed
+    - `#[exact]` - poison if the remainder is non-zero
+
+---
+
+### High-Half Arithmetic Instructions
+
+- `let T:%out = .mulhi(T:%a, T:%b)` - Returns the **high half** of the full `NxN->2N` product of `a` and `b`. Equivalent to `widening_mul(a, b) >> bitwidth(T)` but does not require a `2xbitwidth(T)` output type - useful when `T` is `i64` and no `i128` type exists(I mean we do emulate i128 but why bother). `T` must be of the form `T0` or `<T0,M>` where `T0` is an integer. For vectors, the operation is lanewise.
+
+    - `#[unsigned]` - unsigned multiply; default is signed
+
+---
+
+### Fixed-Point Arithmetic Instructions
+    
 - `let T:%out = .mulfix(T:%a, T:%b, i32:%scale)` - Fixed-point multiply. Multiplies `a` and `b` as if they were fixed-point values with `scale` fractional bits, returning the correctly rounded result in the same type. Concretely: computes `(a * b) >> scale` with the intermediate product computed at double width to avoid overflow. Scale must be a compile-time/run-time constant.
 
     T must be of the form `T0` or `<T0,M>` where T0 is an integer type. `i32:%scale` must be a compile-time/run-time; must satisfy `0 <= scale <= bitwidth(T0)`.
@@ -143,6 +170,7 @@
     - `#[saturating]` - if the shifted result does not fit in T, clamp to the type range instead of producing poison; pair with `#[unsigned]` for unsigned saturation; default is signed saturation when this flag is set
     - `#[nsw]` - only valid without `#[saturating]`; poison on signed overflow
     - `#[nuw]` - only valid without `#[saturating]` and with `#[unsigned]`; poison on unsigned overflow
+    - `#[round]` - round to nearest instead of truncating toward zero; if the fractional part is exactly 0.5, round to the nearest even integer (IEEE 754 "roundTiesToEven" semantics). Default is truncation.
 
 ---
 
@@ -218,23 +246,6 @@ These extend the 1-bit carry shift instructions to handle a shift count of more 
 
 ---
 
-## Combined Quotient and Remainder (`divmod`)
-
-- `let {T, T}:%out = .divmod(T:%a, T:%b)` - Returns both quotient and remainder from a single division, avoiding two separate hardware divides. `T` must be of the form `T0` or `<T0,M>` where `T0` is an integer. For vectors, the operation is lanewise. For vector input, it returns {<T,N>,<T,N>}
-
-    - `#[unsigned]` - unsigned division and remainder; default is signed
-
-- `let {T, T}:%out = .divmod(T:%a, T:%b)` - Float variant: returns `{quotient: T, remainder: T}` where `quotient = integral_part(a / b)` and `remainder = a - quotient * b` (i.e. IEEE 754 remainder with truncation toward zero). `T` must be of the form `T0` or `<T0,M>` where `T0` is float/bfloat. For vectors, the operation is lanewise. For vector input, it returns {<T,N>,<T,N>}
-
-    Float-specific attributes: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
-
-- `let {T, T}:%out = .widening_divmod(T:%dividend_hi, T:%dividend_lo, T:%divisor)` - Widening division. Divides a double-width dividend `(dividend_hi:dividend_lo)` by `divisor`, returning `{quotient: T, remainder: T}`. Equivalent to x86 `DIV`/`IDIV` with a `2N`-bit dividend. `T` must be `i<N>`. Poison if divisor is zero or if the quotient overflows `T`. For vector input, it returns {<T,N>,<T,N>}
-
-    - `#[unsigned]` - unsigned division; default is signed
-    - `#[exact]` - poison if the remainder is non-zero
-
----
-
 ## Overflow-Wrap (Checked Arithmetic) Instructions
 
 These return `{T, i1}` - the wrapped result paired with an overflow flag (`1` if overflow occurred, `0` if not). Useful for implementing checked arithmetic in safe languages. `T` must be `i<N>` or `<i<N>,M>` (vector form is lanewise; each lane produces its own flag bit). For vectors the return type is `{<T,M>, <i1,M>}`.
@@ -279,14 +290,6 @@ These return `{T, i1}` - the wrapped result paired with an overflow flag (`1` if
 - `let {T, i1}:%out = .wrap_ashr(T:%a, T:%b)` - Arithmetic shift right with wrapping, returning the wrapped result and an overflow flag. Overflow occurs if you shift more than the bit width of T. T must be of the form `T0` or `<T0,M>` where T0 is integer. For vectors, the operation is lanewise. No #[unsigned] because dont make sense for #[unsigned]
 
     - `#[saturating]` - Saturate instead of wrap
-
----
-
-## High-Half Multiply
-
-- `let T:%out = .mulhi(T:%a, T:%b)` - Returns the **high half** of the full `NxN->2N` product of `a` and `b`. Equivalent to `widening_mul(a, b) >> bitwidth(T)` but does not require a `2xbitwidth(T)` output type - useful when `T` is `i64` and no `i128` type exists(I mean we do emulate i128 but why bother). `T` must be of the form `T0` or `<T0,M>` where `T0` is an integer. For vectors, the operation is lanewise.
-
-    - `#[unsigned]` - unsigned multiply; default is signed
 
 ---
 

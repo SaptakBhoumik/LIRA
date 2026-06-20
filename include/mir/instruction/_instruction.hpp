@@ -10,22 +10,23 @@ enum class InstType:std::int16_t{
 
     ArithmeticTrinaryInst,
 
-    BitwiseTrinaryInst,
-
-    //## Fixed-Point Arithmetic Instructions
 
     WideningBinaryInst,
     
+    DivModInst,
+    MulHiInst,
+    CTMulFixInst,
+    RTMulFixInst,
+
+
     CarrBorrType1Inst,
     CarrBorrType2Inst,
 
-    // ## Combined Quotient and Remainder (`divmod`)
     WrapBinaryInst,
-    // ## High-Half Multiply
 
     BitwiseBinaryInst,
     
-    // ## Bitwise Trinary Instructions
+    BitwiseTrinaryInst,
  
     CmpBinaryInst,
 

@@ -60,7 +60,7 @@ class IntFMAInst:public IntArithmeticTrinaryInst {
     IntFMAInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                IR::LiteralExprPtr arg3, bool nuw, bool nsw, bool unsigned_, bool saturating);
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -69,7 +69,7 @@ class IntFMSInst:public IntArithmeticTrinaryInst {
     IntFMSInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                IR::LiteralExprPtr arg3, bool nuw, bool nsw, bool unsigned_, bool saturating);
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -78,7 +78,7 @@ class IntFNMAInst:public IntArithmeticTrinaryInst {
     IntFNMAInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                 IR::LiteralExprPtr arg3, bool nuw, bool nsw, bool unsigned_, bool saturating);
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -87,7 +87,7 @@ class IntFNMSInst:public IntArithmeticTrinaryInst {
     IntFNMSInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                 IR::LiteralExprPtr arg3, bool nuw, bool nsw, bool unsigned_, bool saturating);
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -96,7 +96,7 @@ class IntClampInst:public IntArithmeticTrinaryInst {
     IntClampInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                  IR::LiteralExprPtr arg3, bool unsigned_);
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 // ----------------------------- Vector integer Trinary operations ---------------------------
@@ -132,7 +132,7 @@ class VecIntFMAInst:public VecIntArithmeticTrinaryInst {
     VecIntFMAInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                   IR::LiteralExprPtr arg3, bool nuw, bool nsw, bool unsigned_, bool saturating);
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -141,7 +141,7 @@ class VecIntFMSInst:public VecIntArithmeticTrinaryInst {
     VecIntFMSInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                    IR::LiteralExprPtr arg3, bool nuw, bool nsw, bool unsigned_, bool saturating);
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -150,7 +150,7 @@ class VecIntFNMAInst:public VecIntArithmeticTrinaryInst {
     VecIntFNMAInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                     IR::LiteralExprPtr arg3, bool nuw, bool nsw, bool unsigned_, bool saturating);
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -159,7 +159,7 @@ class VecIntFNMSInst:public VecIntArithmeticTrinaryInst {
     VecIntFNMSInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                     IR::LiteralExprPtr arg3, bool nuw, bool nsw, bool unsigned_, bool saturating);
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -168,7 +168,7 @@ class VecIntClampInst:public VecIntArithmeticTrinaryInst {
     VecIntClampInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                      IR::LiteralExprPtr arg3, bool unsigned_);
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 // ---------------------------- Float Trinary operations ---------------------------
@@ -197,7 +197,7 @@ class FloatFMAInst:public FloatArithmeticTrinaryInst {
     FloatFMAInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                   IR::LiteralExprPtr arg3, FastMathAttr fast_math_attr);
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -206,7 +206,7 @@ class FloatFMSInst:public FloatArithmeticTrinaryInst {
     FloatFMSInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                   IR::LiteralExprPtr arg3, FastMathAttr fast_math_attr);
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -215,7 +215,7 @@ class FloatFNMAInst:public FloatArithmeticTrinaryInst {
     FloatFNMAInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                    IR::LiteralExprPtr arg3, FastMathAttr fast_math_attr);
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -224,7 +224,7 @@ class FloatFNMSInst:public FloatArithmeticTrinaryInst {
     FloatFNMSInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                    IR::LiteralExprPtr arg3, FastMathAttr fast_math_attr);
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -233,7 +233,7 @@ class FloatClampInst:public FloatArithmeticTrinaryInst {
     FloatClampInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                     IR::LiteralExprPtr arg3, FastMathAttr fast_math_attr, bool ieee754_2019, bool unordered);
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 // ---------------------------- Vector Float Trinary operations ---------------------------
@@ -262,7 +262,7 @@ class VecFloatFMAInst:public VecFloatArithmeticTrinaryInst {
     VecFloatFMAInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                      IR::LiteralExprPtr arg3, FastMathAttr fast_math_attr);
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -271,7 +271,7 @@ class VecFloatFMSInst:public VecFloatArithmeticTrinaryInst {
     VecFloatFMSInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                      IR::LiteralExprPtr arg3, FastMathAttr fast_math_attr);
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -280,7 +280,7 @@ class VecFloatFNMAInst:public VecFloatArithmeticTrinaryInst {
     VecFloatFNMAInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                        IR::LiteralExprPtr arg3, FastMathAttr fast_math_attr);
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -289,7 +289,7 @@ class VecFloatFNMSInst:public VecFloatArithmeticTrinaryInst {
     VecFloatFNMSInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                        IR::LiteralExprPtr arg3, FastMathAttr fast_math_attr);
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -298,7 +298,7 @@ class VecFloatClampInst:public VecFloatArithmeticTrinaryInst {
     VecFloatClampInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                        IR::LiteralExprPtr arg3, FastMathAttr fast_math_attr, bool ieee754_2019, bool unordered);
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 }

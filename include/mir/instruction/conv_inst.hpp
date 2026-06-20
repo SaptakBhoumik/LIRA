@@ -70,7 +70,7 @@ class IntTruncInst:public ScalarConvInst{
     std::size_t get_in_type_bitwidth() const override;
     std::size_t get_out_type_bitwidth() const override;
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -87,7 +87,7 @@ class FloatTruncInst:public ScalarConvInst{
     std::size_t get_in_type_bitwidth() const override;
     std::size_t get_out_type_bitwidth() const override;
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -101,7 +101,7 @@ class IntExtInst:public ScalarConvInst{
     std::size_t get_in_type_bitwidth() const override;
     std::size_t get_out_type_bitwidth() const override;
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -116,7 +116,7 @@ class FloatExtInst:public ScalarConvInst{
     std::size_t get_in_type_bitwidth() const override;
     std::size_t get_out_type_bitwidth() const override;
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -131,7 +131,7 @@ class FloatToIntInst:public ScalarConvInst{
     std::size_t get_in_type_bitwidth() const override;
     std::size_t get_out_type_bitwidth() const override;
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -146,7 +146,7 @@ class IntToFloatInst:public ScalarConvInst{
     std::size_t get_in_type_bitwidth() const override;
     std::size_t get_out_type_bitwidth() const override;
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -159,7 +159,7 @@ class PtrToIntInst:public ScalarConvInst{
     std::size_t get_in_type_bitwidth() const override;
     std::size_t get_out_type_bitwidth() const override;
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
@@ -172,7 +172,7 @@ class IntToPtrInst:public ScalarConvInst{
     std::size_t get_in_type_bitwidth() const override;
     std::size_t get_out_type_bitwidth() const override;
 
-    OpType get_op_type() const override final;
+    OpType get_op_type() const override;
     std::string to_string() const override;
 };
 

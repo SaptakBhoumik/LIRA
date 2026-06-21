@@ -28,3 +28,5 @@ let result = call fn(i32, i32) -> i32 : add  (10, 3)    ; valid
 ; --- This would be INVALID (no type literal outside call) ---
 let typed: fn(i32, i32) -> i32 = add    ;  not allowed as a variable type
 ```
+
+- In a lot of places in the MIR instruction class implementation, I have not taking in the operand type as a seperate argument. This is because the operand type can be obtained from the destination register's type. This is a design choice to avoid redundancy and potential inconsistencies. The destination register's type serves as the authoritative source for the operand type, ensuring that all operands are consistent with the expected type of the instruction. This also simplifies the instruction constructors and reduces the chances of errors where the operand type might not match the destination register's type.

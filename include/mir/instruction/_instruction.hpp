@@ -14,6 +14,7 @@ enum class InstType:std::int16_t{
     WideningBinaryInst,
     
     DivModInst,
+    WideningDivModInst,
     MulHiInst,
     CTMulFixInst,
     RTMulFixInst,

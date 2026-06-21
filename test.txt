@@ -1,11 +1,6 @@
 NOTE:-Implement Call Inst at the end of everything
 
 
-    ### Combined Quotient and Remainder (`divmod`)
-    ### High-Half Arithmetic Instructions
-    ### Fixed-Point Arithmetic Instructions
-
-
 ## Memory Instructions
     ### Cache Control Instructions
     ### Lifetime and Invariant Scope Instructions

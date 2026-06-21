@@ -1063,6 +1063,9 @@ A terminator must be the final instruction of every block. Falling through to th
     - `#[byval(type:T0, i64:arg_index0, type:T1, i64:arg_index1, ...)]`, `#[byref(type:T0, i64:arg_index0, type:T1, i64:arg_index1, ...)]`, `#[inalloca(type:T0, i64:arg_index0, type:T1, i64:arg_index1, ...)]`, `#[preallocated(type:T0, i64:arg_index0, type:T1, i64:arg_index1, ...)]`, `#[sret(type:T0, i64:arg_index0, type:T1, i64:arg_index1, ...)]`
     - `#[zeroext(i64:idx...)]`, `#[signext(i64:idx...)]`
 
+    We store the above attributes like byref as follows ``std::vector<std::pair<IR::TypeExprPtr, std::vector<uint64_t>>>`` byref_args; where the vector<uint64_t> is the list of argument indices that have the byref attribute for the given type in the pair.
+
+
     **Return value attributes** (applied to the output variable):
 
     let T:%output_var #[noalias] = .call(...)

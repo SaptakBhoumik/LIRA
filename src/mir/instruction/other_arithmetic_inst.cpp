@@ -120,6 +120,90 @@ std::string VecFloatDivModInst::to_string() const{
 }
 
 
+WideningDivModInst::WideningDivModInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr dividend_hi, IR::LiteralExprPtr dividend_lo,
+                                                   IR::LiteralExprPtr divisor, bool unsigned_, bool exact)
+                                                   :Inst(instruction_stmt, destination,std::nullopt){
+    this->dividend_hi = dividend_hi;
+    this->dividend_lo = dividend_lo;
+    this->divisor = divisor;
+    this->unsigned_ = unsigned_;
+    this->exact = exact;
+}
+std::string WideningDivModInst::to_string_helper(const std::string op_name) const{
+    std::string type_str = this->get_operand_type()->to_string();
+    std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(" + this->dividend_hi->to_string() + ", " 
+                                                                                                    + this->dividend_lo->to_string() + ", "
+                                                                                                    + this->divisor->to_string() + ")";
+    if(this->unsigned_){
+        res += " #[unsigned]";
+    }
+    if(this->exact){
+        res += " #[exact]";
+    }
+    return res;
+}
+bool WideningDivModInst::is_unsigned() const{
+    return this->unsigned_;
+}
+bool WideningDivModInst::is_exact() const{
+    return this->exact;
+}
+IR::TypeExprPtr WideningDivModInst::get_operand_type() const{
+    auto struct_type = std::dynamic_pointer_cast<IR::StructTypeExpr>(this->destination->get_type());
+    return struct_type->get_fields()[0];
+}
+IR::LiteralExprPtr WideningDivModInst::get_dividend_hi() const{
+    return this->dividend_hi;
+}
+IR::LiteralExprPtr WideningDivModInst::get_dividend_lo() const{
+    return this->dividend_lo;
+}
+IR::LiteralExprPtr WideningDivModInst::get_divisor() const{
+    return this->divisor;
+}
+InstType WideningDivModInst::get_inst_type() const{
+    return InstType::WideningDivModInst;
+}
+
+
+IntWideningDivModInst::IntWideningDivModInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr dividend_hi, IR::LiteralExprPtr dividend_lo,
+                                             IR::LiteralExprPtr divisor, bool unsigned_, bool exact)
+                                             :WideningDivModInst(instruction_stmt, destination, dividend_hi, dividend_lo, divisor, unsigned_, exact){}
+std::shared_ptr<IR::IntTypeExpr> IntWideningDivModInst::get_casted_operand_type() const{
+    return std::dynamic_pointer_cast<IR::IntTypeExpr>(this->get_operand_type());
+}
+std::size_t IntWideningDivModInst::get_bitwidth() const{
+    return this->get_casted_operand_type()->get_bits();
+}
+InstOperandTypeVarient IntWideningDivModInst::get_operand_type_varient() const{
+    return InstOperandTypeVarient::Int;
+}
+std::string IntWideningDivModInst::to_string() const{
+    return this->to_string_helper("int_widening_divmod");
+}
+
+
+VecIntWideningDivModInst::VecIntWideningDivModInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr dividend_hi, IR::LiteralExprPtr dividend_lo,
+                                                   IR::LiteralExprPtr divisor, bool unsigned_, bool exact)
+                                                   :WideningDivModInst(instruction_stmt, destination, dividend_hi, dividend_lo, divisor, unsigned_, exact){}
+std::shared_ptr<IR::SIMDTypeExpr> VecIntWideningDivModInst::get_casted_operand_type() const{
+    return std::dynamic_pointer_cast<IR::SIMDTypeExpr>(this->get_operand_type());
+}
+std::shared_ptr<IR::IntTypeExpr> VecIntWideningDivModInst::get_casted_operand_basetype() const{
+    return std::dynamic_pointer_cast<IR::IntTypeExpr>(this->get_casted_operand_type()->get_basetype());
+}
+std::size_t VecIntWideningDivModInst::get_operand_basetype_bitwidth() const{
+    return this->get_casted_operand_basetype()->get_bits();
+}
+std::size_t VecIntWideningDivModInst::get_vector_size() const{
+    return this->get_casted_operand_type()->get_size();
+}
+InstOperandTypeVarient VecIntWideningDivModInst::get_operand_type_varient() const{
+    return InstOperandTypeVarient::VecInt;
+}
+std::string VecIntWideningDivModInst::to_string() const{
+    return this->to_string_helper("vec_int_widening_divmod");
+}
 // ---------------------------- High-Half Arithmetic instructions ---------------------------
 MulHiInst::MulHiInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                      bool unsigned_):Inst(instruction_stmt, destination,std::nullopt){

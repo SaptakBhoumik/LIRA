@@ -79,6 +79,58 @@ class VecFloatDivModInst:public DivModInst {
 };
 
 
+class WideningDivModInst:public Inst {
+    // Return {T,T} i.e the output is {quotient,remainder}. This instruction is for cases where we want both quotient and remainder.}
+    protected:
+    IR::LiteralExprPtr dividend_hi;
+    IR::LiteralExprPtr dividend_lo;
+    IR::LiteralExprPtr divisor;
+    bool unsigned_; 
+    bool exact; 
+
+    virtual std::string to_string_helper(const std::string op_name) const final;
+    public:
+    WideningDivModInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr dividend_hi, IR::LiteralExprPtr dividend_lo, 
+                       IR::LiteralExprPtr divisor, bool unsigned_, bool exact);
+
+    virtual bool is_unsigned() const final;
+    virtual bool is_exact() const final;
+
+    virtual InstOperandTypeVarient get_operand_type_varient() const = 0;
+    virtual IR::TypeExprPtr get_operand_type() const final;
+    virtual IR::LiteralExprPtr get_dividend_hi() const final;
+    virtual IR::LiteralExprPtr get_dividend_lo() const final;
+    virtual IR::LiteralExprPtr get_divisor() const final;
+    virtual InstType get_inst_type() const override final;
+};
+
+class IntWideningDivModInst:public WideningDivModInst {
+    public:
+    IntWideningDivModInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr dividend_hi, IR::LiteralExprPtr dividend_lo,
+                          IR::LiteralExprPtr divisor, bool unsigned_, bool exact);
+
+    std::shared_ptr<IR::IntTypeExpr> get_casted_operand_type() const;
+    std::size_t get_bitwidth() const;
+    InstOperandTypeVarient get_operand_type_varient() const override;
+
+    std::string to_string() const override;
+};
+
+class VecIntWideningDivModInst:public WideningDivModInst {
+    public:
+    VecIntWideningDivModInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr dividend_hi, IR::LiteralExprPtr dividend_lo,
+                             IR::LiteralExprPtr divisor, bool unsigned_, bool exact);
+
+    std::shared_ptr<IR::SIMDTypeExpr> get_casted_operand_type() const;
+    std::shared_ptr<IR::IntTypeExpr> get_casted_operand_basetype() const;
+    std::size_t get_operand_basetype_bitwidth() const;
+    std::size_t get_vector_size() const;
+    InstOperandTypeVarient get_operand_type_varient() const override;
+
+    std::string to_string() const override;
+};
+
+
 // ---------------------------- High-Half Arithmetic instructions ---------------------------
 class MulHiInst:public Inst {
     protected:

@@ -542,13 +542,13 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
 
 - `let T:%output_var = .load(ptr:%ptr)` - Loads a value of type T from memory.
 
-    - `#[align(i8:N)]` - alignment of the pointer; must be a power of 2; required if atomic; default is 16
     - `#[volatile]` - volatile load; not elided or reordered
     - `#[invariant.load]` - the loaded value will not change during program execution
     - `#[nontemporal]` - non-temporal (cache-bypassing) load
     - `#[nonnull]` - asserts the pointer is not null
     - `#[nopoison]` - asserts the loaded value is not poison
     - `#[nsb]` - asserts the loaded integer's sign bit is 0 (tighter range for optimizer)
+    - `#[align(i8:N)]` - alignment of the pointer; must be a power of 2; required if atomic; default is 16
     - `#[dereferenceable(i64:N)]` - asserts the pointer is dereferenceable for N bytes
     - `#[atomic(str:ordering)]` - atomic load; ordering must be one of: `acquire`, `monotonic`, `unordered`, `seq_cst`
     - `#[syncscope("singlethreaded")]` - only valid with `#[atomic]`; synchronizes only with atomic ops in the same thread; default is global
@@ -558,11 +558,11 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
 
 - `.store(T:%value, ptr:%ptr)` - Stores a value to memory.
 
-    - `#[align(i8:N)]` - alignment of the pointer; must be a power of 2; required if atomic; default is 16
     - `#[volatile]` - volatile store
     - `#[nontemporal]` - non-temporal (cache-bypassing) store
     - `#[nonnull]` - asserts the pointer is not null
     - `#[nopoison]` - asserts the value being stored is not poison
+    - `#[align(i8:N)]` - alignment of the pointer; must be a power of 2; required if atomic; default is 16
     - `#[dereferenceable(i64:N)]` - asserts the pointer is dereferenceable for N bytes
     - `#[atomic(str:ordering)]` - atomic store; ordering must be one of: `release`, `monotonic`, `unordered`, `seq_cst`
     - `#[syncscope("singlethreaded")]` - only valid with `#[atomic]`; default is global
@@ -570,11 +570,11 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
     If T is float/vec of float:
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
-- `let <T,N>:%out = .masked_load(ptr:%ptr, <i1,N>:%mask, <T,N>:%passthru)` - Loads elements from memory into a vector, but only for lanes where the mask is true. Lanes where the mask is false take their value from `passthru` instead.
+- `let <T,N>:%out = .masked_load(ptr:%ptr [,<i1,N>:%mask, <T,N>:%passthru])` - Loads elements from memory into a vector, but only for lanes where the mask is true. Lanes where the mask is false take their value from `passthru` instead.
 
     - `ptr:%ptr` - pointer to the base address; must be valid for at least `N * sizeof(T)` bytes for active lanes
-    - `<i1,N>:%mask` - per-lane predicate; true = load from memory, false = take from passthru
-    - `<T,N>:%passthru` - values used for inactive lanes; T can be any integer, float, bfloat, or ptr
+    - `<T,N>:%passthru` - values used for inactive lanes; T can be any integer, float, bfloat, or ptr. It is optional. If mask is set then passthru  must be set unless you use the `#[zeropassthru]` attribute which lets you omit it. If mask is not set then passthru must not be set.
+    - `<i1,N>:%mask` - per-lane predicate; true = load from memory, false = take from passthru. It is optional. If not set equivalent to all lanes of mask = 1
 
     Attributes:
     - `#[align(i8:N)]` - alignment of `ptr` in bytes; must be a power of 2; default is 1 (unaligned is the safe default since masked loads are often used for tail handling where alignment cannot be guaranteed)
@@ -582,16 +582,16 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
     - `#[nontemporal]` - non-temporal (cache-bypassing) load for active lanes
     - `#[nonnull]` - asserts `ptr` is not null
     - `#[dereferenceable(i64:N)]` - asserts `ptr` is dereferenceable for N bytes across the entire vector range (not just active lanes)
-    - `#[zeropassthru]` - shorthand: inactive lanes are zeroed; equivalent to passing a zero vector as passthru but allows the backend to emit a zeroing-masked instruction directly rather than materializing a zero vector
+    - `#[zeropassthru]` - shorthand: inactive lanes are zeroed; equivalent to passing a zero vector as passthru but allows the backend to emit a zeroing-masked instruction directly rather than materializing a zero vector. You cant set passthru if this attribute is used. Mask must be set  if this attribute is used
 
     If T is float:
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
-- `.masked_store(<T,N>:%val, ptr:%ptr, <i1,N>:%mask)` - Stores elements to memory only for lanes where the mask is true. Inactive lanes do not produce any memory write - not even to a padding location.
+- `.masked_store(<T,N>:%val, ptr:%ptr [, <i1,N>:%mask])` - Stores elements to memory only for lanes where the mask is true. Inactive lanes do not produce any memory write - not even to a padding location.
 
     - `<T,N>:%val` - vector of values to store; T can be any integer, float, bfloat, or ptr
     - `ptr:%ptr` - base address
-    - `<i1,N>:%mask` - per-lane predicate; true = store to memory, false = no write
+    - `<i1,N>:%mask` - per-lane predicate; true = store to memory, false = no write. It is optional. If not set equivalent to all lanes of mask = 1
 
     No output.
 
@@ -605,27 +605,27 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
     If T is float:
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
-- `let <T,N>:%out = .gather(<ptr,N>:%ptrs, <i1,N>:%mask, <T,N>:%passthru)` - Loads one scalar element per lane from a distinct pointer. Each lane `i` loads from `ptrs[i]`. Inactive lanes (where mask is false) take their value from `passthru`.
+- `let <T,N>:%out = .masked_gather(<ptr,N>:%ptrs [,<i1,N>:%mask, <T,N>:%passthru])` - Loads one scalar element per lane from a distinct pointer. Each lane `i` loads from `ptrs[i]`. Inactive lanes (where mask is false) take their value from `passthru`.
 
     - `<ptr,N>:%ptrs` - vector of N pointers, one per lane
-    - `<i1,N>:%mask` - per-lane predicate; true = load from `ptrs[i]`, false = use `passthru[i]`
-    - `<T,N>:%passthru` - fallback values for inactive lanes; T can be any integer, float, or bfloat
+    - `<T,N>:%passthru` - fallback values for inactive lanes; T can be any integer, float, or bfloat. It is optional. If mask is set then passthru  must be set unless you use the `#[zeropassthru]` attribute which lets you omit it. If mask is not set then passthru must not be set.
+    - `<i1,N>:%mask` - per-lane predicate; true = load from `ptrs[i]`, false = use `passthru[i]`. It is optional. If not set equivalent to all lanes of mask = 1
 
     Attributes:
     - `#[align(i8:N)]` - alignment guarantee for each individual pointer in the vector; default is 1
     - `#[volatile]` - volatile gather
     - `#[nonnull]` - asserts all active pointers are non-null
     - `#[dereferenceable(i64:N)]` - asserts all active pointers are dereferenceable for N bytes
-    - `#[zeropassthru]` - inactive lanes are zeroed; allows the backend to emit a zeroing-masked instruction directly rather than materializing a zero vector
+    - `#[zeropassthru]` - inactive lanes are zeroed; allows the backend to emit a zeroing-masked instruction directly rather than materializing a zero vector.You cant set passthru if this attribute is used. Mask must be set  if this attribute is used
 
     If T is float:
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
-- `.scatter(<T,N>:%val, <ptr,N>:%ptrs, <i1,N>:%mask)` - Stores one scalar element per lane to a distinct pointer. Each lane `i` stores `val[i]` to `ptrs[i]`. Inactive lanes produce no write. If two active lanes write to the same address, the result is undefined (no ordering guarantee). 
+- `.masked_scatter(<T,N>:%val, <ptr,N>:%ptrs [, <i1,N>:%mask])` - Stores one scalar element per lane to a distinct pointer. Each lane `i` stores `val[i]` to `ptrs[i]`. Inactive lanes produce no write. If two active lanes write to the same address, the result is undefined (no ordering guarantee). 
 
     - `<T,N>:%val` - values to scatter; T can be any integer, float, or bfloat
     - `<ptr,N>:%ptrs` - vector of N destination pointers
-    - `<i1,N>:%mask` - per-lane predicate
+    - `<i1,N>:%mask` - per-lane predicate. It is optional. If not set equivalent to all lanes of mask = 1
 
     No output.
 

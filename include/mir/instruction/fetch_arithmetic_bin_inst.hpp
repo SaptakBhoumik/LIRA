@@ -8,7 +8,7 @@ class FetchArithmeticBinInst:public Inst {
     protected:
     std::size_t alignment;//The alignment of the memory access in bytes
     bool volatile_;//Whether the memory access is volatile or not
-    std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info;//If the instruction is atomic, then this field contains the sync scope and atomic ordering of the instruction. Otherwise, it is std::nullopt
+    std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info;//If the instruction is atomic, then this field contains the sync scope and atomic ordering of the instruction. Otherwise, it is std::nullopt
     
     IR::LiteralExprPtr pointer;//Always of type ptr
     IR::LiteralExprPtr value;//Same type as destination
@@ -26,7 +26,7 @@ class FetchArithmeticBinInst:public Inst {
         FETCH_AVG = 1 << 15,
     };
     FetchArithmeticBinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                            std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info, std::optional<FastMathAttr> fast_math_attr);
+                            std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info, std::optional<FastMathAttr> fast_math_attr);
 
     virtual InstOperandTypeVarient get_type_varient() const = 0;
     virtual IR::TypeExprPtr get_type() const final;
@@ -35,7 +35,7 @@ class FetchArithmeticBinInst:public Inst {
 
     virtual std::size_t get_alignment() const final;
     virtual bool is_volatile() const final;
-    virtual std::optional<std::pair<SyncScope,AtomicOrdering>> get_atomic_info() const final;
+    virtual std::optional<std::pair<AtomicOrdering,SyncScope>> get_atomic_info() const final;
     virtual OpType get_op_type() const = 0;
 
     virtual InstType get_inst_type() const override final;
@@ -55,7 +55,7 @@ class IntFetchArithmeticBinInst:public FetchArithmeticBinInst {
     std::string to_string_helper(const std::string op_name) const;
     public:
     IntFetchArithmeticBinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                     std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info,
+                     std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info,
                      bool nuw, bool nsw, bool saturating, bool exact, bool unsigned_, bool floor);
     
     virtual bool is_nuw() const final;
@@ -75,7 +75,7 @@ class IntFetchArithmeticBinInst:public FetchArithmeticBinInst {
 class IntXchgInst:public IntFetchArithmeticBinInst {
     public:
     IntXchgInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info);
+                std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info);
 
     OpType get_op_type() const override;
     std::string to_string() const override;
@@ -85,7 +85,7 @@ class IntXchgInst:public IntFetchArithmeticBinInst {
 class IntFetchAddInst:public IntFetchArithmeticBinInst {
     public:
     IntFetchAddInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                    std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info,
+                    std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info,
                     bool nuw, bool nsw, bool saturating, bool unsigned_);
 
     OpType get_op_type() const override;
@@ -96,7 +96,7 @@ class IntFetchAddInst:public IntFetchArithmeticBinInst {
 class IntFetchSubInst:public IntFetchArithmeticBinInst {
     public:
     IntFetchSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                    std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info,
+                    std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info,
                     bool nuw, bool nsw, bool saturating, bool unsigned_);
 
     OpType get_op_type() const override;
@@ -107,7 +107,7 @@ class IntFetchSubInst:public IntFetchArithmeticBinInst {
 class IntFetchMulInst:public IntFetchArithmeticBinInst {
     public:
     IntFetchMulInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                    std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info,
+                    std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info,
                     bool nuw, bool nsw, bool saturating, bool unsigned_);
 
     OpType get_op_type() const override;
@@ -118,7 +118,7 @@ class IntFetchMulInst:public IntFetchArithmeticBinInst {
 class IntFetchDivInst:public IntFetchArithmeticBinInst {
     public:
     IntFetchDivInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                    std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info,
+                    std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info,
                     bool unsigned_, bool exact);
 
     OpType get_op_type() const override;
@@ -129,7 +129,7 @@ class IntFetchDivInst:public IntFetchArithmeticBinInst {
 class IntFetchRemInst:public IntFetchArithmeticBinInst {
     public:
     IntFetchRemInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                    std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info,
+                    std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info,
                     bool unsigned_);
 
     OpType get_op_type() const override;
@@ -140,7 +140,7 @@ class IntFetchRemInst:public IntFetchArithmeticBinInst {
 class IntFetchCopySignInst:public IntFetchArithmeticBinInst {
     public:
     IntFetchCopySignInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                         std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info, 
+                         std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info, 
                          bool nsw);
 
     OpType get_op_type() const override;
@@ -151,7 +151,7 @@ class IntFetchCopySignInst:public IntFetchArithmeticBinInst {
 class IntFetchMaxInst:public IntFetchArithmeticBinInst {
     public:
     IntFetchMaxInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                    std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info,
+                    std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info,
                     bool unsigned_);
 
     OpType get_op_type() const override;
@@ -162,7 +162,7 @@ class IntFetchMaxInst:public IntFetchArithmeticBinInst {
 class IntFetchMinInst:public IntFetchArithmeticBinInst {
     public:
     IntFetchMinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                    std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info,
+                    std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info,
                     bool unsigned_);
 
     OpType get_op_type() const override;
@@ -173,7 +173,7 @@ class IntFetchMinInst:public IntFetchArithmeticBinInst {
 class IntFetchAvgInst:public IntFetchArithmeticBinInst {
     public:
     IntFetchAvgInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                    std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info,
+                    std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info,
                     bool nuw, bool nsw, bool unsigned_, bool floor);
 
     OpType get_op_type() const override;
@@ -188,7 +188,7 @@ class FloatFetchArithmeticBinInst:public FetchArithmeticBinInst {
     std::string to_string_helper(const std::string op_name) const;
     public:
     FloatFetchArithmeticBinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                      std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info,
+                      std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info,
                       FastMathAttr fast_math_attr, bool unordered, bool ieee754_2019);
 
     virtual std::shared_ptr<IR::FloatTypeExpr> get_casted_type() const final;//Returns the type casted to FloatTypeExpr. Just a helper function to make life easier
@@ -202,7 +202,7 @@ class FloatFetchArithmeticBinInst:public FetchArithmeticBinInst {
 class FloatXchgInst:public FloatFetchArithmeticBinInst {
     public:
     FloatXchgInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info, FastMathAttr fast_math_attr);
+                std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info, FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override;
     std::string to_string() const override;
@@ -212,7 +212,7 @@ class FloatXchgInst:public FloatFetchArithmeticBinInst {
 class FloatFetchAddInst:public FloatFetchArithmeticBinInst {
     public:
     FloatFetchAddInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                      std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info,
+                      std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info,
                       FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override;
@@ -223,7 +223,7 @@ class FloatFetchAddInst:public FloatFetchArithmeticBinInst {
 class FloatFetchSubInst:public FloatFetchArithmeticBinInst {
     public:
     FloatFetchSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                      std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info,
+                      std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info,
                     FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override;
@@ -234,7 +234,7 @@ class FloatFetchSubInst:public FloatFetchArithmeticBinInst {
 class FloatFetchMulInst:public FloatFetchArithmeticBinInst {
     public:
     FloatFetchMulInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                    std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info,
+                    std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info,
                     FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override;
@@ -245,7 +245,7 @@ class FloatFetchMulInst:public FloatFetchArithmeticBinInst {
 class FloatFetchDivInst:public FloatFetchArithmeticBinInst {
     public:
     FloatFetchDivInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                      std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info,
+                      std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info,
                       FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override;
@@ -256,7 +256,7 @@ class FloatFetchDivInst:public FloatFetchArithmeticBinInst {
 class FloatFetchRemInst:public FloatFetchArithmeticBinInst {
     public:
     FloatFetchRemInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                      std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info,
+                      std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info,
                     FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override;
@@ -267,7 +267,7 @@ class FloatFetchRemInst:public FloatFetchArithmeticBinInst {
 class FloatFetchCopySignInst:public FloatFetchArithmeticBinInst {
     public:
     FloatFetchCopySignInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                         std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info, 
+                         std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info, 
                          FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override;
@@ -278,7 +278,7 @@ class FloatFetchCopySignInst:public FloatFetchArithmeticBinInst {
 class FloatFetchMaxInst:public FloatFetchArithmeticBinInst {
     public:
     FloatFetchMaxInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                      std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info,
+                      std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info,
                       FastMathAttr fast_math_attr, bool unordered, bool ieee754_2019);
 
     OpType get_op_type() const override;
@@ -289,7 +289,7 @@ class FloatFetchMaxInst:public FloatFetchArithmeticBinInst {
 class FloatFetchMinInst:public FloatFetchArithmeticBinInst {
     public:
     FloatFetchMinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                      std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info,
+                      std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info,
                       FastMathAttr fast_math_attr, bool unordered, bool ieee754_2019);
 
     OpType get_op_type() const override;
@@ -300,7 +300,7 @@ class FloatFetchMinInst:public FloatFetchArithmeticBinInst {
 class FloatFetchAvgInst:public FloatFetchArithmeticBinInst {
     public:
     FloatFetchAvgInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                    std::size_t alignment, bool volatile_, std::optional<std::pair<SyncScope,AtomicOrdering>> atomic_info,
+                    std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info,
                     FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override;

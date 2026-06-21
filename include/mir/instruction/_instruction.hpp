@@ -39,8 +39,8 @@ enum class InstType:std::int16_t{
 
     LocalInst,
     AllocaInst,
-    LoadInst,//Even the atomic varient returns this as type. We use the is_atomic method to know if atomic or not
-    StoreInst,//Even the atomic varient returns this as type. We use the is_atomic method to know if atomic or not
+    LoadInst,
+    StoreInst,
     GetAddressInst,
     PtrOffsetInst,
     ExtractElementInst,

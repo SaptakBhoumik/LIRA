@@ -4,10 +4,10 @@
 namespace LIRA {
 namespace MIR {
 class LocalInst:public Inst {
-    IR::LiteralExprPtr value;//The value and its type to store. The type must be a pointer type
-    IR::TypeExprPtr type;//The reduced type of value. Must be same as the type of value but without ptr. We need this because we want to support opaque pointers in future where we dont have the type information in the pointer itself. So we need to store the reduced type separately to make sure we can do type checking and other stuff correctly.
+    IR::LiteralExprPtr value;
     public:
-    LocalInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr type);
+    LocalInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value,
+              std::optional<FastMathAttr> fast_math_attr);
 
     IR::LiteralExprPtr get_value() const;
     IR::TypeExprPtr get_type() const;
@@ -37,51 +37,38 @@ class AllocaInst:public Inst {
 class LoadInst:public Inst {
     protected:
     IR::LiteralExprPtr pointer;//The pointer to load from. Must be of type ptr
-    IR::TypeExprPtr type;//The reduced type of the output
 
     bool volatile_ = false;//Whether it has the volatile attribute or not
-    bool nontemporal = false;//Whether it has the nontemporal attribute or not
     bool invariant_load = false;//Whether it has the invariant.load attribute or not
+    bool nontemporal = false;//Whether it has the nontemporal attribute or not
     bool nonull = false;
     bool nopoison = false;
+    bool nsb = false;
     std::size_t alignment;
     std::size_t dereferenceable_bytes; //If 0 means the value is not set
+    std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info;
     public:
-    LoadInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::TypeExprPtr type, 
-             bool volatile_, bool nontemporal, bool invariant_load, bool nonull, bool nopoison, std::size_t alignment, std::size_t dereferenceable_bytes);
+    LoadInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, 
+             bool volatile_, bool invariant_load, bool nontemporal, bool nonull, bool nopoison, 
+             std::size_t alignment, std::size_t dereferenceable_bytes, std::optional<FastMathAttr> fast_math_attr, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info);
 
-    virtual IR::LiteralExprPtr get_pointer() const final;
-    virtual IR::TypeExprPtr get_type() const final;
-    virtual bool is_volatile() const final;
-    virtual bool is_nontemporal() const final;
-    virtual bool is_invariant_load() const final;
-    virtual bool is_nonull() const final;
-    virtual bool is_nopoison() const final;
-    virtual std::size_t get_alignment() const final;
-    virtual std::size_t get_dereferenceable_bytes() const final;
-    virtual bool is_atomic() const;//Whether it is the atomic variant
-
-    virtual InstType get_inst_type() const override;
-    virtual std::string to_string() const override;
-};
-
-class AtomicLoadInst: public LoadInst{
-    protected:
-    SyncScope sync_scope;
-    AtomicOrdering ordering;
-
-    public:
-    AtomicLoadInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::TypeExprPtr type, 
-                    bool volatile_, bool nontemporal, bool invariant_load, bool nonull, bool nopoison, std::size_t alignment, std::size_t dereferenceable_bytes, 
-                    SyncScope sync_scope, AtomicOrdering ordering);
-
-    SyncScope get_sync_scope() const;
-    AtomicOrdering get_ordering() const;
-    bool is_atomic() const override;//Whether it is the atomic variant
+    IR::LiteralExprPtr get_pointer() const;
+    IR::TypeExprPtr get_type() const;
+    
+    bool is_volatile() const;
+    bool is_invariant_load() const;
+    bool is_nontemporal() const;
+    bool is_nonull() const;
+    bool is_nopoison() const;
+    bool is_nsb() const;
+    std::size_t get_alignment() const;
+    std::size_t get_dereferenceable_bytes() const;
+    std::optional<std::pair<AtomicOrdering,SyncScope>> get_atomic_info() const;
 
     InstType get_inst_type() const override;
     std::string to_string() const override;
 };
+
 class StoreInst:public Inst {
     protected:
     IR::LiteralExprPtr pointer;//The pointer to store to. Must be of type ptr
@@ -94,38 +81,23 @@ class StoreInst:public Inst {
     bool nopoison = false;
     std::size_t alignment;
     std::size_t dereferenceable_bytes; //If 0 means the value is not set
+    std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info;
     public:
     StoreInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, IR::TypeExprPtr type, 
-              bool volatile_, bool nontemporal, bool nonull, bool nopoison, std::size_t alignment, std::size_t dereferenceable_bytes);
+              bool volatile_, bool nontemporal, bool nonull, bool nopoison, 
+              std::size_t alignment, std::size_t dereferenceable_bytes,std::optional<FastMathAttr> fast_math_attr, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info);
 
-    virtual IR::LiteralExprPtr get_pointer() const final;
-    virtual IR::LiteralExprPtr get_value() const final;
-    virtual IR::TypeExprPtr get_type() const final;
-    virtual bool is_volatile() const final;
-    virtual bool is_nontemporal() const final;
-    virtual bool is_nonull() const final;
-    virtual bool is_nopoison() const final;
-    virtual std::size_t get_alignment() const final;
-    virtual std::size_t get_dereferenceable_bytes() const final;
-    virtual bool is_atomic() const;//Whether it is the atomic variant
+    IR::LiteralExprPtr get_pointer() const;
+    IR::LiteralExprPtr get_value() const;
+    IR::TypeExprPtr get_type() const;
 
-    virtual InstType get_inst_type() const override;
-    virtual std::string to_string() const override;
-};
-
-class AtomicStoreInst: public StoreInst{
-    protected:
-    SyncScope sync_scope;
-    AtomicOrdering ordering;
-
-    public:
-    AtomicStoreInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, IR::TypeExprPtr type, 
-                    bool volatile_, bool nontemporal, bool nonull, bool nopoison, std::size_t alignment, std::size_t dereferenceable_bytes, 
-                    SyncScope sync_scope, AtomicOrdering ordering);
-
-    SyncScope get_sync_scope() const;
-    AtomicOrdering get_ordering() const;
-    bool is_atomic() const override;//Whether it is the atomic variant
+    bool is_volatile() const;
+    bool is_nontemporal() const;
+    bool is_nonull() const;
+    bool is_nopoison() const;
+    std::size_t get_alignment() const;
+    std::size_t get_dereferenceable_bytes() const;
+    std::optional<std::pair<AtomicOrdering,SyncScope>> get_atomic_info() const;
 
     InstType get_inst_type() const override;
     std::string to_string() const override;

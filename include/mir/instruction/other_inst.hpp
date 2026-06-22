@@ -103,16 +103,34 @@ class VaargInst:public Inst {
 };
 
 class PtrMaskInst:public Inst {
+    protected:
     IR::LiteralExprPtr pointer;//The pointer to mask. Must be of type ptr
     IR::LiteralExprPtr mask;//The value and its type to mask. The type must be of integer type and must have same bit width as pointer i.e i64 for our case
     public:
     PtrMaskInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr mask);
 
-    IR::LiteralExprPtr get_pointer() const;
-    IR::LiteralExprPtr get_mask() const;
-    std::size_t get_mask_bitwidth() const;//Returns the bit width of the mask. We only support x86_64 so return 64
+    virtual IR::LiteralExprPtr get_pointer() const final;
+    virtual IR::LiteralExprPtr get_mask() const final;
 
-    InstType get_inst_type() const override;
+    virtual TypeVarient get_dest_type_var() const = 0;
+    virtual InstType get_inst_type() const override final;
+};
+
+class IntPtrMaskInst:public PtrMaskInst {
+    public:
+    IntPtrMaskInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr mask);
+
+    TypeVarient get_dest_type_var() const override;
+    std::string to_string() const override;
+};
+
+class VecIntPtrMaskInst:public PtrMaskInst {
+    public:
+    VecIntPtrMaskInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr mask);
+
+    std::size_t get_vector_size() const;
+
+    TypeVarient get_dest_type_var() const override;
     std::string to_string() const override;
 };
 

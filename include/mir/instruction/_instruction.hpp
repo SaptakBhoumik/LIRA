@@ -157,7 +157,7 @@ class Inst {
 
 using InstPtr = std::shared_ptr<Inst>;
 
-enum class InstOperandTypeVarient:std::uint64_t{
+enum class TypeVarient:std::uint64_t{
     // A lot of operands are divided into int,float,ptr,vector etc based on the type they operate on. Not every instruction show this property but a lot do. It is for them
     Int = 1 << 0,
     Float = 1 << 1,
@@ -166,7 +166,7 @@ enum class InstOperandTypeVarient:std::uint64_t{
     VecFloat = 1 << 4,
     VecPtr = 1 << 5
     /*
-    We will usually do matching on InstOperandTypeVarient | Opcode. So for every enum opcode, make sure to have a unique bit pattern starting from 1 << 6.
+    We will usually do matching on TypeVarient | Opcode. So for every enum opcode, make sure to have a unique bit pattern starting from 1 << 6.
     Like the following
     enum class OpType:std::uint64_t{
         ADD = 1 << 6,
@@ -178,17 +178,17 @@ enum class InstOperandTypeVarient:std::uint64_t{
     */
 };
 
-bool is_vector_typevarient(const InstOperandTypeVarient var);
-bool is_scalar_typevarient(const InstOperandTypeVarient var);
-bool is_ptr_typevarient(const InstOperandTypeVarient var);
-bool is_float_typevarient(const InstOperandTypeVarient var);
-bool is_int_typevarient(const InstOperandTypeVarient var);
+bool is_vector_typevarient(const TypeVarient var);
+bool is_scalar_typevarient(const TypeVarient var);
+bool is_ptr_typevarient(const TypeVarient var);
+bool is_float_typevarient(const TypeVarient var);
+bool is_int_typevarient(const TypeVarient var);
 
-std::optional<InstOperandTypeVarient> get_type_varient_from_type(const IR::TypeExprPtr type);
+std::optional<TypeVarient> get_type_varient_from_type(const IR::TypeExprPtr type);
 
 template<typename E>
-    requires (std::is_enum_v<E> && (!std::is_same_v<E, InstOperandTypeVarient>))
-constexpr std::uint64_t operator|(InstOperandTypeVarient a, E b) {
+    requires (std::is_enum_v<E> && (!std::is_same_v<E, TypeVarient>))
+constexpr std::uint64_t operator|(TypeVarient a, E b) {
     return static_cast<std::uint64_t>(a) | static_cast<std::uint64_t>(b);
 }
 

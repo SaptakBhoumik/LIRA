@@ -51,8 +51,8 @@ std::shared_ptr<IR::IntTypeExpr> IntUnaryInst::get_casted_operand_type() const {
 std::size_t IntUnaryInst::get_bitwidth() const {
     return this->get_casted_operand_type()->get_bits();
 }
-InstOperandTypeVarient IntUnaryInst::get_type_varient() const {
-    return InstOperandTypeVarient::Int;
+TypeVarient IntUnaryInst::get_type_varient() const {
+    return TypeVarient::Int;
 }
 
 
@@ -222,8 +222,8 @@ std::size_t VecIntUnaryInst::get_basetype_bitwidth() const {
 std::size_t VecIntUnaryInst::get_num_elements() const {
     return this->get_casted_operand_type()->get_size();
 }
-InstOperandTypeVarient VecIntUnaryInst::get_type_varient() const {
-    return InstOperandTypeVarient::VecInt;
+TypeVarient VecIntUnaryInst::get_type_varient() const {
+    return TypeVarient::VecInt;
 }
 
 
@@ -355,8 +355,8 @@ bool FloatUnaryInst::is_brain_float() const {
     auto float_type = this->get_casted_operand_type();
     return float_type->is_brain_float();
 }
-InstOperandTypeVarient FloatUnaryInst::get_type_varient() const {
-    return InstOperandTypeVarient::Float;
+TypeVarient FloatUnaryInst::get_type_varient() const {
+    return TypeVarient::Float;
 }
 
 
@@ -508,8 +508,8 @@ std::shared_ptr<IR::FloatTypeExpr> VecFloatUnaryInst::get_basetype() const {
 std::size_t VecFloatUnaryInst::get_num_elements() const {
     return this->get_casted_operand_type()->get_size();
 }
-InstOperandTypeVarient VecFloatUnaryInst::get_type_varient() const {
-    return InstOperandTypeVarient::VecFloat;
+TypeVarient VecFloatUnaryInst::get_type_varient() const {
+    return TypeVarient::VecFloat;
 }
 
 

@@ -528,7 +528,7 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
 
 - `let ptr:$global_var = .global(T:value)` - Defines a global variable. Output must be a pointer type; `$global_var` holds the address. Value must be a constant expression (not a variable). Not part of MIR; stored in the module's global section.
 
-    - `#[align(i8:N)]` - alignment of the global in bytes; must be a power of 2; default is 16
+    - `#[align(i64:N)]` - alignment of the global in bytes; must be a power of 2; default is 16
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination if T is float/vec of float
 
 - `let T:%local_var = .local(T:initial_value)` - Defines and initializes a local variable. Value can be anything. Present for parser simplicity; does little in MIR. T can be any type. 
@@ -536,9 +536,9 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
     If T is float/vec of float:
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
-- `let ptr:%local_var = .alloca(iN:%size)` - Allocates `size` bytes on the stack. Returns a pointer to the allocation.
+- `let ptr:%local_var = .alloca(i64:%size)` - Allocates `size` bytes on the stack. Returns a pointer to the allocation.
 
-    - `#[align(i8:N)]` - alignment of the allocation in bytes; must be a power of 2; default is 16
+    - `#[align(i64:N)]` - alignment of the allocation in bytes; must be a power of 2; default is 16
 
 - `let T:%output_var = .load(ptr:%ptr)` - Loads a value of type T from memory.
 
@@ -548,7 +548,7 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
     - `#[nonnull]` - asserts the pointer is not null
     - `#[nopoison]` - asserts the loaded value is not poison
     - `#[nsb]` - asserts the loaded integer's sign bit is 0 (tighter range for optimizer)
-    - `#[align(i8:N)]` - alignment of the pointer; must be a power of 2; required if atomic; default is 16
+    - `#[align(i64:N)]` - alignment of the pointer; must be a power of 2; required if atomic; default is 16
     - `#[dereferenceable(i64:N)]` - asserts the pointer is dereferenceable for N bytes
     - `#[atomic(str:ordering)]` - atomic load; ordering must be one of: `acquire`, `monotonic`, `unordered`, `seq_cst`
     - `#[syncscope("singlethreaded")]` - only valid with `#[atomic]`; synchronizes only with atomic ops in the same thread; default is global
@@ -562,7 +562,7 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
     - `#[nontemporal]` - non-temporal (cache-bypassing) store
     - `#[nonnull]` - asserts the pointer is not null
     - `#[nopoison]` - asserts the value being stored is not poison
-    - `#[align(i8:N)]` - alignment of the pointer; must be a power of 2; required if atomic; default is 16
+    - `#[align(i64:N)]` - alignment of the pointer; must be a power of 2; required if atomic; default is 16
     - `#[dereferenceable(i64:N)]` - asserts the pointer is dereferenceable for N bytes
     - `#[atomic(str:ordering)]` - atomic store; ordering must be one of: `release`, `monotonic`, `unordered`, `seq_cst`
     - `#[syncscope("singlethreaded")]` - only valid with `#[atomic]`; default is global
@@ -577,12 +577,12 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
     - `<i1,N>:%mask` - per-lane predicate; true = load from memory, false = take from passthru. It is optional. If not set equivalent to all lanes of mask = 1
 
     Attributes:
-    - `#[align(i8:N)]` - alignment of `ptr` in bytes; must be a power of 2; default is 1 (unaligned is the safe default since masked loads are often used for tail handling where alignment cannot be guaranteed)
     - `#[volatile]` - volatile load; not elided or reordered
     - `#[nontemporal]` - non-temporal (cache-bypassing) load for active lanes
     - `#[nonnull]` - asserts `ptr` is not null
-    - `#[dereferenceable(i64:N)]` - asserts `ptr` is dereferenceable for N bytes across the entire vector range (not just active lanes)
     - `#[zeropassthru]` - shorthand: inactive lanes are zeroed; equivalent to passing a zero vector as passthru but allows the backend to emit a zeroing-masked instruction directly rather than materializing a zero vector. You cant set passthru if this attribute is used. Mask must be set  if this attribute is used
+    - `#[align(i64:N)]` - alignment of `ptr` in bytes; must be a power of 2; default is 1 (unaligned is the safe default since masked loads are often used for tail handling where alignment cannot be guaranteed)
+    - `#[dereferenceable(i64:N)]` - asserts `ptr` is dereferenceable for N bytes across the entire vector range (not just active lanes)
 
     If T is float:
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
@@ -596,10 +596,10 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
     No output.
 
     Attributes:
-    - `#[align(i8:N)]` - alignment of `ptr`; must be a power of 2; default is 1
     - `#[volatile]` - volatile store
     - `#[nontemporal]` - non-temporal stores for active lanes
     - `#[nonnull]` - asserts `ptr` is not null
+    - `#[align(i64:N)]` - alignment of `ptr`; must be a power of 2; default is 1
     - `#[dereferenceable(i64:N)]` - asserts `ptr` is dereferenceable for the full vector range
 
     If T is float:
@@ -612,16 +612,17 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
     - `<i1,N>:%mask` - per-lane predicate; true = load from `ptrs[i]`, false = use `passthru[i]`. It is optional. If not set equivalent to all lanes of mask = 1
 
     Attributes:
-    - `#[align(i8:N)]` - alignment guarantee for each individual pointer in the vector; default is 1
     - `#[volatile]` - volatile gather
+    - `#[nontemporal]` - non-temporal gather for active lanes
     - `#[nonnull]` - asserts all active pointers are non-null
-    - `#[dereferenceable(i64:N)]` - asserts all active pointers are dereferenceable for N bytes
     - `#[zeropassthru]` - inactive lanes are zeroed; allows the backend to emit a zeroing-masked instruction directly rather than materializing a zero vector.You cant set passthru if this attribute is used. Mask must be set  if this attribute is used
+    - `#[align(i64:N)]` - alignment guarantee for each individual pointer in the vector; default is 1
+    - `#[dereferenceable(i64:N)]` - asserts all active pointers are dereferenceable for N bytes
 
     If T is float:
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
-- `.masked_scatter(<T,N>:%val, <ptr,N>:%ptrs [, <i1,N>:%mask])` - Stores one scalar element per lane to a distinct pointer. Each lane `i` stores `val[i]` to `ptrs[i]`. Inactive lanes produce no write. If two active lanes write to the same address, the result is undefined (no ordering guarantee). 
+- `.masked_scatter(<ptr,N>:%ptrs, <T,N>:%val [, <i1,N>:%mask])` - Stores one scalar element per lane to a distinct pointer. Each lane `i` stores `val[i]` to `ptrs[i]`. Inactive lanes produce no write. If two active lanes write to the same address, the result is undefined (no ordering guarantee). 
 
     - `<T,N>:%val` - values to scatter; T can be any integer, float, or bfloat
     - `<ptr,N>:%ptrs` - vector of N destination pointers
@@ -630,9 +631,10 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
     No output.
 
     Attributes:
-    - `#[align(i8:N)]` - per-pointer alignment guarantee; default is 1
     - `#[volatile]` - volatile scatter
+    - `#[nontemporal]` - non-temporal scatter for active lanes
     - `#[nonnull]` - asserts all active pointers are non-null
+    - `#[align(i64:N)]` - per-pointer alignment guarantee; default is 1
     - `#[dereferenceable(i64:N)]` - asserts all active pointers are dereferenceable for N bytes
 
     If T is float:
@@ -653,40 +655,36 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
         - `3` - high locality; `PREFETCHT0` (L1); this is the default
     - `#[instruction]` - prefetch into the instruction cache rather than the data cache; `#[write]` is invalid when `#[instruction]` is set; `#[locality]` still applies
 
-- `.memcpy(ptr:%dest, ptr:%src, iN:%size)` - Copies `size` bytes from `src` to `dest`. Regions must not overlap; use `.memmove` if they may. The index `0` refers to `src` and `1` refers to `dest` in per-pointer attributes.
+- `.memcopy(ptr:%dest, ptr:%src, i64:%size)` - Copies `size` bytes from `src` to `dest`. The index `0` refers to `src` and `1` refers to `dest` in per-pointer attributes.
 
+    - `#[nooverlap]` - asserts the source and destination regions do not overlap; allows for a more efficient copy implementation when true
     - `#[volatile]` - volatile copy
-    - `#[dest_align(i8:N)]` - alignment of the destination pointer; must be a power of 2; default is 16
-    - `#[src_align(i8:N)]` - alignment of the source pointer; must be a power of 2; default is 16
-    - `#[nontemporal(iN:idx...)]` - non-temporal access for the specified pointer(s); at least one index required
-    - `#[nonnull(iN:idx...)]` - asserts the specified pointer(s) are not null; at least one index required
-    - `#[nopoison(iN:idx...)]` - asserts the memory at the specified pointer(s) contains no poison; at least one index required
-    - `#[dest_dereferenceable(i64:N)]` - asserts the destination pointer is dereferenceable for N bytes; default is no assertion
-    - `#[src_dereferenceable(i64:N)]` - asserts the source pointer is dereferenceable for N bytes; default is no assertion
+    - `#[nontemporal(i64:idx...)]` - non-temporal access for the specified pointer(s); at least one index required
+    - `#[nonnull(i64:idx...)]` - asserts the specified pointer(s) are not null; at least one index required
+    - `#[nopoison(i64:idx...)]` - asserts the memory at the specified pointer(s) contains no poison; at least one index required
+    - `#[align(i64:idx0, i64:alignment of arg at idx0, i64:idx1, i64:alignment of arg at idx1)]` - alignment of the argument. Atleast one index is needed if u use this attribute, Else u can skip
+    - `#[dereferenceable(i64:idx0, i64:dedereferenceable bytes of arg at idx0, i64:idx1, i64:dereferenceable_bytes of arg at idx1)]` - asserts the source and destination pointers are dereferenceable for N bytes; default is no assertion. Atleast one index is needed if u use this attribute
 
-- `.memmove(ptr:%dest, ptr:%src, iN:%size)` - Copies `size` bytes from `src` to `dest`. Correct even if regions overlap. Same attributes as `.memcpy` with the same per-pointer index convention.
-
-- `.memset(ptr:%dest, i8:%value, iN:%size)` - Fills `size` bytes at `dest` with `value`.
+- `.memset(ptr:%dest, i8:%value, i64:%size)` - Fills `size` bytes at `dest` with `value`.
 
     - `#[volatile]` - volatile set
-    - `#[align(i8:N)]` - alignment of `dest`; must be a power of 2; default is 16
     - `#[nontemporal]` - non-temporal stores
     - `#[nonnull]` - asserts `dest` is not null
     - `#[nopoison]` - asserts the region contains no poison
+    - `#[align(i64:N)]` - alignment of `dest`; must be a power of 2; default is 16
     - `#[dereferenceable(i64:N)]` - asserts `dest` is dereferenceable for N bytes
 
-- `let i32:%output_var = .memcmp(ptr:%ptr1, ptr:%ptr2, iN:%size)` - Compares `size` bytes at `ptr1` and `ptr2`. Returns a negative, zero, or positive integer if the region at `ptr1` is respectively less than, equal to, or greater than the region at `ptr2`. The index `0` refers to `ptr1` and `1` refers to `ptr2` in per-pointer attributes.
+- `let i32:%output_var = .memcmp(ptr:%ptr1, ptr:%ptr2, i64:%size)` - Compares `size` bytes at `ptr1` and `ptr2`. Returns a negative, zero, or positive integer if the region at `ptr1` is respectively less than, equal to, or greater than the region at `ptr2`. The index `0` refers to `ptr1` and `1` refers to `ptr2` in per-pointer attributes.
 
     - `#[volatile]` - volatile compare
-    - `#[ptr1_align(i8:N)]` - alignment of `ptr1`; must be a power of 2; default is 16
-    - `#[ptr2_align(i8:N)]` - alignment of `ptr2`; must be a power of 2; default is 16
-    - `#[nontemporal(iN:idx...)]` - non-temporal access for the specified pointer(s); at least one index required
-    - `#[nonnull(iN:idx...)]` - asserts the specified pointer(s) are not null; at least one index required
-    - `#[nopoison(iN:idx...)]` - asserts the memory at the specified pointer(s) contains no poison; at least one index required
-    - `#[ptr1_dereferenceable(i64:N)]` - asserts `ptr1` is dereferenceable for N bytes; default is no assertion
-    - `#[ptr2_dereferenceable(i64:N)]` - asserts `ptr2` is dereferenceable for N bytes; default is no assertion
+    - `#[nontemporal(i64:idx...)]` - non-temporal access for the specified pointer(s); at least one index required
+    - `#[nonnull(i64:idx...)]` - asserts the specified pointer(s) are not null; at least one index required
+    - `#[nopoison(i64:idx...)]` - asserts the memory at the specified pointer(s) contains no poison; at least one index required
+    - `#[align(i64:idx0, i64:alignment of arg at idx0, i64:idx1, i64:alignment of arg at idx1)]` - alignment of the argument. Atleast one index is needed if u use this attribute, Else u can skip
+    - `#[dereferenceable(i64:idx0, i64:dedereferenceable bytes of arg at idx0, i64:idx1, i64:dereferenceable_bytes of arg at idx1)]` - asserts the source and destination pointers are dereferenceable for N bytes; default is no assertion. Atleast one index is needed if u use this attribute
+
     
-- `let ptr:%output_var = .getaddress(T:%var, iN:%offset)` - Returns `&var + offset`. Output must be a pointer. `var` must be a variable (not a literal). Offset is in bytes. Note:-We have no seperate block address. If you want address of label just use this
+- `let ptr:%output_var = .getaddress(T:%var, i64:%offset)` - Returns `&var + offset`. Output must be a pointer. `var` must be a variable (not a literal). Offset is in bytes. Note:-We have no seperate block address. If you want address of label just use this
 
     - `#[unsigned]` - offset is unsigned; default is signed
     - `#[nsw]` - poison if the offset causes signed overflow
@@ -696,7 +694,7 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
     If T is float/vec of float:
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
-- `let ptr:%output_var = .ptroffset(ptr:%input_var, T:%offset)` - Returns `input_var + offset`. Output and input must be pointers. Offset can be any integer type. Offset is in bytes.
+- `let ptr:%output_var = .ptroffset(ptr:%input_var, i64:%offset)` - Returns `input_var + offset`. Output and input must be pointers. Offset is in bytes.
 
     - `#[unsigned]` - offset is unsigned; default is signed
     - `#[nsw]` - poison if the offset causes signed overflow
@@ -707,14 +705,14 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
 
 - `.stackrestore(ptr:%stack_ptr)` - Restores the stack pointer to the value saved by `.stacksave`, effectively freeing any dynamic allocations made since the save. The input must be a value previously returned by `.stacksave`. No attributes.
 
-- `let T3:%output_var = .extractelement(T1:%input, T2:%index)` - Extracts element at `index` from a vector/array/struct. `T1` is the aggregate, `T2` is integer index type `iN`, `T3` is the element type. For structs, index must be an integer literal. For arrays and vectors, index can be a literal or variable.
+- `let T2:%output_var = .extractelement(T1:%input, i64:%index)` - Extracts element at `index` from a vector/array/struct. `T1` is the aggregate, `T2` is the element type. For structs, index must be an integer literal. For arrays and vectors, index can be a literal or variable.
 
     - `#[inbounds]` - valid for array and vector only; asserts index is within bounds; not valid for struct (struct access is always in bounds)
 
-    If T3 is float/vec of float:
+    If T2 is float/vec of float:
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
-- `let T1:%output_var = .insertelement(T1:%input, T2:%element, T3:%index)` - Returns a copy of the aggregate with the element at `index` replaced by `element`. Output type equals input aggregate type. `T3` is integer index type `iN`. For structs, index must be an integer literal. For arrays and vectors, index can be a literal or variable.
+- `let T1:%output_var = .insertelement(T1:%input, T2:%element, i64:%index)` - Returns a copy of the aggregate with the element at `index` replaced by `element`. Output type equals input aggregate type. For structs, index must be an integer literal. For arrays and vectors, index can be a literal or variable.
 
     - `#[inbounds]` - valid for array and vector only; not valid for struct
 
@@ -729,9 +727,9 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
 
 - `let {T,i1}:%output_var = .atomic_cmpxchg(ptr:%ptr, T:%expected, T:%desired, str:success_ordering, str:failure_ordering)` - Atomically compares `*ptr` with `expected`. If equal, stores `desired` and returns `{original, true}`; otherwise leaves memory unchanged and returns `{original, false}`. `success_ordering` must be one of: `monotonic`, `acquire`, `release`, `acq_rel`, `seq_cst`. `failure_ordering` must be one of: `monotonic`, `acquire`, `seq_cst` (not `release` or `acq_rel`).
 
-    - `#[align(i8:N)]` - required; alignment of the operation; must be a power of 2; default is 16
     - `#[volatile]` - volatile operation
     - `#[weak]` - weak CAS; permitted to spuriously fail even when `*ptr == expected`
+    - `#[align(i64:N)]` - required; alignment of the operation; must be a power of 2; default is 16
     - `#[syncscope("singlethreaded")]` - synchronizes only with atomic ops in the same thread; default is global
 
     If T is float/vec of float:
@@ -766,7 +764,7 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
 Read-modify-write instructions that read a value from memory, apply a binary operation with a given operand, write the result back, and return the original value. Can optionally be made atomic with `#[atomic](Note:If atomic then max size is limited to 128 bytes)
 
 **Attributes shared by all fetch instructions:**
-- `#[align(i8:N)]` - alignment of the pointer; must be a power of 2; default is 16
+- `#[align(i64:N)]` - alignment of the pointer; must be a power of 2; default is 16
 - `#[volatile]` - volatile operation
 - `#[atomic(str:ordering)]` - makes the operation atomic; ordering must be one of: `monotonic`, `acquire`, `release`, `acq_rel`, `seq_cst`. If absent, the operation is not atomic.
 - `#[syncscope("singlethreaded")]` - only valid with `#[atomic]`; synchronizes only within the same thread; default is global
@@ -864,7 +862,7 @@ Read-modify-write instructions that read a value from memory, apply a binary ope
 Read-modify-write instructions that read a value from memory, apply a binary operation with a given operand, write the result back, and return the original value. Can optionally be made atomic with `#[atomic](Note:If atomic then max size is limited to 128 bytes)
 
 **Attributes shared by all fetch instructions:**
-- `#[align(i8:N)]` - alignment of the pointer; must be a power of 2; default is 16
+- `#[align(i64:N)]` - alignment of the pointer; must be a power of 2; default is 16
 - `#[volatile]` - volatile operation
 - `#[atomic(str:ordering)]` - makes the operation atomic; ordering must be one of: `monotonic`, `acquire`, `release`, `acq_rel`, `seq_cst`. If absent, the operation is not atomic.
 - `#[syncscope("singlethreaded")]` - only valid with `#[atomic]`; synchronizes only within the same thread; default is global
@@ -909,7 +907,7 @@ Read-modify-write instructions that read a value from memory, apply a binary ope
 
 Read-modify-write instructions that apply a unary operation to the value at a memory location and return the original value. Can optionally be made atomic with `#[atomic]`(Note:If atomic then max size is limited to 128 bytes)
 
-**Attributes shared by all unary fetch instructions:** same as Binary Fetch - `#[align(i8:N)]` (default is 16), `#[volatile]`, `#[atomic(str:ordering)]`, `#[syncscope("singlethreaded")]`.
+**Attributes shared by all unary fetch instructions:** same as Binary Fetch - `#[align(i64:N)]` (default is 16), `#[volatile]`, `#[atomic(str:ordering)]`, `#[syncscope("singlethreaded")]`.
 
 ---
 
@@ -1016,7 +1014,7 @@ A terminator must be the final instruction of every block. Falling through to th
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 - `.br(i1:%condition, T0:@true_dest, T1:{...}, T2:@false_dest, T3:{...})` - Conditional branch. Branches to `true_dest` if `condition` is true, else to `false_dest`. `T1:{...}` and `T3:{...}` are arguments for each destination. ``{}:{}`` can be used to pass no arguments
-    - `#[freq(i32:N, i32:M)]` - hints at relative branching frequencies; used by the optimizer to lay out hot/cold paths. Mutually exclusive with `#[unpredictable]`.
+    - `#[freq(i64:N, i64:M)]` - hints at relative branching frequencies; used by the optimizer to lay out hot/cold paths. Mutually exclusive with `#[unpredictable]`.
     - `#[unpredictable]` - hints that the branch is unpredictable. Mutually exclusive with `#[freq]`.
     
     If any argument of the label is float/vec of float:
@@ -1025,14 +1023,14 @@ A terminator must be the final instruction of every block. Falling through to th
     TODO: In future have loop and vectorization hint attributes
 
 - `.switch(T:%condition, T0:@default_dest, T1:{...}, T:%case1_value, T2:@case1_dest, T3:{...}, ...)` - Branches to the destination matching `condition`. Falls through to `default_dest` if no case matches. Condition must be integer; case values must be the same type as the condition. ``{}:{}`` can be used to pass no arguments
-    - `#[freq(i32:N, i32:M, ...)]` - one frequency per destination in order (default first). Mutually exclusive with `#[unpredictable]`.
+    - `#[freq(i64:N, i64:M, ...)]` - one frequency per destination in order (default first). Mutually exclusive with `#[unpredictable]`.
     - `#[unpredictable]` - hints that the branch is unpredictable. Mutually exclusive with `#[freq]`.
 
     If any argument of the label is float/vec of float:
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 - `.indirectbr(ptr:%dest_ptr, label:@label1, label:@label2, ...)` - Branches to the address stored in `dest_ptr`. The address must point to one of the listed labels; otherwise UB. Labels listed here cannot take arguments. ``{}:{}`` can be used to pass no arguments
-    - `#[freq(i32:N, i32:M, ...)]` - one frequency per label in order. Mutually exclusive with `#[unpredictable]`.
+    - `#[freq(i64:N, i64:M, ...)]` - one frequency per label in order. Mutually exclusive with `#[unpredictable]`.
     - `#[unpredictable]` - hints that the branch is unpredictable. Mutually exclusive with `#[freq]`.
 
 ---
@@ -1259,7 +1257,7 @@ The following are defined only on integer
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 - `let <T,N>:%out = .broadcast_load(ptr:%ptr)` - Loads a single scalar of type `T` from memory and broadcasts it to every lane. A single instruction on x86 (`VBROADCASTSS`, `VBROADCASTSD`, etc.); the backend guarantees the fusion that a `.load` + `.splat` pair might not. `T` must be a scalar integer, float, or bfloat (not a vector).
-    - `#[align(i8:N)]` - alignment of `ptr`; must be a power of 2; default is natural alignment of `T`
+    - `#[align(i64:N)]` - alignment of `ptr`; must be a power of 2; default is natural alignment of `T`
     - `#[volatile]` - volatile load
     - `#[nonnull]` - asserts `ptr` is not null
     - `#[nontemporal]` - non-temporal (cache-bypassing) load
@@ -1347,7 +1345,7 @@ The following are defined only on integer
 
     If T is float/bfloat/vector of float: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
-- `let T:%output_var = .ptrmask(T:%input_var, T1:%mask)` - Masks a pointer with an integer mask. T must be `ptr` or `<ptr,M>`. T1 must be an integer or vector of integer. If T1 is a vector, T must be a vector of the same size. No attributes.
+- `let T:%output_var = .ptrmask(T:%input_var, T1:%mask)` - Masks a pointer with an integer mask. T must be `ptr` or `<ptr,M>`. T1 must be an integer or vector of integer. If T1 is a vector, T must be a vector of the same size. No attributes. T1 must be i64 or <i64,M>.
 
 - `let type:%type_name = .assign_type(type:<type_definition>)` - Creates a type alias. Not a real instruction; ignored by MIR. Present only to simplify the parser.
 

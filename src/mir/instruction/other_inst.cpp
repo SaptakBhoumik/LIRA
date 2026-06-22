@@ -178,8 +178,30 @@ IR::LiteralExprPtr PtrMaskInst::get_mask() const{
 InstType PtrMaskInst::get_inst_type() const{
     return InstType::PtrMaskInst;
 }
-std::string PtrMaskInst::to_string() const{
+
+
+IntPtrMaskInst::IntPtrMaskInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr mask)
+                               :PtrMaskInst(instruction_stmt, destination, pointer, mask){}
+TypeVarient IntPtrMaskInst::get_dest_type_var() const{
+    return TypeVarient::Ptr;
+}
+std::string IntPtrMaskInst::to_string() const{
     return "let " + this->destination->to_string() + " = .ptrmask(ptr:" + this->pointer->to_string() + ", i64:" + this->mask->to_string() + ")";
+}
+
+
+VecIntPtrMaskInst::VecIntPtrMaskInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr mask)
+                               :PtrMaskInst(instruction_stmt, destination, pointer, mask){}
+TypeVarient VecIntPtrMaskInst::get_dest_type_var() const{
+    return TypeVarient::Ptr;
+}
+std::size_t VecIntPtrMaskInst::get_vector_size() const{
+    auto type = std::dynamic_pointer_cast<IR::SIMDTypeExpr>(this->destination->get_type());
+    return type->get_size();
+}
+std::string VecIntPtrMaskInst::to_string() const{
+    std::string size = std::to_string(this->get_vector_size());
+    return "let " + this->destination->to_string() + " = .ptrmask(<ptr," + size + ">:" + this->pointer->to_string() + ", <i64," + size + ">:" + this->mask->to_string() + ")";
 }
 
 

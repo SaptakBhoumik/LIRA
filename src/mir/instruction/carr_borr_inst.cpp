@@ -50,8 +50,8 @@ std::shared_ptr<IR::IntTypeExpr> IntCarrBorrType1Inst::get_casted_operand_type()
 std::size_t IntCarrBorrType1Inst::get_bitwidth() const{
     return this->get_casted_operand_type()->get_bits();
 }
-InstOperandTypeVarient IntCarrBorrType1Inst::get_operand_type_varient() const{
-    return InstOperandTypeVarient::Int;
+TypeVarient IntCarrBorrType1Inst::get_operand_type_varient() const{
+    return TypeVarient::Int;
 }
 
 
@@ -125,8 +125,8 @@ std::size_t VecIntCarrBorrType1Inst::get_operand_basetype_bitwidth() const{
 std::size_t VecIntCarrBorrType1Inst::get_vector_size() const{
     return this->get_casted_operand_type()->get_size();
 }
-InstOperandTypeVarient VecIntCarrBorrType1Inst::get_operand_type_varient() const{
-    return InstOperandTypeVarient::VecInt;
+TypeVarient VecIntCarrBorrType1Inst::get_operand_type_varient() const{
+    return TypeVarient::VecInt;
 }
 
 
@@ -232,8 +232,8 @@ std::shared_ptr<IR::IntTypeExpr> IntCarrBorrType2Inst::get_casted_operand_type()
 std::size_t IntCarrBorrType2Inst::get_bitwidth() const{
     return this->get_casted_operand_type()->get_bits();
 }
-InstOperandTypeVarient IntCarrBorrType2Inst::get_operand_type_varient() const{
-    return InstOperandTypeVarient::Int;
+TypeVarient IntCarrBorrType2Inst::get_operand_type_varient() const{
+    return TypeVarient::Int;
 }
 
 
@@ -294,8 +294,8 @@ std::size_t VecIntCarrBorrType2Inst::get_operand_basetype_bitwidth() const{
 std::size_t VecIntCarrBorrType2Inst::get_vector_size() const{
     return this->get_casted_operand_type()->get_size();
 }
-InstOperandTypeVarient VecIntCarrBorrType2Inst::get_operand_type_varient() const{
-    return InstOperandTypeVarient::VecInt;
+TypeVarient VecIntCarrBorrType2Inst::get_operand_type_varient() const{
+    return TypeVarient::VecInt;
 }
 
 

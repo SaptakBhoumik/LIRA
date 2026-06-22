@@ -42,8 +42,8 @@ std::size_t IntBitwiseTrinaryInst::get_bitwidth() const{
     auto type = this->get_casted_operand_type();
     return type->get_bits();
 }
-InstOperandTypeVarient IntBitwiseTrinaryInst::get_operand_type_varient() const{
-    return InstOperandTypeVarient::Int;
+TypeVarient IntBitwiseTrinaryInst::get_operand_type_varient() const{
+    return TypeVarient::Int;
 }
 
 
@@ -91,8 +91,8 @@ std::size_t VecIntBitwiseTrinaryInst::get_num_elements() const{
     auto type = this->get_casted_operand_type();
     return type->get_size();
 }
-InstOperandTypeVarient VecIntBitwiseTrinaryInst::get_operand_type_varient() const{
-    return InstOperandTypeVarient::VecInt;
+TypeVarient VecIntBitwiseTrinaryInst::get_operand_type_varient() const{
+    return TypeVarient::VecInt;
 }
 
 

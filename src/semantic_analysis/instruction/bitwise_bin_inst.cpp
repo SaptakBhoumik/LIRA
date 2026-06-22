@@ -60,12 +60,12 @@ MIR::InstPtr SemanticAnalyzer::analyze_bitwise_bin_inst(IR::Token name,IR::Instr
 }
 
 MIR::InstPtr SemanticAnalyzer::analyze_and_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
-                                                    MIR::InstOperandTypeVarient type_varient, IR::InstructionStmtPtr inst_stmt){
+                                                    MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     if(attributes.size()>0){
         error(inst_stmt->get_token(),"Bitwise and instruction cannot have attributes");
     }
-    if(type_varient == MIR::InstOperandTypeVarient::Int){
+    if(type_varient == MIR::TypeVarient::Int){
         return std::make_shared<MIR::IntANDInst>(inst_stmt,dest,lhs,rhs);
     }
     else {
@@ -74,14 +74,14 @@ MIR::InstPtr SemanticAnalyzer::analyze_and_bin_inst(MIR::LocalDestRegisterPtr de
 }
 
 MIR::InstPtr SemanticAnalyzer::analyze_or_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
-                                                    MIR::InstOperandTypeVarient type_varient, IR::InstructionStmtPtr inst_stmt){
+                                                    MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [flag_attrs,remaining_attrs] = extract_flag_attrs(attributes, {"disjoint"});
     if(remaining_attrs.size() > 0){
         error(remaining_attrs[0]->get_token(),"Unsupported attribute for int bitwise or instruction: " + remaining_attrs[0]->to_string());
     }
     bool disjoint = flag_attrs["disjoint"];
-    if(type_varient == MIR::InstOperandTypeVarient::Int){
+    if(type_varient == MIR::TypeVarient::Int){
         return std::make_shared<MIR::IntORInst>(inst_stmt,dest,lhs,rhs,disjoint);
     }
     else {
@@ -90,12 +90,12 @@ MIR::InstPtr SemanticAnalyzer::analyze_or_bin_inst(MIR::LocalDestRegisterPtr des
 }
 
 MIR::InstPtr SemanticAnalyzer::analyze_xor_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
-                                                    MIR::InstOperandTypeVarient type_varient, IR::InstructionStmtPtr inst_stmt){
+                                                    MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     if(attributes.size()>0){
         error(inst_stmt->get_token(),"Bitwise xor instruction cannot have attributes");
     }
-    if(type_varient == MIR::InstOperandTypeVarient::Int){
+    if(type_varient == MIR::TypeVarient::Int){
         return std::make_shared<MIR::IntXORInst>(inst_stmt,dest,lhs,rhs);
     }
     else {
@@ -104,7 +104,7 @@ MIR::InstPtr SemanticAnalyzer::analyze_xor_bin_inst(MIR::LocalDestRegisterPtr de
 }
 
 MIR::InstPtr SemanticAnalyzer::analyze_shl_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
-                                                    MIR::InstOperandTypeVarient type_varient, IR::InstructionStmtPtr inst_stmt){
+                                                    MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [flag_attrs,remaining_attrs] = extract_flag_attrs(attributes, {"nuw", "nsw"});
     if(remaining_attrs.size() > 0){
@@ -112,7 +112,7 @@ MIR::InstPtr SemanticAnalyzer::analyze_shl_bin_inst(MIR::LocalDestRegisterPtr de
     }
     bool nuw = flag_attrs["nuw"];
     bool nsw = flag_attrs["nsw"];
-    if(type_varient == MIR::InstOperandTypeVarient::Int){
+    if(type_varient == MIR::TypeVarient::Int){
         return std::make_shared<MIR::IntSHLInst>(inst_stmt,dest,lhs,rhs,nuw,nsw);
     }
     else {
@@ -121,14 +121,14 @@ MIR::InstPtr SemanticAnalyzer::analyze_shl_bin_inst(MIR::LocalDestRegisterPtr de
 }
 
 MIR::InstPtr SemanticAnalyzer::analyze_lshr_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
-                                                    MIR::InstOperandTypeVarient type_varient, IR::InstructionStmtPtr inst_stmt){
+                                                    MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [flag_attrs,remaining_attrs] = extract_flag_attrs(attributes, {"exact"});
     if(remaining_attrs.size() > 0){
         error(remaining_attrs[0]->get_token(),"Unsupported attribute for int bitwise lshr instruction: " + remaining_attrs[0]->to_string());
     }
     bool exact = flag_attrs["exact"];
-    if(type_varient == MIR::InstOperandTypeVarient::Int){
+    if(type_varient == MIR::TypeVarient::Int){
         return std::make_shared<MIR::IntLSHRInst>(inst_stmt,dest,lhs,rhs,exact);
     }
     else {
@@ -137,14 +137,14 @@ MIR::InstPtr SemanticAnalyzer::analyze_lshr_bin_inst(MIR::LocalDestRegisterPtr d
 }
 
 MIR::InstPtr SemanticAnalyzer::analyze_ashr_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
-                                                    MIR::InstOperandTypeVarient type_varient, IR::InstructionStmtPtr inst_stmt){
+                                                    MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [flag_attrs,remaining_attrs] = extract_flag_attrs(attributes, {"exact"});
     if(remaining_attrs.size() > 0){
         error(remaining_attrs[0]->get_token(),"Unsupported attribute for int bitwise ashr instruction: " + remaining_attrs[0]->to_string());
     }
     bool exact = flag_attrs["exact"];
-    if(type_varient == MIR::InstOperandTypeVarient::Int){
+    if(type_varient == MIR::TypeVarient::Int){
         return std::make_shared<MIR::IntASHRInst>(inst_stmt,dest,lhs,rhs,exact);
     }
     else {

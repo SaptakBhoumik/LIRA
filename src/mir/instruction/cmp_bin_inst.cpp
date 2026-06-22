@@ -45,8 +45,8 @@ std::size_t IntCmpBinaryInst::get_bitwidth() const{
     auto int_type = this->get_casted_operand_type();
     return int_type->get_bits();
 }
-InstOperandTypeVarient IntCmpBinaryInst::get_operand_type_varient() const{
-    return InstOperandTypeVarient::Int;
+TypeVarient IntCmpBinaryInst::get_operand_type_varient() const{
+    return TypeVarient::Int;
 }
 
 
@@ -138,8 +138,8 @@ std::size_t VecIntCmpBinaryInst::get_num_elements() const{
     auto simd_type = this->get_casted_operand_type();
     return simd_type->get_size();
 }
-InstOperandTypeVarient VecIntCmpBinaryInst::get_operand_type_varient() const{
-    return InstOperandTypeVarient::VecInt;
+TypeVarient VecIntCmpBinaryInst::get_operand_type_varient() const{
+    return TypeVarient::VecInt;
 }
 
 
@@ -213,8 +213,8 @@ std::string PtrCmpBinaryInst::to_string_helper(std::string op_name) const{
 std::size_t PtrCmpBinaryInst::get_bitwidth() const{
     return 64;//We support only x86_64 for now but can return diffrent in future if we support more arch. Just a helper function to make life easier
 }
-InstOperandTypeVarient PtrCmpBinaryInst::get_operand_type_varient() const{
-    return InstOperandTypeVarient::Ptr;
+TypeVarient PtrCmpBinaryInst::get_operand_type_varient() const{
+    return TypeVarient::Ptr;
 }
 
 
@@ -295,8 +295,8 @@ std::size_t VecPtrCmpBinaryInst::get_num_elements() const{
     auto simd_type = this->get_casted_type();
     return simd_type->get_size();
 }
-InstOperandTypeVarient VecPtrCmpBinaryInst::get_operand_type_varient() const{
-    return InstOperandTypeVarient::VecPtr;
+TypeVarient VecPtrCmpBinaryInst::get_operand_type_varient() const{
+    return TypeVarient::VecPtr;
 }
 
 
@@ -388,8 +388,8 @@ std::size_t FloatCmpBinaryInst::get_bitwidth() const{
 bool FloatCmpBinaryInst::is_brain_float() const{
     return false;
 }
-InstOperandTypeVarient FloatCmpBinaryInst::get_operand_type_varient() const{
-    return InstOperandTypeVarient::Float;
+TypeVarient FloatCmpBinaryInst::get_operand_type_varient() const{
+    return TypeVarient::Float;
 }
 
 
@@ -510,8 +510,8 @@ std::size_t VecFloatCmpBinaryInst::get_num_elements() const{
     auto simd_type = this->get_casted_operand_type();
     return simd_type->get_size();
 }
-InstOperandTypeVarient VecFloatCmpBinaryInst::get_operand_type_varient() const{
-    return InstOperandTypeVarient::VecFloat;
+TypeVarient VecFloatCmpBinaryInst::get_operand_type_varient() const{
+    return TypeVarient::VecFloat;
 }
 
 

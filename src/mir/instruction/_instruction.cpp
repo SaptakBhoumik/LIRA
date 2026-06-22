@@ -58,32 +58,32 @@ IR::DebugInfoPtr Inst::get_debug_info() const{
 }
 
 
-bool is_vector_typevarient(const InstOperandTypeVarient var) {
-    return var == InstOperandTypeVarient::VecInt || var == InstOperandTypeVarient::VecFloat || var == InstOperandTypeVarient::VecPtr;
+bool is_vector_typevarient(const TypeVarient var) {
+    return var == TypeVarient::VecInt || var == TypeVarient::VecFloat || var == TypeVarient::VecPtr;
 }
-bool is_scalar_typevarient(const InstOperandTypeVarient var) {
-    return var == InstOperandTypeVarient::Int || var == InstOperandTypeVarient::Float || var == InstOperandTypeVarient::Ptr;
+bool is_scalar_typevarient(const TypeVarient var) {
+    return var == TypeVarient::Int || var == TypeVarient::Float || var == TypeVarient::Ptr;
 }
-bool is_ptr_typevarient(const InstOperandTypeVarient var) {
-    return var == InstOperandTypeVarient::Ptr || var == InstOperandTypeVarient::VecPtr;
+bool is_ptr_typevarient(const TypeVarient var) {
+    return var == TypeVarient::Ptr || var == TypeVarient::VecPtr;
 }
-bool is_float_typevarient(const InstOperandTypeVarient var) {
-    return var == InstOperandTypeVarient::Float || var == InstOperandTypeVarient::VecFloat;
+bool is_float_typevarient(const TypeVarient var) {
+    return var == TypeVarient::Float || var == TypeVarient::VecFloat;
 }
-bool is_int_typevarient(const InstOperandTypeVarient var) {
-    return var == InstOperandTypeVarient::Int || var == InstOperandTypeVarient::VecInt;
+bool is_int_typevarient(const TypeVarient var) {
+    return var == TypeVarient::Int || var == TypeVarient::VecInt;
 }
 
-inline std::optional<InstOperandTypeVarient> get_type_varient_from_type(const IR::TypeExprPtr type){
+inline std::optional<TypeVarient> get_type_varient_from_type(const IR::TypeExprPtr type){
     switch(type->get_kind()){
         case IR::TypeExprKind::IntTypeExpr:{
-            return InstOperandTypeVarient::Int;
+            return TypeVarient::Int;
         }
         case IR::TypeExprKind::FloatTypeExpr:{
-            return InstOperandTypeVarient::Float;
+            return TypeVarient::Float;
         }
         case IR::TypeExprKind::PtrTypeExpr:{
-            return InstOperandTypeVarient::Ptr;
+            return TypeVarient::Ptr;
         }
         case IR::TypeExprKind::SIMDTypeExpr:{
                 auto simd_type = std::dynamic_pointer_cast<IR::SIMDTypeExpr>(type);
@@ -91,13 +91,13 @@ inline std::optional<InstOperandTypeVarient> get_type_varient_from_type(const IR
                 auto element_type = simd_type->get_basetype();
                 switch(element_type->get_kind()){
                     case IR::TypeExprKind::IntTypeExpr:{
-                        return InstOperandTypeVarient::VecInt;
+                        return TypeVarient::VecInt;
                     }
                     case IR::TypeExprKind::FloatTypeExpr:{  
-                        return InstOperandTypeVarient::VecFloat;
+                        return TypeVarient::VecFloat;
                     }
                     case IR::TypeExprKind::PtrTypeExpr:{
-                        return InstOperandTypeVarient::VecPtr;
+                        return TypeVarient::VecPtr;
                     }
                     default:{
                         return std::nullopt;

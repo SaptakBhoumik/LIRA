@@ -9,10 +9,10 @@ namespace LIRA {
 namespace Utils {
 //Put it in a proper file later. Perhaps type_utils.hpp and error function in error_util.hpp. Or something like that
 bool type_eq(IR::TypeExprPtr t1, IR::TypeExprPtr t2);//Check if two types are equal. This is a recursive function that checks if the two types are equal
-bool type_ge(std::string filename, IR::TypeExprPtr t1, IR::TypeExprPtr t2);//Check if type t1 is greater than or equal to type t2. Expects 2 type of the same InstOperandTypeVarient(Else error)
+bool type_ge(std::string filename, IR::TypeExprPtr t1, IR::TypeExprPtr t2);//Check if type t1 is greater than or equal to type t2. Expects 2 type of the same TypeVarient(Else error)
                                                                            //Expects float or int or their vector(Otherwise error)
                                                                            //If scaler float/int then return if basetype size is greater or equal. 
-                                                                           //If vector then we expect the same number of elements(Error otherwise) and expects the base type to have same InstOperandTypeVarient(Else error)
+                                                                           //If vector then we expect the same number of elements(Error otherwise) and expects the base type to have same TypeVarient(Else error)
                                                                            //If same number of element we compare size of basetype
 bool type_compatible(VarSymTablePtr var_symtable, IR::TypeExprPtr type, IR::ExprPtr literal);//Check if a reduced type is compatible with a literal. This is used to check if a literal can be assigned to a variable of a certain type.
 [[noreturn]] void error(std::string filename, IR::Token tok, std::string msg,std::string submsg="",std::string ecode="");
@@ -54,17 +54,17 @@ class SemanticAnalyzer {
     // ## High-Half Multiply
 
     MIR::InstPtr analyze_bitwise_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
-    MIR::InstPtr analyze_and_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::InstOperandTypeVarient type_varient, 
+    MIR::InstPtr analyze_and_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVarient type_varient, 
                                       IR::InstructionStmtPtr inst_stmt);
-    MIR::InstPtr analyze_or_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::InstOperandTypeVarient type_varient, 
+    MIR::InstPtr analyze_or_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVarient type_varient, 
                                       IR::InstructionStmtPtr inst_stmt);
-    MIR::InstPtr analyze_xor_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::InstOperandTypeVarient type_varient, 
+    MIR::InstPtr analyze_xor_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVarient type_varient, 
                                       IR::InstructionStmtPtr inst_stmt);
-    MIR::InstPtr analyze_shl_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::InstOperandTypeVarient type_varient,
+    MIR::InstPtr analyze_shl_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVarient type_varient,
                                       IR::InstructionStmtPtr inst_stmt);
-    MIR::InstPtr analyze_lshr_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::InstOperandTypeVarient type_varient,
+    MIR::InstPtr analyze_lshr_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVarient type_varient,
                                       IR::InstructionStmtPtr inst_stmt);
-    MIR::InstPtr analyze_ashr_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::InstOperandTypeVarient type_varient,
+    MIR::InstPtr analyze_ashr_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVarient type_varient,
                                       IR::InstructionStmtPtr inst_stmt);
     // ## Bitwise Trinary Instructions
     MIR::InstPtr analyze_cmp_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);

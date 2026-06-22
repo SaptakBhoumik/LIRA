@@ -76,8 +76,8 @@ std::shared_ptr<IR::IntTypeExpr> IntFetchUnaryInst::get_casted_operand_type() co
 std::size_t IntFetchUnaryInst::get_bitwidth() const{
     return get_casted_operand_type()->get_bits();
 }
-InstOperandTypeVarient IntFetchUnaryInst::get_type_varient() const{
-    return InstOperandTypeVarient::Int;
+TypeVarient IntFetchUnaryInst::get_type_varient() const{
+    return TypeVarient::Int;
 }
 
 
@@ -267,8 +267,8 @@ std::size_t FloatFetchUnaryInst::get_bitwidth() const{
 bool FloatFetchUnaryInst::is_brain_float() const{
     return get_casted_operand_type()->is_brain_float();
 }
-InstOperandTypeVarient FloatFetchUnaryInst::get_type_varient() const{
-    return InstOperandTypeVarient::Float;
+TypeVarient FloatFetchUnaryInst::get_type_varient() const{
+    return TypeVarient::Float;
 }
 
 

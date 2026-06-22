@@ -49,8 +49,8 @@ std::shared_ptr<IR::IntTypeExpr> IntDivModInst::get_casted_operand_type() const{
 std::size_t IntDivModInst::get_bitwidth() const{
     return this->get_casted_operand_type()->get_bits();
 }
-InstOperandTypeVarient IntDivModInst::get_operand_type_varient() const{
-    return InstOperandTypeVarient::Int;
+TypeVarient IntDivModInst::get_operand_type_varient() const{
+    return TypeVarient::Int;
 }
 std::string IntDivModInst::to_string() const{
     return this->to_string_helper("int_divmod");
@@ -72,8 +72,8 @@ std::size_t VecIntDivModInst::get_operand_basetype_bitwidth() const{
 std::size_t VecIntDivModInst::get_vector_size() const{
     return this->get_casted_operand_type()->get_size();
 }
-InstOperandTypeVarient VecIntDivModInst::get_operand_type_varient() const{
-    return InstOperandTypeVarient::VecInt;
+TypeVarient VecIntDivModInst::get_operand_type_varient() const{
+    return TypeVarient::VecInt;
 }
 std::string VecIntDivModInst::to_string() const{
     return this->to_string_helper("vec_int_divmod");
@@ -92,8 +92,8 @@ std::size_t FloatDivModInst::get_bitwidth() const{
 bool FloatDivModInst::is_brain_float() const{
     return this->get_casted_operand_type()->is_brain_float();
 }
-InstOperandTypeVarient FloatDivModInst::get_operand_type_varient() const{
-    return InstOperandTypeVarient::Float;
+TypeVarient FloatDivModInst::get_operand_type_varient() const{
+    return TypeVarient::Float;
 }
 std::string FloatDivModInst::to_string() const{
     return this->to_string_helper("float_divmod");
@@ -112,8 +112,8 @@ std::shared_ptr<IR::FloatTypeExpr> VecFloatDivModInst::get_casted_operand_basety
 std::size_t VecFloatDivModInst::get_vector_size() const{
     return this->get_casted_operand_type()->get_size();
 }
-InstOperandTypeVarient VecFloatDivModInst::get_operand_type_varient() const{
-    return InstOperandTypeVarient::VecFloat;
+TypeVarient VecFloatDivModInst::get_operand_type_varient() const{
+    return TypeVarient::VecFloat;
 }
 std::string VecFloatDivModInst::to_string() const{
     return this->to_string_helper("vec_float_divmod");
@@ -175,8 +175,8 @@ std::shared_ptr<IR::IntTypeExpr> IntWideningDivModInst::get_casted_operand_type(
 std::size_t IntWideningDivModInst::get_bitwidth() const{
     return this->get_casted_operand_type()->get_bits();
 }
-InstOperandTypeVarient IntWideningDivModInst::get_operand_type_varient() const{
-    return InstOperandTypeVarient::Int;
+TypeVarient IntWideningDivModInst::get_operand_type_varient() const{
+    return TypeVarient::Int;
 }
 std::string IntWideningDivModInst::to_string() const{
     return this->to_string_helper("int_widening_divmod");
@@ -198,8 +198,8 @@ std::size_t VecIntWideningDivModInst::get_operand_basetype_bitwidth() const{
 std::size_t VecIntWideningDivModInst::get_vector_size() const{
     return this->get_casted_operand_type()->get_size();
 }
-InstOperandTypeVarient VecIntWideningDivModInst::get_operand_type_varient() const{
-    return InstOperandTypeVarient::VecInt;
+TypeVarient VecIntWideningDivModInst::get_operand_type_varient() const{
+    return TypeVarient::VecInt;
 }
 std::string VecIntWideningDivModInst::to_string() const{
     return this->to_string_helper("vec_int_widening_divmod");
@@ -245,8 +245,8 @@ std::shared_ptr<IR::IntTypeExpr> IntMulHiInst::get_casted_operand_type() const{
 std::size_t IntMulHiInst::get_bitwidth() const{
     return this->get_casted_operand_type()->get_bits();
 }
-InstOperandTypeVarient IntMulHiInst::get_operand_type_varient() const{
-    return InstOperandTypeVarient::Int;
+TypeVarient IntMulHiInst::get_operand_type_varient() const{
+    return TypeVarient::Int;
 }
 std::string IntMulHiInst::to_string() const{
     return this->to_string_helper("int_mulhi");
@@ -268,8 +268,8 @@ std::size_t VecIntMulHiInst::get_operand_basetype_bitwidth() const{
 std::size_t VecIntMulHiInst::get_vector_size() const{
     return this->get_casted_operand_type()->get_size();
 }
-InstOperandTypeVarient VecIntMulHiInst::get_operand_type_varient() const{
-    return InstOperandTypeVarient::VecInt;
+TypeVarient VecIntMulHiInst::get_operand_type_varient() const{
+    return TypeVarient::VecInt;
 }
 std::string VecIntMulHiInst::to_string() const{
     return this->to_string_helper("vec_int_mulhi");
@@ -341,8 +341,8 @@ std::shared_ptr<IR::IntTypeExpr> IntCTMulFixInst::get_casted_operand_type() cons
 std::size_t IntCTMulFixInst::get_bitwidth() const{
     return this->get_casted_operand_type()->get_bits();
 }
-InstOperandTypeVarient IntCTMulFixInst::get_operand_type_varient() const{
-    return InstOperandTypeVarient::Int;
+TypeVarient IntCTMulFixInst::get_operand_type_varient() const{
+    return TypeVarient::Int;
 }
 std::string IntCTMulFixInst::to_string() const{
     return this->to_string_helper("int_ct_mulfix");
@@ -364,8 +364,8 @@ std::size_t VecIntCTMulFixInst::get_operand_basetype_bitwidth() const{
 std::size_t VecIntCTMulFixInst::get_vector_size() const{
     return this->get_casted_operand_type()->get_size();
 }
-InstOperandTypeVarient VecIntCTMulFixInst::get_operand_type_varient() const{
-    return InstOperandTypeVarient::VecInt;
+TypeVarient VecIntCTMulFixInst::get_operand_type_varient() const{
+    return TypeVarient::VecInt;
 }
 std::string VecIntCTMulFixInst::to_string() const{
     return this->to_string_helper("vec_int_ct_mulfix");
@@ -436,8 +436,8 @@ std::shared_ptr<IR::IntTypeExpr> IntRTMulFixInst::get_casted_operand_type() cons
 std::size_t IntRTMulFixInst::get_bitwidth() const{
     return this->get_casted_operand_type()->get_bits();
 }
-InstOperandTypeVarient IntRTMulFixInst::get_operand_type_varient() const{
-    return InstOperandTypeVarient::Int;
+TypeVarient IntRTMulFixInst::get_operand_type_varient() const{
+    return TypeVarient::Int;
 }
 std::string IntRTMulFixInst::to_string() const{
     return this->to_string_helper("int_rt_mulfix");
@@ -459,8 +459,8 @@ std::size_t VecIntRTMulFixInst::get_operand_basetype_bitwidth() const{
 std::size_t VecIntRTMulFixInst::get_vector_size() const{
     return this->get_casted_operand_type()->get_size();
 }
-InstOperandTypeVarient VecIntRTMulFixInst::get_operand_type_varient() const{
-    return InstOperandTypeVarient::VecInt;
+TypeVarient VecIntRTMulFixInst::get_operand_type_varient() const{
+    return TypeVarient::VecInt;
 }
 std::string VecIntRTMulFixInst::to_string() const{
     return this->to_string_helper("vec_int_rt_mulfix");

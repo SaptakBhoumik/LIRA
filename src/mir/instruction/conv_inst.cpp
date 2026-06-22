@@ -35,10 +35,10 @@ std::string ConvInst::to_string_helper(std::string op_name) const{
     }
     return res;
 }
-std::optional<InstOperandTypeVarient> ConvInst::get_in_type_varient() const{
+std::optional<TypeVarient> ConvInst::get_in_type_varient() const{
     return get_type_varient_from_type(this->in_type);
 }
-std::optional<InstOperandTypeVarient> ConvInst::get_out_type_varient() const{
+std::optional<TypeVarient> ConvInst::get_out_type_varient() const{
     return get_type_varient_from_type(this->destination->get_type());
 }
 IR::TypeExprPtr ConvInst::get_in_type() const{

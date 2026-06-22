@@ -39,7 +39,7 @@ class FetchUnaryInst:public Inst {
     FetchUnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
                   std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info, std::optional<FastMathAttr> fast_math_attr);
 
-    virtual InstOperandTypeVarient get_type_varient() const = 0;
+    virtual TypeVarient get_type_varient() const = 0;
     virtual IR::TypeExprPtr get_type() const final;
     virtual IR::LiteralExprPtr get_value() const final;
 
@@ -70,7 +70,7 @@ class IntFetchUnaryInst:public FetchUnaryInst{
     virtual std::shared_ptr<IR::IntTypeExpr> get_casted_operand_type() const final;
     virtual std::size_t get_bitwidth() const final;
     
-    virtual InstOperandTypeVarient get_type_varient() const override final;
+    virtual TypeVarient get_type_varient() const override final;
 };
 
 class IntFetchNegInst:public IntFetchUnaryInst {
@@ -207,7 +207,7 @@ class FloatFetchUnaryInst:public FetchUnaryInst{
     virtual std::size_t get_bitwidth() const final;
     virtual bool is_brain_float() const final;
     
-    virtual InstOperandTypeVarient get_type_varient() const override final;
+    virtual TypeVarient get_type_varient() const override final;
 };
 
 class FloatFetchNegInst:public FloatFetchUnaryInst {

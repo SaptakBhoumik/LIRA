@@ -20,7 +20,7 @@ class ArithmeticTrinaryInst:public Inst {
     ArithmeticTrinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                           IR::LiteralExprPtr arg3, std::optional<FastMathAttr> fast_math_attr);
 
-    virtual InstOperandTypeVarient get_operand_type_varient() const = 0;
+    virtual TypeVarient get_operand_type_varient() const = 0;
     virtual IR::TypeExprPtr get_operand_type() const final;
     virtual IR::LiteralExprPtr get_arg1() const final;
     virtual IR::LiteralExprPtr get_arg2() const final;
@@ -52,7 +52,7 @@ class IntArithmeticTrinaryInst:public ArithmeticTrinaryInst {
     virtual std::shared_ptr<IR::IntTypeExpr> get_casted_operand_type() const final;//Returns the operand type casted to IntTypeExpr. Just a helper function to make life easier
     virtual std::size_t get_bitwidth() const final;//Returns the bit width of the operand type. Just a helper function to make life easier
     
-    virtual InstOperandTypeVarient get_operand_type_varient() const override final;
+    virtual TypeVarient get_operand_type_varient() const override final;
 };
 
 class IntFMAInst:public IntArithmeticTrinaryInst {
@@ -124,7 +124,7 @@ class VecIntArithmeticTrinaryInst:public ArithmeticTrinaryInst {
     virtual std::size_t get_basetype_bitwidth() const final;//Returns the bit width of the operand basetype. Just a helper function to make life easier
     virtual std::size_t get_num_elements() const final;//Returns the number of elements in the vector. Just a helper function to make life easier
 
-    virtual InstOperandTypeVarient get_operand_type_varient() const override final;
+    virtual TypeVarient get_operand_type_varient() const override final;
 };
 
 class VecIntFMAInst:public VecIntArithmeticTrinaryInst {
@@ -189,7 +189,7 @@ class FloatArithmeticTrinaryInst:public ArithmeticTrinaryInst {
     virtual std::size_t get_bitwidth() const final;//Returns the bit width of the operand type. Just a helper function to make life easier
     virtual bool is_brain_float() const final;
 
-    virtual InstOperandTypeVarient get_operand_type_varient() const override final;
+    virtual TypeVarient get_operand_type_varient() const override final;
 };
 
 class FloatFMAInst:public FloatArithmeticTrinaryInst {
@@ -254,7 +254,7 @@ class VecFloatArithmeticTrinaryInst:public ArithmeticTrinaryInst {
     virtual std::shared_ptr<IR::FloatTypeExpr> get_basetype() const final;//We dont return width of base type because it can be f16,bf16 and so on. Width alone not enough
     virtual std::size_t get_num_elements() const final;//Returns the number of elements in the vector. Just a helper function to make life easier
     
-    virtual InstOperandTypeVarient get_operand_type_varient() const override final;
+    virtual TypeVarient get_operand_type_varient() const override final;
 };
 
 class VecFloatFMAInst:public VecFloatArithmeticTrinaryInst {

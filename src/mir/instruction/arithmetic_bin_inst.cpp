@@ -81,8 +81,8 @@ std::size_t IntArithmeticBinaryInst::get_bitwidth() const{
     auto int_type = this->get_casted_operand_type();
     return int_type->get_bits();
 }
-InstOperandTypeVarient IntArithmeticBinaryInst::get_operand_type_varient() const{
-    return InstOperandTypeVarient::Int;
+TypeVarient IntArithmeticBinaryInst::get_operand_type_varient() const{
+    return TypeVarient::Int;
 }
 
 
@@ -244,8 +244,8 @@ std::size_t VecIntArithmeticBinaryInst::get_basetype_bitwidth() const{
 std::size_t VecIntArithmeticBinaryInst::get_num_elements() const{
     return this->get_casted_operand_type()->get_size();
 }   
-InstOperandTypeVarient VecIntArithmeticBinaryInst::get_operand_type_varient() const{
-    return InstOperandTypeVarient::VecInt;
+TypeVarient VecIntArithmeticBinaryInst::get_operand_type_varient() const{
+    return TypeVarient::VecInt;
 }
 
 
@@ -384,8 +384,8 @@ bool FloatArithmeticBinaryInst::is_brain_float() const{
     auto float_type = this->get_casted_operand_type();
     return float_type->is_brain_float();
 }
-InstOperandTypeVarient FloatArithmeticBinaryInst::get_operand_type_varient() const{
-    return InstOperandTypeVarient::Float;
+TypeVarient FloatArithmeticBinaryInst::get_operand_type_varient() const{
+    return TypeVarient::Float;
 }
 
 
@@ -522,8 +522,8 @@ std::shared_ptr<IR::FloatTypeExpr> VecFloatArithmeticBinaryInst::get_basetype() 
 std::size_t VecFloatArithmeticBinaryInst::get_num_elements() const{
     return this->get_casted_operand_type()->get_size();
 }
-InstOperandTypeVarient VecFloatArithmeticBinaryInst::get_operand_type_varient() const{
-    return InstOperandTypeVarient::VecFloat;
+TypeVarient VecFloatArithmeticBinaryInst::get_operand_type_varient() const{
+    return TypeVarient::VecFloat;
 }
 
 

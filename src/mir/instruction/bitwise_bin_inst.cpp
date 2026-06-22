@@ -65,8 +65,8 @@ std::shared_ptr<IR::IntTypeExpr> IntBitwiseBinaryInst::get_casted_operand_type()
 std::size_t IntBitwiseBinaryInst::get_bitwidth() const{
     return this->get_casted_operand_type()->get_bits();
 }
-InstOperandTypeVarient IntBitwiseBinaryInst::get_type_varient() const{
-    return InstOperandTypeVarient::Int;
+TypeVarient IntBitwiseBinaryInst::get_type_varient() const{
+    return TypeVarient::Int;
 }
 
 
@@ -216,8 +216,8 @@ std::size_t VecIntBitwiseBinaryInst::get_num_elements() const{
     auto simd_type = this->get_casted_operand_type();
     return simd_type->get_size();
 }
-InstOperandTypeVarient VecIntBitwiseBinaryInst::get_type_varient() const{
-    return InstOperandTypeVarient::VecInt;
+TypeVarient VecIntBitwiseBinaryInst::get_type_varient() const{
+    return TypeVarient::VecInt;
 }
 
 

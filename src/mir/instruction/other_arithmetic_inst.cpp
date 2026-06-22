@@ -278,7 +278,7 @@ std::string VecIntMulHiInst::to_string() const{
 
 // ---------------------------- Fixed-Point Arithmetic instructions ---------------------------
 CTMulFixInst::CTMulFixInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                           std::size_t scale, bool nuw, bool nsw, bool unsigned_, bool saturating, bool round)
+                           std::uint64_t scale, bool nuw, bool nsw, bool unsigned_, bool saturating, bool round)
                            :Inst(instruction_stmt, destination,std::nullopt){
     this->lhs = lhs;
     this->rhs = rhs;
@@ -294,7 +294,7 @@ std::string CTMulFixInst::to_string_helper(const std::string op_name) const{
     std::string type_str = this->get_operand_type()->to_string();
     std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(" + type_str + ":" + this->lhs->to_string() + ", " 
                                                                                                     + type_str + ":" + this->rhs->to_string() + ", "
-                                                                                                    + "i32:" + std::to_string(this->scale) + ")";
+                                                                                                    + "i64:" + std::to_string(this->scale) + ")";
     if(this->nuw){
         res += " #[nuw]";
     }
@@ -324,7 +324,7 @@ IR::LiteralExprPtr CTMulFixInst::get_lhs() const{
 IR::LiteralExprPtr CTMulFixInst::get_rhs() const{
     return this->rhs;
 }
-std::size_t CTMulFixInst::get_scale() const{
+std::uint64_t CTMulFixInst::get_scale() const{
     return this->scale;
 }
 InstType CTMulFixInst::get_inst_type() const{
@@ -333,7 +333,7 @@ InstType CTMulFixInst::get_inst_type() const{
 
 
 IntCTMulFixInst::IntCTMulFixInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                                 std::size_t scale, bool nuw, bool nsw, bool unsigned_, bool saturating, bool round)
+                                 std::uint64_t scale, bool nuw, bool nsw, bool unsigned_, bool saturating, bool round)
                                  :CTMulFixInst(instruction_stmt, destination, lhs, rhs, scale, nuw, nsw, unsigned_, saturating, round){}
 std::shared_ptr<IR::IntTypeExpr> IntCTMulFixInst::get_casted_operand_type() const{
     return std::dynamic_pointer_cast<IR::IntTypeExpr>(this->get_operand_type());
@@ -350,7 +350,7 @@ std::string IntCTMulFixInst::to_string() const{
 
 
 VecIntCTMulFixInst::VecIntCTMulFixInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                                       std::size_t scale, bool nuw, bool nsw, bool unsigned_, bool saturating, bool round)
+                                       std::uint64_t scale, bool nuw, bool nsw, bool unsigned_, bool saturating, bool round)
                                        :CTMulFixInst(instruction_stmt, destination, lhs, rhs, scale, nuw, nsw, unsigned_, saturating, round){}
 std::shared_ptr<IR::SIMDTypeExpr> VecIntCTMulFixInst::get_casted_operand_type() const{
     return std::dynamic_pointer_cast<IR::SIMDTypeExpr>(this->get_operand_type());
@@ -389,7 +389,7 @@ std::string RTMulFixInst::to_string_helper(const std::string op_name) const{
     std::string type_str = this->get_operand_type()->to_string();
     std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(" + type_str + ":" + this->lhs->to_string() + ", " 
                                                                                                     + type_str + ":" + this->rhs->to_string() + ", "
-                                                                                                    + "i32:" + this->scale->to_string() + ")";
+                                                                                                    + "i64:" + this->scale->to_string() + ")";
     if(this->nuw){
         res += " #[nuw]";
     }

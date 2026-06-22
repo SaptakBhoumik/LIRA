@@ -162,9 +162,9 @@
 
 ### Fixed-Point Arithmetic Instructions
     
-- `let T:%out = .mulfix(T:%a, T:%b, i32:%scale)` - Fixed-point multiply. Multiplies `a` and `b` as if they were fixed-point values with `scale` fractional bits, returning the correctly rounded result in the same type. Concretely: computes `(a * b) >> scale` with the intermediate product computed at double width to avoid overflow. Scale must be a compile-time/run-time constant.
+- `let T:%out = .mulfix(T:%a, T:%b, i64:%scale)` - Fixed-point multiply. Multiplies `a` and `b` as if they were fixed-point values with `scale` fractional bits, returning the correctly rounded result in the same type. Concretely: computes `(a * b) >> scale` with the intermediate product computed at double width to avoid overflow. Scale must be a compile-time/run-time constant.
 
-    T must be of the form `T0` or `<T0,M>` where T0 is an integer type. `i32:%scale` must be a compile-time/run-time; must satisfy `0 <= scale <= bitwidth(T0)`.
+    T must be of the form `T0` or `<T0,M>` where T0 is an integer type. `i64:%scale` must be a compile-time/run-time; must satisfy `0 <= scale <= bitwidth(T0)`.
 
     - `#[unsigned]` - treat `a` and `b` as unsigned fixed-point values; default is signed
     - `#[saturating]` - if the shifted result does not fit in T, clamp to the type range instead of producing poison; pair with `#[unsigned]` for unsigned saturation; default is signed saturation when this flag is set
@@ -674,7 +674,7 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
     - `#[align(i64:N)]` - alignment of `dest`; must be a power of 2; default is 16
     - `#[dereferenceable(i64:N)]` - asserts `dest` is dereferenceable for N bytes
 
-- `let i32:%output_var = .memcmp(ptr:%ptr1, ptr:%ptr2, i64:%size)` - Compares `size` bytes at `ptr1` and `ptr2`. Returns a negative, zero, or positive integer if the region at `ptr1` is respectively less than, equal to, or greater than the region at `ptr2`. The index `0` refers to `ptr1` and `1` refers to `ptr2` in per-pointer attributes.
+- `let i32:%output_var = .memcmp(ptr:%ptr1, ptr:%ptr2, i64:%size)` - Compares `size` bytes at `ptr1` and `ptr2`. Returns a negative, zero, or positive integer if the region at `ptr1` is respectively less than, equal to, or greater than the region at `ptr2`. The index `0` refers to `ptr1` and `1` refers to `ptr2` in per-pointer attributes. We return i32 and not i8 because linux x86_64 memcmp returns int and not char. More of a compatibility thing
 
     - `#[volatile]` - volatile compare
     - `#[nontemporal(i64:idx...)]` - non-temporal access for the specified pointer(s); at least one index required
@@ -1076,12 +1076,54 @@ A terminator must be the final instruction of every block. Falling through to th
 
 ## SIMD Instructions
 
-- `let <T,M>:%output_var = .shufflevector(<T,N2>:%input1, <T,N3>:%input2, <i16,M>:%mask)` - Shuffles elements of two vectors according to a mask(Run time or compile time).
+- `let <T,M>:%output_var = .shufflevector(<T,N2>:%input1, <T,N3>:%input2, <i64,M>:%mask)` - Shuffles elements of two vectors according to a mask(Run time or compile time). T can be float/int/ptr
 
     If T is float:
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 - `let <i1,N>:%output_var = .ternlog(<i1,N>:%a, <i1,N>:%b, <i1,N>:%c, i8:imm)` - Trinary logic operation on the bitwise representation of `a`, `b`, and `c`. For each bit position, the result is determined by the corresponding bit in `imm` (0-255). For example, if `imm` is 0b11110000, the result bit will be `a` for input 000, `b` for 001, `c` for 010, `a&b` for 011, `a&c` for 100, `b&c` for 101, `a|b|c` for 110, and `0` for 111. No attributes.
+
+- `let <T,N>:%output_var = .splat(T:%input_scalar)` - Broadcasts a scalar into every lane of a vector. T can be integer, float, or ptr.
+
+    If T is float/bfloat: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+
+- `let <T,N>:%output_var = .step_vector(T:%start, T:%step)` - Creates a vector `[start, start+step, start+2*step, ...]`. T can be integer or float. 
+
+    If T is float:
+    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+
+- `let <T,N>:%out = .insert_subvector(<T,N>:%vec, <T,M>:%sub, i64:%index)` - Inserts a shorter vector into a lane-aligned position within a longer vector, returning the updated longer vector. The other lanes are unchanged. 
+
+    - `<T,N>:%vec` - the destination vector; T can be any integer, float, or bfloat; N is the total lane count
+    - `<T,M>:%sub` - the subvector to insert; same element type T; M < N; M must divide N
+    - `i64:%index` - the starting lane index in `vec` where insertion begins; must be a compile-time/run-time integer; must satisfy `index + M <= N`; If at compiletime multiple of M then we can optimize it better
+
+    Output type: `<T,N>` - same type as `vec`
+
+    If T is float:
+    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+
+- `let <T,M>:%out = .extract_subvector(<T,N>:%vec, i64:%index)` - Extracts a contiguous slice of lanes from a vector into a shorter vector. 
+
+    - `<T,N>:%vec` - the source vector; T can be any integer, float, or bfloat
+    - `i64:%index` - the starting lane index; must be a compile-time/run-time integer; must satisfy `index + M <= N`. If at compiletime multiple of M then we can optimize it better
+
+    Output type: `<T,M>` - the element type is the same T; M is determined by the declared output type; M < N; M must divide N
+
+    If T is float:
+    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+
+- `let <i1,N>:%mask = .active_lane_mask(T:%base, T:%count)` - Generates a boolean vector mask where lane `i` is true if and only if `base + i < count`. Used to safely handle loop tail iterations in vectorized loops without out-of-bounds memory access - the mask is passed directly to `.masked_load` / `.masked_store`. 
+
+    - `T:%base` - the starting index for this iteration; T must be an integer type 
+    - `T:%count` - the total element count (exclusive upper bound); must be the same type as `base`
+
+    Output type: `<i1,N>` - N is determined by the declared output type; reflects the target vector width.
+
+    Attributes:
+    - `#[unsigned]` - comparison `base + i < count` is unsigned; this is almost always what you want since indices are non-negative; default is signed
+
+### Reduce SIMD Instructions
 
 - `let T0:%output_var = .reduce_add(<T0,N>:%input_vector [, <i1,N>:%mask])`  
   Sums all elements of the vector where the mask is true (or all elements if no mask); result is scalar.
@@ -1142,46 +1184,6 @@ A terminator must be the final instruction of every block. Falling through to th
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 Note: `.reduce_sub`, `.reduce_nand`, `.reduce_nor`, `.reduce_div`, `.reduce_rem` are intentionally absent - these operations are neither associative nor commutative (or both), so a well-defined reduction order cannot be assumed.
-
-- `let <T,N>:%output_var = .splat(T:%input_scalar)` - Broadcasts a scalar into every lane of a vector. T can be integer, float, or ptr.
-
-    If T is float/bfloat: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
-
-- `let <T,N>:%output_var = .step_vector(T:%start, T:%step)` - Creates a vector `[start, start+step, start+2*step, ...]`. T can be integer or float. 
-
-    If T is float:
-    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
-
-- `let <T,N>:%out = .insert_subvector(<T,N>:%vec, <T,M>:%sub, i64:%index)` - Inserts a shorter vector into a lane-aligned position within a longer vector, returning the updated longer vector. The other lanes are unchanged. 
-
-    - `<T,N>:%vec` - the destination vector; T can be any integer, float, or bfloat; N is the total lane count
-    - `<T,M>:%sub` - the subvector to insert; same element type T; M < N; M must divide N
-    - `i64:%index` - the starting lane index in `vec` where insertion begins; must be a compile-time/run-time integer; must be a multiple of M (i.e. aligned to subvector boundaries); must satisfy `index + M <= N`
-
-    Output type: `<T,N>` - same type as `vec`
-
-    If T is float:
-    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
-
-- `let <T,M>:%out = .extract_subvector(<T,N>:%vec, i64:%index)` - Extracts a contiguous slice of lanes from a vector into a shorter vector. 
-
-    - `<T,N>:%vec` - the source vector; T can be any integer, float, or bfloat
-    - `i64:%index` - the starting lane index; must be a compile-time/run-time integer; must be a multiple of M; must satisfy `index + M <= N`
-
-    Output type: `<T,M>` - the element type is the same T; M is determined by the declared output type; M < N; M must divide N
-
-    If T is float:
-    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
-
-- `let <i1,N>:%mask = .active_lane_mask(T:%base, T:%count)` - Generates a boolean vector mask where lane `i` is true if and only if `base + i < count`. Used to safely handle loop tail iterations in vectorized loops without out-of-bounds memory access - the mask is passed directly to `.masked_load` / `.masked_store`. 
-
-    - `T:%base` - the starting index for this iteration; T must be an integer type (`i32` or `i64`; `i64` recommended to avoid truncation issues on large arrays)
-    - `T:%count` - the total element count (exclusive upper bound); must be the same type as `base`
-
-    Output type: `<i1,N>` - N is determined by the declared output type; reflects the target vector width.
-
-    Attributes:
-    - `#[unsigned]` - comparison `base + i < count` is unsigned; this is almost always what you want since indices are non-negative; default is signed
 
 ### Horizontal SIMD Instructions
 

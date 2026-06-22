@@ -6,6 +6,7 @@ NOTE:-Implement Call Inst at the end of everything
     ### Lifetime and Invariant Scope Instructions
 ## Call Instruction
 ## SIMD Instructions
+    ### Reduce SIMD Instructions
     ### Horizontal SIMD Instructions
     ### Dot Product Instruction
     ### Absolute Difference Instructions
@@ -40,6 +41,7 @@ NOTE:-Implement Call Inst at the end of everything
 ## Terminator Instructions
 ## Call Instruction
 ## SIMD Instructions
+    ### Reduce SIMD Instructions
     ### Horizontal SIMD Instructions
     ### Dot Product Instruction
     ### Absolute Difference Instructions
@@ -94,6 +96,7 @@ NOTE:-Implement Call Inst at the end of everything
 ## Terminator Instructions
 ## Call Instruction
 ## SIMD Instructions
+    ### Reduce SIMD Instructions
     ### Horizontal SIMD Instructions
     ### Dot Product Instruction
     ### Absolute Difference Instructions

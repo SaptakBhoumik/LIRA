@@ -185,7 +185,7 @@ class CTMulFixInst:public Inst {
     protected:
     IR::LiteralExprPtr lhs;
     IR::LiteralExprPtr rhs;
-    std::size_t scale;
+    std::uint64_t scale;
 
     bool nuw;
     bool nsw;
@@ -196,7 +196,7 @@ class CTMulFixInst:public Inst {
     virtual std::string to_string_helper(const std::string op_name) const final;
     public:
     CTMulFixInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                 std::size_t scale, bool nuw, bool nsw, bool unsigned_, bool saturating, bool round);
+                 std::uint64_t scale, bool nuw, bool nsw, bool unsigned_, bool saturating, bool round);
 
     virtual bool is_nuw() const final;
     virtual bool is_nsw() const final;
@@ -208,14 +208,14 @@ class CTMulFixInst:public Inst {
     virtual IR::TypeExprPtr get_operand_type() const final;
     virtual IR::LiteralExprPtr get_lhs() const final;
     virtual IR::LiteralExprPtr get_rhs() const final;
-    virtual std::size_t get_scale() const final;
+    virtual std::uint64_t get_scale() const final;
     virtual InstType get_inst_type() const override final;
 };
 
 class IntCTMulFixInst:public CTMulFixInst {
     public:
     IntCTMulFixInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                    std::size_t scale, bool unsigned_, bool saturating, bool nsw, bool nuw, bool round);
+                    std::uint64_t scale, bool unsigned_, bool saturating, bool nsw, bool nuw, bool round);
 
     std::shared_ptr<IR::IntTypeExpr> get_casted_operand_type() const;
     std::size_t get_bitwidth() const;
@@ -227,7 +227,7 @@ class IntCTMulFixInst:public CTMulFixInst {
 class VecIntCTMulFixInst:public CTMulFixInst {
     public:
     VecIntCTMulFixInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                        std::size_t scale, bool unsigned_, bool saturating, bool nsw, bool nuw, bool round);
+                        std::uint64_t scale, bool unsigned_, bool saturating, bool nsw, bool nuw, bool round);
 
     std::shared_ptr<IR::SIMDTypeExpr> get_casted_operand_type() const;
     std::shared_ptr<IR::IntTypeExpr> get_casted_operand_basetype() const;

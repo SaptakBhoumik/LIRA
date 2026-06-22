@@ -180,67 +180,7 @@ class VecIntMulHiInst:public MulHiInst {
 
 
 // ---------------------------- Fixed-Point Arithmetic instructions ---------------------------
-class CTMulFixInst:public Inst {
-    //THe compile time scale version
-    protected:
-    IR::LiteralExprPtr lhs;
-    IR::LiteralExprPtr rhs;
-    std::uint64_t scale;
-
-    bool nuw;
-    bool nsw;
-    bool unsigned_; 
-    bool saturating;
-    bool round;
-
-    virtual std::string to_string_helper(const std::string op_name) const final;
-    public:
-    CTMulFixInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                 std::uint64_t scale, bool nuw, bool nsw, bool unsigned_, bool saturating, bool round);
-
-    virtual bool is_nuw() const final;
-    virtual bool is_nsw() const final;
-    virtual bool is_unsigned() const final;
-    virtual bool is_saturating() const final;
-    virtual bool is_round() const final;
-    
-    virtual TypeVarient get_operand_type_varient() const = 0;
-    virtual IR::TypeExprPtr get_operand_type() const final;
-    virtual IR::LiteralExprPtr get_lhs() const final;
-    virtual IR::LiteralExprPtr get_rhs() const final;
-    virtual std::uint64_t get_scale() const final;
-    virtual InstType get_inst_type() const override final;
-};
-
-class IntCTMulFixInst:public CTMulFixInst {
-    public:
-    IntCTMulFixInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                    std::uint64_t scale, bool unsigned_, bool saturating, bool nsw, bool nuw, bool round);
-
-    std::shared_ptr<IR::IntTypeExpr> get_casted_operand_type() const;
-    std::size_t get_bitwidth() const;
-    TypeVarient get_operand_type_varient() const override;
-
-    std::string to_string() const override;
-};
-
-class VecIntCTMulFixInst:public CTMulFixInst {
-    public:
-    VecIntCTMulFixInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                        std::uint64_t scale, bool unsigned_, bool saturating, bool nsw, bool nuw, bool round);
-
-    std::shared_ptr<IR::SIMDTypeExpr> get_casted_operand_type() const;
-    std::shared_ptr<IR::IntTypeExpr> get_casted_operand_basetype() const;
-    std::size_t get_operand_basetype_bitwidth() const;
-    std::size_t get_vector_size() const;
-    TypeVarient get_operand_type_varient() const override;
-
-    std::string to_string() const override;
-};
-
-
-class RTMulFixInst:public Inst {
-    //THe run time scale version
+class MulFixInst:public Inst {
     protected:
     IR::LiteralExprPtr lhs;
     IR::LiteralExprPtr rhs;
@@ -254,8 +194,8 @@ class RTMulFixInst:public Inst {
 
     virtual std::string to_string_helper(const std::string op_name) const final;
     public:
-    RTMulFixInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                 IR::LiteralExprPtr scale, bool nuw, bool nsw, bool unsigned_, bool saturating, bool round);
+    MulFixInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+               IR::LiteralExprPtr scale, bool nuw, bool nsw, bool unsigned_, bool saturating, bool round);
 
     virtual bool is_nuw() const final;
     virtual bool is_nsw() const final;
@@ -271,9 +211,9 @@ class RTMulFixInst:public Inst {
     virtual InstType get_inst_type() const override final;
 };
 
-class IntRTMulFixInst:public RTMulFixInst {
+class IntMulFixInst:public MulFixInst {
     public:
-    IntRTMulFixInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    IntMulFixInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                     IR::LiteralExprPtr scale, bool unsigned_, bool saturating, bool nsw, bool nuw, bool round);
 
     std::shared_ptr<IR::IntTypeExpr> get_casted_operand_type() const;
@@ -283,9 +223,9 @@ class IntRTMulFixInst:public RTMulFixInst {
     std::string to_string() const override;
 };
 
-class VecIntRTMulFixInst:public RTMulFixInst {
+class VecIntMulFixInst:public MulFixInst {
     public:
-    VecIntRTMulFixInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    VecIntMulFixInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                         IR::LiteralExprPtr scale, bool unsigned_, bool saturating, bool nsw, bool nuw, bool round);
 
     std::shared_ptr<IR::SIMDTypeExpr> get_casted_operand_type() const;

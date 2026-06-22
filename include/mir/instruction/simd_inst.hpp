@@ -4,7 +4,7 @@
 #include <cstddef>
 namespace LIRA {
 namespace MIR {
-//--------------------------------- Uncategorized SIMD Identification ---------------------------------
+//--------------------------------- Uncategorized SIMD Instructions ---------------------------------
 class CTShuffleVectorInst:public Inst {
     protected:
     //Compile time varient
@@ -382,6 +382,315 @@ class ActiveLaneMaskInst:public Inst {
 
     InstType get_inst_type() const override;
     std::string to_string() const override;
+};
+
+//--------------------------------- Reduce SIMD Instructions ---------------------------------
+//----------------------- Reduce Arithmetic SIMD Instructions -----------------------
+class ReduceArithmeticSIMDInst:public Inst {
+    protected:
+    IR::LiteralExprPtr vector;
+    IR::LiteralExprPtr mask;//Optional. May be nullptr if not used
+    std::size_t vector_size;
+
+    public:
+    enum class OpType:std::uint64_t{
+        REDUCE_ADD = 1 << 6,
+        REDUCE_MUL = 1 << 7,
+        REDUCE_AVG = 1 << 8,
+        REDUCE_MIN = 1 << 9,
+        REDUCE_MAX = 1 << 10,
+    };
+    ReduceArithmeticSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+                             IR::LiteralExprPtr mask, std::size_t vector_size, std::optional<FastMathAttr> fast_math_attr);
+    
+    virtual IR::LiteralExprPtr get_vector() const final;
+    virtual IR::LiteralExprPtr get_mask() const final;
+    virtual std::size_t get_vector_size() const final;
+    virtual IR::TypeExprPtr get_element_type() const final;//From destination
+
+    virtual TypeVarient get_element_type_varient() const = 0;
+    virtual OpType get_op_type() const = 0;
+    virtual InstType get_inst_type() const override final;
+};
+
+//--------------------------------- Int Reduce Arithmetic SIMD Instructions ---------------------------------
+class IntReduceArithmeticSIMDInst:public ReduceArithmeticSIMDInst {
+    protected:
+    bool nuw;
+    bool nsw;
+    bool unsigned_;
+    bool saturating;
+    bool floor;
+
+    virtual std::string to_string_helper(const std::string op_name) const final;
+    public:
+    IntReduceArithmeticSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+                                IR::LiteralExprPtr mask, std::size_t vector_size, bool nuw, bool nsw, bool unsigned_, bool saturating, bool floor);
+    
+    virtual std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const final;
+    virtual std::size_t get_element_bitwidth() const final;
+
+    virtual bool is_nuw() const final;
+    virtual bool is_nsw() const final;
+    virtual bool is_unsigned() const final;
+    virtual bool is_saturating() const final;
+    virtual bool is_floor() const final;
+
+    virtual TypeVarient get_element_type_varient() const override final;
+};
+
+class IntReduceAddInst:public IntReduceArithmeticSIMDInst {
+    public:
+    IntReduceAddInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+                      IR::LiteralExprPtr mask, std::size_t vector_size, bool nuw, bool nsw, bool unsigned_, bool saturating);
+    
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
+class IntReduceMulInst:public IntReduceArithmeticSIMDInst {
+    public:
+    IntReduceMulInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+                      IR::LiteralExprPtr mask, std::size_t vector_size, bool nuw, bool nsw, bool unsigned_, bool saturating);
+    
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
+class IntReduceAvgInst:public IntReduceArithmeticSIMDInst {
+    public:
+    IntReduceAvgInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+                     IR::LiteralExprPtr mask, std::size_t vector_size, bool nuw, bool nsw, bool unsigned_, bool floor);
+    
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
+class IntReduceMinInst:public IntReduceArithmeticSIMDInst {
+    public:
+    IntReduceMinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+                     IR::LiteralExprPtr mask, std::size_t vector_size, bool unsigned_);
+    
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
+class IntReduceMaxInst:public IntReduceArithmeticSIMDInst {
+    public:
+    IntReduceMaxInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+                     IR::LiteralExprPtr mask, std::size_t vector_size, bool unsigned_);
+    
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
+//--------------------------------- Float Reduce Arithmetic SIMD Instructions ---------------------------------
+class FloatReduceArithmeticSIMDInst:public ReduceArithmeticSIMDInst {
+    protected:
+    bool ieee754_2019;
+    bool unordered;
+
+    virtual std::string to_string_helper(const std::string op_name) const final;
+    public:
+    FloatReduceArithmeticSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+                                  IR::LiteralExprPtr mask, std::size_t vector_size, FastMathAttr fast_math_attr, bool ieee754_2019, bool unordered);
+    
+    virtual std::shared_ptr<IR::FloatTypeExpr> get_casted_element_type() const final;
+    virtual std::size_t get_element_bitwidth() const final;
+    virtual bool is_brain_float_type() const final;
+
+    virtual bool is_ieee754_2019() const final;
+    virtual bool is_unordered() const final;
+
+    virtual TypeVarient get_element_type_varient() const override final;
+};
+
+class FloatReduceAddInst:public FloatReduceArithmeticSIMDInst {
+    public:
+    FloatReduceAddInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+                       IR::LiteralExprPtr mask, std::size_t vector_size, FastMathAttr fast_math_attr);
+    
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
+class FloatReduceMulInst:public FloatReduceArithmeticSIMDInst {
+    public:
+    FloatReduceMulInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+                       IR::LiteralExprPtr mask, std::size_t vector_size, FastMathAttr fast_math_attr);
+    
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
+class FloatReduceAvgInst:public FloatReduceArithmeticSIMDInst {
+    public:
+    FloatReduceAvgInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+                       IR::LiteralExprPtr mask, std::size_t vector_size, FastMathAttr fast_math_attr);
+    
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
+class FloatReduceMinInst:public FloatReduceArithmeticSIMDInst {
+    public:
+    FloatReduceMinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+                       IR::LiteralExprPtr mask, std::size_t vector_size, FastMathAttr fast_math_attr, bool ieee754_2019, bool unordered);
+    
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
+class FloatReduceMaxInst:public FloatReduceArithmeticSIMDInst {
+    public:
+    FloatReduceMaxInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+                       IR::LiteralExprPtr mask, std::size_t vector_size, FastMathAttr fast_math_attr, bool ieee754_2019, bool unordered);
+    
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
+    
+//--------------------------------- Int Reduce Bitwise SIMD Instructions ---------------------------------
+class IntReduceBitwiseSIMDInst:public Inst {
+    protected:
+    IR::LiteralExprPtr vector;
+    IR::LiteralExprPtr mask;//Optional. May be nullptr if not used
+    std::size_t vector_size;
+    bool disjoint;
+
+    virtual std::string to_string_helper(const std::string op_name) const final;
+    public:
+    enum class OpType:std::uint64_t{
+        REDUCE_AND = 1 << 6,
+        REDUCE_OR = 1 << 7,
+        REDUCE_XOR = 1 << 8,
+        REDUCE_XNOR = 1 << 9,
+    };
+    IntReduceBitwiseSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+                             IR::LiteralExprPtr mask, std::size_t vector_size, bool disjoint);
+    
+    virtual IR::LiteralExprPtr get_vector() const final;
+    virtual IR::LiteralExprPtr get_mask() const final;
+    virtual std::size_t get_vector_size() const final;
+    virtual std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const final;//From destination
+    virtual std::size_t get_element_bitwidth() const final;
+    virtual bool is_disjoint() const final;
+
+    virtual OpType get_op_type() const = 0;
+    virtual InstType get_inst_type() const override final;
+};
+
+class IntReduceAndInst:public IntReduceBitwiseSIMDInst {
+    public:
+    IntReduceAndInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+                     IR::LiteralExprPtr mask, std::size_t vector_size);
+
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
+class IntReduceOrInst:public IntReduceBitwiseSIMDInst {
+    public:
+    IntReduceOrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+                    IR::LiteralExprPtr mask, std::size_t vector_size, bool disjoint);
+    
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
+class IntReduceXorInst:public IntReduceBitwiseSIMDInst {
+    public:
+    IntReduceXorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+                     IR::LiteralExprPtr mask, std::size_t vector_size);
+    
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
+class IntReduceXnorInst:public IntReduceBitwiseSIMDInst {
+    public:
+    IntReduceXnorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+                      IR::LiteralExprPtr mask, std::size_t vector_size);
+    
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
+//--------------------------------- Horizontal SIMD Instructions ---------------------------------
+//---------------- Horizontal Arithmetic SIMD Instructions ----------------
+class HArithmeticSIMDInst:public Inst {
+    protected:
+    IR::LiteralExprPtr lhs;
+    IR::LiteralExprPtr rhs;
+
+    public:
+    enum class OpType:std::uint64_t{
+        HADD = 1 << 6,
+        HSUB = 1 << 7,
+        HMUL = 1 << 8,
+        HAVG = 1 << 9,
+        HMIN = 1 << 10,
+        HMAX = 1 << 11,
+    };
+    HArithmeticSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                       std::optional<FastMathAttr> fast_math_attr);
+    
+    virtual IR::LiteralExprPtr get_lhs() const final;
+    virtual IR::LiteralExprPtr get_rhs() const final;
+    virtual IR::TypeExprPtr get_element_type() const final;//From destination
+    virtual std::size_t get_vector_size() const final;//From destination
+
+    virtual TypeVarient get_element_type_varient() const = 0;
+    virtual OpType get_op_type() const = 0;
+    virtual InstType get_inst_type() const override final;
+};
+
+//---------------- Int Horizontal Arithmetic SIMD Instructions ----------------
+class IntHArithmeticSIMDInst:public HArithmeticSIMDInst {
+    protected:
+    bool nuw;
+    bool nsw;
+    bool unsigned_;
+    bool saturating;
+    bool floor;
+
+    virtual std::string to_string_helper(const std::string op_name) const final;
+    public:
+    IntHArithmeticSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                           std::optional<FastMathAttr> fast_math_attr, bool nuw, bool nsw, bool unsigned_, bool saturating, bool floor);
+    
+    virtual std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const final;
+    virtual std::size_t get_element_bitwidth() const final;
+
+    virtual bool is_nuw() const final;
+    virtual bool is_nsw() const final;
+    virtual bool is_unsigned() const final;
+    virtual bool is_saturating() const final;
+    virtual bool is_floor() const final;
+
+    virtual TypeVarient get_element_type_varient() const override;
+};
+
+//---------------- Float Horizontal Arithmetic SIMD Instructions ----------------
+class FloatHArithmeticSIMDInst:public HArithmeticSIMDInst {
+    protected:
+    bool ieee754_2019;
+    bool unordered;
+
+    virtual std::string to_string_helper(const std::string op_name) const final;
+    public:
+    FloatHArithmeticSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                             std::optional<FastMathAttr> fast_math_attr, bool ieee754_2019, bool unordered);
+    
+    virtual std::shared_ptr<IR::FloatTypeExpr> get_casted_element_type() const final;
+    virtual std::size_t get_element_bitwidth() const final;
+    virtual bool is_brain_float_type() const final;
+
+    virtual bool is_ieee754_2019() const final;
+    virtual bool is_unordered() const final;
+
+    virtual TypeVarient get_element_type_varient() const override;
 };
 }
 }

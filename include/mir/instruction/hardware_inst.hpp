@@ -4,7 +4,7 @@
 #include <cstddef>
 namespace LIRA {
 namespace MIR {
-//---------------------------------Processor Identification---------------------------------
+//---------------------------------Processor Identification Instructions ---------------------------------
 class CpuIdInst : public Inst {
     IR::LiteralExprPtr leaf;
     IR::LiteralExprPtr subleaf;
@@ -207,28 +207,12 @@ class AesImcInst : public Inst {
     std::string to_string() const override;
 };
 
-// Compile-time rcon variant: rcon is a known immediate, lowers directly to AESKEYGENASSIST xmm, xmm, imm8.
-class CTAesKeyGenAssistInst : public Inst {
-    IR::LiteralExprPtr a;
-    std::uint8_t rcon;
-    public:
-    CTAesKeyGenAssistInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
-                          IR::LiteralExprPtr a, std::uint8_t rcon);
-
-    IR::LiteralExprPtr get_a() const;
-    std::uint8_t get_rcon() const;
-
-    InstType get_inst_type() const override;
-    std::string to_string() const override;
-};
-
-// Run-time rcon variant: rcon is a runtime value; lowered via runtime dispatch (e.g. switch/table).
-class RTAesKeyGenAssistInst : public Inst {
+class AesKeyGenAssistInst : public Inst {
     IR::LiteralExprPtr a;
     IR::LiteralExprPtr rcon;
     public:
-    RTAesKeyGenAssistInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
-                               IR::LiteralExprPtr a, IR::LiteralExprPtr rcon);
+    AesKeyGenAssistInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+                        IR::LiteralExprPtr a, IR::LiteralExprPtr rcon);
 
     IR::LiteralExprPtr get_a() const;
     IR::LiteralExprPtr get_rcon() const;
@@ -253,30 +237,12 @@ class ClmulInst : public Inst {
 };
 
 // ---- SHA (all operate on <i32,4> state) ----
-// Compile-time func variant: func is a known immediate 0-3, lowers directly to SHA1RNDS4 xmm, xmm, imm8.
-class CTSha1Rnds4Inst : public Inst {
-    IR::LiteralExprPtr abcd;
-    IR::LiteralExprPtr msg;
-    std::uint8_t func; // 0-3
-    public:
-    CTSha1Rnds4Inst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
-                  IR::LiteralExprPtr abcd, IR::LiteralExprPtr msg, std::uint8_t func);
-
-    IR::LiteralExprPtr get_abcd() const;
-    IR::LiteralExprPtr get_msg() const;
-    std::uint8_t get_func() const;
-
-    InstType get_inst_type() const override;
-    std::string to_string() const override;
-};
-
-// Run-time func variant: func is a runtime value; lowered via runtime dispatch.
-class RTSha1Rnds4Inst : public Inst {
+class Sha1Rnds4Inst : public Inst {
     IR::LiteralExprPtr abcd;
     IR::LiteralExprPtr msg;
     IR::LiteralExprPtr func;
     public:
-    RTSha1Rnds4Inst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+    Sha1Rnds4Inst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
                     IR::LiteralExprPtr abcd, IR::LiteralExprPtr msg, IR::LiteralExprPtr func);
 
     IR::LiteralExprPtr get_abcd() const;

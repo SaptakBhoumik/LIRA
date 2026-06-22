@@ -5,7 +5,7 @@
 
 namespace LIRA {
 namespace MIR {
-//---------------------------------Processor Identification---------------------------------
+//---------------------------------Processor Identification Instructions ---------------------------------
 CpuIdInst::CpuIdInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr leaf, IR::LiteralExprPtr subleaf):
                      Inst(instruction_stmt, destination, std::nullopt){
     this->leaf = leaf;
@@ -282,41 +282,22 @@ std::string AesImcInst::to_string() const{
 }
 
 
-CTAesKeyGenAssistInst::CTAesKeyGenAssistInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
-                                             IR::LiteralExprPtr a, uint8_t rcon):Inst(instruction_stmt, destination, std::nullopt){
+AesKeyGenAssistInst::AesKeyGenAssistInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+                                         IR::LiteralExprPtr a, IR::LiteralExprPtr rcon):Inst(instruction_stmt, destination, std::nullopt){
     this->a = a;
     this->rcon = rcon;
 }
-IR::LiteralExprPtr CTAesKeyGenAssistInst::get_a() const{
+IR::LiteralExprPtr AesKeyGenAssistInst::get_a() const{
     return this->a;
 }
-std::uint8_t CTAesKeyGenAssistInst::get_rcon() const{
+IR::LiteralExprPtr AesKeyGenAssistInst::get_rcon() const{
     return this->rcon;
 }
-InstType CTAesKeyGenAssistInst::get_inst_type() const{
-    return InstType::CTAesKeyGenAssistInst;
+InstType AesKeyGenAssistInst::get_inst_type() const{
+    return InstType::AesKeyGenAssistInst;
 }
-std::string CTAesKeyGenAssistInst::to_string() const{
-    return "let " + this->destination->to_string() + " = .ct_aeskeygenassist(<i8,16>:" + this->a->to_string() + ", i8:" + std::to_string(this->rcon) + ")";
-}
-
-
-RTAesKeyGenAssistInst::RTAesKeyGenAssistInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
-                                             IR::LiteralExprPtr a, IR::LiteralExprPtr rcon):Inst(instruction_stmt, destination, std::nullopt){
-    this->a = a;
-    this->rcon = rcon;
-}
-IR::LiteralExprPtr RTAesKeyGenAssistInst::get_a() const{
-    return this->a;
-}
-IR::LiteralExprPtr RTAesKeyGenAssistInst::get_rcon() const{
-    return this->rcon;
-}
-InstType RTAesKeyGenAssistInst::get_inst_type() const{
-    return InstType::RTAesKeyGenAssistInst;
-}
-std::string RTAesKeyGenAssistInst::to_string() const{
-    return "let " + this->destination->to_string() + " = .rt_aeskeygenassist(<i8,16>:" + this->a->to_string() + ", <i8,16>:" + this->rcon->to_string() + ")";
+std::string AesKeyGenAssistInst::to_string() const{
+    return "let " + this->destination->to_string() + " = .aeskeygenassist(<i8,16>:" + this->a->to_string() + ", <i8,16>:" + this->rcon->to_string() + ")";
 }
 
 
@@ -342,49 +323,26 @@ std::string ClmulInst::to_string() const{
 
 
 // ---- SHA (all operate on <i32,4> state) ----
-CTSha1Rnds4Inst::CTSha1Rnds4Inst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
-                                 IR::LiteralExprPtr abcd, IR::LiteralExprPtr msg, std::uint8_t func):Inst(instruction_stmt,destination,std::nullopt){
+Sha1Rnds4Inst::Sha1Rnds4Inst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+                             IR::LiteralExprPtr abcd, IR::LiteralExprPtr msg, IR::LiteralExprPtr func):Inst(instruction_stmt,destination,std::nullopt){
     this->abcd = abcd;
     this->msg = msg;
     this->func = func;
 }
-IR::LiteralExprPtr CTSha1Rnds4Inst::get_abcd() const{
+IR::LiteralExprPtr Sha1Rnds4Inst::get_abcd() const{
     return this->abcd;
 }
-IR::LiteralExprPtr CTSha1Rnds4Inst::get_msg() const{
+IR::LiteralExprPtr Sha1Rnds4Inst::get_msg() const{
     return this->msg;
 }
-std::uint8_t CTSha1Rnds4Inst::get_func() const{
+IR::LiteralExprPtr Sha1Rnds4Inst::get_func() const{
     return this->func;
 }
-InstType CTSha1Rnds4Inst::get_inst_type() const{
-    return InstType::CTSha1Rnds4Inst;
+InstType Sha1Rnds4Inst::get_inst_type() const{
+    return InstType::Sha1Rnds4Inst;
 }
-std::string CTSha1Rnds4Inst::to_string() const{
-    return "let " + this->destination->to_string() + " = .ct_sha1rnds4(<i32,4>:" + this->abcd->to_string() + ", <i32,4>:" + this->msg->to_string() + ", i8:" + std::to_string(this->func) + ")";
-}
-
-
-RTSha1Rnds4Inst::RTSha1Rnds4Inst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
-                                 IR::LiteralExprPtr abcd, IR::LiteralExprPtr msg, IR::LiteralExprPtr func):Inst(instruction_stmt,destination,std::nullopt){
-    this->abcd = abcd;
-    this->msg = msg;
-    this->func = func;
-}
-IR::LiteralExprPtr RTSha1Rnds4Inst::get_abcd() const{
-    return this->abcd;
-}
-IR::LiteralExprPtr RTSha1Rnds4Inst::get_msg() const{
-    return this->msg;
-}
-IR::LiteralExprPtr RTSha1Rnds4Inst::get_func() const{
-    return this->func;
-}
-InstType RTSha1Rnds4Inst::get_inst_type() const{
-    return InstType::RTSha1Rnds4Inst;
-}
-std::string RTSha1Rnds4Inst::to_string() const{
-    return "let " + this->destination->to_string() + " = .rt_sha1rnds4(<i32,4>:" + this->abcd->to_string() + ", <i32,4>:" + this->msg->to_string() + ", i8:" + this->func->to_string() + ")";
+std::string Sha1Rnds4Inst::to_string() const{
+    return "let " + this->destination->to_string() + " = .sha1rnds4(<i32,4>:" + this->abcd->to_string() + ", <i32,4>:" + this->msg->to_string() + ", i8:" + this->func->to_string() + ")";
 }
 
 

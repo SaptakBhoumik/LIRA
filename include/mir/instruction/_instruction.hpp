@@ -16,8 +16,7 @@ enum class InstType:std::int16_t{
     DivModInst,
     WideningDivModInst,
     MulHiInst,
-    CTMulFixInst,
-    RTMulFixInst,
+    MulFixInst,
 
 
     CarrBorrType1Inst,
@@ -101,11 +100,9 @@ enum class InstType:std::int16_t{
     AesDecInst,
     AesDecLastInst,
     AesImcInst,
-    CTAesKeyGenAssistInst,
-    RTAesKeyGenAssistInst,
+    AesKeyGenAssistInst,
     ClmulInst,
-    CTSha1Rnds4Inst,
-    RTSha1Rnds4Inst,
+    Sha1Rnds4Inst,
     Sha1NextEInst,
     Sha1Msg1Inst,
     Sha1Msg2Inst,

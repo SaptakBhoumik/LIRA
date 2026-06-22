@@ -4,7 +4,7 @@
 #include <cstddef>
 namespace LIRA {
 namespace MIR {
-//--------------------------------- Uncategorized Memory Identification ---------------------------------
+//--------------------------------- Uncategorized Memory Instructions ---------------------------------
 class LocalInst:public Inst {
     IR::LiteralExprPtr value;
     public:

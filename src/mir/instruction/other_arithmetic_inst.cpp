@@ -277,9 +277,9 @@ std::string VecIntMulHiInst::to_string() const{
 
 
 // ---------------------------- Fixed-Point Arithmetic instructions ---------------------------
-CTMulFixInst::CTMulFixInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                           std::uint64_t scale, bool nuw, bool nsw, bool unsigned_, bool saturating, bool round)
-                           :Inst(instruction_stmt, destination,std::nullopt){
+MulFixInst::MulFixInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+                       IR::LiteralExprPtr scale, bool nuw, bool nsw, bool unsigned_, bool saturating, bool round)
+                       :Inst(instruction_stmt, destination,std::nullopt){
     this->lhs = lhs;
     this->rhs = rhs;
     this->scale = scale;
@@ -290,102 +290,7 @@ CTMulFixInst::CTMulFixInst(IR::InstructionStmtPtr instruction_stmt, LocalDestReg
     this->saturating = saturating;
     this->round = round;
 }
-std::string CTMulFixInst::to_string_helper(const std::string op_name) const{    
-    std::string type_str = this->get_operand_type()->to_string();
-    std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(" + type_str + ":" + this->lhs->to_string() + ", " 
-                                                                                                    + type_str + ":" + this->rhs->to_string() + ", "
-                                                                                                    + "i64:" + std::to_string(this->scale) + ")";
-    if(this->nuw){
-        res += " #[nuw]";
-    }
-    if(this->nsw){
-        res += " #[nsw]";
-    }
-    if(this->unsigned_){
-        res += " #[unsigned]";
-    }
-    if(this->saturating){
-        res += " #[saturating]";
-    }
-    if(this->round){
-        res += " #[round]";
-    }
-    return res;
-}
-bool CTMulFixInst::is_unsigned() const{
-    return this->unsigned_;
-}
-IR::TypeExprPtr CTMulFixInst::get_operand_type() const{
-    return this->destination->get_type();
-}
-IR::LiteralExprPtr CTMulFixInst::get_lhs() const{
-    return this->lhs;
-}
-IR::LiteralExprPtr CTMulFixInst::get_rhs() const{
-    return this->rhs;
-}
-std::uint64_t CTMulFixInst::get_scale() const{
-    return this->scale;
-}
-InstType CTMulFixInst::get_inst_type() const{
-    return InstType::CTMulFixInst;
-}
-
-
-IntCTMulFixInst::IntCTMulFixInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                                 std::uint64_t scale, bool nuw, bool nsw, bool unsigned_, bool saturating, bool round)
-                                 :CTMulFixInst(instruction_stmt, destination, lhs, rhs, scale, nuw, nsw, unsigned_, saturating, round){}
-std::shared_ptr<IR::IntTypeExpr> IntCTMulFixInst::get_casted_operand_type() const{
-    return std::dynamic_pointer_cast<IR::IntTypeExpr>(this->get_operand_type());
-}
-std::size_t IntCTMulFixInst::get_bitwidth() const{
-    return this->get_casted_operand_type()->get_bits();
-}
-TypeVarient IntCTMulFixInst::get_operand_type_varient() const{
-    return TypeVarient::Int;
-}
-std::string IntCTMulFixInst::to_string() const{
-    return this->to_string_helper("int_ct_mulfix");
-}
-
-
-VecIntCTMulFixInst::VecIntCTMulFixInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                                       std::uint64_t scale, bool nuw, bool nsw, bool unsigned_, bool saturating, bool round)
-                                       :CTMulFixInst(instruction_stmt, destination, lhs, rhs, scale, nuw, nsw, unsigned_, saturating, round){}
-std::shared_ptr<IR::SIMDTypeExpr> VecIntCTMulFixInst::get_casted_operand_type() const{
-    return std::dynamic_pointer_cast<IR::SIMDTypeExpr>(this->get_operand_type());
-}
-std::shared_ptr<IR::IntTypeExpr> VecIntCTMulFixInst::get_casted_operand_basetype() const{
-    return std::dynamic_pointer_cast<IR::IntTypeExpr>(this->get_casted_operand_type()->get_basetype());
-}
-std::size_t VecIntCTMulFixInst::get_operand_basetype_bitwidth() const{
-    return this->get_casted_operand_basetype()->get_bits();
-}
-std::size_t VecIntCTMulFixInst::get_vector_size() const{
-    return this->get_casted_operand_type()->get_size();
-}
-TypeVarient VecIntCTMulFixInst::get_operand_type_varient() const{
-    return TypeVarient::VecInt;
-}
-std::string VecIntCTMulFixInst::to_string() const{
-    return this->to_string_helper("vec_int_ct_mulfix");
-}
-
-                                       
-RTMulFixInst::RTMulFixInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                           IR::LiteralExprPtr scale, bool nuw, bool nsw, bool unsigned_, bool saturating, bool round)
-                           :Inst(instruction_stmt, destination,std::nullopt){
-    this->lhs = lhs;
-    this->rhs = rhs;
-    this->scale = scale;
-
-    this->nuw = nuw;
-    this->nsw = nsw;
-    this->unsigned_ = unsigned_;
-    this->saturating = saturating;
-    this->round = round;
-}
-std::string RTMulFixInst::to_string_helper(const std::string op_name) const{    
+std::string MulFixInst::to_string_helper(const std::string op_name) const{    
     std::string type_str = this->get_operand_type()->to_string();
     std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(" + type_str + ":" + this->lhs->to_string() + ", " 
                                                                                                     + type_str + ":" + this->rhs->to_string() + ", "
@@ -407,63 +312,63 @@ std::string RTMulFixInst::to_string_helper(const std::string op_name) const{
     }
     return res;
 }
-bool RTMulFixInst::is_unsigned() const{
+bool MulFixInst::is_unsigned() const{
     return this->unsigned_;
 }
-IR::TypeExprPtr RTMulFixInst::get_operand_type() const{
+IR::TypeExprPtr MulFixInst::get_operand_type() const{
     return this->destination->get_type();
 }
-IR::LiteralExprPtr RTMulFixInst::get_lhs() const{
+IR::LiteralExprPtr MulFixInst::get_lhs() const{
     return this->lhs;
 }
-IR::LiteralExprPtr RTMulFixInst::get_rhs() const{
+IR::LiteralExprPtr MulFixInst::get_rhs() const{
     return this->rhs;
 }
-IR::LiteralExprPtr RTMulFixInst::get_scale() const{
+IR::LiteralExprPtr MulFixInst::get_scale() const{
     return this->scale;
 }
-InstType RTMulFixInst::get_inst_type() const{
-    return InstType::RTMulFixInst;
+InstType MulFixInst::get_inst_type() const{
+    return InstType::MulFixInst;
 }
 
 
-IntRTMulFixInst::IntRTMulFixInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                                 IR::LiteralExprPtr scale, bool nuw, bool nsw, bool unsigned_, bool saturating, bool round)
-                                 :RTMulFixInst(instruction_stmt, destination, lhs, rhs, scale, nuw, nsw, unsigned_, saturating, round){}
-std::shared_ptr<IR::IntTypeExpr> IntRTMulFixInst::get_casted_operand_type() const{
+IntMulFixInst::IntMulFixInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+                             IR::LiteralExprPtr scale, bool nuw, bool nsw, bool unsigned_, bool saturating, bool round)
+                             :MulFixInst(instruction_stmt, destination, lhs, rhs, scale, nuw, nsw, unsigned_, saturating, round){}
+std::shared_ptr<IR::IntTypeExpr> IntMulFixInst::get_casted_operand_type() const{
     return std::dynamic_pointer_cast<IR::IntTypeExpr>(this->get_operand_type());
 }
-std::size_t IntRTMulFixInst::get_bitwidth() const{
+std::size_t IntMulFixInst::get_bitwidth() const{
     return this->get_casted_operand_type()->get_bits();
 }
-TypeVarient IntRTMulFixInst::get_operand_type_varient() const{
+TypeVarient IntMulFixInst::get_operand_type_varient() const{
     return TypeVarient::Int;
 }
-std::string IntRTMulFixInst::to_string() const{
-    return this->to_string_helper("int_rt_mulfix");
+std::string IntMulFixInst::to_string() const{
+    return this->to_string_helper("int_mulfix");
 }
 
 
-VecIntRTMulFixInst::VecIntRTMulFixInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                                       IR::LiteralExprPtr scale, bool nuw, bool nsw, bool unsigned_, bool saturating, bool round)
-                                       :RTMulFixInst(instruction_stmt, destination, lhs, rhs, scale, nuw, nsw, unsigned_, saturating, round){}
-std::shared_ptr<IR::SIMDTypeExpr> VecIntRTMulFixInst::get_casted_operand_type() const{
+VecIntMulFixInst::VecIntMulFixInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+                                   IR::LiteralExprPtr scale, bool nuw, bool nsw, bool unsigned_, bool saturating, bool round)
+                                   :MulFixInst(instruction_stmt, destination, lhs, rhs, scale, nuw, nsw, unsigned_, saturating, round){}
+std::shared_ptr<IR::SIMDTypeExpr> VecIntMulFixInst::get_casted_operand_type() const{
     return std::dynamic_pointer_cast<IR::SIMDTypeExpr>(this->get_operand_type());
 }
-std::shared_ptr<IR::IntTypeExpr> VecIntRTMulFixInst::get_casted_operand_basetype() const{
+std::shared_ptr<IR::IntTypeExpr> VecIntMulFixInst::get_casted_operand_basetype() const{
     return std::dynamic_pointer_cast<IR::IntTypeExpr>(this->get_casted_operand_type()->get_basetype());
 }
-std::size_t VecIntRTMulFixInst::get_operand_basetype_bitwidth() const{
+std::size_t VecIntMulFixInst::get_operand_basetype_bitwidth() const{
     return this->get_casted_operand_basetype()->get_bits();
 }
-std::size_t VecIntRTMulFixInst::get_vector_size() const{
+std::size_t VecIntMulFixInst::get_vector_size() const{
     return this->get_casted_operand_type()->get_size();
 }
-TypeVarient VecIntRTMulFixInst::get_operand_type_varient() const{
+TypeVarient VecIntMulFixInst::get_operand_type_varient() const{
     return TypeVarient::VecInt;
 }
-std::string VecIntRTMulFixInst::to_string() const{
-    return this->to_string_helper("vec_int_rt_mulfix");
+std::string VecIntMulFixInst::to_string() const{
+    return this->to_string_helper("vec_int_mulfix");
 }
 }
 }

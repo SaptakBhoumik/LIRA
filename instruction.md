@@ -1125,6 +1125,10 @@ A terminator must be the final instruction of every block. Falling through to th
 
 ### Reduce SIMD Instructions
 
+Note: `.reduce_sub`, `.reduce_nand`, `.reduce_nor`, `.reduce_div`, `.reduce_rem` etc etc are intentionally absent - these operations are neither associative nor commutative (or both), so a well-defined reduction order cannot be assumed.
+
+#### Reduce Arithmetic SIMD Instructions
+
 - `let T0:%output_var = .reduce_add(<T0,N>:%input_vector [, <i1,N>:%mask])`  
   Sums all elements of the vector where the mask is true (or all elements if no mask); result is scalar.
 
@@ -1148,19 +1152,6 @@ A terminator must be the final instruction of every block. Falling through to th
 - `let T0:%out = .reduce_avg(<T0,N>:%vec [, <i1,N>:%mask])`  
   Returns the arithmetic mean of all lanes where the mask is true (or all lanes if no mask). Result is scalar. `T0` can be integer or float/bfloat. Same attribute rules as `.avg`.
 
-- `let T0:%output_var = .reduce_and(<T0,N>:%input_vector [, <i1,N>:%mask])`  
-  Bitwise AND of all elements where the mask is true (or all elements if no mask); result is scalar. T0 must be integer. No attributes.
-
-- `let T0:%output_var = .reduce_or(<T0,N>:%input_vector [, <i1,N>:%mask])`  
-  Bitwise OR of all elements where the mask is true (or all elements if no mask); result is scalar. T0 must be integer.
-    - `#[disjoint]` – asserts no bit is set in more than one element; poison if violated
-
-- `let T0:%output_var = .reduce_xor(<T0,N>:%input_vector [, <i1,N>:%mask])`  
-  Bitwise XOR of all elements where the mask is true (or all elements if no mask); result is scalar. T0 must be integer. No attributes.
-
-- `let T0:%output_var = .reduce_xnor(<T0,N>:%input_vector [, <i1,N>:%mask])`  
-  Bitwise XNOR of all elements where the mask is true (or all elements if no mask); result is scalar. T0 must be integer. No attributes.
-
 - `let T0:%output_var = .reduce_min(<T0,N>:%input_vector [, <i1,N>:%mask])`  
   Minimum element among the lanes where the mask is true (or all lanes if no mask); result is scalar. T0 can be integer or float.
 
@@ -1183,9 +1174,31 @@ A terminator must be the final instruction of every block. Falling through to th
     - `#[ieee754_2019]` – correct signed-zero ordering across the full reduction; when combined with `#[unordered]`, gets 754-2019 `maximumNumber` semantics. Combining with `#[nsz]` is a compile error. Only valid when T0 is float or bfloat.
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
-Note: `.reduce_sub`, `.reduce_nand`, `.reduce_nor`, `.reduce_div`, `.reduce_rem` are intentionally absent - these operations are neither associative nor commutative (or both), so a well-defined reduction order cannot be assumed.
+
+#### Reduce Arithmetic SIMD Instructions
+
+- `let T0:%output_var = .reduce_and(<T0,N>:%input_vector [, <i1,N>:%mask])`  
+  Bitwise AND of all elements where the mask is true (or all elements if no mask); result is scalar. T0 must be integer. No attributes.
+
+- `let T0:%output_var = .reduce_or(<T0,N>:%input_vector [, <i1,N>:%mask])`  
+  Bitwise OR of all elements where the mask is true (or all elements if no mask); result is scalar. T0 must be integer.
+    - `#[disjoint]` – asserts no bit is set in more than one element; poison if violated
+
+- `let T0:%output_var = .reduce_xor(<T0,N>:%input_vector [, <i1,N>:%mask])`  
+  Bitwise XOR of all elements where the mask is true (or all elements if no mask); result is scalar. T0 must be integer. No attributes.
+
+- `let T0:%output_var = .reduce_xnor(<T0,N>:%input_vector [, <i1,N>:%mask])`  
+  Bitwise XNOR of all elements where the mask is true (or all elements if no mask); result is scalar. T0 must be integer. No attributes.
 
 ### Horizontal SIMD Instructions
+
+A horizontal op is included when both adjacent lanes carry the same semantic role, making an interleaved layout a natural outcome of real workloads. For .hadd, .hmul, .hand, etc., both lanes are values of the same kind the pairwise combination is meaningful and the layout arises organically.
+
+Ops where adjacent lanes have distinct roles dividend/divisor for .hdiv, value/shift-amount for .hshl are excluded. Such a layout would almost never arise naturally; the data would need to be deliberately constructed to fit the instruction rather than the instruction serving an existing data pattern.
+
+.hsub is the primary exception: minuend and subtrahend are semantically distinct, but pairwise subtraction of adjacent elements is a genuine and common pattern (finite differences, delta encoding), so the layout justifies itself on practical grounds regardless of the asymmetry.
+
+#### Horizontal Arithmetic SIMD Instructions
 
 - `let <T0,N>:%out = .hadd(<T0,N>:%a, <T0,N>:%b)` - Pairwise-adds adjacent lanes, consuming two `N`-lane input vectors and producing one `N`-lane output vector. The lower `N/2` output lanes are pairwise sums from `a`; the upper `N/2` output lanes are pairwise sums from `b`. Mirrors `HADDPS`/`PHADDW`/`PHADDD` semantics. `N` must be even. `T0` can be integer or float/bfloat.
 
@@ -1197,15 +1210,36 @@ Note: `.reduce_sub`, `.reduce_nand`, `.reduce_nor`, `.reduce_div`, `.reduce_rem`
 
     **If `T0` is float/bfloat:** `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
-- `let <T0,N>:%out = .hsub(<T0,N>:%a, <T0,N>:%b)` - Pairwise-subtracts adjacent lanes. Lane `2i` minus lane `2i+1` for each pair. Lower `N/2` from `a`, upper `N/2` from `b`. Mirrors `HSUBPS`/`PHSUBW`/`PHSUBD`. Same type and attribute rules as `.hadd`.
+- `let <T0,N>:%out = .hsub(<T0,N>:%a, <T0,N>:%b)` - Pairwise-subtracts adjacent lanes. Same type and attribute rules as `.hadd`.
+
+- `let <T0,N>:%out = .hmul(<T0,N>:%a, <T0,N>:%b)` - Pairwise-multiplies adjacent lanes. Same type and attribute rules as `.hadd`.
 
 - `let <T0,N>:%out = .havg(<T0,N>:%a, <T0,N>:%b)` - Horizontal (pairwise) average. Lower `N/2` output lanes are pairwise averages from `a`; upper `N/2` are pairwise averages from `b`. `N` must be even. Same attribute rules as `.avg`.
+
+- `let <T0,N>:%out = .hmin(<T0,N>:%a, <T0,N>:%b)` - Pairwise minimum. Same attribute rules as `.reduce_min`.
+
+- `let <T0,N>:%out = .hmax(<T0,N>:%a, <T0,N>:%b)` - Pairwise maximum. Same attribute rules as `.reduce_max`.
+
+
+#### Horizontal Bitwise SIMD Instructions
+
+- `let <T0,N>:%out = .hand(<T0,N>:%a, <T0,N>:%b)` - Pairwise bitwise AND of adjacent lanes. Same type and attribute rules as `.reduce_and`.
+
+- `let <T0,N>:%out = .hor(<T0,N>:%a, <T0,N>:%b)` - Pairwise bitwise OR of adjacent lanes. Same type and attribute rules as `.reduce_or`.
+
+- `let <T0,N>:%out = .hxor(<T0,N>:%a, <T0,N>:%b)` - Pairwise bitwise XOR of adjacent lanes. Same type and attribute rules as `.reduce_xor`.
+
+- `let <T0,N>:%out = .hnand(<T0,N>:%a, <T0,N>:%b)` - Pairwise bitwise NAND of adjacent lanes. Same type and attribute rules as `.reduce_and`.
+
+- `let <T0,N>:%out = .hnor(<T0,N>:%a, <T0,N>:%b)` - Pairwise bitwise NOR of adjacent lanes. Same type and attribute rules as `.reduce_or`.
+
+- `let <T0,N>:%out = .hxnor(<T0,N>:%a, <T0,N>:%b)` - Pairwise bitwise XNOR of adjacent lanes. Same type and attribute rules as `.reduce_xor`.
 
 ### Dot Product Instruction
 
 - `let T2:%out = .dot(<T1,N>:%a, <T1,N>:%b)` - Computes the dot product of `a` and `b`: sum of `a[i] * b[i]` over all lanes `i`, returning a scalar result in `T2`. When an optional third argument `%acc` is provided (`let T2:%out = .dot(<T1,N>:%a, <T1,N>:%b, T2:%acc)`), it is added to the result (`dot(a, b) + acc`), mapping directly to VNNI-style instructions and fused floating-point MACs. Output is always scalar.
 
-    **If `T1` is integer:** The per-lane multiply is widening (products computed at `2xbitwidth(T1)` internally before accumulation). `T2` must be an integer type with `bitwidth(T2) >= 2 * bitwidth(T1)`. When `%acc` is provided it must be of type `T2`.
+    **If `T1` is integer:** The per-lane multiply is widening (products computed at `bitwidth(T2)` internally before accumulation). `T2` must be an integer type with `bitwidth(T2) >= bitwidth(T1)`. When `%acc` is provided it must be of type `T2`.
     - `#[unsigned]` - treat lane values as unsigned; default is signed
     - `#[nsw]` - poison if the accumulated sum overflows `T2`
     - `#[nuw]` - poison on unsigned overflow; only valid with `#[unsigned]`
@@ -1324,6 +1358,8 @@ The following are defined only on integer
     
     If T1 is float:
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+
+### Widening Horizontal
 
 ---
 

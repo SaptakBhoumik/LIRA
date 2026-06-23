@@ -658,7 +658,7 @@ class IntHArithmeticSIMDInst:public HArithmeticSIMDInst {
     virtual std::string to_string_helper(const std::string op_name) const final;
     public:
     IntHArithmeticSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
-                           std::optional<FastMathAttr> fast_math_attr, bool nuw, bool nsw, bool unsigned_, bool saturating, bool floor);
+                           bool nuw, bool nsw, bool unsigned_, bool saturating, bool floor);
     
     virtual std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const final;
     virtual std::size_t get_element_bitwidth() const final;
@@ -670,6 +670,60 @@ class IntHArithmeticSIMDInst:public HArithmeticSIMDInst {
     virtual bool is_floor() const final;
 
     virtual TypeVarient get_element_type_varient() const override;
+};
+
+class IntHorizontalAddInst:public IntHArithmeticSIMDInst {
+    public:
+    IntHorizontalAddInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                        bool nuw, bool nsw, bool unsigned_, bool saturating);
+    
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
+class IntHorizontalSubInst:public IntHArithmeticSIMDInst {
+    public:
+    IntHorizontalSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                        bool nuw, bool nsw, bool unsigned_, bool saturating);
+    
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
+class IntHorizontalMulInst:public IntHArithmeticSIMDInst {
+    public:
+    IntHorizontalMulInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                         bool nuw, bool nsw, bool unsigned_, bool saturating);
+    
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
+class IntHorizontalAvgInst:public IntHArithmeticSIMDInst {
+    public:
+    IntHorizontalAvgInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                        bool nuw, bool nsw, bool unsigned_, bool floor);
+    
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
+class IntHorizontalMinInst:public IntHArithmeticSIMDInst {
+    public:
+    IntHorizontalMinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                        bool unsigned_);
+    
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
+class IntHorizontalMaxInst:public IntHArithmeticSIMDInst {
+    public:
+    IntHorizontalMaxInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                        bool unsigned_);
+    
+    OpType get_op_type() const override;
+    std::string to_string() const override;
 };
 
 //---------------- Float Horizontal Arithmetic SIMD Instructions ----------------
@@ -691,6 +745,141 @@ class FloatHArithmeticSIMDInst:public HArithmeticSIMDInst {
     virtual bool is_unordered() const final;
 
     virtual TypeVarient get_element_type_varient() const override;
+};
+
+class FloatHorizontalAddInst:public FloatHArithmeticSIMDInst {
+    public:
+    FloatHorizontalAddInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                           FastMathAttr fast_math_attr);
+    
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
+class FloatHorizontalSubInst:public FloatHArithmeticSIMDInst {
+    public:
+    FloatHorizontalSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                           FastMathAttr fast_math_attr);
+    
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
+class FloatHorizontalMulInst:public FloatHArithmeticSIMDInst {
+    public:
+    FloatHorizontalMulInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                           FastMathAttr fast_math_attr);
+    
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
+class FloatHorizontalAvgInst:public FloatHArithmeticSIMDInst {
+    public:
+    FloatHorizontalAvgInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                           FastMathAttr fast_math_attr);
+    
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
+class FloatHorizontalMinInst:public FloatHArithmeticSIMDInst {
+    public:
+    FloatHorizontalMinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                            FastMathAttr fast_math_attr, bool ieee754_2019, bool unordered);
+    
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
+class FloatHorizontalMaxInst:public FloatHArithmeticSIMDInst {
+    public:
+    FloatHorizontalMaxInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                            FastMathAttr fast_math_attr, bool ieee754_2019, bool unordered);
+    
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
+//---------------- Int Horizontal Bitwise SIMD Instructions ----------------
+class IntHBitwiseSIMDInst:public Inst {
+    protected:
+    IR::LiteralExprPtr lhs;
+    IR::LiteralExprPtr rhs;
+    bool disjoint;
+
+    virtual std::string to_string_helper(const std::string op_name) const final;
+    public:
+    enum class OpType:std::uint64_t{
+        HAND = 1 << 6,
+        HNAND = 1 << 7,
+        HOR = 1 << 8,
+        HNOR = 1 << 9,
+        HXOR = 1 << 10,
+        HXNOR = 1 << 11,
+    };
+    IntHBitwiseSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                       bool disjoint);
+    
+    virtual IR::LiteralExprPtr get_lhs() const final;
+    virtual IR::LiteralExprPtr get_rhs() const final;
+    virtual std::size_t get_vector_size() const final;//From destination
+    virtual std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const final;//From destination
+    virtual std::size_t get_element_bitwidth() const final;
+    virtual bool is_disjoint() const final;
+
+    virtual OpType get_op_type() const = 0;
+    virtual InstType get_inst_type() const override final;
+};
+
+class IntHorizontalAndInst:public IntHBitwiseSIMDInst {
+    public:
+    IntHorizontalAndInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
+    
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
+class IntHorizontalNandInst:public IntHBitwiseSIMDInst {
+    public:
+    IntHorizontalNandInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
+    
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
+class IntHorizontalOrInst:public IntHBitwiseSIMDInst {
+    public:
+    IntHorizontalOrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                        bool disjoint);
+    
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
+class IntHorizontalNorInst:public IntHBitwiseSIMDInst {
+    public:
+    IntHorizontalNorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                         bool disjoint);
+    
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
+class IntHorizontalXorInst:public IntHBitwiseSIMDInst {
+    public:
+    IntHorizontalXorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
+    
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
+class IntHorizontalXnorInst:public IntHBitwiseSIMDInst {
+    public:
+    IntHorizontalXnorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
+    
+    OpType get_op_type() const override;
+    std::string to_string() const override;
 };
 }
 }

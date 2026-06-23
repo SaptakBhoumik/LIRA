@@ -81,6 +81,16 @@
     **If `T0` is float/bfloat:** Computes `(a + b) * 0.5` exactly.
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
+
+- `let T:%out = .absdiff(T:%a, T:%b)` - Returns `|a - b|`. `T` must be of the form `T0` or `<T0,M>` where `T0` is integer, float, or bfloat. For vectors, the operation is lanewise. Equivalent to `abs(a - b)` but expressed as a single instruction so the backend can emit `VABSSUBPS`, `VPABSB`/`VPABSW`/`VPABSD` patterns directly.
+
+    **If `T0` is integer:**
+    - `#[unsigned]` - treat values as unsigned (result is always non-negative; equivalent to `max(a,b) - min(a,b)` unsigned); default is signed
+    - `#[nuw]` - poison if the subtraction unsigned overflows before taking absolute value
+    - `#[nsw]` - poison if the subtraction signed overflows before taking absolute value
+    - `#[saturating]` - clamp to type range instead of wrapping. Pair with `#[unsigned]` for unsigned saturation; default is signed saturation.
+
+    **If `T0` is float/bfloat:** `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 ---
 
 ## Trinary Arithmetic Instructions
@@ -202,6 +212,8 @@ Widening instructions compute `a OP b` at the full precision of the *output* typ
 
     **If `T1`/`T2` base type is float/bfloat:** `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
+- `let T2:%out = .widening_absdiff(T1:%a, T1:%b)` - Returns `|a - b|` in the wider type `T2`. Same extension and attribute rules as `.widening_add`.
+
 ---
 
 ## Carry/Borrowing instructions
@@ -258,6 +270,11 @@ These return `{T, i1}` - the wrapped result paired with an overflow flag (`1` if
 - `let {T, i1}:%out = .wrap_sub(T:%a, T:%b)` - Subtracts `b` from `a` with wrapping, returning the wrapped result and an underflow/overflow flag.
 
     - `#[unsigned]` - detect unsigned underflow; default detects signed overflow
+    - `#[saturating]` - Saturate instead of wrap
+
+- `let {T, i1}:%out = .wrap_absdiff(T:%a, T:%b)` - Returns `|a - b|` with wrapping, returning the wrapped result and an overflow flag.
+
+    - `#[unsigned]` - detect unsigned overflow; default detects signed overflow
     - `#[saturating]` - Saturate instead of wrap
 
 - `let {T, i1}:%out = .wrap_mul(T:%a, T:%b)` - Multiplies `a` and `b` with wrapping, returning the wrapped result and an overflow flag.
@@ -794,6 +811,15 @@ Read-modify-write instructions that read a value from memory, apply a binary ope
 
     If T is float/bfloat: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
+- `let T:%old = .fetch_absdiff(ptr:%ptr, T:%value)` - Computes `abs(*ptr - value)`; returns the original. T can be integer or float.
+
+    If T is integer:
+    - `#[nsw]` - poison on signed overflow
+    - `#[nuw]` - poison on unsigned overflow
+    - `#[saturating]` - clamp instead of wrap; pair with `#[unsigned]` for unsigned saturation
+
+    If T is float/bfloat: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+
 - `let T:%old = .fetch_mul(ptr:%ptr, T:%value)` - Multiplies `*ptr` by `value`; returns the original. T can be integer or float.
 
     If T is integer:
@@ -1196,7 +1222,7 @@ A horizontal op is included when both adjacent lanes carry the same semantic rol
 
 Ops where adjacent lanes have distinct roles dividend/divisor for .hdiv, value/shift-amount for .hshl are excluded. Such a layout would almost never arise naturally; the data would need to be deliberately constructed to fit the instruction rather than the instruction serving an existing data pattern.
 
-.hsub is the primary exception: minuend and subtrahend are semantically distinct, but pairwise subtraction of adjacent elements is a genuine and common pattern (finite differences, delta encoding), so the layout justifies itself on practical grounds regardless of the asymmetry.
+.hsub and .absdiff is the primary exception: minuend and subtrahend are semantically distinct, but pairwise subtraction of adjacent elements is a genuine and common pattern (finite differences, delta encoding), so the layout justifies itself on practical grounds regardless of the asymmetry.
 
 #### Horizontal Arithmetic SIMD Instructions
 
@@ -1211,6 +1237,8 @@ Ops where adjacent lanes have distinct roles dividend/divisor for .hdiv, value/s
     **If `T0` is float/bfloat:** `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 - `let <T0,N>:%out = .hsub(<T0,N>:%a, <T0,N>:%b)` - Pairwise-subtracts adjacent lanes. Same type and attribute rules as `.hadd`.
+
+- `let <T0,N>:%out = .habsdiff(<T0,N>:%a, <T0,N>:%b)` - Pairwise absolute differences of adjacent lanes. Same type and attribute rules as `.hadd`.
 
 - `let <T0,N>:%out = .hmul(<T0,N>:%a, <T0,N>:%b)` - Pairwise-multiplies adjacent lanes. Same type and attribute rules as `.hadd`.
 
@@ -1249,13 +1277,6 @@ Ops where adjacent lanes have distinct roles dividend/divisor for .hdiv, value/s
 
 ### Absolute Difference Instructions
 
-- `let T:%out = .absdiff(T:%a, T:%b)` - Returns `|a - b|`. `T` must be of the form `T0` or `<T0,M>` where `T0` is integer, float, or bfloat. For vectors, the operation is lanewise. Equivalent to `abs(a - b)` but expressed as a single instruction so the backend can emit `VABSSUBPS`, `VPABSB`/`VPABSW`/`VPABSD` patterns directly.
-
-    **If `T0` is integer:**
-    - `#[unsigned]` - treat values as unsigned (result is always non-negative; equivalent to `max(a,b) - min(a,b)` unsigned); default is signed
-    - `#[nsw]` - poison if the subtraction overflows before taking absolute value
-
-    **If `T0` is float/bfloat:** `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 - `let T2:%out = .sad(<T1,N>:%a, <T1,N>:%b)` - Sum of absolute differences: returns the sum of `|a[i] - b[i]|` over all lanes, scalar result in `T2`. Default is signed; use `#[unsigned]` for unsigned (natural for pixel data; matches `PSADBW` semantics).
 

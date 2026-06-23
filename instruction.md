@@ -1275,6 +1275,7 @@ Ops where adjacent lanes have distinct roles dividend/divisor for .hdiv, value/s
     **If `T1` is integer:** Lane-wise differences are computed without overflow (widened to `2xbitwidth(T1)` internally before summing). `T2` must be an integer type with sufficient width for the full sum.
     - `#[unsigned]` - treat lane values as unsigned before differencing
     - `#[nsw]` / `#[nuw]` - poison on signed/unsigned overflow of the accumulated sum
+    - `#[saturating]` - clamp the accumulator to the `T2` range instead of wrapping
 
     **If `T1` is float/bfloat:** Each `|a[i] - b[i]|` is computed as a float absolute difference and then accumulated into `T2`. `T2` must be float/bfloat with `bitwidth(T2) >= bitwidth(T1)`. Float attributes: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 

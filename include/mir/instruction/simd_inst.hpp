@@ -919,5 +919,132 @@ class IntHorizontalXnorInst:public IntHBitwiseSIMDInst {
     OpType get_op_type() const override;
     std::string to_string() const override;
 };
+
+//--------------------------------- Dot Product Instructions ---------------------------------
+class DotInst:public Inst {
+    protected:
+    IR::LiteralExprPtr lhs;
+    IR::LiteralExprPtr rhs;
+    IR::TypeExprPtr input_vector_type;//Type of lhs and rhs. Must be same type
+
+    virtual std::string to_string_helper(const std::string op_name) const final;
+    public:
+    DotInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr input_vector_type,
+            std::optional<FastMathAttr> fast_math_attr);
+    
+    virtual IR::LiteralExprPtr get_lhs() const final;
+    virtual IR::LiteralExprPtr get_rhs() const final;
+    virtual IR::TypeExprPtr get_element_type() const final;//From input_vector_type
+    virtual std::size_t get_vector_size() const final;//From input_vector_type
+    virtual IR::TypeExprPtr get_output_type() const final;// From destination
+
+    virtual TypeVarient get_type_varient() const = 0;
+    virtual InstType get_inst_type() const override final;
+};
+
+class IntDotInst:public DotInst {
+    protected:
+    bool nuw;
+    bool nsw;
+    bool unsigned_;
+    bool saturating;
+    public:
+    IntDotInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr input_vector_type,
+               bool nuw, bool nsw, bool unsigned_, bool saturating);
+
+    bool is_nuw() const;
+    bool is_nsw() const;
+    bool is_unsigned() const;
+    bool is_saturating() const;
+    
+    std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const;
+    std::size_t get_element_bitwidth() const;
+    std::shared_ptr<IR::IntTypeExpr> get_casted_output_type() const;
+    std::size_t get_output_bitwidth() const;
+
+    TypeVarient get_type_varient() const override;
+    std::string to_string() const override;
+};
+
+class FloatDotInst:public DotInst {
+    public:
+    FloatDotInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr input_vector_type,
+                 FastMathAttr fast_math_attr);
+
+    std::shared_ptr<IR::FloatTypeExpr> get_casted_element_type() const;
+    std::size_t get_element_bitwidth() const;
+    bool is_element_brain_float() const;
+    std::shared_ptr<IR::FloatTypeExpr> get_casted_output_type() const;
+    std::size_t get_output_bitwidth() const;
+    bool is_output_brain_float() const;
+
+    TypeVarient get_type_varient() const override;
+    std::string to_string() const override;
+};
+
+//--------------------------------- Absolute Difference Instructions ---------------------------------
+class SADInst:public Inst {
+    protected:
+    IR::LiteralExprPtr lhs;
+    IR::LiteralExprPtr rhs;
+    IR::TypeExprPtr input_vector_type;//Type of lhs and rhs. Must be same type
+
+    virtual std::string to_string_helper(const std::string op_name) const final;
+    public:
+    SADInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr input_vector_type,
+            std::optional<FastMathAttr> fast_math_attr);
+    
+    virtual IR::LiteralExprPtr get_lhs() const final;
+    virtual IR::LiteralExprPtr get_rhs() const final;
+    virtual IR::TypeExprPtr get_element_type() const final;//From input_vector_type
+    virtual std::size_t get_vector_size() const final;//From input_vector_type
+    virtual IR::TypeExprPtr get_output_type() const final;// From destination
+
+    virtual TypeVarient get_type_varient() const = 0;
+    virtual InstType get_inst_type() const override final;
+};
+
+class IntSADInst:public SADInst {
+    protected:
+    bool nuw;
+    bool nsw;
+    bool unsigned_;
+    bool saturating;
+    public:
+    IntSADInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr input_vector_type,
+               bool nuw, bool nsw, bool unsigned_, bool saturating);
+
+    bool is_nuw() const;
+    bool is_nsw() const;
+    bool is_unsigned() const;
+    bool is_saturating() const;
+    
+    std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const;
+    std::size_t get_element_bitwidth() const;
+    std::shared_ptr<IR::IntTypeExpr> get_casted_output_type() const;
+    std::size_t get_output_bitwidth() const;
+
+    TypeVarient get_type_varient() const override;
+    std::string to_string() const override;
+};
+
+class FloatSADInst:public SADInst {
+    public:
+    FloatSADInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr input_vector_type,
+                  FastMathAttr fast_math_attr);
+
+    std::shared_ptr<IR::FloatTypeExpr> get_casted_element_type() const;
+    std::size_t get_element_bitwidth() const;
+    bool is_element_brain_float() const;
+    std::shared_ptr<IR::FloatTypeExpr> get_casted_output_type() const;
+    std::size_t get_output_bitwidth() const;
+    bool is_output_brain_float() const;
+
+    TypeVarient get_type_varient() const override;
+    std::string to_string() const override;
+};
+
+
+//--------------------------------- Pack / Unpack Instructions ---------------------------------
 }
 }

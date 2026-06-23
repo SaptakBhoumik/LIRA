@@ -578,6 +578,16 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
     If T is float/vec of float:
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
+- `let <T,N>:%out = .broadcast_load(ptr:%ptr)` - Loads a single scalar of type `T` from memory and broadcasts it to every lane. A single instruction on x86 (`VBROADCASTSS`, `VBROADCASTSD`, etc.); the backend guarantees the fusion that a `.load` + `.splat` pair might not. `T` must be a scalar integer, float, or bfloat (not a vector) or ptr.
+    - `#[volatile]` - volatile load
+    - `#[nontemporal]` - non-temporal (cache-bypassing) load
+    - `#[nonnull]` - asserts `ptr` is not null
+    - `#[align(i64:N)]` - alignment of `ptr`; must be a power of 2; default is natural alignment of `T`
+    - `#[dereferenceable(i64:N)]` - asserts `ptr` is dereferenceable for N bytes across the entire vector range (not just active lanes)
+
+    If T is float:
+    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+
 - `let <T,N>:%out = .masked_load(ptr:%ptr [,<i1,N>:%mask, <T,N>:%passthru])` - Loads elements from memory into a vector, but only for lanes where the mask is true. Lanes where the mask is false take their value from `passthru` instead.
 
     - `ptr:%ptr` - pointer to the base address; must be valid for at least `N * sizeof(T)` bytes for active lanes
@@ -1111,7 +1121,7 @@ A terminator must be the final instruction of every block. Falling through to th
 
 - `let <T,N>:%out = .insert_subvector(<T,N>:%vec, <T,M>:%sub, i64:%index)` - Inserts a shorter vector into a lane-aligned position within a longer vector, returning the updated longer vector. The other lanes are unchanged. 
 
-    - `<T,N>:%vec` - the destination vector; T can be any integer, float, or bfloat; N is the total lane count
+    - `<T,N>:%vec` - the destination vector; T can be any integer, float, ptr, or bfloat; N is the total lane count
     - `<T,M>:%sub` - the subvector to insert; same element type T; M < N; M must divide N
     - `i64:%index` - the starting lane index in `vec` where insertion begins; must be a compile-time/run-time integer; must satisfy `index + M <= N`; If at compiletime multiple of M then we can optimize it better
 
@@ -1122,7 +1132,7 @@ A terminator must be the final instruction of every block. Falling through to th
 
 - `let <T,M>:%out = .extract_subvector(<T,N>:%vec, i64:%index)` - Extracts a contiguous slice of lanes from a vector into a shorter vector. 
 
-    - `<T,N>:%vec` - the source vector; T can be any integer, float, or bfloat
+    - `<T,N>:%vec` - the source vector; T can be any integer, float, ptr, or bfloat
     - `i64:%index` - the starting lane index; must be a compile-time/run-time integer; must satisfy `index + M <= N`. If at compiletime multiple of M then we can optimize it better
 
     Output type: `<T,M>` - the element type is the same T; M is determined by the declared output type; M < N; M must divide N
@@ -1139,6 +1149,16 @@ A terminator must be the final instruction of every block. Falling through to th
 
     Attributes:
     - `#[unsigned]` - comparison `base + i < count` is unsigned; this is almost always what you want since indices are non-negative; default is signed
+
+- `let <T0,N>:%out = .addsub(<T0,N>:%a, <T0,N>:%b)` - Alternates subtraction and addition on adjacent lanes: even-indexed lanes compute `a[i] - b[i]`; odd-indexed lanes compute `a[i] + b[i]`. Mirrors `ADDSUBPS`/`ADDSUBPD`. Primary use case: complex number multiplication. `T0` can be integer or float/bfloat.
+
+    **If `T0` is integer:**
+    - `#[nsw]` - poison on signed overflow in any lane
+    - `#[nuw]` - poison on unsigned overflow; only valid with `#[unsigned]`
+    - `#[unsigned]` - treat lanes as unsigned
+    - `#[saturating]` - clamp instead of wrap
+
+    **If `T0` is float/bfloat:** `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 ### Reduce SIMD Instructions
 
@@ -1192,7 +1212,7 @@ Note: `.reduce_sub`, `.reduce_nand`, `.reduce_nor`, `.reduce_div`, `.reduce_rem`
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 
-#### Reduce Arithmetic SIMD Instructions
+#### Reduce Bitwise SIMD Instructions
 
 - `let T0:%output_var = .reduce_and(<T0,N>:%input_vector [, <i1,N>:%mask])`  
   Bitwise AND of all elements where the mask is true (or all elements if no mask); result is scalar. T0 must be integer. No attributes.
@@ -1286,7 +1306,7 @@ The following are defined only on integer
 - `let <T2,N2>:%out = .pack_sat(<T1,N>:%a, <T1,N>:%b)` - Narrows both input vectors and concatenates them into one output vector. `bitwidth(T2) < bitwidth(T1)`; `N2 = 2*N`. Each element is clamped to the *signed* range of `T2` before truncation, even if the inputs are unsigned. Mirrors `PACKSSWB`, `PACKSSDW`.
     - `#[unsigned]` - clamp to the *unsigned* range of `T2` instead (e.g., `[0, 255]` for `i8`); mirrors `PACKUSWB`, `PACKUSDW`
 
-- `let <T2,N2>:%out = .unpack_lo(<T1,N>:%a, <T1,N>:%b)` - Interleaves the *lower half* lanes of `a` and `b` into a single output vector. `N2 = N`; each output element is widened from `T1` to `T2` (`bitwidth(T2) = 2 * bitwidth(T1)`). Output order: `a[0], b[0], a[1], b[1], ..., a[N/2-1], b[N/2-1]`. Mirrors `PUNPCKLBW` / `PUNPCKLWD` / `PUNPCKLDQ`.
+- `let <T2,N2>:%out = .unpack_lo(<T1,N>:%a, <T1,N>:%b)` - Interleaves the *lower half* lanes of `a` and `b` into a single output vector. `N2 = N`; each output element is widened from `T1` to `T2` (`bitwidth(T2) >= bitwidth(T1)`). Output order: `a[0], b[0], a[1], b[1], ..., a[N/2-1], b[N/2-1]`. Mirrors `PUNPCKLBW` / `PUNPCKLWD` / `PUNPCKLDQ`.
     - `#[unsigned]` - zero-extend lanes; default is sign-extend
 
 - `let <T2,N2>:%out = .unpack_hi(<T1,N>:%a, <T1,N>:%b)` - Same as `.unpack_lo` but takes the *upper half* lanes. Output order: `a[N/2], b[N/2], ..., a[N-1], b[N-1]`. Mirrors `PUNPCKHBW` / `PUNPCKHWD` / `PUNPCKHDQ`.
@@ -1294,28 +1314,19 @@ The following are defined only on integer
 
 ### Vector Layout Instructions
 
-- `let <T,N>:%out = .compress(<T,N>:%src, <i1,N>:%mask)` - Packs active lanes (where `mask` is true) contiguously into the low lanes of the output. Inactive output lanes are zeroed unless `#[undef_inactive]` is set. Mirrors `VPCOMPRESSPS`/`VPCOMPRESSQ`/`VPCOMPRESSB`. `T` can be any integer, float, or bfloat.
+- `let <T,N>:%out = .compress(<T,N>:%src, <i1,N>:%mask)` - Packs active lanes (where `mask` is true) contiguously into the low lanes of the output. Inactive output lanes are zeroed unless `#[undef_inactive]` is set. Mirrors `VPCOMPRESSPS`/`VPCOMPRESSQ`/`VPCOMPRESSB`. `T` can be any integer, float, or bfloat or ptr.
     - `#[undef_inactive]` - inactive output lanes are undefined (allows the backend to skip zeroing)
 
     If T is float:
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
-- `let <T,N>:%out = .expand(<T,N>:%src, <i1,N>:%mask, <T,N>:%passthru)` - Inverse of `.compress`. Reads elements from the consecutive low lanes of `src` and scatters them into the active (mask=true) lanes of the output. Inactive lanes take their value from `passthru`. Mirrors `VPEXPANDPS`/`VPEXPANDQ`/`VPEXPANDB`.
-    - `#[zeropassthru]` - inactive lanes are zeroed; avoids materialising a zero `passthru` vector
+- `let <T,N>:%out = .expand(<T,N>:%src, <i1,N>:%mask [,<T,N>:%passthru])` - Inverse of `.compress`. Reads elements from the consecutive low lanes of `src` and scatters them into the active (mask=true) lanes of the output. Inactive lanes take their value from `passthru`. Mirrors `VPEXPANDPS`/`VPEXPANDQ`/`VPEXPANDB`.
+    - `#[zeropassthru]` - inactive lanes are zeroed; avoids materialising a zero `passthru` vector. If passthru is not provided and this attribute is not set then you get poisoned inactive lanes
 
     If T is float:
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
-- `let <T,N>:%out = .broadcast_load(ptr:%ptr)` - Loads a single scalar of type `T` from memory and broadcasts it to every lane. A single instruction on x86 (`VBROADCASTSS`, `VBROADCASTSD`, etc.); the backend guarantees the fusion that a `.load` + `.splat` pair might not. `T` must be a scalar integer, float, or bfloat (not a vector).
-    - `#[align(i64:N)]` - alignment of `ptr`; must be a power of 2; default is natural alignment of `T`
-    - `#[volatile]` - volatile load
-    - `#[nonnull]` - asserts `ptr` is not null
-    - `#[nontemporal]` - non-temporal (cache-bypassing) load
-
-    If T is float:
-    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
-
-- `let <T,N2>:%out = .interleave2(<T,N>:%a, <T,N>:%b)` - Interleaves channels into a single packed vector. `N2 = 2*N`. Output element at position `i*2 + j` equals input `vj[i]` (channel `j`, element `i`). `T` can be any integer, float, or bfloat. 
+- `let <T,N2>:%out = .interleave2(<T,N>:%a, <T,N>:%b)` - Interleaves channels into a single packed vector. `N2 = 2*N`. Output element at position `i*2 + j` equals input `vj[i]` (channel `j`, element `i`). `T` can be any integer, float, or ptr, or bfloat. 
 
     If T is float:
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
@@ -1323,7 +1334,7 @@ The following are defined only on integer
 - `let <T,N3>:%out = .interleave3(<T,N>:%a, <T,N>:%b, <T,N>:%c)` - Interleave three channels. `N3 = 3*N`. Same rules.
 - `let <T,N4>:%out = .interleave4(<T,N>:%a, <T,N>:%b, <T,N>:%c, <T,N>:%d)` - Interleave four channels. `N4 = 4*N`. Same rules.
 
-- `let <T,N>:%out = .deinterleave2(<T,N2>:%v, i8:channel)` - Extracts one channel from an interleaved vector. `channel` must be a compile-time/run-time in `[0, 1]`. Extracts elements at positions `channel, channel+2, channel+4, ...`. Output length `N = N2/2`.
+- `let <T,N>:%out = .deinterleave2(<T,N2>:%v, i8:channel)` - Extracts one channel from an interleaved vector. `channel` must be a compile-time/run-time in `[0, 1]`. Extracts elements at positions `channel, channel+2, channel+4, ...`. Output length `N = N2/2`. T is ptr/integer/float/bfloat.
 
     If T is float:
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
@@ -1331,51 +1342,12 @@ The following are defined only on integer
 - `let <T,N>:%out = .deinterleave3(<T,N3>:%v, i8:channel)` - Same for 3-channel interleaving, `channel` in `[0, 2]`. Output length `N = N3/3`. Allows fast math attribute for float/bfloat T.
 - `let <T,N>:%out = .deinterleave4(<T,N4>:%v, i8:channel)` - Same for 4-channel interleaving, `channel` in `[0, 3]`. Output length `N = N4/4`. Allows fast math attribute for float/bfloat T
 
-- `let <T0,N>:%out = .addsub(<T0,N>:%a, <T0,N>:%b)` - Alternates subtraction and addition on adjacent lanes: even-indexed lanes compute `a[i] - b[i]`; odd-indexed lanes compute `a[i] + b[i]`. `N` must be even. Mirrors `ADDSUBPS`/`ADDSUBPD`. Primary use case: complex number multiplication. `T0` can be integer or float/bfloat.
-
-    **If `T0` is integer:**
-    - `#[nsw]` - poison on signed overflow in any lane
-    - `#[nuw]` - poison on unsigned overflow; only valid with `#[unsigned]`
-    - `#[unsigned]` - treat lanes as unsigned
-    - `#[saturating]` - clamp instead of wrap
-
-    **If `T0` is float/bfloat:** `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 ### Lane Mask Conversion Instructions
 
-- `let iM:%out = .lane_mask_to_int(<i1,N>:%mask)` - Packs the N single-bit lanes of `mask` into the low N bits of a scalar integer of type `iM`. Lane `i` maps to bit `i` of the result; the remaining `M - N` high bits are zeroed. Mirrors `VMOVMSKPS`/`VPMOVMSKB`/`KMOVD` semantics. `M` must satisfy `M >= N`. No attributes.
+- `let iM:%out = .mask_to_int(<i1,N>:%mask)` - Packs the N single-bit lanes of `mask` into the low N bits of a scalar integer of type `iM`. Lane `i` maps to bit `i` of the result; the remaining `M - N` high bits are zeroed. Mirrors `VMOVMSKPS`/`VPMOVMSKB`/`KMOVD` semantics. `M` must satisfy `M >= N`. No attributes.
 
-- `let <i1,N>:%out = .int_to_lane_mask(iM:%bits)` - Inverse of `.lane_mask_to_int`. Unpacks the low N bits of `bits` into an N-lane `i1` vector. Bit `i` of `bits` becomes lane `i` of the output. High bits beyond N are ignored. Mirrors `KMOVD`/`VPMOVM2B` semantics. `M` must satisfy `M >= N`. No attributes.
-
-### Widening Reductions
-
-- `let T2:%out = .reduce_add_wide(<T1,N>:%v [, <i1,N>:%mask])` - Sums all lanes where the mask is true (or all lanes if no mask), accumulating in `T2`.  
-    `T1` must be integer/float/bfloat; `T2` must be integer with `bitwidth(T2) >= bitwidth(T1)`.
-    - `#[unsigned]` – treat lanes as unsigned; default is signed
-    - `#[saturating]` – clamp accumulator to `T2` range instead of wrapping; pair with `#[unsigned]` for unsigned saturation
-
-    If T1 is float:
-    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
-
-- `let T2:%out = .reduce_mul_wide(<T1,N>:%v [, <i1,N>:%mask])` - Multiplies all lanes where the mask is true (or all lanes if no mask), accumulating in `T2`.  
-    `T1` must be integer/float/bfloat; `T2` must be integer with `bitwidth(T2) >= bitwidth(T1)`.
-    - `#[unsigned]` – treat lanes as unsigned; default is signed
-    - `#[saturating]` – clamp accumulator to `T2` range instead of wrapping; pair with `#[unsigned]` for unsigned saturation
-
-    If T1 is float:
-    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
-
-- `let T2:%out = .reduce_avg_wide(<T1,N>:%v [, <i1,N>:%mask])` - Computes the arithmetic mean of all lanes where the mask is true (or all lanes if no mask) with intermediate accumulation in `T2`.  
-    `T1` must be integer/float/bfloat; `T2` must be integer with `bitwidth(T2) >= bitwidth(T1)`.
-    - `#[unsigned]` – treat lanes as unsigned; default is signed
-    - `#[saturating]` – clamp accumulator to `T2` range instead of wrapping; pair with `#[unsigned]` for unsigned saturation
-    
-    If T1 is float:
-    - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
-
-### Widening Horizontal
-
-TODO:
+- `let <i1,N>:%out = .int_to_mask(iM:%bits)` - Inverse of `.mask_to_int`. Unpacks the low N bits of `bits` into an N-lane `i1` vector. Bit `i` of `bits` becomes lane `i` of the output. High bits beyond N are ignored. Mirrors `KMOVD`/`VPMOVM2B` semantics. `M` must satisfy `M >= N`. No attributes.
 ---
 
 ## Other Instructions

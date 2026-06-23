@@ -99,6 +99,76 @@ class StoreInst:public Inst {
     std::string to_string() const override;
 };
 
+class BroadcastLoadInst:public Inst {
+    protected:
+    IR::LiteralExprPtr src;
+
+    bool volatile_ = false;
+    bool nontemporal = false;
+    bool nonull = false;
+    std::size_t alignment;
+    std::size_t dereferenceable_bytes;
+
+    virtual std::string to_string_helper(const std::string op_name) const final;
+    public:
+    BroadcastLoadInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr src, 
+                      bool volatile_, bool nontemporal, bool nonull, std::size_t alignment, 
+                      std::size_t dereferenceable_bytes, std::optional<FastMathAttr> fast_math_attr);
+
+    virtual IR::LiteralExprPtr get_pointer() const final;
+    virtual IR::TypeExprPtr get_element_type() const final;
+    virtual std::shared_ptr<IR::SIMDTypeExpr> get_casted_vector_type() const final;
+    virtual std::size_t get_vector_size() const final;
+
+    virtual bool is_volatile() const final;
+    virtual bool is_nontemporal() const final;
+    virtual bool is_nonull() const final;
+    virtual std::size_t get_alignment() const final;
+    virtual std::size_t get_dereferenceable_bytes() const final;
+
+    virtual InstType get_inst_type() const override final;
+    virtual TypeVarient get_element_type_varient() const = 0;
+};
+
+class IntBroadcastLoadInst:public BroadcastLoadInst {
+    public:
+    IntBroadcastLoadInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr src, 
+                         bool volatile_, bool nontemporal, bool nonull, std::size_t alignment, 
+                         std::size_t dereferenceable_bytes);
+    
+    std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const;
+    std::size_t get_element_bitwidth() const;
+
+    TypeVarient get_element_type_varient() const override;
+    std::string to_string() const override;
+};
+
+class PtrBroadcastLoadInst:public BroadcastLoadInst {
+    public:
+    PtrBroadcastLoadInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr src, 
+                         bool volatile_, bool nontemporal, bool nonull, std::size_t alignment, 
+                         std::size_t dereferenceable_bytes);
+    
+    std::size_t get_element_bitwidth() const;
+
+    TypeVarient get_element_type_varient() const override;
+    std::string to_string() const override;
+};
+
+class FloatBroadcastLoadInst:public BroadcastLoadInst {
+    public:
+    FloatBroadcastLoadInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr src, 
+                           bool volatile_, bool nontemporal, bool nonull, std::size_t alignment, 
+                           std::size_t dereferenceable_bytes, FastMathAttr fast_math_attr);
+    
+    std::shared_ptr<IR::FloatTypeExpr> get_casted_element_type() const;
+    std::size_t get_element_bitwidth() const;
+    bool is_brain_float() const;
+
+    TypeVarient get_element_type_varient() const override;
+    std::string to_string() const override;
+};
+
 class MaskedLoadInst:public Inst {
     protected:
     IR::LiteralExprPtr pointer;//The pointer to load from. Must be of type ptr

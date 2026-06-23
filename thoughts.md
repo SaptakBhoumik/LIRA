@@ -6,3 +6,4 @@
 - Should I allow other arithmetic operation for Fixed-Point Arithmetic Instructions and High-Half Arithmetic Instructions
 - Should I allow i<N> for any N for mulhi scale?
 - Should I cread min/max varient for regular min/max, reduce min/max, horizontal min/max etc that also returns the index of min/max
+- Should I have widening varient for reduce and horizontal simd operations?

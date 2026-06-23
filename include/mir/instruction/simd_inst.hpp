@@ -5,72 +5,7 @@
 namespace LIRA {
 namespace MIR {
 //--------------------------------- Uncategorized SIMD Instructions ---------------------------------
-class CTShuffleVectorInst:public Inst {
-    protected:
-    //Compile time varient
-    protected:
-    IR::LiteralExprPtr vector1;
-    IR::LiteralExprPtr vector2;
-    std::uint64_t mask;
-    std::size_t vec1_elm_count;
-    std::size_t vec2_elm_count;
-
-    virtual std::string to_string_helper(const std::string op_name) const final;
-    public:
-    CTShuffleVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector1, IR::LiteralExprPtr vector2, std::uint64_t mask, 
-                        std::size_t vec1_elm_count, std::size_t vec2_elm_count, std::optional<FastMathAttr> fast_math_attr);
-
-    virtual IR::LiteralExprPtr get_vector1() const final;
-    virtual IR::LiteralExprPtr get_vector2() const final;
-    virtual std::uint64_t get_mask() const final;
-
-    virtual IR::TypeExprPtr get_basetype() const final;//Base type of vector1,vector2 and output
-    virtual TypeVarient get_basetype_varient() const = 0;
-    virtual std::size_t get_vec1_elm_count() const final;
-    virtual std::size_t get_vec2_elm_count() const final;
-
-
-    virtual InstType get_inst_type() const override final;
-};
-
-class IntCTShuffleVectorInst:public CTShuffleVectorInst {
-    public:
-    IntCTShuffleVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector1, IR::LiteralExprPtr vector2, std::uint64_t mask, 
-                           std::size_t vec1_elm_count, std::size_t vec2_elm_count);
-    
-    std::shared_ptr<IR::IntTypeExpr> get_casted_basetype() const;
-    std::size_t get_basetype_bitwidth() const;
-
-    TypeVarient get_basetype_varient() const override;
-    std::string to_string() const override;
-};
-
-class PtrCTShuffleVectorInst:public CTShuffleVectorInst {
-    public:
-    PtrCTShuffleVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector1, IR::LiteralExprPtr vector2, std::uint64_t mask, 
-                           std::size_t vec1_elm_count, std::size_t vec2_elm_count);
-    
-    std::size_t get_basetype_bitwidth() const;
-
-    TypeVarient get_basetype_varient() const override;
-    std::string to_string() const override;
-};
-
-class FloatCTShuffleVectorInst:public CTShuffleVectorInst {
-    public:
-    FloatCTShuffleVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector1, IR::LiteralExprPtr vector2, std::uint64_t mask, 
-                             std::size_t vec1_elm_count, std::size_t vec2_elm_count, FastMathAttr fast_math_attr);
-    
-    std::shared_ptr<IR::FloatTypeExpr> get_casted_basetype() const;
-    std::size_t get_basetype_bitwidth() const;
-    bool is_basetype_brain_float() const;
-
-    TypeVarient get_basetype_varient() const override;
-    std::string to_string() const override;
-};
-
-class RTShuffleVectorInst:public Inst {
-    //Run time varient
+class ShuffleVectorInst:public Inst {
     protected:
     IR::LiteralExprPtr vector1;
     IR::LiteralExprPtr vector2;
@@ -80,8 +15,8 @@ class RTShuffleVectorInst:public Inst {
 
     virtual std::string to_string_helper(const std::string op_name) const final;
     public:
-    RTShuffleVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector1, IR::LiteralExprPtr vector2, IR::LiteralExprPtr mask, 
-                        std::size_t vec1_elm_count, std::size_t vec2_elm_count, std::optional<FastMathAttr> fast_math_attr);
+    ShuffleVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector1, IR::LiteralExprPtr vector2, IR::LiteralExprPtr mask, 
+                      std::size_t vec1_elm_count, std::size_t vec2_elm_count, std::optional<FastMathAttr> fast_math_attr);
 
     virtual IR::LiteralExprPtr get_vector1() const final;
     virtual IR::LiteralExprPtr get_vector2() const final;
@@ -96,9 +31,9 @@ class RTShuffleVectorInst:public Inst {
     virtual InstType get_inst_type() const override final;
 };
 
-class IntRTShuffleVectorInst:public RTShuffleVectorInst {
+class IntShuffleVectorInst:public ShuffleVectorInst {
     public:
-    IntRTShuffleVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector1, IR::LiteralExprPtr vector2, IR::LiteralExprPtr mask, 
+    IntShuffleVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector1, IR::LiteralExprPtr vector2, IR::LiteralExprPtr mask, 
                            std::size_t vec1_elm_count, std::size_t vec2_elm_count);
     
     std::shared_ptr<IR::IntTypeExpr> get_casted_basetype() const;
@@ -108,9 +43,9 @@ class IntRTShuffleVectorInst:public RTShuffleVectorInst {
     std::string to_string() const override;
 };
 
-class PtrRTShuffleVectorInst:public RTShuffleVectorInst {
+class PtrShuffleVectorInst:public ShuffleVectorInst {
     public:
-    PtrRTShuffleVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector1, IR::LiteralExprPtr vector2, IR::LiteralExprPtr mask, 
+    PtrShuffleVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector1, IR::LiteralExprPtr vector2, IR::LiteralExprPtr mask, 
                            std::size_t vec1_elm_count, std::size_t vec2_elm_count);
     
     std::size_t get_basetype_bitwidth() const;
@@ -119,9 +54,9 @@ class PtrRTShuffleVectorInst:public RTShuffleVectorInst {
     std::string to_string() const override;
 };
 
-class FloatRTShuffleVectorInst:public RTShuffleVectorInst {
+class FloatShuffleVectorInst:public ShuffleVectorInst {
     public:
-    FloatRTShuffleVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector1, IR::LiteralExprPtr vector2, IR::LiteralExprPtr mask, 
+    FloatShuffleVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector1, IR::LiteralExprPtr vector2, IR::LiteralExprPtr mask, 
                              std::size_t vec1_elm_count, std::size_t vec2_elm_count, FastMathAttr fast_math_attr);
     
     std::shared_ptr<IR::FloatTypeExpr> get_casted_basetype() const;
@@ -384,6 +319,58 @@ class ActiveLaneMaskInst:public Inst {
     std::string to_string() const override;
 };
 
+class AddSubInst:public Inst {
+    protected:
+    IR::LiteralExprPtr lhs;
+    IR::LiteralExprPtr rhs;
+
+    virtual std::string to_string_helper(const std::string op_name) const final;
+    public:
+    AddSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+               std::optional<FastMathAttr> fast_math_attr);
+
+    virtual IR::LiteralExprPtr get_lhs() const final;
+    virtual IR::LiteralExprPtr get_rhs() const final;
+    virtual IR::TypeExprPtr get_element_type() const final;//From destination
+    virtual size_t get_vector_size() const final;//From destination
+    
+    virtual TypeVarient get_element_type_varient() const = 0;
+    virtual InstType get_inst_type() const override final;
+    std::string to_string() const override;
+};
+
+class IntAddSubInst:public AddSubInst{
+    bool nuw;
+    bool nsw;
+    bool unsigned_;
+    bool saturating;
+    public:
+    IntAddSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                  bool nuw, bool nsw, bool unsigned_, bool saturating);
+    
+    std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const;
+    std::size_t get_element_bitwidth() const;
+
+    bool is_nuw() const;
+    bool is_nsw() const;
+    bool is_unsigned() const;
+    bool is_saturating() const;
+    bool is_floor() const;
+
+    TypeVarient get_element_type_varient() const override;
+};
+
+class FloatAddSubInst:public AddSubInst{
+    public:
+    FloatAddSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                    FastMathAttr fast_math_attr);
+    
+    std::shared_ptr<IR::FloatTypeExpr> get_casted_element_type() const;
+    std::size_t get_element_bitwidth() const;
+    bool is_brain_float_type() const;
+
+    TypeVarient get_element_type_varient() const override;
+};
 //--------------------------------- Reduce SIMD Instructions ---------------------------------
 //----------------------- Reduce Arithmetic SIMD Instructions -----------------------
 class ReduceArithmeticSIMDInst:public Inst {
@@ -938,7 +925,7 @@ class DotInst:public Inst {
     virtual std::size_t get_vector_size() const final;//From input_vector_type
     virtual IR::TypeExprPtr get_output_type() const final;// From destination
 
-    virtual TypeVarient get_type_varient() const = 0;
+    virtual TypeVarient get_element_type_varient() const = 0;
     virtual InstType get_inst_type() const override final;
 };
 
@@ -962,7 +949,7 @@ class IntDotInst:public DotInst {
     std::shared_ptr<IR::IntTypeExpr> get_casted_output_type() const;
     std::size_t get_output_bitwidth() const;
 
-    TypeVarient get_type_varient() const override;
+    TypeVarient get_element_type_varient() const override;
     std::string to_string() const override;
 };
 
@@ -978,7 +965,7 @@ class FloatDotInst:public DotInst {
     std::size_t get_output_bitwidth() const;
     bool is_output_brain_float() const;
 
-    TypeVarient get_type_varient() const override;
+    TypeVarient get_element_type_varient() const override;
     std::string to_string() const override;
 };
 
@@ -1000,7 +987,7 @@ class SADInst:public Inst {
     virtual std::size_t get_vector_size() const final;//From input_vector_type
     virtual IR::TypeExprPtr get_output_type() const final;// From destination
 
-    virtual TypeVarient get_type_varient() const = 0;
+    virtual TypeVarient get_element_type_varient() const = 0;
     virtual InstType get_inst_type() const override final;
 };
 
@@ -1024,7 +1011,7 @@ class IntSADInst:public SADInst {
     std::shared_ptr<IR::IntTypeExpr> get_casted_output_type() const;
     std::size_t get_output_bitwidth() const;
 
-    TypeVarient get_type_varient() const override;
+    TypeVarient get_element_type_varient() const override;
     std::string to_string() const override;
 };
 
@@ -1040,11 +1027,314 @@ class FloatSADInst:public SADInst {
     std::size_t get_output_bitwidth() const;
     bool is_output_brain_float() const;
 
-    TypeVarient get_type_varient() const override;
+    TypeVarient get_element_type_varient() const override;
     std::string to_string() const override;
 };
 
 
 //--------------------------------- Pack / Unpack Instructions ---------------------------------
+class PackSatInst:public Inst {
+    protected:
+    IR::LiteralExprPtr lhs;
+    IR::LiteralExprPtr rhs;
+    IR::TypeExprPtr input_vector_type;//Type of lhs and rhs. Must be same type
+    
+    bool unsigned_;
+    public:
+    PackSatInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                IR::TypeExprPtr input_vector_type, bool unsigned_);
+    
+    bool is_unsigned() const;
+
+    IR::LiteralExprPtr get_lhs() const;
+    IR::LiteralExprPtr get_rhs() const;
+    std::size_t get_input_vector_size() const;//From input_vector_type
+    std::size_t get_output_vector_size() const;//From destination
+    std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const;//From input_vector_type
+    std::size_t get_element_bitwidth() const;//From input_vector_type
+    std::shared_ptr<IR::IntTypeExpr> get_casted_output_type() const;//From destination
+    std::size_t get_output_bitwidth() const;//From destination
+
+    InstType get_inst_type() const override;
+    std::string to_string() const override;
+};
+
+
+class UnpackLoInst:public Inst {
+    protected:
+    IR::LiteralExprPtr lhs;
+    IR::LiteralExprPtr rhs;
+    IR::TypeExprPtr input_vector_type;//Type of lhs and rhs. Must be same type
+    
+    bool unsigned_;
+    public:
+    UnpackLoInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                 IR::TypeExprPtr input_vector_type, bool unsigned_);
+    
+    bool is_unsigned() const;
+
+    IR::LiteralExprPtr get_lhs() const;
+    IR::LiteralExprPtr get_rhs() const;
+    std::size_t get_input_vector_size() const;//From input_vector_type
+    std::size_t get_output_vector_size() const;//From destination
+    std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const;//From input_vector_type
+    std::size_t get_element_bitwidth() const;//From input_vector_type
+    std::shared_ptr<IR::IntTypeExpr> get_casted_output_type() const;//From destination
+    std::size_t get_output_bitwidth() const;//From destination
+
+    InstType get_inst_type() const override;
+    std::string to_string() const override;
+};
+
+
+class UnpackHiInst:public Inst {
+    protected:
+    IR::LiteralExprPtr lhs;
+    IR::LiteralExprPtr rhs;
+    IR::TypeExprPtr input_vector_type;//Type of lhs and rhs. Must be same type
+    
+    bool unsigned_;
+    public:
+    UnpackHiInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                 IR::TypeExprPtr input_vector_type, bool unsigned_);
+    
+    bool is_unsigned() const;
+
+    IR::LiteralExprPtr get_lhs() const;
+    IR::LiteralExprPtr get_rhs() const;
+    std::size_t get_input_vector_size() const;//From input_vector_type
+    std::size_t get_output_vector_size() const;//From destination
+    std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const;//From input_vector_type
+    std::size_t get_element_bitwidth() const;//From input_vector_type
+    std::shared_ptr<IR::IntTypeExpr> get_casted_output_type() const;//From destination
+    std::size_t get_output_bitwidth() const;//From destination
+
+    InstType get_inst_type() const override;
+    std::string to_string() const override;
+};
+
+//--------------------------------- Vector Layout Instructions ---------------------------------
+class CompressInst:public Inst {
+    protected:
+    IR::LiteralExprPtr src;
+    IR::LiteralExprPtr mask;
+    bool undef_inactive;
+
+    virtual std::string to_string_helper(const std::string op_name) const final;
+    public:
+    CompressInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask,
+                 bool undef_inactive, std::optional<FastMathAttr> fast_math_attr);
+
+    virtual IR::LiteralExprPtr get_src() const final;
+    virtual IR::LiteralExprPtr get_mask() const final;
+    virtual bool is_undef_inactive() const final;
+    virtual IR::TypeExprPtr get_element_type() const final;//From destination
+    virtual std::size_t get_vector_size() const final;//From destination
+
+    virtual TypeVarient get_element_type_varient() const = 0;
+    virtual InstType get_inst_type() const override final;
+};
+
+class IntCompressInst:public CompressInst {
+    public:
+    IntCompressInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask,
+                    bool undef_inactive);
+
+    std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const;
+    std::size_t get_element_bitwidth() const;
+
+    TypeVarient get_element_type_varient() const override;
+    std::string to_string() const override;
+};
+
+class PtrCompressInst:public CompressInst {
+    public:
+    PtrCompressInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask,
+                    bool undef_inactive);
+
+    std::size_t get_element_bitwidth() const;
+
+    TypeVarient get_element_type_varient() const override;
+    std::string to_string() const override;
+};
+
+class FloatCompressInst:public CompressInst {
+    public:
+    FloatCompressInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask,
+                      bool undef_inactive, FastMathAttr fast_math_attr);
+
+    std::shared_ptr<IR::FloatTypeExpr> get_casted_element_type() const;
+    std::size_t get_element_bitwidth() const;
+    bool is_brain_float_type() const;
+
+    TypeVarient get_element_type_varient() const override;
+    std::string to_string() const override;
+};
+
+class ExpandInst:public Inst {
+    protected:
+    IR::LiteralExprPtr src;
+    IR::LiteralExprPtr mask;
+    IR::LiteralExprPtr passthru;//May be nullptr
+    bool zeropassthru;
+
+    virtual std::string to_string_helper(const std::string op_name) const final;
+    public:
+    ExpandInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask, IR::LiteralExprPtr passthru,
+               bool zeropassthru, std::optional<FastMathAttr> fast_math_attr);
+
+    virtual IR::LiteralExprPtr get_src() const final;
+    virtual IR::LiteralExprPtr get_mask() const final;
+    virtual IR::LiteralExprPtr get_passthru() const final;
+    virtual bool is_zeropassthru() const final;
+    virtual IR::TypeExprPtr get_element_type() const final;//From destination
+    virtual std::size_t get_vector_size() const final;//From destination
+
+    virtual TypeVarient get_element_type_varient() const = 0;
+    virtual InstType get_inst_type() const override final;
+};
+
+class IntExpandInst:public ExpandInst {
+    public:
+    IntExpandInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask, IR::LiteralExprPtr passthru,
+                  bool zeropassthru);
+
+    std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const;
+    std::size_t get_element_bitwidth() const;
+
+    TypeVarient get_element_type_varient() const override;
+    std::string to_string() const override;
+};
+
+class PtrExpandInst:public ExpandInst {
+    public:
+    PtrExpandInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask, IR::LiteralExprPtr passthru,
+                  bool zeropassthru);
+
+    std::size_t get_element_bitwidth() const;
+
+    TypeVarient get_element_type_varient() const override;
+    std::string to_string() const override;
+};
+
+class FloatExpandInst:public ExpandInst {
+    public:
+    FloatExpandInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask, IR::LiteralExprPtr passthru,
+                    bool zeropassthru, FastMathAttr fast_math_attr);
+
+    std::shared_ptr<IR::FloatTypeExpr> get_casted_element_type() const;
+    std::size_t get_element_bitwidth() const;
+    bool is_brain_float_type() const;
+
+    TypeVarient get_element_type_varient() const override;
+    std::string to_string() const override;
+};
+
+class InterleaveInst:public Inst {
+    protected:
+    std::vector<IR::LiteralExprPtr> args;
+
+    virtual std::string to_string_helper(const std::string op_name) const final;
+    public:
+    InterleaveInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, std::vector<IR::LiteralExprPtr> args, 
+                   std::optional<FastMathAttr> fast_math_attr);
+
+    virtual std::vector<IR::LiteralExprPtr> get_args() const final;
+    virtual std::size_t get_interleave_kind() const final;//interleave2 or interleave3 or interleave4. From args.size()
+    virtual IR::TypeExprPtr get_element_type() const final;//From destination
+    virtual std::size_t get_input_vector_size() const final;//From destination. N/args.size() where N is the size of the destination vector
+    virtual std::size_t get_output_vector_size() const final;//From destination. N
+
+    virtual TypeVarient get_element_type_varient() const = 0;
+    virtual InstType get_inst_type() const override final;
+};
+
+class IntInterleaveInst:public InterleaveInst {
+    public:
+    IntInterleaveInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, std::vector<IR::LiteralExprPtr> args);
+
+    std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const;
+    std::size_t get_element_bitwidth() const;
+
+    TypeVarient get_element_type_varient() const override;
+    std::string to_string() const override;
+};
+
+class PtrInterleaveInst:public InterleaveInst {
+    public:
+    PtrInterleaveInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, std::vector<IR::LiteralExprPtr> args);
+
+    std::size_t get_element_bitwidth() const;
+
+    TypeVarient get_element_type_varient() const override;
+    std::string to_string() const override;
+};
+
+class FloatInterleaveInst:public InterleaveInst {
+    public:
+    FloatInterleaveInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, std::vector<IR::LiteralExprPtr> args, 
+                        FastMathAttr fast_math_attr);
+
+    std::shared_ptr<IR::FloatTypeExpr> get_casted_element_type() const;
+    std::size_t get_element_bitwidth() const;
+    bool is_brain_float_type() const;
+
+    TypeVarient get_element_type_varient() const override;
+    std::string to_string() const override;
+};
+
+class DeinterleaveInst:public Inst {
+    protected:
+    IR::LiteralExprPtr arg;
+    IR::TypeExprPtr arg_type;//Type of src. Must be same type as arg
+    IR::LiteralExprPtr channel;
+    
+    virtual std::string to_string_helper(const std::string op_name) const final;
+    public:
+    DeinterleaveInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr arg, IR::TypeExprPtr arg_type, IR::LiteralExprPtr channel,
+                     std::optional<FastMathAttr> fast_math_attr);
+
+    virtual IR::LiteralExprPtr get_arg() const final;
+    virtual IR::LiteralExprPtr get_channel() const final;
+    virtual std::size_t get_deinterleave_kind() const final;//deinterleave2 or deinterleave3 or deinterleave4. N1/N2
+    virtual IR::TypeExprPtr get_element_type() const final;//From arg_type
+    virtual std::size_t get_input_vector_size() const final;//From arg_type. N1 where N1 is the size of the arg_type
+    virtual std::size_t get_output_vector_size() const final;//From arg_type. N2 where N2 is the size of destination vector
+    
+    virtual TypeVarient get_element_type_varient() const = 0;
+    virtual InstType get_inst_type() const override final;
+};
+
+
+//--------------------------------- Lane Mask Conversion Instructions --------------------------------
+class MaskToIntInst:public Inst {
+    protected:
+    IR::LiteralExprPtr mask;
+    IR::TypeExprPtr mask_type;
+    public:
+    MaskToIntInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr mask, IR::TypeExprPtr mask_type);
+
+    virtual IR::LiteralExprPtr get_mask() const final;
+    virtual std::size_t get_mask_size() const final;
+    virtual std::size_t get_output_int_bitwidth() const final;
+
+    virtual InstType get_inst_type() const override final;
+    std::string to_string() const override;
+};
+
+class IntToMaskInst:public Inst {
+    protected:
+    IR::LiteralExprPtr input;
+    IR::TypeExprPtr input_type;
+    public:
+    IntToMaskInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr input, IR::TypeExprPtr input_type);
+
+    virtual IR::LiteralExprPtr get_input() const final;
+    virtual std::size_t get_input_int_bitwidth() const final;
+    virtual std::size_t get_output_mask_size() const final;
+
+    virtual InstType get_inst_type() const override final;
+    std::string to_string() const override;
+};
 }
 }

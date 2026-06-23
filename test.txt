@@ -14,8 +14,6 @@ NOTE:-Implement Call Inst at the end of everything
     ### Pack / Unpack Instructions
     ### Vector Layout Instructions
     ### Lane Mask Conversion Instructions
-    ### Widening Reductions
-    ### Widening Horizontal instructions
 
 
 ## Other Arithmetic Instructions
@@ -50,8 +48,6 @@ NOTE:-Implement Call Inst at the end of everything
     ### Pack / Unpack Instructions
     ### Vector Layout Instructions
     ### Lane Mask Conversion Instructions
-    ### Widening Reductions
-    ### Widening Horizontal instructions
 ## Other Instructions
     ### Optimizer Hint Instructions
         #### Binding Assumptions (UB if violated)
@@ -106,8 +102,6 @@ NOTE:-Implement Call Inst at the end of everything
     ### Pack / Unpack Instructions
     ### Vector Layout Instructions
     ### Lane Mask Conversion Instructions
-    ### Widening Reductions
-    ### Widening Horizontal instructions
 ## Other Instructions
     ### Optimizer Hint Instructions
         #### Binding Assumptions (UB if violated)

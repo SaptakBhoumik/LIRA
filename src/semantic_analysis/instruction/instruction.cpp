@@ -3,7 +3,7 @@
 namespace LIRA {
 namespace Pass {
 bool is_arithmetic_bin_inst(std::string inst_name){
-    return inst_name == ".add" || inst_name == ".sub" || inst_name == ".mul" || inst_name == ".div" || inst_name == ".rem" 
+    return inst_name == ".add" || inst_name == ".sub" || inst_name == ".absdiff" || inst_name == ".mul" || inst_name == ".div" || inst_name == ".rem" 
             || inst_name == ".copysign" || inst_name == ".min" || inst_name == ".max" || inst_name == ".avg";
 }
 bool is_arithmetic_tri_inst(std::string inst_name){
@@ -11,7 +11,7 @@ bool is_arithmetic_tri_inst(std::string inst_name){
 }
 //## Fixed-Point Arithmetic Instructions
 bool is_widening_bin_inst(std::string inst_name){
-    return inst_name == ".widening_add" || inst_name == ".widening_sub" || inst_name == ".widening_mul";
+    return inst_name == ".widening_add" || inst_name == ".widening_sub" || inst_name == ".widening_absdiff" || inst_name == ".widening_mul";
 }
 // ## Carry/Borrowing instructions
 // ## Combined Quotient and Remainder (`divmod`)

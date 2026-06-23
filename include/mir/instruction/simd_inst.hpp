@@ -628,10 +628,12 @@ class HArithmeticSIMDInst:public Inst {
     enum class OpType:std::uint64_t{
         HADD = 1 << 6,
         HSUB = 1 << 7,
-        HMUL = 1 << 8,
-        HAVG = 1 << 9,
-        HMIN = 1 << 10,
-        HMAX = 1 << 11,
+        HABSDIFF = 1 << 8,
+        HADDSUB = 1 << 9,
+        HMUL = 1 << 10,
+        HAVG = 1 << 11,
+        HMIN = 1 << 12,
+        HMAX = 1 << 13,
     };
     HArithmeticSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                        std::optional<FastMathAttr> fast_math_attr);
@@ -685,6 +687,24 @@ class IntHorizontalSubInst:public IntHArithmeticSIMDInst {
     public:
     IntHorizontalSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                         bool nuw, bool nsw, bool unsigned_, bool saturating);
+    
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
+class IntHorizontalAbsDiffInst:public IntHArithmeticSIMDInst {
+    public:
+    IntHorizontalAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                             bool nuw, bool nsw, bool unsigned_, bool saturating);
+    
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
+class IntHorizontalAddSubInst:public IntHArithmeticSIMDInst {
+    public:
+    IntHorizontalAddSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                            bool nuw, bool nsw, bool unsigned_, bool saturating);
     
     OpType get_op_type() const override;
     std::string to_string() const override;
@@ -760,6 +780,24 @@ class FloatHorizontalSubInst:public FloatHArithmeticSIMDInst {
     public:
     FloatHorizontalSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                            FastMathAttr fast_math_attr);
+    
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
+class FloatHorizontalAbsDiffInst:public FloatHArithmeticSIMDInst {
+    public:
+    FloatHorizontalAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                               FastMathAttr fast_math_attr);
+    
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
+class FloatHorizontalAddSubInst:public FloatHArithmeticSIMDInst {
+    public:
+    FloatHorizontalAddSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                              FastMathAttr fast_math_attr);
     
     OpType get_op_type() const override;
     std::string to_string() const override;

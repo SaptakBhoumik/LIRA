@@ -78,6 +78,16 @@ std::string IntWrapSubInst::to_string() const{
 }
 
 
+IntWrapAbsDiffInst::IntWrapAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                                     bool unsigned_, bool saturating):IntWrapBinaryInst(instruction_stmt, destination, lhs, rhs, unsigned_, saturating){}
+WrapBinaryInst::OpType IntWrapAbsDiffInst::get_op_type() const{
+    return OpType::WRAP_ABSDIFF;
+}
+std::string IntWrapAbsDiffInst::to_string() const{
+    return this->to_string_helper("int_wrap_absdiff");
+}
+
+
 IntWrapMulInst::IntWrapMulInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                bool unsigned_, bool saturating):IntWrapBinaryInst(instruction_stmt, destination, lhs, rhs, unsigned_, saturating){}
 WrapBinaryInst::OpType IntWrapMulInst::get_op_type() const{
@@ -185,6 +195,16 @@ WrapBinaryInst::OpType VecIntWrapSubInst::get_op_type() const{
 }
 std::string VecIntWrapSubInst::to_string() const{
     return this->to_string_helper("vec_int_wrap_sub");
+}
+
+
+VecIntWrapAbsDiffInst::VecIntWrapAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                                             bool unsigned_, bool saturating):VecIntWrapBinaryInst(instruction_stmt, destination, lhs, rhs, unsigned_, saturating){}
+WrapBinaryInst::OpType VecIntWrapAbsDiffInst::get_op_type() const{
+    return OpType::WRAP_ABSDIFF;
+}
+std::string VecIntWrapAbsDiffInst::to_string() const{
+    return this->to_string_helper("vec_int_wrap_absdiff");
 }
 
 

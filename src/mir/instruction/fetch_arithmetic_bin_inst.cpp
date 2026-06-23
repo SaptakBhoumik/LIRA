@@ -142,6 +142,18 @@ std::string IntFetchSubInst::to_string() const {
 }
 
 
+IntFetchAbsDiffInst::IntFetchAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+                    std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info,
+                    bool nuw, bool nsw, bool saturating, bool unsigned_)
+                    :IntFetchArithmeticBinInst(instruction_stmt, destination, pointer, value, alignment, volatile_, atomic_info, nuw, nsw, saturating, false, unsigned_, false){}
+FetchArithmeticBinInst::OpType IntFetchAbsDiffInst::get_op_type() const {
+    return OpType::FETCH_ABSDIFF;
+}
+std::string IntFetchAbsDiffInst::to_string() const {
+    return this->to_string_helper("int_fetch_absdiff");
+}
+
+
 IntFetchMulInst::IntFetchMulInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info,
                     bool nuw, bool nsw, bool saturating, bool unsigned_)
@@ -290,6 +302,18 @@ FetchArithmeticBinInst::OpType FloatFetchSubInst::get_op_type() const {
 }
 std::string FloatFetchSubInst::to_string() const {
     return this->to_string_helper("float_fetch_sub");
+}
+
+
+FloatFetchAbsDiffInst::FloatFetchAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+                    std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info,
+                    FastMathAttr fast_math_attr)
+                    :FloatFetchArithmeticBinInst(instruction_stmt, destination, pointer, value, alignment, volatile_, atomic_info, fast_math_attr, false, false){}
+FetchArithmeticBinInst::OpType FloatFetchAbsDiffInst::get_op_type() const {
+    return OpType::FETCH_ABSDIFF;
+}
+std::string FloatFetchAbsDiffInst::to_string() const {
+    return this->to_string_helper("float_fetch_absdiff");
 }
 
 

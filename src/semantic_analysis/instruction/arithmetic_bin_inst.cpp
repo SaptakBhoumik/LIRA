@@ -11,6 +11,8 @@ MIR::InstPtr analyze_add_bin_inst(std::string filename, MIR::LocalDestRegisterPt
                                   MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);
 MIR::InstPtr analyze_sub_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                   MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);
+MIR::InstPtr analyze_absdiff_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                                      MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);
 MIR::InstPtr analyze_mul_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                   MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);
 MIR::InstPtr analyze_div_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
@@ -32,6 +34,7 @@ MIR::InstPtr SemanticAnalyzer::analyze_arithmetic_bin_inst(IR::Token name,IR::In
     const std::unordered_map<std::string, DispatchFuncType> dispatch_map = {
             {".add", analyze_add_bin_inst},
             {".sub", analyze_sub_bin_inst},
+            {".absdiff", analyze_absdiff_bin_inst},
             {".mul", analyze_mul_bin_inst},
             {".div", analyze_div_bin_inst},
             {".rem", analyze_rem_bin_inst},
@@ -132,6 +135,34 @@ MIR::InstPtr analyze_sub_bin_inst(std::string filename, MIR::LocalDestRegisterPt
         }
         else{
             return std::make_shared<MIR::VecIntSubInst>(inst_stmt,dest,lhs,rhs,flag_attrs["nuw"],flag_attrs["nsw"],flag_attrs["unsigned"],flag_attrs["saturating"]);
+        }
+    }
+}
+MIR::InstPtr analyze_absdiff_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+                                     MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt){
+    std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
+    if(MIR::is_float_typevarient(type_varient)){
+        auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
+        if(remaining_attrs.size() > 0){
+            Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for float arithmetic binary instruction: " + remaining_attrs[0]->to_string());
+        }
+        if(type_varient == MIR::TypeVarient::Float){
+            return std::make_shared<MIR::FloatAbsDiffInst>(inst_stmt,dest,lhs,rhs,fast_math_attr);
+        }
+        else{
+            return std::make_shared<MIR::VecFloatAbsDiffInst>(inst_stmt,dest,lhs,rhs,fast_math_attr);
+        }
+    }
+    else{
+        auto [flag_attrs,remaining_attrs] = Utils::extract_flag_attrs(filename,attributes, {"nsw", "nuw","unsigned", "saturating"});
+        if(remaining_attrs.size() > 0){
+            Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for int arithmetic binary instruction: " + remaining_attrs[0]->to_string());
+        }
+        if(type_varient == MIR::TypeVarient::Int){
+            return std::make_shared<MIR::IntAbsDiffInst>(inst_stmt,dest,lhs,rhs,flag_attrs["nuw"],flag_attrs["nsw"],flag_attrs["unsigned"],flag_attrs["saturating"]);
+        }
+        else{
+            return std::make_shared<MIR::VecIntAbsDiffInst>(inst_stmt,dest,lhs,rhs,flag_attrs["nuw"],flag_attrs["nsw"],flag_attrs["unsigned"],flag_attrs["saturating"]);
         }
     }
 }

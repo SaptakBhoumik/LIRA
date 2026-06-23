@@ -13,6 +13,8 @@ MIR::InstPtr analyze_widening_add_bin_inst(std::string filename, MIR::LocalDestR
                                            IR::TypeExprPtr input_type, MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);
 MIR::InstPtr analyze_widening_sub_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                            IR::TypeExprPtr input_type, MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);
+MIR::InstPtr analyze_widening_absdiff_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                                           IR::TypeExprPtr input_type, MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);
 MIR::InstPtr analyze_widening_mul_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                            IR::TypeExprPtr input_type, MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);
 
@@ -20,6 +22,7 @@ MIR::InstPtr SemanticAnalyzer::analyze_widening_bin_inst(IR::Token name,IR::Inst
     const std::unordered_map<std::string, DispatchFuncType> dispatch_map = {
             {".widening_add", analyze_widening_add_bin_inst},
             {".widening_sub", analyze_widening_sub_bin_inst},
+            {".widening_absdiff", analyze_widening_absdiff_bin_inst},
             {".widening_mul", analyze_widening_mul_bin_inst}
     };
 
@@ -123,6 +126,35 @@ MIR::InstPtr analyze_widening_sub_bin_inst(std::string filename, MIR::LocalDestR
         }
     }
 }
+MIR::InstPtr analyze_widening_absdiff_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                                           IR::TypeExprPtr input_type, MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt){
+    std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
+    if(MIR::is_float_typevarient(type_varient)){
+        auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
+        if(remaining_attrs.size() > 0){
+            Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for float widening arithmetic binary instruction: " + remaining_attrs[0]->to_string());
+        }
+        if(type_varient == MIR::TypeVarient::Float){
+            return std::make_shared<MIR::FloatWideningAbsDiffInst>(inst_stmt,dest,lhs,rhs,input_type,fast_math_attr);
+        }
+        else{
+            return std::make_shared<MIR::VecFloatWideningAbsDiffInst>(inst_stmt,dest,lhs,rhs,input_type,fast_math_attr);
+        }
+    }
+    else{
+        auto [flag_attrs,remaining_attrs] = Utils::extract_flag_attrs(filename,attributes, {"nsw", "nuw","unsigned"});
+        if(remaining_attrs.size() > 0){
+            Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for int widening arithmetic binary instruction: " + remaining_attrs[0]->to_string());
+        }
+        if(type_varient == MIR::TypeVarient::Int){
+            return std::make_shared<MIR::IntWideningAbsDiffInst>(inst_stmt,dest,lhs,rhs,input_type,flag_attrs["nuw"],flag_attrs["nsw"],flag_attrs["unsigned"]);
+        }
+        else{
+            return std::make_shared<MIR::VecIntWideningAbsDiffInst>(inst_stmt,dest,lhs,rhs,input_type,flag_attrs["nuw"],flag_attrs["nsw"],flag_attrs["unsigned"]);
+        }
+    }
+}
+
 MIR::InstPtr analyze_widening_mul_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                            IR::TypeExprPtr input_type, MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();

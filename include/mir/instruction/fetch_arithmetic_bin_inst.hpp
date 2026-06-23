@@ -17,13 +17,14 @@ class FetchArithmeticBinInst:public Inst {
         FETCH_XCHG = 1 << 6,
         FETCH_ADD = 1 << 7,
         FETCH_SUB = 1 << 8,
-        FETCH_MUL = 1 << 9,
-        FETCH_DIV = 1 << 10,
-        FETCH_REM = 1 << 11,
-        FETCH_COPYSIGN = 1 << 12,
-        FETCH_MIN = 1 << 13,
-        FETCH_MAX = 1 << 14,
-        FETCH_AVG = 1 << 15,
+        FETCH_ABSDIFF = 1 << 9,
+        FETCH_MUL = 1 << 10,
+        FETCH_DIV = 1 << 11,
+        FETCH_REM = 1 << 12,
+        FETCH_COPYSIGN = 1 << 13,
+        FETCH_MIN = 1 << 14,
+        FETCH_MAX = 1 << 15,
+        FETCH_AVG = 1 << 16,
     };
     FetchArithmeticBinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                             std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info, std::optional<FastMathAttr> fast_math_attr);
@@ -98,6 +99,17 @@ class IntFetchSubInst:public IntFetchArithmeticBinInst {
     IntFetchSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info,
                     bool nuw, bool nsw, bool saturating, bool unsigned_);
+
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
+
+class IntFetchAbsDiffInst:public IntFetchArithmeticBinInst {
+    public:
+    IntFetchAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+                        std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info,
+                        bool nuw, bool nsw, bool saturating, bool unsigned_);
 
     OpType get_op_type() const override;
     std::string to_string() const override;
@@ -224,12 +236,21 @@ class FloatFetchSubInst:public FloatFetchArithmeticBinInst {
     public:
     FloatFetchSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                       std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info,
-                    FastMathAttr fast_math_attr);
+                      FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override;
     std::string to_string() const override;
 };
 
+class FloatFetchAbsDiffInst:public FloatFetchArithmeticBinInst {
+    public:
+    FloatFetchAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+                          std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info,
+                          FastMathAttr fast_math_attr);
+
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
 
 class FloatFetchMulInst:public FloatFetchArithmeticBinInst {
     public:

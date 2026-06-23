@@ -13,7 +13,8 @@ class WideningBinaryInst:public Inst {
     enum class OpType:std::uint64_t{
         WIDENING_ADD = 1 << 6,
         WIDENING_SUB = 1 << 7,
-        WIDENING_MUL = 1 << 8,
+        WIDENING_ABSDIFF = 1 << 8,
+        WIDENING_MUL = 1 << 9,
     };
     WideningBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                         IR::TypeExprPtr input_type, std::optional<FastMathAttr> fast_math_attr);
@@ -56,7 +57,7 @@ class IntWideningBinaryInst:public WideningBinaryInst {
 class IntWideningAddInst:public IntWideningBinaryInst {
     public:
     IntWideningAddInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                        IR::TypeExprPtr input_type, bool nuw, bool nsw, bool unsigned_);
+                       IR::TypeExprPtr input_type, bool nuw, bool nsw, bool unsigned_);
 
     OpType get_op_type() const override;
     std::string to_string() const override;
@@ -65,7 +66,16 @@ class IntWideningAddInst:public IntWideningBinaryInst {
 class IntWideningSubInst:public IntWideningBinaryInst {
     public:
     IntWideningSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                        IR::TypeExprPtr input_type, bool nuw, bool nsw, bool unsigned_);
+                       IR::TypeExprPtr input_type, bool nuw, bool nsw, bool unsigned_);
+
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
+class IntWideningAbsDiffInst:public IntWideningBinaryInst {
+    public:
+    IntWideningAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+                           IR::TypeExprPtr input_type, bool nuw, bool nsw, bool unsigned_);
 
     OpType get_op_type() const override;
     std::string to_string() const override;
@@ -124,6 +134,15 @@ class VecIntWideningSubInst:public VecIntWideningBinaryInst {
     std::string to_string() const override;
 };
 
+class VecIntWideningAbsDiffInst:public VecIntWideningBinaryInst {
+    public:
+    VecIntWideningAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+                              IR::TypeExprPtr input_type, bool nuw, bool nsw, bool unsigned_);
+
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
 class VecIntWideningMulInst:public VecIntWideningBinaryInst {
     public:
     VecIntWideningMulInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
@@ -169,6 +188,15 @@ class FloatWideningSubInst:public FloatWideningBinaryInst {
     std::string to_string() const override;
 };
 
+class FloatWideningAbsDiffInst:public FloatWideningBinaryInst {
+    public:
+    FloatWideningAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+                              IR::TypeExprPtr input_type, FastMathAttr fast_math_attr);
+
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
 class FloatWideningMulInst:public FloatWideningBinaryInst {
     public:
     FloatWideningMulInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
@@ -207,6 +235,15 @@ class VecFloatWideningSubInst:public VecFloatWideningBinaryInst {
     public:
     VecFloatWideningSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                           IR::TypeExprPtr input_type, FastMathAttr fast_math_attr);
+
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
+class VecFloatWideningAbsDiffInst:public VecFloatWideningBinaryInst {
+    public:
+    VecFloatWideningAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+                              IR::TypeExprPtr input_type, FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override;
     std::string to_string() const override;

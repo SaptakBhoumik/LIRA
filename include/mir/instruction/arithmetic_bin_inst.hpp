@@ -12,13 +12,14 @@ class ArithmeticBinaryInst:public Inst {
     enum class OpType:std::uint64_t{
         ADD = 1 << 6,
         SUB = 1 << 7,
-        MUL = 1 << 8,
-        DIV = 1 << 9,
-        REM = 1 << 10,
-        COPYSIGN = 1 << 11,
-        MIN = 1 << 12,
-        MAX = 1 << 13,
-        AVG = 1 << 14,
+        ABSDIFF = 1 << 8,
+        MUL = 1 << 9,
+        DIV = 1 << 10,
+        REM = 1 << 11,
+        COPYSIGN = 1 << 12,
+        MIN = 1 << 13,
+        MAX = 1 << 14,
+        AVG = 1 << 15,
     };
     ArithmeticBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                          std::optional<FastMathAttr> fast_math_attr);
@@ -74,6 +75,16 @@ class IntSubInst:public IntArithmeticBinaryInst {
     public:
     IntSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                 bool nuw, bool nsw, bool unsigned_, bool saturating);
+
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
+
+class IntAbsDiffInst:public IntArithmeticBinaryInst {
+    public:
+    IntAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                    bool nuw, bool nsw, bool unsigned_, bool saturating);
 
     OpType get_op_type() const override;
     std::string to_string() const override;
@@ -195,6 +206,16 @@ class VecIntSubInst:public VecIntArithmeticBinaryInst {
 };
 
 
+class VecIntAbsDiffInst:public VecIntArithmeticBinaryInst {
+    public:
+    VecIntAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                      bool nuw, bool nsw, bool unsigned_, bool saturating);
+
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
+
 class VecIntMulInst:public VecIntArithmeticBinaryInst {
     public:
     VecIntMulInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
@@ -296,6 +317,17 @@ class FloatSubInst:public FloatArithmeticBinaryInst {
     OpType get_op_type() const override;
     std::string to_string() const override;
 };
+
+
+class FloatAbsDiffInst:public FloatArithmeticBinaryInst {
+    public:
+    FloatAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                    FastMathAttr fast_math_attr);
+
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
 
 class FloatMulInst:public FloatArithmeticBinaryInst {
     public:
@@ -399,6 +431,17 @@ class VecFloatSubInst:public VecFloatArithmeticBinaryInst {
     OpType get_op_type() const override;
     std::string to_string() const override;
 };
+
+
+class VecFloatAbsDiffInst:public VecFloatArithmeticBinaryInst {
+    public:
+    VecFloatAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                    FastMathAttr fast_math_attr);
+
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
 
 class VecFloatMulInst:public VecFloatArithmeticBinaryInst {
     public:

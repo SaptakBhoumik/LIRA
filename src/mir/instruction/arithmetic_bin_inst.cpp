@@ -108,6 +108,17 @@ std::string IntSubInst::to_string() const{
 }
 
 
+IntAbsDiffInst::IntAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                        bool nuw, bool nsw, bool unsigned_, bool saturating)
+                        :IntArithmeticBinaryInst(instruction_stmt, destination, lhs, rhs, nuw, nsw, unsigned_, saturating, false, false){}
+ArithmeticBinaryInst::OpType IntAbsDiffInst::get_op_type() const{
+    return OpType::ABSDIFF;
+}
+std::string IntAbsDiffInst::to_string() const{
+    return this->to_string_helper("int_absdiff");
+}
+
+
 IntMulInst::IntMulInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                         bool nuw, bool nsw, bool unsigned_, bool saturating)
                         :IntArithmeticBinaryInst(instruction_stmt, destination, lhs, rhs, nuw, nsw, unsigned_, saturating, false, false){}
@@ -271,6 +282,17 @@ std::string VecIntSubInst::to_string() const{
 }
 
 
+VecIntAbsDiffInst::VecIntAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                        bool nuw, bool nsw, bool unsigned_, bool saturating)
+                        :VecIntArithmeticBinaryInst(instruction_stmt, destination, lhs, rhs, nuw, nsw, unsigned_, saturating, false, false){}
+ArithmeticBinaryInst::OpType VecIntAbsDiffInst::get_op_type() const{
+    return OpType::ABSDIFF;
+}
+std::string VecIntAbsDiffInst::to_string() const{
+    return this->to_string_helper("vec_int_absdiff");
+}
+
+
 VecIntMulInst::VecIntMulInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                         bool nuw, bool nsw, bool unsigned_, bool saturating)
                         :VecIntArithmeticBinaryInst(instruction_stmt, destination, lhs, rhs, nuw, nsw, unsigned_, saturating, false, false){}
@@ -411,6 +433,17 @@ std::string FloatSubInst::to_string() const{
 }
 
 
+FloatAbsDiffInst::FloatAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                            FastMathAttr fast_math_attr)
+                            :FloatArithmeticBinaryInst(instruction_stmt, destination, lhs, rhs, fast_math_attr,false,false){}
+ArithmeticBinaryInst::OpType FloatAbsDiffInst::get_op_type() const{
+    return OpType::ABSDIFF;
+}
+std::string FloatAbsDiffInst::to_string() const{
+    return this->to_string_helper("float_absdiff");
+}
+
+
 FloatMulInst::FloatMulInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                             FastMathAttr fast_math_attr)
                             :FloatArithmeticBinaryInst(instruction_stmt, destination, lhs, rhs, fast_math_attr, false, false){}
@@ -546,6 +579,17 @@ ArithmeticBinaryInst::OpType VecFloatSubInst::get_op_type() const{
 }
 std::string VecFloatSubInst::to_string() const{
     return this->to_string_helper("vec_float_sub");
+}
+
+
+VecFloatAbsDiffInst::VecFloatAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                            FastMathAttr fast_math_attr)
+                            :VecFloatArithmeticBinaryInst(instruction_stmt, destination, lhs, rhs, fast_math_attr, false, false){}
+ArithmeticBinaryInst::OpType VecFloatAbsDiffInst::get_op_type() const{
+    return OpType::ABSDIFF;
+}
+std::string VecFloatAbsDiffInst::to_string() const{
+    return this->to_string_helper("vec_float_absdiff");
 }
 
 

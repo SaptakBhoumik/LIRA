@@ -20,6 +20,16 @@
 
     If `T0` is float/bfloat: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
+- `let T:%out = .absdiff(T:%a, T:%b)` - Returns `|a - b|`. `T` must be of the form `T0` or `<T0,M>` where `T0` is integer, float, or bfloat. For vectors, the operation is lanewise. Equivalent to `abs(a - b)` but expressed as a single instruction so the backend can emit `VABSSUBPS`, `VPABSB`/`VPABSW`/`VPABSD` patterns directly.
+
+    **If `T0` is integer:**
+    - `#[unsigned]` - treat values as unsigned (result is always non-negative; equivalent to `max(a,b) - min(a,b)` unsigned); default is signed
+    - `#[nuw]` - poison if the subtraction unsigned overflows before taking absolute value
+    - `#[nsw]` - poison if the subtraction signed overflows before taking absolute value
+    - `#[saturating]` - clamp to type range instead of wrapping. Pair with `#[unsigned]` for unsigned saturation; default is signed saturation.
+
+    **If `T0` is float/bfloat:** `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+
 - `let T:%output_var = .mul(T:%input_var1, T:%input_var2)` - Multiplies 2 numbers. T must be of the form `T0` or `<T0,M>` where T0 is some float/bfloat/integer.
 
     If `T0` is integer:
@@ -81,16 +91,6 @@
     **If `T0` is float/bfloat:** Computes `(a + b) * 0.5` exactly.
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
-
-- `let T:%out = .absdiff(T:%a, T:%b)` - Returns `|a - b|`. `T` must be of the form `T0` or `<T0,M>` where `T0` is integer, float, or bfloat. For vectors, the operation is lanewise. Equivalent to `abs(a - b)` but expressed as a single instruction so the backend can emit `VABSSUBPS`, `VPABSB`/`VPABSW`/`VPABSD` patterns directly.
-
-    **If `T0` is integer:**
-    - `#[unsigned]` - treat values as unsigned (result is always non-negative; equivalent to `max(a,b) - min(a,b)` unsigned); default is signed
-    - `#[nuw]` - poison if the subtraction unsigned overflows before taking absolute value
-    - `#[nsw]` - poison if the subtraction signed overflows before taking absolute value
-    - `#[saturating]` - clamp to type range instead of wrapping. Pair with `#[unsigned]` for unsigned saturation; default is signed saturation.
-
-    **If `T0` is float/bfloat:** `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 ---
 
 ## Trinary Arithmetic Instructions
@@ -201,18 +201,9 @@ Widening instructions compute `a OP b` at the full precision of the *output* typ
 
 - `let T2:%out = .widening_sub(T1:%a, T1:%b)` - Subtracts `b` from `a`, returning the result in the wider type `T2`. Same extension and attribute rules as `.widening_add`.
 
-- `let T2:%out = .widening_mul(T1:%a, T1:%b)` - Multiplies `a` and `b`, returning the full-width product in `T2`. Same extension rules as `.widening_add`.
-
-    `T1` and `T2` must share the same kind (integer->integer, float/bfloat->float, or `<T0,M>`->`<T0,M>`). `bitwidth(T2) >= bitwidth(T1)`.
-
-    **If `T1`/`T2` base type is integer:**
-    - `#[unsigned]` - treat both inputs as unsigned before extension
-    - `#[nsw]` - poison if the result does not fit in the *input* type range (i.e. overflow would have occurred at the narrow width)
-    - `#[nuw]` - same but unsigned; only valid with `#[unsigned]`
-
-    **If `T1`/`T2` base type is float/bfloat:** `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
-
 - `let T2:%out = .widening_absdiff(T1:%a, T1:%b)` - Returns `|a - b|` in the wider type `T2`. Same extension and attribute rules as `.widening_add`.
+
+- `let T2:%out = .widening_mul(T1:%a, T1:%b)` - Multiplies `a` and `b`, returning the full-width product in `T2`. Same extension rules as `.widening_add`.
 
 ---
 
@@ -1240,6 +1231,8 @@ Ops where adjacent lanes have distinct roles dividend/divisor for .hdiv, value/s
 
 - `let <T0,N>:%out = .habsdiff(<T0,N>:%a, <T0,N>:%b)` - Pairwise absolute differences of adjacent lanes. Same type and attribute rules as `.hadd`.
 
+- `let <T0,N>:%out = .haddsub(<T0,N>:%a, <T0,N>:%b)` - Pairwise-combines adjacent lanes, consuming two `N`-lane input vectors and producing one `N`-lane output vector. The lower `N/2` output lanes are pairwise alternating differences and sums from `a`; the upper `N/2` output lanes are pairwise alternating differences and sums from `b`. Within each pair, the even-indexed output lane is the difference (`a[2i] - a[2i+1]`) and the odd-indexed output lane is the sum (`a[2i] + a[2i+1]`). No direct mirror instruction; equivalent to interleaving `HSUBPS` and `HADDPS` results. `N` must be even. `T0` must be float or bfloat.
+
 - `let <T0,N>:%out = .hmul(<T0,N>:%a, <T0,N>:%b)` - Pairwise-multiplies adjacent lanes. Same type and attribute rules as `.hadd`.
 
 - `let <T0,N>:%out = .havg(<T0,N>:%a, <T0,N>:%b)` - Horizontal (pairwise) average. Lower `N/2` output lanes are pairwise averages from `a`; upper `N/2` are pairwise averages from `b`. `N` must be even. Same attribute rules as `.avg`.
@@ -1276,7 +1269,6 @@ Ops where adjacent lanes have distinct roles dividend/divisor for .hdiv, value/s
     **If `T1` is float/bfloat:** `T2` must be float/bfloat with `bitwidth(T2) >= bitwidth(T1)`. When `%acc` is provided it must be of type `T2`. Float attributes: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 ### Absolute Difference Instructions
-
 
 - `let T2:%out = .sad(<T1,N>:%a, <T1,N>:%b)` - Sum of absolute differences: returns the sum of `|a[i] - b[i]|` over all lanes, scalar result in `T2`. Default is signed; use `#[unsigned]` for unsigned (natural for pixel data; matches `PSADBW` semantics).
 
@@ -1382,6 +1374,7 @@ The following are defined only on integer
 
 ### Widening Horizontal
 
+TODO:
 ---
 
 ## Other Instructions

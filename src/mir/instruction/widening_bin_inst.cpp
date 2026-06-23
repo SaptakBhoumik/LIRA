@@ -95,6 +95,16 @@ std::string IntWideningSubInst::to_string() const{
 }
 
 
+IntWideningAbsDiffInst::IntWideningAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+                            IR::TypeExprPtr input_type, bool nuw, bool nsw, bool unsigned_)
+                            :IntWideningBinaryInst(instruction_stmt, destination, lhs, rhs, input_type, nuw, nsw, unsigned_){}
+WideningBinaryInst::OpType IntWideningAbsDiffInst::get_op_type() const{
+    return OpType::WIDENING_ABSDIFF;
+}
+std::string IntWideningAbsDiffInst::to_string() const{
+    return this->to_string_helper("int_widening_absdiff");
+}
+
 IntWideningMulInst::IntWideningMulInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                             IR::TypeExprPtr input_type, bool nuw, bool nsw, bool unsigned_)
                             :IntWideningBinaryInst(instruction_stmt, destination, lhs, rhs, input_type, nuw, nsw, unsigned_){}
@@ -182,6 +192,17 @@ std::string VecIntWideningSubInst::to_string() const{
 }
 
 
+VecIntWideningAbsDiffInst::VecIntWideningAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+                            IR::TypeExprPtr input_type, bool nuw, bool nsw, bool unsigned_)
+                            :VecIntWideningBinaryInst(instruction_stmt, destination, lhs, rhs, input_type, nuw, nsw, unsigned_){}
+WideningBinaryInst::OpType VecIntWideningAbsDiffInst::get_op_type() const{
+    return OpType::WIDENING_ABSDIFF;
+}   
+std::string VecIntWideningAbsDiffInst::to_string() const{
+    return this->to_string_helper("vec_int_widening_absdiff");
+}
+
+
 VecIntWideningMulInst::VecIntWideningMulInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                             IR::TypeExprPtr input_type, bool nuw, bool nsw, bool unsigned_)
                             :VecIntWideningBinaryInst(instruction_stmt, destination, lhs, rhs, input_type, nuw, nsw, unsigned_){}
@@ -249,6 +270,17 @@ std::string FloatWideningSubInst::to_string() const{
 }
 
 
+FloatWideningAbsDiffInst::FloatWideningAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+                            IR::TypeExprPtr input_type, FastMathAttr fast_math_attr)
+                            :FloatWideningBinaryInst(instruction_stmt, destination, lhs, rhs, input_type, fast_math_attr){}
+WideningBinaryInst::OpType FloatWideningAbsDiffInst::get_op_type() const{
+    return OpType::WIDENING_ABSDIFF;
+}
+std::string FloatWideningAbsDiffInst::to_string() const{
+    return this->to_string_helper("float_widening_absdiff");
+}
+
+
 FloatWideningMulInst::FloatWideningMulInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                             IR::TypeExprPtr input_type, FastMathAttr fast_math_attr)
                             :FloatWideningBinaryInst(instruction_stmt, destination, lhs, rhs, input_type, fast_math_attr){}
@@ -307,6 +339,17 @@ WideningBinaryInst::OpType VecFloatWideningSubInst::get_op_type() const{
 }
 std::string VecFloatWideningSubInst::to_string() const{
     return this->to_string_helper("vec_float_widening_sub");
+}
+
+
+VecFloatWideningAbsDiffInst::VecFloatWideningAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+                            IR::TypeExprPtr input_type, FastMathAttr fast_math_attr)
+                            :VecFloatWideningBinaryInst(instruction_stmt, destination, lhs, rhs, input_type, fast_math_attr){}
+WideningBinaryInst::OpType VecFloatWideningAbsDiffInst::get_op_type() const{
+    return OpType::WIDENING_ABSDIFF;
+}
+std::string VecFloatWideningAbsDiffInst::to_string() const{
+    return this->to_string_helper("vec_float_widening_absdiff");
 }
 
 

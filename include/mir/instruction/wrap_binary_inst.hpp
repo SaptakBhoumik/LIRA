@@ -17,13 +17,14 @@ class WrapBinaryInst:public Inst {
     enum class OpType:std::uint64_t{
         WRAP_ADD = 1 << 6,
         WRAP_SUB = 1 << 7,
-        WRAP_MUL = 1 << 8,
-        WRAP_DIV = 1 << 9,
-        WRAP_REM = 1 << 10,
-        WRAP_COPYSIGN = 1 << 11,
-        WRAP_SHL = 1 << 12,
-        WRAP_LSHR = 1 << 13,
-        WRAP_ASHR = 1 << 14,
+        WRAP_ABSDIFF = 1 << 8,
+        WRAP_MUL = 1 << 9,
+        WRAP_DIV = 1 << 10,
+        WRAP_REM = 1 << 11,
+        WRAP_COPYSIGN = 1 << 12,
+        WRAP_SHL = 1 << 13,
+        WRAP_LSHR = 1 << 14,
+        WRAP_ASHR = 1 << 15,
     };
     WrapBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                    bool unsigned_, bool saturating);
@@ -65,6 +66,15 @@ class IntWrapSubInst:public IntWrapBinaryInst {
     public:
     IntWrapSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                    bool unsigned_, bool saturating);
+
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
+class IntWrapAbsDiffInst:public IntWrapBinaryInst {
+    public:
+    IntWrapAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+                       bool unsigned_, bool saturating);
 
     OpType get_op_type() const override;
     std::string to_string() const override;
@@ -166,6 +176,15 @@ class VecIntWrapSubInst:public VecIntWrapBinaryInst {
     std::string to_string() const override;
 };
 
+class VecIntWrapAbsDiffInst:public VecIntWrapBinaryInst {
+    public:
+    VecIntWrapAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+                          bool unsigned_, bool saturating);
+
+    OpType get_op_type() const override;
+    std::string to_string() const override;
+};
+
 class VecIntWrapMulInst:public VecIntWrapBinaryInst {   
     public:
     VecIntWrapMulInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
@@ -174,6 +193,7 @@ class VecIntWrapMulInst:public VecIntWrapBinaryInst {
     OpType get_op_type() const override;
     std::string to_string() const override;
 };
+
 
 class VecIntWrapDivInst:public VecIntWrapBinaryInst {
     public:

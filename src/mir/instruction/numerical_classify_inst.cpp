@@ -40,8 +40,8 @@ bool FloatClassifyInst::is_brain_float() const{
     auto float_type = this->get_casted_operand_type();
     return float_type->is_brain_float();
 }
-TypeVarient FloatClassifyInst::get_type_varient() const{
-    return TypeVarient::Float;
+TypeVariant FloatClassifyInst::get_type_variant() const{
+    return TypeVariant::Float;
 }
 
 
@@ -144,8 +144,8 @@ std::shared_ptr<IR::FloatTypeExpr> VecFloatClassifyInst::get_basetype() const{
 std::size_t VecFloatClassifyInst::get_num_elements() const{
     return this->get_casted_operand_type()->get_size();
 }
-TypeVarient VecFloatClassifyInst::get_type_varient() const{
-    return TypeVarient::VecFloat;
+TypeVariant VecFloatClassifyInst::get_type_variant() const{
+    return TypeVariant::VecFloat;
 }
 
 

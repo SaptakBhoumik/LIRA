@@ -282,8 +282,8 @@ std::shared_ptr<IR::IntTypeExpr> IntBroadcastLoadInst::get_casted_element_type()
 std::size_t IntBroadcastLoadInst::get_element_bitwidth() const{
     return this->get_casted_element_type()->get_bits();
 }
-TypeVarient IntBroadcastLoadInst::get_element_type_varient() const{
-    return TypeVarient::Int;
+TypeVariant IntBroadcastLoadInst::get_element_type_variant() const{
+    return TypeVariant::Int;
 }
 std::string IntBroadcastLoadInst::to_string() const{
     return this->to_string_helper("int_broadcast_load");
@@ -297,8 +297,8 @@ PtrBroadcastLoadInst::PtrBroadcastLoadInst(IR::InstructionStmtPtr instruction_st
 std::size_t PtrBroadcastLoadInst::get_element_bitwidth() const{
     return 64; //Assuming 64 bit pointers
 }
-TypeVarient PtrBroadcastLoadInst::get_element_type_varient() const{
-    return TypeVarient::Ptr;
+TypeVariant PtrBroadcastLoadInst::get_element_type_variant() const{
+    return TypeVariant::Ptr;
 }
 std::string PtrBroadcastLoadInst::to_string() const{
     return this->to_string_helper("ptr_broadcast_load");
@@ -318,8 +318,8 @@ std::size_t FloatBroadcastLoadInst::get_element_bitwidth() const{
 bool FloatBroadcastLoadInst::is_element_brain_float() const{
     return this->get_casted_element_type()->is_brain_float();
 }
-TypeVarient FloatBroadcastLoadInst::get_element_type_varient() const{
-    return TypeVarient::Float;
+TypeVariant FloatBroadcastLoadInst::get_element_type_variant() const{
+    return TypeVariant::Float;
 }
 std::string FloatBroadcastLoadInst::to_string() const{
     return this->to_string_helper("float_broadcast_load");
@@ -423,8 +423,8 @@ std::shared_ptr<IR::IntTypeExpr> IntMaskedLoadInst::get_casted_element_type() co
 std::size_t IntMaskedLoadInst::get_element_bitwidth() const{
     return this->get_casted_element_type()->get_bits();
 }
-TypeVarient IntMaskedLoadInst::get_element_type_varient() const{
-    return TypeVarient::Int;
+TypeVariant IntMaskedLoadInst::get_element_type_variant() const{
+    return TypeVariant::Int;
 }
 std::string IntMaskedLoadInst::to_string() const{
     return this->to_string_helper("int_masked_load");
@@ -438,8 +438,8 @@ PtrMaskedLoadInst::PtrMaskedLoadInst(IR::InstructionStmtPtr instruction_stmt, Lo
 std::size_t PtrMaskedLoadInst::get_element_bitwidth() const{
     return 64; //Assuming 64 bit pointers
 }
-TypeVarient PtrMaskedLoadInst::get_element_type_varient() const{
-    return TypeVarient::Ptr;
+TypeVariant PtrMaskedLoadInst::get_element_type_variant() const{
+    return TypeVariant::Ptr;
 }
 std::string PtrMaskedLoadInst::to_string() const{
     return this->to_string_helper("ptr_masked_load");
@@ -459,8 +459,8 @@ std::size_t FloatMaskedLoadInst::get_element_bitwidth() const{
 bool FloatMaskedLoadInst::is_element_brain_float() const{
     return this->get_casted_element_type()->is_brain_float();
 }
-TypeVarient FloatMaskedLoadInst::get_element_type_varient() const{
-    return TypeVarient::Float;
+TypeVariant FloatMaskedLoadInst::get_element_type_variant() const{
+    return TypeVariant::Float;
 }
 std::string FloatMaskedLoadInst::to_string() const{
     return this->to_string_helper("float_masked_load");
@@ -555,8 +555,8 @@ std::shared_ptr<IR::IntTypeExpr> IntMaskedStoreInst::get_casted_value_basetype()
 std::size_t IntMaskedStoreInst::get_value_basetype_bitwidth() const{
     return this->get_casted_value_basetype()->get_bits();
 }
-TypeVarient IntMaskedStoreInst::get_element_type_varient() const{
-    return TypeVarient::Int;
+TypeVariant IntMaskedStoreInst::get_element_type_variant() const{
+    return TypeVariant::Int;
 }
 std::string IntMaskedStoreInst::to_string() const{
     return this->to_string_helper("int_masked_store");  
@@ -570,8 +570,8 @@ PtrMaskedStoreInst::PtrMaskedStoreInst(IR::InstructionStmtPtr instruction_stmt, 
 std::size_t PtrMaskedStoreInst::get_value_basetype_bitwidth() const{
     return 64; //Assuming 64 bit pointers
 }
-TypeVarient PtrMaskedStoreInst::get_element_type_varient() const{
-    return TypeVarient::Ptr;
+TypeVariant PtrMaskedStoreInst::get_element_type_variant() const{
+    return TypeVariant::Ptr;
 }
 std::string PtrMaskedStoreInst::to_string() const{
     return this->to_string_helper("ptr_masked_store");  
@@ -591,8 +591,8 @@ std::size_t FloatMaskedStoreInst::get_value_basetype_bitwidth() const{
 bool FloatMaskedStoreInst::is_element_brain_float() const{
     return this->get_casted_value_basetype()->is_brain_float();
 }
-TypeVarient FloatMaskedStoreInst::get_element_type_varient() const{
-    return TypeVarient::Float;
+TypeVariant FloatMaskedStoreInst::get_element_type_variant() const{
+    return TypeVariant::Float;
 }
 std::string FloatMaskedStoreInst::to_string() const{
     return this->to_string_helper("float_masked_store");
@@ -696,8 +696,8 @@ std::shared_ptr<IR::IntTypeExpr> IntMaskedGatherInst::get_casted_element_type() 
 std::size_t IntMaskedGatherInst::get_element_bitwidth() const{
     return this->get_casted_element_type()->get_bits();
 }
-TypeVarient IntMaskedGatherInst::get_element_type_varient() const{
-    return TypeVarient::Int;
+TypeVariant IntMaskedGatherInst::get_element_type_variant() const{
+    return TypeVariant::Int;
 }
 std::string IntMaskedGatherInst::to_string() const{
     return this->to_string_helper("int_masked_gather");
@@ -711,8 +711,8 @@ PtrMaskedGatherInst::PtrMaskedGatherInst(IR::InstructionStmtPtr instruction_stmt
 std::size_t PtrMaskedGatherInst::get_element_bitwidth() const{
     return 64; //Assuming 64 bit pointers
 }
-TypeVarient PtrMaskedGatherInst::get_element_type_varient() const{
-    return TypeVarient::Ptr;
+TypeVariant PtrMaskedGatherInst::get_element_type_variant() const{
+    return TypeVariant::Ptr;
 }
 std::string PtrMaskedGatherInst::to_string() const{
     return this->to_string_helper("ptr_masked_gather");
@@ -732,8 +732,8 @@ std::size_t FloatMaskedGatherInst::get_element_bitwidth() const{
 bool FloatMaskedGatherInst::is_element_brain_float() const{
     return this->get_casted_element_type()->is_brain_float();
 }
-TypeVarient FloatMaskedGatherInst::get_element_type_varient() const{
-    return TypeVarient::Float;
+TypeVariant FloatMaskedGatherInst::get_element_type_variant() const{
+    return TypeVariant::Float;
 }
 std::string FloatMaskedGatherInst::to_string() const{
     return this->to_string_helper("float_masked_gather");
@@ -828,8 +828,8 @@ std::shared_ptr<IR::IntTypeExpr> IntMaskedScatterInst::get_casted_value_basetype
 std::size_t IntMaskedScatterInst::get_value_basetype_bitwidth() const{
     return this->get_casted_value_basetype()->get_bits();
 }
-TypeVarient IntMaskedScatterInst::get_element_type_varient() const{
-    return TypeVarient::Int;
+TypeVariant IntMaskedScatterInst::get_element_type_variant() const{
+    return TypeVariant::Int;
 }
 std::string IntMaskedScatterInst::to_string() const{
     return this->to_string_helper("int_masked_scatter");
@@ -843,8 +843,8 @@ PtrMaskedScatterInst::PtrMaskedScatterInst(IR::InstructionStmtPtr instruction_st
 std::size_t PtrMaskedScatterInst::get_value_basetype_bitwidth() const{
     return 64; //Assuming 64 bit pointers
 }
-TypeVarient PtrMaskedScatterInst::get_element_type_varient() const{
-    return TypeVarient::Ptr;
+TypeVariant PtrMaskedScatterInst::get_element_type_variant() const{
+    return TypeVariant::Ptr;
 }
 std::string PtrMaskedScatterInst::to_string() const{
     return this->to_string_helper("ptr_masked_scatter");
@@ -864,8 +864,8 @@ std::size_t FloatMaskedScatterInst::get_value_basetype_bitwidth() const{
 bool FloatMaskedScatterInst::is_element_brain_float() const{
     return this->get_casted_value_basetype()->is_brain_float();
 }
-TypeVarient FloatMaskedScatterInst::get_element_type_varient() const{
-    return TypeVarient::Float;
+TypeVariant FloatMaskedScatterInst::get_element_type_variant() const{
+    return TypeVariant::Float;
 }
 std::string FloatMaskedScatterInst::to_string() const{
     return this->to_string_helper("float_masked_scatter");

@@ -19,7 +19,7 @@ class WideningBinaryInst:public Inst {
     WideningBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                         IR::TypeExprPtr input_type, std::optional<FastMathAttr> fast_math_attr);
 
-    virtual TypeVarient get_type_varient() const = 0;//Type varient of result and input is gonna be same
+    virtual TypeVariant get_type_variant() const = 0;//Type variant of result and input is gonna be same
     virtual IR::TypeExprPtr get_input_type() const final;
     virtual IR::TypeExprPtr get_result_type() const final;
     virtual IR::LiteralExprPtr get_lhs() const final;
@@ -51,7 +51,7 @@ class IntWideningBinaryInst:public WideningBinaryInst {
     virtual std::size_t get_input_bitwidth() const final;
     virtual std::size_t get_result_bitwidth() const final;
     
-    virtual TypeVarient get_type_varient() const override final;
+    virtual TypeVariant get_type_variant() const override final;
 };
 
 class IntWideningAddInst:public IntWideningBinaryInst {
@@ -113,7 +113,7 @@ class VecIntWideningBinaryInst:public WideningBinaryInst {
     virtual std::size_t get_result_base_bitwidth() const final;
     virtual std::size_t get_num_elements() const final;
     
-    virtual TypeVarient get_type_varient() const override final;
+    virtual TypeVariant get_type_variant() const override final;
 };
 
 class VecIntWideningAddInst:public VecIntWideningBinaryInst {
@@ -167,7 +167,7 @@ class FloatWideningBinaryInst:public WideningBinaryInst {
     virtual bool is_input_brain_float() const final;
     virtual bool is_result_brain_float() const final;
 
-    virtual TypeVarient get_type_varient() const override final;
+    virtual TypeVariant get_type_variant() const override final;
 };
 
 class FloatWideningAddInst:public FloatWideningBinaryInst {
@@ -219,7 +219,7 @@ class VecFloatWideningBinaryInst:public WideningBinaryInst {
     virtual std::shared_ptr<IR::FloatTypeExpr> get_casted_result_basetype() const final;
     virtual std::size_t get_num_elements() const final;
 
-    virtual TypeVarient get_type_varient() const override final;
+    virtual TypeVariant get_type_variant() const override final;
 };
 
 class VecFloatWideningAddInst:public VecFloatWideningBinaryInst {

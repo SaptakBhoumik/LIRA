@@ -71,8 +71,8 @@ std::size_t IntArithmeticTrinaryInst::get_bitwidth() const{
     auto type = this->get_casted_operand_type();
     return type->get_bits();
 }
-TypeVarient IntArithmeticTrinaryInst::get_operand_type_varient() const{
-    return TypeVarient::Int;
+TypeVariant IntArithmeticTrinaryInst::get_operand_type_variant() const{
+    return TypeVariant::Int;
 }
 
 
@@ -179,8 +179,8 @@ std::size_t VecIntArithmeticTrinaryInst::get_num_elements() const{
     auto type = this->get_casted_operand_type();
     return type->get_size();
 }
-TypeVarient VecIntArithmeticTrinaryInst::get_operand_type_varient() const{
-    return TypeVarient::VecInt;
+TypeVariant VecIntArithmeticTrinaryInst::get_operand_type_variant() const{
+    return TypeVariant::VecInt;
 }
 
 
@@ -274,8 +274,8 @@ bool FloatArithmeticTrinaryInst::is_brain_float() const{
     auto type = this->get_casted_operand_type();
     return type->is_brain_float();
 }
-TypeVarient FloatArithmeticTrinaryInst::get_operand_type_varient() const{
-    return TypeVarient::Float;
+TypeVariant FloatArithmeticTrinaryInst::get_operand_type_variant() const{
+    return TypeVariant::Float;
 }
 
 
@@ -369,8 +369,8 @@ std::size_t VecFloatArithmeticTrinaryInst::get_num_elements() const{
     auto type = this->get_casted_operand_type();
     return type->get_size();
 }
-TypeVarient VecFloatArithmeticTrinaryInst::get_operand_type_varient() const{
-    return TypeVarient::VecFloat;
+TypeVariant VecFloatArithmeticTrinaryInst::get_operand_type_variant() const{
+    return TypeVariant::VecFloat;
 }
 
 

@@ -7,25 +7,25 @@
 namespace LIRA {
 namespace SemanticAnalyzer {
 using DispatchFuncType = std::function<MIR::InstPtr(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
-                                                    IR::TypeExprPtr type, MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt)>; 
+                                                    IR::TypeExprPtr type, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt)>; 
 MIR::InstPtr analyze_eq_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                                 IR::TypeExprPtr type, MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);
+                                 IR::TypeExprPtr type, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
 MIR::InstPtr analyze_neq_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
-                                  IR::TypeExprPtr type, MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);
+                                  IR::TypeExprPtr type, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
 MIR::InstPtr analyze_gt_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
-                                  IR::TypeExprPtr type, MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);
+                                  IR::TypeExprPtr type, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
 MIR::InstPtr analyze_lt_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
-                                  IR::TypeExprPtr type, MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);
+                                  IR::TypeExprPtr type, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
 MIR::InstPtr analyze_ge_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                                  IR::TypeExprPtr type, MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);
+                                  IR::TypeExprPtr type, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
 MIR::InstPtr analyze_le_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                                  IR::TypeExprPtr type, MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);
+                                  IR::TypeExprPtr type, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
 MIR::InstPtr analyze_either_nan_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                                        IR::TypeExprPtr type, MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);
+                                        IR::TypeExprPtr type, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
 MIR::InstPtr analyze_neither_nan_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
-                                         IR::TypeExprPtr type, MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);         
+                                         IR::TypeExprPtr type, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);         
 MIR::InstPtr analyze_both_nan_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
-                                        IR::TypeExprPtr type, MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);                                             
+                                        IR::TypeExprPtr type, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);                                             
 MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_cmp_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt){
     const std::unordered_map<std::string, DispatchFuncType> dispatch_map = {
         {".eq", analyze_eq_bin_inst},
@@ -83,18 +83,18 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_cmp_bin_inst(IR::Token name,IR::In
         }
     }
 
-    auto type_varient = MIR::get_type_varient_from_type(type);
-    if(!type_varient.has_value()){
+    auto type_variant = MIR::get_type_variant_from_type(type);
+    if(!type_variant.has_value()){
         Utils::error(this->filename,name,"Unsupported type for comparison binary instruction: " + type->to_string());
     }
-    else if((!MIR::is_int_typevarient(type_varient.value())) && (!MIR::is_float_typevarient(type_varient.value())) && (!MIR::is_ptr_typevarient(type_varient.value())) ){
+    else if((!MIR::is_int_typevariant(type_variant.value())) && (!MIR::is_float_typevariant(type_variant.value())) && (!MIR::is_ptr_typevariant(type_variant.value())) ){
         Utils::error(this->filename,name,"Only int, float, and pointer types and their vectors are supported for comparison binary instruction");
     }
 
-    //After this stage, type varient can only be float or int or ptr or it's vector. So the args are literal expr. No need to check if they are literal expr or not cuz gurrentee
+    //After this stage, type variant can only be float or int or ptr or it's vector. So the args are literal expr. No need to check if they are literal expr or not cuz gurrentee
     auto dispatch_func = dispatch_map.find(name.value);
     if(dispatch_func != dispatch_map.end()){
-        return dispatch_func->second(this->filename,dest,args[0].first->get_literal(),args[1].first->get_literal(),type,type_varient.value(),inst_stmt);
+        return dispatch_func->second(this->filename,dest,args[0].first->get_literal(),args[1].first->get_literal(),type,type_variant.value(),inst_stmt);
     }
     else{
         std::cerr << "Unknown comparison binary instruction: " << name.value << std::endl;
@@ -104,27 +104,27 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_cmp_bin_inst(IR::Token name,IR::In
 }
 
 MIR::InstPtr analyze_eq_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
-                                 MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt){
+                                 MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
-    if(MIR::is_float_typevarient(type_varient)){
+    if(MIR::is_float_typevariant(type_variant)){
         auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
         auto [flag_attrs, final_remaining_attrs] = Utils::extract_flag_attrs(filename,remaining_attrs, {"unordered"});
         if(!final_remaining_attrs.empty()){
             Utils::error(filename,final_remaining_attrs[0]->get_token(), "Unsupported attribute(s) for .eq instruction with floating point operands: " + final_remaining_attrs[0]->to_string());
         }
         bool unordered = flag_attrs["unordered"];
-        if(type_varient == MIR::TypeVarient::Float){
+        if(type_variant == MIR::TypeVariant::Float){
             return std::make_shared<MIR::FloatEqInst>(inst_stmt, dest, lhs, rhs, type, fast_math_attr, unordered);
         }
         else{
             return std::make_shared<MIR::VecFloatEqInst>(inst_stmt, dest, lhs, rhs, type, fast_math_attr, unordered);
         }
     }
-    else if(MIR::is_int_typevarient(type_varient)){
+    else if(MIR::is_int_typevariant(type_variant)){
         if(attributes.size() > 0){
             Utils::error(filename,attributes[0]->get_token(), "Attributes are not supported for .eq instruction with integer operands");
         }
-        if(type_varient == MIR::TypeVarient::Int){
+        if(type_variant == MIR::TypeVariant::Int){
             return std::make_shared<MIR::IntEqInst>(inst_stmt, dest, lhs, rhs, type);
         }
         else{
@@ -135,7 +135,7 @@ MIR::InstPtr analyze_eq_bin_inst(std::string filename, MIR::LocalDestRegisterPtr
         if(attributes.size() > 0){
             Utils::error(filename,attributes[0]->get_token(), "Attributes are not supported for .eq instruction with pointer operands");
         }
-        if(type_varient == MIR::TypeVarient::Ptr){
+        if(type_variant == MIR::TypeVariant::Ptr){
             return std::make_shared<MIR::PtrEqInst>(inst_stmt, dest, lhs, rhs);
         }
         else{
@@ -144,27 +144,27 @@ MIR::InstPtr analyze_eq_bin_inst(std::string filename, MIR::LocalDestRegisterPtr
     }
 }
 MIR::InstPtr analyze_neq_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
-                                  MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt){
+                                  MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
-    if(MIR::is_float_typevarient(type_varient)){
+    if(MIR::is_float_typevariant(type_variant)){
         auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
         auto [flag_attrs, final_remaining_attrs] = Utils::extract_flag_attrs(filename,remaining_attrs, {"unordered"});
         if(!final_remaining_attrs.empty()){
             Utils::error(filename,final_remaining_attrs[0]->get_token(), "Unsupported attribute(s) for .neq instruction with floating point operands: " + final_remaining_attrs[0]->to_string());
         }
         bool unordered = flag_attrs["unordered"];
-        if(type_varient == MIR::TypeVarient::Float){
+        if(type_variant == MIR::TypeVariant::Float){
             return std::make_shared<MIR::FloatNeqInst>(inst_stmt, dest, lhs, rhs, type, fast_math_attr, unordered);
         }
         else{
             return std::make_shared<MIR::VecFloatNeqInst>(inst_stmt, dest, lhs, rhs, type, fast_math_attr, unordered);
         } 
     }
-    else if(MIR::is_int_typevarient(type_varient)){
+    else if(MIR::is_int_typevariant(type_variant)){
         if(attributes.size() > 0){
             Utils::error(filename,attributes[0]->get_token(), "Attributes are not supported for .neq instruction with integer operands");
         }
-        if(type_varient == MIR::TypeVarient::Int){
+        if(type_variant == MIR::TypeVariant::Int){
             return std::make_shared<MIR::IntNeqInst>(inst_stmt, dest, lhs, rhs, type);
         }
         else{
@@ -175,7 +175,7 @@ MIR::InstPtr analyze_neq_bin_inst(std::string filename, MIR::LocalDestRegisterPt
         if(attributes.size() > 0){
             Utils::error(filename,attributes[0]->get_token(), "Attributes are not supported for .neq instruction with pointer operands");
         }
-        if(type_varient == MIR::TypeVarient::Ptr){
+        if(type_variant == MIR::TypeVariant::Ptr){
             return std::make_shared<MIR::PtrNeqInst>(inst_stmt, dest, lhs, rhs);
         }
         else{
@@ -184,29 +184,29 @@ MIR::InstPtr analyze_neq_bin_inst(std::string filename, MIR::LocalDestRegisterPt
     }
 }
 MIR::InstPtr analyze_gt_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type, 
-                                 MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt){
+                                 MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
-    if(MIR::is_float_typevarient(type_varient)){
+    if(MIR::is_float_typevariant(type_variant)){
         auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
         auto [flag_attrs, final_remaining_attrs] = Utils::extract_flag_attrs(filename,remaining_attrs, {"unordered"});
         if(!final_remaining_attrs.empty()){
             Utils::error(filename,final_remaining_attrs[0]->get_token(), "Unsupported attribute(s) for .gt instruction with floating point operands: " + final_remaining_attrs[0]->to_string());
         }
         bool unordered = flag_attrs["unordered"];
-        if(type_varient == MIR::TypeVarient::Float){
+        if(type_variant == MIR::TypeVariant::Float){
             return std::make_shared<MIR::FloatGtInst>(inst_stmt, dest, lhs, rhs, type, fast_math_attr, unordered);
         }
         else{
             return std::make_shared<MIR::VecFloatGtInst>(inst_stmt, dest, lhs, rhs, type, fast_math_attr, unordered);
         }   
     }
-    else if(MIR::is_int_typevarient(type_varient)){
+    else if(MIR::is_int_typevariant(type_variant)){
         auto [flag_attrs, final_remaining_attrs] = Utils::extract_flag_attrs(filename,attributes, {"unsigned"});
         if(!final_remaining_attrs.empty()){
             Utils::error(filename,final_remaining_attrs[0]->get_token(), "Unsupported attribute(s) for .gt instruction with integer operands: " + final_remaining_attrs[0]->to_string());
         }
         bool is_unsigned = flag_attrs["unsigned"];
-        if(type_varient == MIR::TypeVarient::Int){
+        if(type_variant == MIR::TypeVariant::Int){
             return std::make_shared<MIR::IntGtInst>(inst_stmt, dest, lhs, rhs, type, is_unsigned);
         }
         else{
@@ -217,7 +217,7 @@ MIR::InstPtr analyze_gt_bin_inst(std::string filename, MIR::LocalDestRegisterPtr
         if(attributes.size() > 0){
             Utils::error(filename,attributes[0]->get_token(), "Attributes are not supported for .gt instruction with pointer operands");
         }
-        if(type_varient == MIR::TypeVarient::Ptr){
+        if(type_variant == MIR::TypeVariant::Ptr){
             return std::make_shared<MIR::PtrGtInst>(inst_stmt, dest, lhs, rhs);
         }
         else{
@@ -226,29 +226,29 @@ MIR::InstPtr analyze_gt_bin_inst(std::string filename, MIR::LocalDestRegisterPtr
     }
 }
 MIR::InstPtr analyze_lt_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
-                                 MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt){
+                                 MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
-    if(MIR::is_float_typevarient(type_varient)){
+    if(MIR::is_float_typevariant(type_variant)){
         auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
         auto [flag_attrs, final_remaining_attrs] = Utils::extract_flag_attrs(filename,remaining_attrs, {"unordered"});
         if(!final_remaining_attrs.empty()){
             Utils::error(filename,final_remaining_attrs[0]->get_token(), "Unsupported attribute(s) for .lt instruction with floating point operands: " + final_remaining_attrs[0]->to_string());
         }
         bool unordered = flag_attrs["unordered"];
-        if(type_varient == MIR::TypeVarient::Float){
+        if(type_variant == MIR::TypeVariant::Float){
             return std::make_shared<MIR::FloatLtInst>(inst_stmt, dest, lhs, rhs, type, fast_math_attr, unordered);
         }
         else{
             return std::make_shared<MIR::VecFloatLtInst>(inst_stmt, dest, lhs, rhs, type, fast_math_attr, unordered);
         }
     }
-    else if(MIR::is_int_typevarient(type_varient)){
+    else if(MIR::is_int_typevariant(type_variant)){
         auto [flag_attrs, final_remaining_attrs] = Utils::extract_flag_attrs(filename,attributes, {"unsigned"});
         if(!final_remaining_attrs.empty()){
             Utils::error(filename,final_remaining_attrs[0]->get_token(), "Unsupported attribute(s) for .lt instruction with integer operands: " + final_remaining_attrs[0]->to_string());
         }
         bool is_unsigned = flag_attrs["unsigned"];
-        if(type_varient == MIR::TypeVarient::Int){
+        if(type_variant == MIR::TypeVariant::Int){
             return std::make_shared<MIR::IntLtInst>(inst_stmt, dest, lhs, rhs, type, is_unsigned);
         }
         else{
@@ -259,7 +259,7 @@ MIR::InstPtr analyze_lt_bin_inst(std::string filename, MIR::LocalDestRegisterPtr
         if(attributes.size() > 0){
             Utils::error(filename,attributes[0]->get_token(), "Attributes are not supported for .lt instruction with pointer operands");
         }
-        if(type_varient == MIR::TypeVarient::Ptr){
+        if(type_variant == MIR::TypeVariant::Ptr){
             return std::make_shared<MIR::PtrLtInst>(inst_stmt, dest, lhs, rhs);
         }
         else{
@@ -268,29 +268,29 @@ MIR::InstPtr analyze_lt_bin_inst(std::string filename, MIR::LocalDestRegisterPtr
     }
 }
 MIR::InstPtr analyze_ge_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type, 
-                                 MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt){
+                                 MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
-    if(MIR::is_float_typevarient(type_varient)){
+    if(MIR::is_float_typevariant(type_variant)){
         auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
         auto [flag_attrs, final_remaining_attrs] = Utils::extract_flag_attrs(filename,remaining_attrs, {"unordered"});
         if(!final_remaining_attrs.empty()){
             Utils::error(filename,final_remaining_attrs[0]->get_token(), "Unsupported attribute(s) for .ge instruction with floating point operands: " + final_remaining_attrs[0]->to_string());
         }
         bool unordered = flag_attrs["unordered"];
-        if(type_varient == MIR::TypeVarient::Float){
+        if(type_variant == MIR::TypeVariant::Float){
             return std::make_shared<MIR::FloatGeInst>(inst_stmt, dest, lhs, rhs, type, fast_math_attr, unordered);
         }
         else{
             return std::make_shared<MIR::VecFloatGeInst>(inst_stmt, dest, lhs, rhs, type, fast_math_attr, unordered);
         }
     }
-    else if(MIR::is_int_typevarient(type_varient)){
+    else if(MIR::is_int_typevariant(type_variant)){
         auto [flag_attrs, final_remaining_attrs] = Utils::extract_flag_attrs(filename,attributes, {"unsigned"});
         if(!final_remaining_attrs.empty()){
             Utils::error(filename,final_remaining_attrs[0]->get_token(), "Unsupported attribute(s) for .ge instruction with integer operands: " + final_remaining_attrs[0]->to_string());
         }
         bool is_unsigned = flag_attrs["unsigned"];
-        if(type_varient == MIR::TypeVarient::Int){
+        if(type_variant == MIR::TypeVariant::Int){
             return std::make_shared<MIR::IntGeInst>(inst_stmt, dest, lhs, rhs, type, is_unsigned);
         }
         else{
@@ -301,7 +301,7 @@ MIR::InstPtr analyze_ge_bin_inst(std::string filename, MIR::LocalDestRegisterPtr
         if(attributes.size() > 0){
             Utils::error(filename,attributes[0]->get_token(), "Attributes are not supported for .ge instruction with pointer operands");
         }
-        if(type_varient == MIR::TypeVarient::Ptr){
+        if(type_variant == MIR::TypeVariant::Ptr){
             return std::make_shared<MIR::PtrGeInst>(inst_stmt, dest, lhs, rhs);
         }
         else{
@@ -310,29 +310,29 @@ MIR::InstPtr analyze_ge_bin_inst(std::string filename, MIR::LocalDestRegisterPtr
     }
 }
 MIR::InstPtr analyze_le_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type, 
-                                 MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt){
+                                 MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
-    if(MIR::is_float_typevarient(type_varient)){
+    if(MIR::is_float_typevariant(type_variant)){
         auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
         auto [flag_attrs, final_remaining_attrs] = Utils::extract_flag_attrs(filename,remaining_attrs, {"unordered"});
         if(!final_remaining_attrs.empty()){
             Utils::error(filename,final_remaining_attrs[0]->get_token(), "Unsupported attribute(s) for .le instruction with floating point operands: " + final_remaining_attrs[0]->to_string());
         }
         bool unordered = flag_attrs["unordered"];
-        if(type_varient == MIR::TypeVarient::Float){
+        if(type_variant == MIR::TypeVariant::Float){
             return std::make_shared<MIR::FloatLeInst>(inst_stmt, dest, lhs, rhs, type, fast_math_attr, unordered);
         }
         else{
             return std::make_shared<MIR::VecFloatLeInst>(inst_stmt, dest, lhs, rhs, type, fast_math_attr, unordered);
         }
     }
-    else if(MIR::is_int_typevarient(type_varient)){
+    else if(MIR::is_int_typevariant(type_variant)){
         auto [flag_attrs, final_remaining_attrs] = Utils::extract_flag_attrs(filename,attributes, {"unsigned"});
         if(!final_remaining_attrs.empty()){
             Utils::error(filename,final_remaining_attrs[0]->get_token(), "Unsupported attribute(s) for .le instruction with integer operands: " + final_remaining_attrs[0]->to_string());
         }
         bool is_unsigned = flag_attrs["unsigned"];
-        if(type_varient == MIR::TypeVarient::Int){
+        if(type_variant == MIR::TypeVariant::Int){
             return std::make_shared<MIR::IntLeInst>(inst_stmt, dest, lhs, rhs, type, is_unsigned);
         }
         else{
@@ -343,7 +343,7 @@ MIR::InstPtr analyze_le_bin_inst(std::string filename, MIR::LocalDestRegisterPtr
         if(attributes.size() > 0){
             Utils::error(filename,attributes[0]->get_token(), "Attributes are not supported for .le instruction with pointer operands");
         }
-        if(type_varient == MIR::TypeVarient::Ptr){
+        if(type_variant == MIR::TypeVariant::Ptr){
             return std::make_shared<MIR::PtrLeInst>(inst_stmt, dest, lhs, rhs);
         }
         else{
@@ -353,8 +353,8 @@ MIR::InstPtr analyze_le_bin_inst(std::string filename, MIR::LocalDestRegisterPtr
 }
 
 MIR::InstPtr analyze_either_nan_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type, 
-                                         MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt){
-    if(!MIR::is_float_typevarient(type_varient)){
+                                         MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
+    if(!MIR::is_float_typevariant(type_variant)){
         Utils::error(filename,inst_stmt->get_value()->get_token(), ".either_nan instruction only supports floating point types");
     }
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
@@ -362,7 +362,7 @@ MIR::InstPtr analyze_either_nan_bin_inst(std::string filename, MIR::LocalDestReg
     if(!remaining_attrs.empty()){
         Utils::error(filename,remaining_attrs[0]->get_token(), "Unsupported attribute(s) for .either_nan instruction: " + remaining_attrs[0]->to_string());
     }
-    if(type_varient == MIR::TypeVarient::Float){
+    if(type_variant == MIR::TypeVariant::Float){
         return std::make_shared<MIR::FloatEitherNanInst>(inst_stmt, dest, lhs, rhs, type, fast_math_attr);
     }
     else{
@@ -370,9 +370,9 @@ MIR::InstPtr analyze_either_nan_bin_inst(std::string filename, MIR::LocalDestReg
     }
 }
 MIR::InstPtr analyze_neither_nan_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type, 
-                                          MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt){
+                                          MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
 
-    if(!MIR::is_float_typevarient(type_varient)){
+    if(!MIR::is_float_typevariant(type_variant)){
         Utils::error(filename,inst_stmt->get_value()->get_token(), ".neither_nan instruction only supports floating point types");
     }
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
@@ -380,7 +380,7 @@ MIR::InstPtr analyze_neither_nan_bin_inst(std::string filename, MIR::LocalDestRe
     if(!remaining_attrs.empty()){
         Utils::error(filename,remaining_attrs[0]->get_token(), "Unsupported attribute(s) for .neither_nan instruction: " + remaining_attrs[0]->to_string());
     }
-    if(type_varient == MIR::TypeVarient::Float){
+    if(type_variant == MIR::TypeVariant::Float){
         return std::make_shared<MIR::FloatNeitherNanInst>(inst_stmt, dest, lhs, rhs, type, fast_math_attr);
     }
     else{
@@ -388,9 +388,9 @@ MIR::InstPtr analyze_neither_nan_bin_inst(std::string filename, MIR::LocalDestRe
     }
 }
 MIR::InstPtr analyze_both_nan_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type, 
-                                       MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt){
+                                       MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
 
-    if(!MIR::is_float_typevarient(type_varient)){
+    if(!MIR::is_float_typevariant(type_variant)){
         Utils::error(filename,inst_stmt->get_value()->get_token(), ".both_nan instruction only supports floating point types");
     }
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
@@ -398,7 +398,7 @@ MIR::InstPtr analyze_both_nan_bin_inst(std::string filename, MIR::LocalDestRegis
     if(!remaining_attrs.empty()){
         Utils::error(filename,remaining_attrs[0]->get_token(), "Unsupported attribute(s) for .both_nan instruction: " + remaining_attrs[0]->to_string());
     }
-    if(type_varient == MIR::TypeVarient::Float){
+    if(type_variant == MIR::TypeVariant::Float){
         return std::make_shared<MIR::FloatBothNanInst>(inst_stmt, dest, lhs, rhs, type, fast_math_attr);
     }
     else{

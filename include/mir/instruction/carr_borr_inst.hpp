@@ -26,7 +26,7 @@ class CarrBorrType1Inst:public Inst {
 
     virtual bool is_unsigned() const final;
 
-    virtual TypeVarient get_operand_type_varient() const = 0;
+    virtual TypeVariant get_operand_type_variant() const = 0;
     virtual IR::TypeExprPtr get_operand_type() const final;
     virtual IR::LiteralExprPtr get_lhs() const final;
     virtual IR::LiteralExprPtr get_rhs() const final;
@@ -46,7 +46,7 @@ class IntCarrBorrType1Inst:public CarrBorrType1Inst {
     virtual std::shared_ptr<IR::IntTypeExpr> get_casted_operand_type() const final;
     virtual std::size_t get_bitwidth() const final;
     
-    virtual TypeVarient get_operand_type_varient() const override final;
+    virtual TypeVariant get_operand_type_variant() const override final;
 };
 
 class IntCarrAddInst:public IntCarrBorrType1Inst {
@@ -107,7 +107,7 @@ class VecIntCarrBorrType1Inst:public CarrBorrType1Inst {
     virtual std::size_t get_operand_basetype_bitwidth() const final;
     virtual std::size_t get_vector_size() const final;
     
-    virtual TypeVarient get_operand_type_varient() const override final;
+    virtual TypeVariant get_operand_type_variant() const override final;
 };
 
 
@@ -179,7 +179,7 @@ class CarrBorrType2Inst:public Inst {
 
     virtual bool is_unsigned() const final;
 
-    virtual TypeVarient get_operand_type_varient() const = 0;
+    virtual TypeVariant get_operand_type_variant() const = 0;
     virtual IR::TypeExprPtr get_operand_type() const final;
     virtual IR::LiteralExprPtr get_lhs() const final;
     virtual IR::LiteralExprPtr get_rhs() const final;
@@ -198,7 +198,7 @@ class IntCarrBorrType2Inst:public CarrBorrType2Inst {
     virtual std::shared_ptr<IR::IntTypeExpr> get_casted_operand_type() const final;
     virtual std::size_t get_bitwidth() const final;
     
-    virtual TypeVarient get_operand_type_varient() const override final;
+    virtual TypeVariant get_operand_type_variant() const override final;
 };
 
 class IntMacWideInst:public IntCarrBorrType2Inst {
@@ -249,7 +249,7 @@ class VecIntCarrBorrType2Inst:public CarrBorrType2Inst {
     virtual std::size_t get_operand_basetype_bitwidth() const final;
     virtual std::size_t get_vector_size() const final;
     
-    virtual TypeVarient get_operand_type_varient() const override final;
+    virtual TypeVariant get_operand_type_variant() const override final;
 };
 
 class VecIntMacWideInst:public VecIntCarrBorrType2Inst {

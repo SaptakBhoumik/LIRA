@@ -62,8 +62,8 @@ std::shared_ptr<IR::IntTypeExpr> IntShuffleVectorInst::get_casted_basetype() con
 std::size_t IntShuffleVectorInst::get_basetype_bitwidth() const {
     return this->get_casted_basetype()->get_bits();
 }
-TypeVarient IntShuffleVectorInst::get_basetype_varient() const {
-    return TypeVarient::Int;
+TypeVariant IntShuffleVectorInst::get_basetype_variant() const {
+    return TypeVariant::Int;
 }
 std::string IntShuffleVectorInst::to_string() const {
     return this->to_string_helper("int_shuffle_vector");
@@ -76,8 +76,8 @@ PtrShuffleVectorInst::PtrShuffleVectorInst(IR::InstructionStmtPtr instruction_st
 std::size_t PtrShuffleVectorInst::get_basetype_bitwidth() const {
     return 64;
 }
-TypeVarient PtrShuffleVectorInst::get_basetype_varient() const {
-    return TypeVarient::Ptr;
+TypeVariant PtrShuffleVectorInst::get_basetype_variant() const {
+    return TypeVariant::Ptr;
 }
 std::string PtrShuffleVectorInst::to_string() const {
     return this->to_string_helper("ptr_shuffle_vector");
@@ -96,8 +96,8 @@ std::size_t FloatShuffleVectorInst::get_basetype_bitwidth() const {
 bool FloatShuffleVectorInst::is_basetype_brain_float() const {
     return this->get_casted_basetype()->is_brain_float();
 }
-TypeVarient FloatShuffleVectorInst::get_basetype_varient() const {
-    return TypeVarient::Float;
+TypeVariant FloatShuffleVectorInst::get_basetype_variant() const {
+    return TypeVariant::Float;
 }
 std::string FloatShuffleVectorInst::to_string() const {
     return this->to_string_helper("float_shuffle_vector");
@@ -174,8 +174,8 @@ std::shared_ptr<IR::IntTypeExpr> IntSplatInst::get_casted_element_type() const {
 std::size_t IntSplatInst::get_element_bitwidth() const {
     return this->get_casted_element_type()->get_bits();
 }
-TypeVarient IntSplatInst::get_element_type_varient() const  {
-    return TypeVarient::Int;
+TypeVariant IntSplatInst::get_element_type_variant() const  {
+    return TypeVariant::Int;
 }
 std::string IntSplatInst::to_string() const {
     return this->to_string_helper("int_splat");
@@ -187,8 +187,8 @@ PtrSplatInst::PtrSplatInst(IR::InstructionStmtPtr instruction_stmt, LocalDestReg
 std::size_t PtrSplatInst::get_element_bitwidth() const {
     return 64;
 }
-TypeVarient PtrSplatInst::get_element_type_varient() const  {
-    return TypeVarient::Ptr;
+TypeVariant PtrSplatInst::get_element_type_variant() const  {
+    return TypeVariant::Ptr;
 }
 std::string PtrSplatInst::to_string() const {
     return this->to_string_helper("ptr_splat");
@@ -206,8 +206,8 @@ std::size_t FloatSplatInst::get_element_bitwidth() const {
 bool FloatSplatInst::is_brain_float() const {
     return this->get_casted_element_type()->is_brain_float();
 }
-TypeVarient FloatSplatInst::get_element_type_varient() const  {
-    return TypeVarient::Float;
+TypeVariant FloatSplatInst::get_element_type_variant() const  {
+    return TypeVariant::Float;
 }
 std::string FloatSplatInst::to_string() const {
     return this->to_string_helper("float_splat");
@@ -255,8 +255,8 @@ std::shared_ptr<IR::IntTypeExpr> IntStepVectorInst::get_casted_element_type() co
 std::size_t IntStepVectorInst::get_element_bitwidth() const {
     return this->get_casted_element_type()->get_bits();
 }
-TypeVarient IntStepVectorInst::get_element_type_varient() const  {
-    return TypeVarient::Int;
+TypeVariant IntStepVectorInst::get_element_type_variant() const  {
+    return TypeVariant::Int;
 }
 std::string IntStepVectorInst::to_string() const {
     return this->to_string_helper("int_step_vector");
@@ -275,8 +275,8 @@ std::size_t FloatStepVectorInst::get_element_bitwidth() const {
 bool FloatStepVectorInst::is_brain_float() const {
     return this->get_casted_element_type()->is_brain_float();
 }
-TypeVarient FloatStepVectorInst::get_element_type_varient() const  {
-    return TypeVarient::Float;
+TypeVariant FloatStepVectorInst::get_element_type_variant() const  {
+    return TypeVariant::Float;
 }
 std::string FloatStepVectorInst::to_string() const {
     return this->to_string_helper("float_step_vector");
@@ -336,8 +336,8 @@ std::shared_ptr<IR::IntTypeExpr> IntInsertSubVectorInst::get_casted_element_type
 std::size_t IntInsertSubVectorInst::get_element_bitwidth() const {
     return this->get_casted_element_type()->get_bits();
 }
-TypeVarient IntInsertSubVectorInst::get_element_type_varient() const  {
-    return TypeVarient::Int;
+TypeVariant IntInsertSubVectorInst::get_element_type_variant() const  {
+    return TypeVariant::Int;
 }
 std::string IntInsertSubVectorInst::to_string() const {
     return this->to_string_helper("int_insert_subvector");
@@ -350,8 +350,8 @@ PtrInsertSubVectorInst::PtrInsertSubVectorInst(IR::InstructionStmtPtr instructio
 std::size_t PtrInsertSubVectorInst::get_element_bitwidth() const {
     return 64;
 }
-TypeVarient PtrInsertSubVectorInst::get_element_type_varient() const  {
-    return TypeVarient::Ptr;
+TypeVariant PtrInsertSubVectorInst::get_element_type_variant() const  {
+    return TypeVariant::Ptr;
 }
 std::string PtrInsertSubVectorInst::to_string() const {
     return this->to_string_helper("ptr_insert_subvector");
@@ -369,8 +369,8 @@ std::size_t FloatInsertSubVectorInst::get_element_bitwidth() const {
 bool FloatInsertSubVectorInst::is_brain_float() const {
     return this->get_casted_element_type()->is_brain_float();
 }
-TypeVarient FloatInsertSubVectorInst::get_element_type_varient() const  {
-    return TypeVarient::Float;
+TypeVariant FloatInsertSubVectorInst::get_element_type_variant() const  {
+    return TypeVariant::Float;
 }
 std::string FloatInsertSubVectorInst::to_string() const {
     return this->to_string_helper("float_insert_subvector");
@@ -424,8 +424,8 @@ std::shared_ptr<IR::IntTypeExpr> IntExtractSubVectorInst::get_casted_element_typ
 std::size_t IntExtractSubVectorInst::get_element_bitwidth() const {
     return this->get_casted_element_type()->get_bits();
 }
-TypeVarient IntExtractSubVectorInst::get_element_type_varient() const  {
-    return TypeVarient::Int;
+TypeVariant IntExtractSubVectorInst::get_element_type_variant() const  {
+    return TypeVariant::Int;
 }
 std::string IntExtractSubVectorInst::to_string() const {
     return this->to_string_helper("int_extract_subvector");
@@ -438,8 +438,8 @@ PtrExtractSubVectorInst::PtrExtractSubVectorInst(IR::InstructionStmtPtr instruct
 std::size_t PtrExtractSubVectorInst::get_element_bitwidth() const {
     return 64;
 }
-TypeVarient PtrExtractSubVectorInst::get_element_type_varient() const  {
-    return TypeVarient::Ptr;
+TypeVariant PtrExtractSubVectorInst::get_element_type_variant() const  {
+    return TypeVariant::Ptr;
 }
 std::string PtrExtractSubVectorInst::to_string() const {
     return this->to_string_helper("ptr_extract_subvector");
@@ -458,8 +458,8 @@ std::size_t FloatExtractSubVectorInst::get_element_bitwidth() const {
 bool FloatExtractSubVectorInst::is_brain_float() const {
     return this->get_casted_element_type()->is_brain_float();
 }
-TypeVarient FloatExtractSubVectorInst::get_element_type_varient() const  {
-    return TypeVarient::Float;
+TypeVariant FloatExtractSubVectorInst::get_element_type_variant() const  {
+    return TypeVariant::Float;
 }
 std::string FloatExtractSubVectorInst::to_string() const {
     return this->to_string_helper("float_extract_subvector");
@@ -549,8 +549,8 @@ bool IntAddSubInst::is_unsigned() const {
 bool IntAddSubInst::is_saturating() const {
     return this->saturating;
 }
-TypeVarient IntAddSubInst::get_element_type_varient() const {
-    return TypeVarient::Int;
+TypeVariant IntAddSubInst::get_element_type_variant() const {
+    return TypeVariant::Int;
 }
 std::string IntAddSubInst::to_string() const {
     std::string str = "let " + this->destination->to_string() + " = .int_addsub(" + this->lhs->to_string() + ", " + this->rhs->to_string() + ")";
@@ -581,8 +581,8 @@ std::size_t FloatAddSubInst::get_element_bitwidth() const {
 bool FloatAddSubInst::is_brain_float_type() const {
     return this->get_casted_element_type()->is_brain_float();
 }
-TypeVarient FloatAddSubInst::get_element_type_varient() const {
-    return TypeVarient::Float;
+TypeVariant FloatAddSubInst::get_element_type_variant() const {
+    return TypeVariant::Float;
 }
 std::string FloatAddSubInst::to_string() const {
     std::string res =  "let " + this->destination->to_string() + " = .float_addsub(" + this->lhs->to_string() + ", " + this->rhs->to_string() + ")";
@@ -590,6 +590,325 @@ std::string FloatAddSubInst::to_string() const {
         res += " " + this->fast_math_attr.value().to_string();
     }
     return res;
+}
+
+
+//----------------------- Reduce Arithmetic SIMD Instructions -----------------------
+ReduceArithmeticSIMDInst::ReduceArithmeticSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+                                                    IR::LiteralExprPtr mask, std::size_t vector_size, std::optional<FastMathAttr> fast_math_attr):
+                                                    Inst(instruction_stmt,destination,fast_math_attr) {
+    this->vector = vector;
+    this->mask = mask;
+    this->vector_size = vector_size;
+}
+IR::LiteralExprPtr ReduceArithmeticSIMDInst::get_vector() const {
+    return this->vector;
+}
+IR::LiteralExprPtr ReduceArithmeticSIMDInst::get_mask() const {
+    return this->mask;
+}
+std::size_t ReduceArithmeticSIMDInst::get_vector_size() const {
+    return this->vector_size;
+}
+IR::TypeExprPtr ReduceArithmeticSIMDInst::get_element_type() const {
+    return this->destination->get_type();
+}
+InstType ReduceArithmeticSIMDInst::get_inst_type() const {
+    return InstType::ReduceArithmeticSIMDInst;
+}
+
+
+//--------------------------------- Int Reduce Arithmetic SIMD Instructions ---------------------------------
+IntReduceArithmeticSIMDInst::IntReduceArithmeticSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+                                                        IR::LiteralExprPtr mask, std::size_t vector_size, bool nuw, bool nsw, bool unsigned_, bool saturating, bool floor)
+                                                        :ReduceArithmeticSIMDInst(instruction_stmt,destination,vector,mask,vector_size,std::nullopt) {
+    this->nuw = nuw;
+    this->nsw = nsw;
+    this->unsigned_ = unsigned_;
+    this->saturating = saturating;
+    this->floor = floor;    
+}
+std::string IntReduceArithmeticSIMDInst::to_string_helper(const std::string op_name) const{
+    std::string vec_type = "<" + this->get_element_type()->to_string() + "," + std::to_string(this->vector_size) + ">:";
+    std::string mask_type = "<i64," + std::to_string(this->vector_size) + ">:";
+    std::string str = "let " + this->destination->to_string() + " = ." + op_name + "(" + vec_type + this->vector->to_string();
+    if(this->mask!= nullptr) {
+        str += ", " + mask_type + this->mask->to_string();
+    }
+    str += ")";
+    if(this->nuw) {
+        str += " #[nuw]";
+    }
+    if(this->nsw) {
+        str += " #[nsw]";
+    }
+    if(this->unsigned_) {
+        str += " #[unsigned]";
+    }
+    if(this->saturating) {
+        str += " #[saturating]";
+    }
+    if(this->floor) {
+        str += " #[floor]";
+    }
+    return str;
+}
+std::shared_ptr<IR::IntTypeExpr> IntReduceArithmeticSIMDInst::get_casted_element_type() const{
+    return std::dynamic_pointer_cast<IR::IntTypeExpr>(this->get_element_type());
+}
+std::size_t IntReduceArithmeticSIMDInst::get_element_bitwidth() const{
+    return this->get_casted_element_type()->get_bits();
+}
+bool IntReduceArithmeticSIMDInst::is_nuw() const{
+    return this->nuw;
+}
+bool IntReduceArithmeticSIMDInst::is_nsw() const{
+    return this->nsw;
+}
+bool IntReduceArithmeticSIMDInst::is_unsigned() const{
+    return this->unsigned_;
+}
+bool IntReduceArithmeticSIMDInst::is_saturating() const{
+    return this->saturating;
+}
+bool IntReduceArithmeticSIMDInst::is_floor() const{
+    return this->floor;
+}
+TypeVariant IntReduceArithmeticSIMDInst::get_element_type_variant() const{
+    return TypeVariant::Int;
+}
+
+
+IntReduceAddInst::IntReduceAddInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+                                   IR::LiteralExprPtr mask, std::size_t vector_size, bool nuw, bool nsw, bool unsigned_, bool saturating)
+                                   :IntReduceArithmeticSIMDInst(instruction_stmt,destination,vector,mask,vector_size,nuw,nsw,unsigned_,saturating,false) {}
+ReduceArithmeticSIMDInst::OpType IntReduceAddInst::get_op_type() const{
+    return OpType::REDUCE_ADD;
+}
+std::string IntReduceAddInst::to_string() const{
+    return this->to_string_helper("int_reduce_add");
+}
+
+
+IntReduceMulInst::IntReduceMulInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+                                   IR::LiteralExprPtr mask, std::size_t vector_size, bool nuw, bool nsw, bool unsigned_, bool saturating)
+                                   :IntReduceArithmeticSIMDInst(instruction_stmt,destination,vector,mask,vector_size,nuw,nsw,unsigned_,saturating,false) {}
+ReduceArithmeticSIMDInst::OpType IntReduceMulInst::get_op_type() const{
+    return OpType::REDUCE_MUL;
+}
+std::string IntReduceMulInst::to_string() const{
+    return this->to_string_helper("int_reduce_mul");
+}
+
+
+IntReduceAvgInst::IntReduceAvgInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+                                    IR::LiteralExprPtr mask, std::size_t vector_size, bool nuw, bool nsw, bool unsigned_, bool floor)
+                                   :IntReduceArithmeticSIMDInst(instruction_stmt,destination,vector,mask,vector_size,nuw,nsw,unsigned_,false,floor) {}
+ReduceArithmeticSIMDInst::OpType IntReduceAvgInst::get_op_type() const{
+    return OpType::REDUCE_AVG;
+}
+std::string IntReduceAvgInst::to_string() const{
+    return this->to_string_helper("int_reduce_avg");
+}
+
+
+IntReduceMinInst::IntReduceMinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+                                   IR::LiteralExprPtr mask, std::size_t vector_size, bool unsigned_)
+                                   :IntReduceArithmeticSIMDInst(instruction_stmt,destination,vector,mask,vector_size,false,false,unsigned_,false,false) {}
+ReduceArithmeticSIMDInst::OpType IntReduceMinInst::get_op_type() const{
+    return OpType::REDUCE_MIN;
+}
+std::string IntReduceMinInst::to_string() const{
+    return this->to_string_helper("int_reduce_min");
+}
+
+
+//--------------------------------- Float Reduce Arithmetic SIMD Instructions ---------------------------------
+FloatReduceArithmeticSIMDInst::FloatReduceArithmeticSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+                                                             IR::LiteralExprPtr mask, std::size_t vector_size, FastMathAttr fast_math_attr, bool ieee754_2019, bool unordered)
+                                                             :ReduceArithmeticSIMDInst(instruction_stmt,destination,vector,mask,vector_size,fast_math_attr) {
+    this->ieee754_2019 = ieee754_2019;
+    this->unordered = unordered;
+}
+std::string FloatReduceArithmeticSIMDInst::to_string_helper(const std::string op_name) const{
+    std::string vec_type = "<" + this->get_element_type()->to_string() + "," + std::to_string(this->vector_size) + ">:";
+    std::string mask_type = "<i64," + std::to_string(this->vector_size) + ">:";
+    std::string str = "let " + this->destination->to_string() + " = ." + op_name + "(" + vec_type + this->vector->to_string();
+    if(this->mask!= nullptr) {
+        str += ", " + mask_type + this->mask->to_string();
+    }
+    str += ")";
+    if(this->fast_math_attr.has_value()) {
+        str += " " + this->fast_math_attr.value().to_string();
+    }
+    if(this->ieee754_2019) {
+        str += " #[ieee754_2019]";
+    }
+    if(this->unordered) {
+        str += " #[unordered]";
+    }
+    return str;
+}
+std::shared_ptr<IR::FloatTypeExpr> FloatReduceArithmeticSIMDInst::get_casted_element_type() const{
+    return std::dynamic_pointer_cast<IR::FloatTypeExpr>(this->get_element_type());
+}
+std::size_t FloatReduceArithmeticSIMDInst::get_element_bitwidth() const{
+    return this->get_casted_element_type()->get_bits();
+}
+bool FloatReduceArithmeticSIMDInst::is_brain_float_type() const{
+    return this->get_casted_element_type()->is_brain_float();
+}
+bool FloatReduceArithmeticSIMDInst::is_ieee754_2019() const{
+    return this->ieee754_2019;
+}
+bool FloatReduceArithmeticSIMDInst::is_unordered() const{
+    return this->unordered;
+}
+TypeVariant FloatReduceArithmeticSIMDInst::get_element_type_variant() const {
+    return TypeVariant::Float;
+}
+
+FloatReduceAddInst::FloatReduceAddInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+                                         IR::LiteralExprPtr mask, std::size_t vector_size, FastMathAttr fast_math_attr)
+                                         :FloatReduceArithmeticSIMDInst(instruction_stmt,destination,vector,mask,vector_size,fast_math_attr,false,false) {}
+ReduceArithmeticSIMDInst::OpType FloatReduceAddInst::get_op_type() const{
+    return OpType::REDUCE_ADD;
+}
+std::string FloatReduceAddInst::to_string() const{
+    return this->to_string_helper("float_reduce_add");
+}
+
+
+FloatReduceMulInst::FloatReduceMulInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+                                         IR::LiteralExprPtr mask, std::size_t vector_size, FastMathAttr fast_math_attr)
+                                         :FloatReduceArithmeticSIMDInst(instruction_stmt,destination,vector,mask,vector_size,fast_math_attr,false,false) {}
+ReduceArithmeticSIMDInst::OpType FloatReduceMulInst::get_op_type() const{
+    return OpType::REDUCE_MUL;
+}
+std::string FloatReduceMulInst::to_string() const{
+    return this->to_string_helper("float_reduce_mul");
+}
+
+
+FloatReduceAvgInst::FloatReduceAvgInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+                                         IR::LiteralExprPtr mask, std::size_t vector_size, FastMathAttr fast_math_attr)
+                                         :FloatReduceArithmeticSIMDInst(instruction_stmt,destination,vector,mask,vector_size,fast_math_attr,false,false) {}
+ReduceArithmeticSIMDInst::OpType FloatReduceAvgInst::get_op_type() const{
+    return OpType::REDUCE_AVG;
+}
+std::string FloatReduceAvgInst::to_string() const{
+    return this->to_string_helper("float_reduce_avg");
+}
+
+
+FloatReduceMinInst::FloatReduceMinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+                                         IR::LiteralExprPtr mask, std::size_t vector_size, FastMathAttr fast_math_attr, bool ieee754_2019, bool unordered)
+                                         :FloatReduceArithmeticSIMDInst(instruction_stmt,destination,vector,mask,vector_size,fast_math_attr,ieee754_2019,unordered) {}
+ReduceArithmeticSIMDInst::OpType FloatReduceMinInst::get_op_type() const{
+    return OpType::REDUCE_MIN;
+}
+std::string FloatReduceMinInst::to_string() const{
+    return this->to_string_helper("float_reduce_min");
+}
+
+
+FloatReduceMaxInst::FloatReduceMaxInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+                                         IR::LiteralExprPtr mask, std::size_t vector_size, FastMathAttr fast_math_attr, bool ieee754_2019, bool unordered)
+                                         :FloatReduceArithmeticSIMDInst(instruction_stmt,destination,vector,mask,vector_size,fast_math_attr,ieee754_2019,unordered) {}
+ReduceArithmeticSIMDInst::OpType FloatReduceMaxInst::get_op_type() const{
+    return OpType::REDUCE_MAX;
+}
+std::string FloatReduceMaxInst::to_string() const{
+    return this->to_string_helper("float_reduce_max");
+}
+
+
+IntReduceBitwiseSIMDInst::IntReduceBitwiseSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+                                                   IR::LiteralExprPtr mask, std::size_t vector_size, bool disjoint)
+                                                   :Inst(instruction_stmt,destination,std::nullopt) {
+    this->vector = vector;
+    this->mask = mask;
+    this->vector_size = vector_size;
+    this->disjoint = disjoint;
+}
+std::string IntReduceBitwiseSIMDInst::to_string_helper(const std::string op_name) const{
+    std::string vec_type = this->destination->get_type()->to_string() + ":";
+    std::string mask_type = "<i64," + std::to_string(this->vector_size) + ">:";
+    std::string str = "let " + this->destination->to_string() + " = ." + op_name + "(" + vec_type + this->vector->to_string();
+    if(this->mask!= nullptr) {
+        str += ", " + mask_type + this->mask->to_string();
+    }
+    str += ")";
+    if(this->disjoint) {
+        str += " #[disjoint]";
+    }
+    return str;
+}
+IR::LiteralExprPtr IntReduceBitwiseSIMDInst::get_vector() const{
+    return this->vector;
+}
+IR::LiteralExprPtr IntReduceBitwiseSIMDInst::get_mask() const{
+    return this->mask;
+}
+std::size_t IntReduceBitwiseSIMDInst::get_vector_size() const{
+    return this->vector_size;
+}
+std::shared_ptr<IR::IntTypeExpr> IntReduceBitwiseSIMDInst::get_casted_element_type() const{
+    auto simd_type = std::dynamic_pointer_cast<IR::SIMDTypeExpr>(this->destination->get_type());
+    return std::dynamic_pointer_cast<IR::IntTypeExpr>(simd_type->get_basetype());
+}
+std::size_t IntReduceBitwiseSIMDInst::get_element_bitwidth() const{
+    return get_casted_element_type()->get_bits();
+}
+bool IntReduceBitwiseSIMDInst::is_disjoint() const{
+    return this->disjoint;
+}
+InstType IntReduceBitwiseSIMDInst::get_inst_type() const{
+    return InstType::IntReduceBitwiseSIMDInst;
+}
+
+
+IntReduceAndInst::IntReduceAndInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+                                    IR::LiteralExprPtr mask, std::size_t vector_size)
+                                    :IntReduceBitwiseSIMDInst(instruction_stmt,destination,vector,mask,vector_size,false) {}
+IntReduceBitwiseSIMDInst::OpType IntReduceAndInst::get_op_type() const{
+    return OpType::REDUCE_AND;
+}
+std::string IntReduceAndInst::to_string() const{
+    return this->to_string_helper("int_reduce_and");
+}
+
+
+IntReduceOrInst::IntReduceOrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+                                    IR::LiteralExprPtr mask, std::size_t vector_size, bool disjoint)
+                                    :IntReduceBitwiseSIMDInst(instruction_stmt,destination,vector,mask,vector_size,disjoint) {}
+IntReduceBitwiseSIMDInst::OpType IntReduceOrInst::get_op_type() const{
+    return OpType::REDUCE_OR;
+}
+std::string IntReduceOrInst::to_string() const{
+    return this->to_string_helper("int_reduce_or");
+}
+
+
+IntReduceXorInst::IntReduceXorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+                                    IR::LiteralExprPtr mask, std::size_t vector_size)
+                                    :IntReduceBitwiseSIMDInst(instruction_stmt,destination,vector,mask,vector_size,false) {}
+IntReduceBitwiseSIMDInst::OpType IntReduceXorInst::get_op_type() const{
+    return OpType::REDUCE_XOR;
+}
+std::string IntReduceXorInst::to_string() const{
+    return this->to_string_helper("int_reduce_xor");
+}
+
+
+IntReduceXnorInst::IntReduceXnorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+                                    IR::LiteralExprPtr mask, std::size_t vector_size)
+                                    :IntReduceBitwiseSIMDInst(instruction_stmt,destination,vector,mask,vector_size,false) {}
+IntReduceBitwiseSIMDInst::OpType IntReduceXnorInst::get_op_type() const{
+    return OpType::REDUCE_XNOR;
+}
+std::string IntReduceXnorInst::to_string() const{
+    return this->to_string_helper("int_reduce_xnor");
 }
 }
 }

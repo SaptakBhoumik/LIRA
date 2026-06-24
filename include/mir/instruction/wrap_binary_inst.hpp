@@ -32,7 +32,7 @@ class WrapBinaryInst:public Inst {
     virtual bool is_unsigned() const final;
     virtual bool is_saturating() const final;
 
-    virtual TypeVarient get_operand_type_varient() const = 0;
+    virtual TypeVariant get_operand_type_variant() const = 0;
     virtual IR::TypeExprPtr get_operand_type() const final;
     virtual IR::LiteralExprPtr get_lhs() const final;
     virtual IR::LiteralExprPtr get_rhs() const final;
@@ -50,7 +50,7 @@ class IntWrapBinaryInst:public WrapBinaryInst {
     virtual std::shared_ptr<IR::IntTypeExpr> get_casted_operand_type() const final;
     virtual std::size_t get_bitwidth() const final;
     
-    virtual TypeVarient get_operand_type_varient() const override final;
+    virtual TypeVariant get_operand_type_variant() const override final;
 };
 
 class IntWrapAddInst:public IntWrapBinaryInst {
@@ -155,7 +155,7 @@ class VecIntWrapBinaryInst:public WrapBinaryInst {
     virtual std::size_t get_operand_basetype_bitwidth() const final;
     virtual std::size_t get_vector_size() const final;
     
-    virtual TypeVarient get_operand_type_varient() const override final;
+    virtual TypeVariant get_operand_type_variant() const override final;
 };
 
 class VecIntWrapAddInst:public VecIntWrapBinaryInst {

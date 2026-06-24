@@ -53,8 +53,8 @@ std::shared_ptr<IR::IntTypeExpr> IntWrapBinaryInst::get_casted_operand_type() co
 std::size_t IntWrapBinaryInst::get_bitwidth() const{
     return this->get_casted_operand_type()->get_bits();
 }
-TypeVarient IntWrapBinaryInst::get_operand_type_varient() const{
-    return TypeVarient::Int;
+TypeVariant IntWrapBinaryInst::get_operand_type_variant() const{
+    return TypeVariant::Int;
 }
 
 
@@ -173,8 +173,8 @@ std::size_t VecIntWrapBinaryInst::get_operand_basetype_bitwidth() const{
 std::size_t VecIntWrapBinaryInst::get_vector_size() const{
     return this->get_casted_operand_type()->get_size();
 }
-TypeVarient VecIntWrapBinaryInst::get_operand_type_varient() const{
-    return TypeVarient::VecInt;
+TypeVariant VecIntWrapBinaryInst::get_operand_type_variant() const{
+    return TypeVariant::VecInt;
 }
 
 

@@ -112,7 +112,7 @@ class PtrMaskInst:public Inst {
     virtual IR::LiteralExprPtr get_pointer() const final;
     virtual IR::LiteralExprPtr get_mask() const final;
 
-    virtual TypeVarient get_dest_type_var() const = 0;
+    virtual TypeVariant get_dest_type_var() const = 0;
     virtual InstType get_inst_type() const override final;
 };
 
@@ -120,7 +120,7 @@ class IntPtrMaskInst:public PtrMaskInst {
     public:
     IntPtrMaskInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr mask);
 
-    TypeVarient get_dest_type_var() const override;
+    TypeVariant get_dest_type_var() const override;
     std::string to_string() const override;
 };
 
@@ -130,7 +130,7 @@ class VecIntPtrMaskInst:public PtrMaskInst {
 
     std::size_t get_vector_size() const;
 
-    TypeVarient get_dest_type_var() const override;
+    TypeVariant get_dest_type_var() const override;
     std::string to_string() const override;
 };
 

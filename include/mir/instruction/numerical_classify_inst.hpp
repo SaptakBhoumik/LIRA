@@ -24,7 +24,7 @@ class NumericalClassifyInst:public Inst {
     NumericalClassifyInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                           std::optional<FastMathAttr> fast_math_attr);
 
-    virtual TypeVarient get_type_varient() const = 0;
+    virtual TypeVariant get_type_variant() const = 0;
     virtual IR::TypeExprPtr get_value_type() const final;
     virtual IR::LiteralExprPtr get_value() const final;
     virtual OpType get_op_type() const = 0;//Whether it is neg or not etc.
@@ -45,7 +45,7 @@ class FloatClassifyInst:public NumericalClassifyInst{
     virtual std::size_t get_bitwidth() const final;
     virtual bool is_brain_float() const final;
     
-    virtual TypeVarient get_type_varient() const override final;
+    virtual TypeVariant get_type_variant() const override final;
 };
 
 class FloatIsNanInst:public FloatClassifyInst {
@@ -131,7 +131,7 @@ class VecFloatClassifyInst:public NumericalClassifyInst{
     virtual std::shared_ptr<IR::FloatTypeExpr> get_basetype() const final;
     virtual std::size_t get_num_elements() const final;
     
-    virtual TypeVarient get_type_varient() const override final;
+    virtual TypeVariant get_type_variant() const override final;
 };
 
 class VecFloatIsNanInst:public VecFloatClassifyInst {

@@ -6,17 +6,17 @@
 namespace LIRA {
 namespace SemanticAnalyzer {
 using DispatchFuncType = std::function<MIR::InstPtr(std::string, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
-                                                    IR::TypeExprPtr input_type, MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt)>;
+                                                    IR::TypeExprPtr input_type, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt)>;
 
 //NOTE:-Dont merge them into one templated function. The attributes can change in future. It is more code but more maintainable imo+The error messages can be more specific
 MIR::InstPtr analyze_widening_add_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
-                                           IR::TypeExprPtr input_type, MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);
+                                           IR::TypeExprPtr input_type, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
 MIR::InstPtr analyze_widening_sub_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
-                                           IR::TypeExprPtr input_type, MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);
+                                           IR::TypeExprPtr input_type, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
 MIR::InstPtr analyze_widening_absdiff_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
-                                           IR::TypeExprPtr input_type, MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);
+                                           IR::TypeExprPtr input_type, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
 MIR::InstPtr analyze_widening_mul_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
-                                           IR::TypeExprPtr input_type, MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);
+                                           IR::TypeExprPtr input_type, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
 
 MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_widening_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt){
     const std::unordered_map<std::string, DispatchFuncType> dispatch_map = {
@@ -50,18 +50,18 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_widening_bin_inst(IR::Token name,I
         Utils::error(this->filename, args[1].first->get_token(), "Argument type " + args[1].second->to_string() + " is not the same as argument type " + args[0].second->to_string());
     }
     IR::TypeExprPtr input_type = args[0].second;
-    auto type_varient = MIR::get_type_varient_from_type(type);
-    if(!type_varient.has_value()){
+    auto type_variant = MIR::get_type_variant_from_type(type);
+    if(!type_variant.has_value()){
         Utils::error(this->filename, name, "Unsupported type for binary widening instruction: " + type->to_string());
     }
-    if((!MIR::is_int_typevarient(type_varient.value())) && (!MIR::is_float_typevarient(type_varient.value()))){
+    if((!MIR::is_int_typevariant(type_variant.value())) && (!MIR::is_float_typevariant(type_variant.value()))){
         Utils::error(this->filename, name, "Only int and float types are supported for binary widening instruction");
     }
 
-    //After this stage, type varient can only be float or int or it's vector. So the args are literal expr. No need to check if they are literal expr or not cuz gurrentee
+    //After this stage, type variant can only be float or int or it's vector. So the args are literal expr. No need to check if they are literal expr or not cuz gurrentee
     auto it = dispatch_map.find(name.value);
     if(it != dispatch_map.end()){
-        return it->second(this->filename,dest,args[0].first->get_literal(),args[1].first->get_literal(),input_type,type_varient.value(),inst_stmt);
+        return it->second(this->filename,dest,args[0].first->get_literal(),args[1].first->get_literal(),input_type,type_variant.value(),inst_stmt);
     }
     else{
         std::cerr << "Unknown binary widening instruction: " << name.value << std::endl;
@@ -71,14 +71,14 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_widening_bin_inst(IR::Token name,I
 }
 
 MIR::InstPtr analyze_widening_add_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
-                                           IR::TypeExprPtr input_type, MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt){
+                                           IR::TypeExprPtr input_type, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
-    if(MIR::is_float_typevarient(type_varient)){
+    if(MIR::is_float_typevariant(type_variant)){
         auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
         if(remaining_attrs.size() > 0){
             Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for float widening arithmetic binary instruction: " + remaining_attrs[0]->to_string());
         }
-        if(type_varient == MIR::TypeVarient::Float){
+        if(type_variant == MIR::TypeVariant::Float){
             return std::make_shared<MIR::FloatWideningAddInst>(inst_stmt,dest,lhs,rhs,input_type,fast_math_attr);
         }
         else{
@@ -90,7 +90,7 @@ MIR::InstPtr analyze_widening_add_bin_inst(std::string filename, MIR::LocalDestR
         if(remaining_attrs.size() > 0){
             Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for int widening arithmetic binary instruction: " + remaining_attrs[0]->to_string());
         }
-        if(type_varient == MIR::TypeVarient::Int){
+        if(type_variant == MIR::TypeVariant::Int){
             return std::make_shared<MIR::IntWideningAddInst>(inst_stmt,dest,lhs,rhs,input_type,flag_attrs["nuw"],flag_attrs["nsw"],flag_attrs["unsigned"]);
         }
         else{
@@ -99,14 +99,14 @@ MIR::InstPtr analyze_widening_add_bin_inst(std::string filename, MIR::LocalDestR
     }
 }
 MIR::InstPtr analyze_widening_sub_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
-                                           IR::TypeExprPtr input_type, MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt){
+                                           IR::TypeExprPtr input_type, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
-    if(MIR::is_float_typevarient(type_varient)){
+    if(MIR::is_float_typevariant(type_variant)){
         auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
         if(remaining_attrs.size() > 0){
             Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for float widening arithmetic binary instruction: " + remaining_attrs[0]->to_string());
         }
-        if(type_varient == MIR::TypeVarient::Float){
+        if(type_variant == MIR::TypeVariant::Float){
             return std::make_shared<MIR::FloatWideningSubInst>(inst_stmt,dest,lhs,rhs,input_type,fast_math_attr);
         }
         else{
@@ -118,7 +118,7 @@ MIR::InstPtr analyze_widening_sub_bin_inst(std::string filename, MIR::LocalDestR
         if(remaining_attrs.size() > 0){
             Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for int widening arithmetic binary instruction: " + remaining_attrs[0]->to_string());
         }
-        if(type_varient == MIR::TypeVarient::Int){
+        if(type_variant == MIR::TypeVariant::Int){
             return std::make_shared<MIR::IntWideningSubInst>(inst_stmt,dest,lhs,rhs,input_type,flag_attrs["nuw"],flag_attrs["nsw"],flag_attrs["unsigned"]);
         }
         else{
@@ -127,14 +127,14 @@ MIR::InstPtr analyze_widening_sub_bin_inst(std::string filename, MIR::LocalDestR
     }
 }
 MIR::InstPtr analyze_widening_absdiff_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
-                                           IR::TypeExprPtr input_type, MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt){
+                                           IR::TypeExprPtr input_type, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
-    if(MIR::is_float_typevarient(type_varient)){
+    if(MIR::is_float_typevariant(type_variant)){
         auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
         if(remaining_attrs.size() > 0){
             Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for float widening arithmetic binary instruction: " + remaining_attrs[0]->to_string());
         }
-        if(type_varient == MIR::TypeVarient::Float){
+        if(type_variant == MIR::TypeVariant::Float){
             return std::make_shared<MIR::FloatWideningAbsDiffInst>(inst_stmt,dest,lhs,rhs,input_type,fast_math_attr);
         }
         else{
@@ -146,7 +146,7 @@ MIR::InstPtr analyze_widening_absdiff_bin_inst(std::string filename, MIR::LocalD
         if(remaining_attrs.size() > 0){
             Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for int widening arithmetic binary instruction: " + remaining_attrs[0]->to_string());
         }
-        if(type_varient == MIR::TypeVarient::Int){
+        if(type_variant == MIR::TypeVariant::Int){
             return std::make_shared<MIR::IntWideningAbsDiffInst>(inst_stmt,dest,lhs,rhs,input_type,flag_attrs["nuw"],flag_attrs["nsw"],flag_attrs["unsigned"]);
         }
         else{
@@ -156,14 +156,14 @@ MIR::InstPtr analyze_widening_absdiff_bin_inst(std::string filename, MIR::LocalD
 }
 
 MIR::InstPtr analyze_widening_mul_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
-                                           IR::TypeExprPtr input_type, MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt){
+                                           IR::TypeExprPtr input_type, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
-    if(MIR::is_float_typevarient(type_varient)){
+    if(MIR::is_float_typevariant(type_variant)){
         auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
         if(remaining_attrs.size() > 0){
             Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for float widening arithmetic binary instruction: " + remaining_attrs[0]->to_string());
         }
-        if(type_varient == MIR::TypeVarient::Float){
+        if(type_variant == MIR::TypeVariant::Float){
             return std::make_shared<MIR::FloatWideningMulInst>(inst_stmt,dest,lhs,rhs,input_type,fast_math_attr);
         }
         else{
@@ -175,7 +175,7 @@ MIR::InstPtr analyze_widening_mul_bin_inst(std::string filename, MIR::LocalDestR
         if(remaining_attrs.size() > 0){
             Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for int widening arithmetic binary instruction: " + remaining_attrs[0]->to_string());
         }
-        if(type_varient == MIR::TypeVarient::Int){
+        if(type_variant == MIR::TypeVariant::Int){
             return std::make_shared<MIR::IntWideningMulInst>(inst_stmt,dest,lhs,rhs,input_type,flag_attrs["nuw"],flag_attrs["nsw"],flag_attrs["unsigned"]);
         }
         else{

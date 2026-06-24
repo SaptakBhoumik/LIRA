@@ -31,9 +31,9 @@ class ConvInst:public Inst {
     ConvInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type,
              bool nuw, bool nsw, bool nsb, bool unsigned_, bool saturating, std::optional<FastMathAttr> fast_math_attr);
 
-    virtual std::optional<TypeVarient> get_in_type_varient() const final;//Can be calculated easily from ``in_type``. Just a helper function
-    virtual std::optional<TypeVarient> get_out_type_varient() const final;//Can be calculated easily from ``out_type``. Just a helper function
-    // NOTE: get_in_type_varient and  get_out_type_varient is ignored for BitcastInst because it can be any type as long as the bit width is same + dont make sense
+    virtual std::optional<TypeVariant> get_in_type_variant() const final;//Can be calculated easily from ``in_type``. Just a helper function
+    virtual std::optional<TypeVariant> get_out_type_variant() const final;//Can be calculated easily from ``out_type``. Just a helper function
+    // NOTE: get_in_type_variant and  get_out_type_variant is ignored for BitcastInst because it can be any type as long as the bit width is same + dont make sense
     virtual IR::TypeExprPtr get_in_type() const final;
     virtual IR::TypeExprPtr get_out_type() const final;
     virtual IR::LiteralExprPtr get_value() const final;

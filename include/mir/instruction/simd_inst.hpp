@@ -23,7 +23,7 @@ class ShuffleVectorInst:public Inst {
     virtual IR::LiteralExprPtr get_mask() const final;
 
     virtual IR::TypeExprPtr get_basetype() const final;//Base type of vector1,vector2 and output
-    virtual TypeVarient get_basetype_varient() const = 0;
+    virtual TypeVariant get_basetype_variant() const = 0;
     virtual std::size_t get_vec1_elm_count() const final;
     virtual std::size_t get_vec2_elm_count() const final;
     virtual std::size_t get_mask_elm_count() const final;
@@ -40,7 +40,7 @@ class IntShuffleVectorInst:public ShuffleVectorInst {
     std::shared_ptr<IR::IntTypeExpr> get_casted_basetype() const;
     std::size_t get_basetype_bitwidth() const;
 
-    TypeVarient get_basetype_varient() const override;
+    TypeVariant get_basetype_variant() const override;
     std::string to_string() const override;
 };
 
@@ -51,7 +51,7 @@ class PtrShuffleVectorInst:public ShuffleVectorInst {
     
     std::size_t get_basetype_bitwidth() const;
 
-    TypeVarient get_basetype_varient() const override;
+    TypeVariant get_basetype_variant() const override;
     std::string to_string() const override;
 };
 
@@ -64,7 +64,7 @@ class FloatShuffleVectorInst:public ShuffleVectorInst {
     std::size_t get_basetype_bitwidth() const;
     bool is_basetype_brain_float() const;
 
-    TypeVarient get_basetype_varient() const override;
+    TypeVariant get_basetype_variant() const override;
     std::string to_string() const override;
 };
 
@@ -101,7 +101,7 @@ class SplatInst:public Inst {
     virtual IR::TypeExprPtr get_element_type() const final;//From destination
     virtual std::size_t get_vector_size() const final;//From destination
     
-    virtual TypeVarient get_element_type_varient() const = 0;
+    virtual TypeVariant get_element_type_variant() const = 0;
     virtual InstType get_inst_type() const override final;
 };
 
@@ -112,7 +112,7 @@ class IntSplatInst:public SplatInst {
     std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const;
     std::size_t get_element_bitwidth() const;
     
-    TypeVarient get_element_type_varient() const override;
+    TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
 };
 
@@ -122,7 +122,7 @@ class PtrSplatInst:public SplatInst {
     
     std::size_t get_element_bitwidth() const;
     
-    TypeVarient get_element_type_varient() const override;
+    TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
 };
 
@@ -134,7 +134,7 @@ class FloatSplatInst:public SplatInst {
     std::size_t get_element_bitwidth() const;
     bool is_brain_float() const;
     
-    TypeVarient get_element_type_varient() const override;
+    TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
 };
 
@@ -153,7 +153,7 @@ class StepVectorInst:public Inst {
     virtual IR::TypeExprPtr get_element_type() const final;//From destination
     virtual std::size_t get_vector_size() const final;//From destination
     
-    virtual TypeVarient get_element_type_varient() const = 0;
+    virtual TypeVariant get_element_type_variant() const = 0;
     virtual InstType get_inst_type() const override final;
 };
 
@@ -164,7 +164,7 @@ class IntStepVectorInst:public StepVectorInst {
     std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const;
     std::size_t get_element_bitwidth() const;
     
-    TypeVarient get_element_type_varient() const override;
+    TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
 };
 
@@ -177,7 +177,7 @@ class FloatStepVectorInst:public StepVectorInst {
     std::size_t get_element_bitwidth() const;
     bool is_brain_float() const;
     
-    TypeVarient get_element_type_varient() const override;
+    TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
 };
 
@@ -200,7 +200,7 @@ class InsertSubVectorInst:public Inst {
     virtual std::size_t get_vector_size() const final;//From destination. Size of destination and original vector
     virtual std::size_t get_subvector_size() const final;
 
-    virtual TypeVarient get_element_type_varient() const = 0;
+    virtual TypeVariant get_element_type_variant() const = 0;
     virtual InstType get_inst_type() const override final;
 };
 
@@ -212,7 +212,7 @@ class IntInsertSubVectorInst:public InsertSubVectorInst {
     std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const;
     std::size_t get_element_bitwidth() const;
 
-    TypeVarient get_element_type_varient() const override;
+    TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
 };
 
@@ -223,7 +223,7 @@ class PtrInsertSubVectorInst:public InsertSubVectorInst {
     
     std::size_t get_element_bitwidth() const;
 
-    TypeVarient get_element_type_varient() const override;
+    TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
 };
 
@@ -236,7 +236,7 @@ class FloatInsertSubVectorInst:public InsertSubVectorInst {
     std::size_t get_element_bitwidth() const;
     bool is_brain_float() const;
 
-    TypeVarient get_element_type_varient() const override;
+    TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
 };
 
@@ -257,7 +257,7 @@ class ExtractSubVectorInst:public Inst {
     virtual std::size_t get_vector_size() const final;
     virtual std::size_t get_subvector_size() const final;//From destination. Size of extracted subvector
 
-    virtual TypeVarient get_element_type_varient() const = 0;
+    virtual TypeVariant get_element_type_variant() const = 0;
     virtual InstType get_inst_type() const override final;
 };
 
@@ -269,7 +269,7 @@ class IntExtractSubVectorInst:public ExtractSubVectorInst {
     std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const;
     std::size_t get_element_bitwidth() const;
 
-    TypeVarient get_element_type_varient() const override;
+    TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
 };
 
@@ -280,7 +280,7 @@ class PtrExtractSubVectorInst:public ExtractSubVectorInst {
     
     std::size_t get_element_bitwidth() const;
 
-    TypeVarient get_element_type_varient() const override;
+    TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
 };
 
@@ -293,7 +293,7 @@ class FloatExtractSubVectorInst:public ExtractSubVectorInst {
     std::size_t get_element_bitwidth() const;
     bool is_brain_float() const;
 
-    TypeVarient get_element_type_varient() const override;
+    TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
 };
 
@@ -333,7 +333,7 @@ class AddSubInst:public Inst {
     virtual IR::TypeExprPtr get_element_type() const final;//From destination
     virtual size_t get_vector_size() const final;//From destination
     
-    virtual TypeVarient get_element_type_varient() const = 0;
+    virtual TypeVariant get_element_type_variant() const = 0;
     virtual InstType get_inst_type() const override final;
 };
 
@@ -354,7 +354,7 @@ class IntAddSubInst:public AddSubInst{
     bool is_unsigned() const;
     bool is_saturating() const;
 
-    TypeVarient get_element_type_varient() const override;
+    TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
 };
 
@@ -367,7 +367,7 @@ class FloatAddSubInst:public AddSubInst{
     std::size_t get_element_bitwidth() const;
     bool is_brain_float_type() const;
 
-    TypeVarient get_element_type_varient() const override;
+    TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
 };
 //--------------------------------- Reduce SIMD Instructions ---------------------------------
@@ -394,7 +394,7 @@ class ReduceArithmeticSIMDInst:public Inst {
     virtual std::size_t get_vector_size() const final;
     virtual IR::TypeExprPtr get_element_type() const final;//From destination
 
-    virtual TypeVarient get_element_type_varient() const = 0;
+    virtual TypeVariant get_element_type_variant() const = 0;
     virtual OpType get_op_type() const = 0;
     virtual InstType get_inst_type() const override final;
 };
@@ -422,7 +422,7 @@ class IntReduceArithmeticSIMDInst:public ReduceArithmeticSIMDInst {
     virtual bool is_saturating() const final;
     virtual bool is_floor() const final;
 
-    virtual TypeVarient get_element_type_varient() const override final;
+    virtual TypeVariant get_element_type_variant() const override final;
 };
 
 class IntReduceAddInst:public IntReduceArithmeticSIMDInst {
@@ -488,9 +488,9 @@ class FloatReduceArithmeticSIMDInst:public ReduceArithmeticSIMDInst {
     virtual bool is_ieee754_2019() const final;
     virtual bool is_unordered() const final;
 
-    virtual TypeVarient get_element_type_varient() const override final;
+    virtual TypeVariant get_element_type_variant() const override final;
 };
-
+ 
 class FloatReduceAddInst:public FloatReduceArithmeticSIMDInst {
     public:
     FloatReduceAddInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
@@ -629,7 +629,7 @@ class HArithmeticSIMDInst:public Inst {
     virtual IR::TypeExprPtr get_element_type() const final;//From destination
     virtual std::size_t get_vector_size() const final;//From destination
 
-    virtual TypeVarient get_element_type_varient() const = 0;
+    virtual TypeVariant get_element_type_variant() const = 0;
     virtual OpType get_op_type() const = 0;
     virtual InstType get_inst_type() const override final;
 };
@@ -657,7 +657,7 @@ class IntHArithmeticSIMDInst:public HArithmeticSIMDInst {
     virtual bool is_saturating() const final;
     virtual bool is_floor() const final;
 
-    virtual TypeVarient get_element_type_varient() const override;
+    virtual TypeVariant get_element_type_variant() const override;
 };
 
 class IntHorizontalAddInst:public IntHArithmeticSIMDInst {
@@ -750,7 +750,7 @@ class FloatHArithmeticSIMDInst:public HArithmeticSIMDInst {
     virtual bool is_ieee754_2019() const final;
     virtual bool is_unordered() const final;
 
-    virtual TypeVarient get_element_type_varient() const override;
+    virtual TypeVariant get_element_type_variant() const override;
 };
 
 class FloatHorizontalAddInst:public FloatHArithmeticSIMDInst {
@@ -924,7 +924,7 @@ class DotInst:public Inst {
     virtual std::size_t get_vector_size() const final;//From input_vector_type
     virtual IR::TypeExprPtr get_output_type() const final;// From destination
 
-    virtual TypeVarient get_element_type_varient() const = 0;
+    virtual TypeVariant get_element_type_variant() const = 0;
     virtual InstType get_inst_type() const override final;
 };
 
@@ -948,7 +948,7 @@ class IntDotInst:public DotInst {
     std::shared_ptr<IR::IntTypeExpr> get_casted_output_type() const;
     std::size_t get_output_bitwidth() const;
 
-    TypeVarient get_element_type_varient() const override;
+    TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
 };
 
@@ -964,7 +964,7 @@ class FloatDotInst:public DotInst {
     std::size_t get_output_bitwidth() const;
     bool is_output_brain_float() const;
 
-    TypeVarient get_element_type_varient() const override;
+    TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
 };
 
@@ -986,7 +986,7 @@ class SADInst:public Inst {
     virtual std::size_t get_vector_size() const final;//From input_vector_type
     virtual IR::TypeExprPtr get_output_type() const final;// From destination
 
-    virtual TypeVarient get_element_type_varient() const = 0;
+    virtual TypeVariant get_element_type_variant() const = 0;
     virtual InstType get_inst_type() const override final;
 };
 
@@ -1010,7 +1010,7 @@ class IntSADInst:public SADInst {
     std::shared_ptr<IR::IntTypeExpr> get_casted_output_type() const;
     std::size_t get_output_bitwidth() const;
 
-    TypeVarient get_element_type_varient() const override;
+    TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
 };
 
@@ -1026,7 +1026,7 @@ class FloatSADInst:public SADInst {
     std::size_t get_output_bitwidth() const;
     bool is_output_brain_float() const;
 
-    TypeVarient get_element_type_varient() const override;
+    TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
 };
 
@@ -1130,7 +1130,7 @@ class CompressInst:public Inst {
     virtual IR::TypeExprPtr get_element_type() const final;//From destination
     virtual std::size_t get_vector_size() const final;//From destination
 
-    virtual TypeVarient get_element_type_varient() const = 0;
+    virtual TypeVariant get_element_type_variant() const = 0;
     virtual InstType get_inst_type() const override final;
 };
 
@@ -1142,7 +1142,7 @@ class IntCompressInst:public CompressInst {
     std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const;
     std::size_t get_element_bitwidth() const;
 
-    TypeVarient get_element_type_varient() const override;
+    TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
 };
 
@@ -1153,7 +1153,7 @@ class PtrCompressInst:public CompressInst {
 
     std::size_t get_element_bitwidth() const;
 
-    TypeVarient get_element_type_varient() const override;
+    TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
 };
 
@@ -1166,7 +1166,7 @@ class FloatCompressInst:public CompressInst {
     std::size_t get_element_bitwidth() const;
     bool is_brain_float_type() const;
 
-    TypeVarient get_element_type_varient() const override;
+    TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
 };
 
@@ -1189,7 +1189,7 @@ class ExpandInst:public Inst {
     virtual IR::TypeExprPtr get_element_type() const final;//From destination
     virtual std::size_t get_vector_size() const final;//From destination
 
-    virtual TypeVarient get_element_type_varient() const = 0;
+    virtual TypeVariant get_element_type_variant() const = 0;
     virtual InstType get_inst_type() const override final;
 };
 
@@ -1201,7 +1201,7 @@ class IntExpandInst:public ExpandInst {
     std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const;
     std::size_t get_element_bitwidth() const;
 
-    TypeVarient get_element_type_varient() const override;
+    TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
 };
 
@@ -1212,7 +1212,7 @@ class PtrExpandInst:public ExpandInst {
 
     std::size_t get_element_bitwidth() const;
 
-    TypeVarient get_element_type_varient() const override;
+    TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
 };
 
@@ -1225,7 +1225,7 @@ class FloatExpandInst:public ExpandInst {
     std::size_t get_element_bitwidth() const;
     bool is_brain_float_type() const;
 
-    TypeVarient get_element_type_varient() const override;
+    TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
 };
 
@@ -1244,7 +1244,7 @@ class InterleaveInst:public Inst {
     virtual std::size_t get_input_vector_size() const final;//From destination. N/args.size() where N is the size of the destination vector
     virtual std::size_t get_output_vector_size() const final;//From destination. N
 
-    virtual TypeVarient get_element_type_varient() const = 0;
+    virtual TypeVariant get_element_type_variant() const = 0;
     virtual InstType get_inst_type() const override final;
 };
 
@@ -1255,7 +1255,7 @@ class IntInterleaveInst:public InterleaveInst {
     std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const;
     std::size_t get_element_bitwidth() const;
 
-    TypeVarient get_element_type_varient() const override;
+    TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
 };
 
@@ -1265,7 +1265,7 @@ class PtrInterleaveInst:public InterleaveInst {
 
     std::size_t get_element_bitwidth() const;
 
-    TypeVarient get_element_type_varient() const override;
+    TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
 };
 
@@ -1278,7 +1278,7 @@ class FloatInterleaveInst:public InterleaveInst {
     std::size_t get_element_bitwidth() const;
     bool is_brain_float_type() const;
 
-    TypeVarient get_element_type_varient() const override;
+    TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
 };
 
@@ -1300,7 +1300,7 @@ class DeinterleaveInst:public Inst {
     virtual std::size_t get_input_vector_size() const final;//From arg_type. N1 where N1 is the size of the arg_type
     virtual std::size_t get_output_vector_size() const final;//From arg_type. N2 where N2 is the size of destination vector
     
-    virtual TypeVarient get_element_type_varient() const = 0;
+    virtual TypeVariant get_element_type_variant() const = 0;
     virtual InstType get_inst_type() const override final;
 };
 

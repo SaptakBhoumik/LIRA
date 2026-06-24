@@ -34,7 +34,7 @@ class UnaryInst:public Inst {
     };
     UnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, std::optional<FastMathAttr> fast_math_attr);
 
-    virtual TypeVarient get_type_varient() const = 0;
+    virtual TypeVariant get_type_variant() const = 0;
     virtual IR::TypeExprPtr get_type() const final;
     virtual IR::LiteralExprPtr get_value() const final;
     virtual OpType get_op_type() const = 0;//Whether it is neg or not etc.
@@ -60,7 +60,7 @@ class IntUnaryInst:public UnaryInst{
     virtual std::shared_ptr<IR::IntTypeExpr> get_casted_operand_type() const final;
     virtual std::size_t get_bitwidth() const final;
     
-    virtual TypeVarient get_type_varient() const override final;
+    virtual TypeVariant get_type_variant() const override final;
 };
 
 class IntNegInst:public IntUnaryInst {
@@ -186,7 +186,7 @@ class VecIntUnaryInst:public UnaryInst{
     virtual std::size_t get_basetype_bitwidth() const final;
     virtual std::size_t get_num_elements() const final;
     
-    virtual TypeVarient get_type_varient() const override final;
+    virtual TypeVariant get_type_variant() const override final;
 };
 
 class VecIntNegInst:public VecIntUnaryInst {
@@ -308,7 +308,7 @@ class FloatUnaryInst:public UnaryInst{
     virtual std::size_t get_bitwidth() const final;
     virtual bool is_brain_float() const final;
     
-    virtual TypeVarient get_type_varient() const override final;
+    virtual TypeVariant get_type_variant() const override final;
 };
 
 class FloatNegInst:public FloatUnaryInst {
@@ -435,7 +435,7 @@ class VecFloatUnaryInst:public UnaryInst{
     virtual std::shared_ptr<IR::FloatTypeExpr> get_basetype() const final;
     virtual std::size_t get_num_elements() const final;
     
-    virtual TypeVarient get_type_varient() const override final;
+    virtual TypeVariant get_type_variant() const override final;
 };
 
 class VecFloatNegInst:public VecFloatUnaryInst {

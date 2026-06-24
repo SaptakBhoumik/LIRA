@@ -39,7 +39,7 @@ class FetchBitwiseBinInst:public Inst {
                         std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info,
                         bool nuw, bool nsw, bool exact, bool disjoint);
 
-    virtual TypeVarient get_type_varient() const = 0;
+    virtual TypeVariant get_type_variant() const = 0;
     virtual IR::TypeExprPtr get_type() const final;
     virtual IR::LiteralExprPtr get_pointer() const final;
     virtual IR::LiteralExprPtr get_value() const final;
@@ -67,7 +67,7 @@ class IntFetchBitwiseBinInst:public FetchBitwiseBinInst {
     virtual std::shared_ptr<IR::IntTypeExpr> get_casted_type() const final;//Returns the type casted to IntTypeExpr. Just a helper function to make life easier
     virtual std::size_t get_bitwidth() const final;//Returns the bit width of the type. Calculated automatically
 
-    virtual TypeVarient get_type_varient() const override final;
+    virtual TypeVariant get_type_variant() const override final;
 };
 
 class IntFetchAndInst:public IntFetchBitwiseBinInst {

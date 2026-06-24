@@ -34,7 +34,7 @@ class BitwiseBinaryInst:public Inst {
     BitwiseBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                       bool nuw, bool nsw, bool exact, bool disjoint);
 
-    virtual TypeVarient get_type_varient() const = 0;
+    virtual TypeVariant get_type_variant() const = 0;
     virtual IR::TypeExprPtr get_operand_type() const final;
     virtual IR::LiteralExprPtr get_lhs() const final;
     virtual IR::LiteralExprPtr get_rhs() const final;
@@ -57,7 +57,7 @@ class IntBitwiseBinaryInst:public BitwiseBinaryInst {
     virtual std::shared_ptr<IR::IntTypeExpr> get_casted_operand_type() const final;//Returns the operand type casted to IntTypeExpr. Just a helper function to make life easier
     virtual std::size_t get_bitwidth() const final;//Returns the bit width of the operand type. Just a helper function to make life easier
 
-    virtual TypeVarient get_type_varient() const override final;
+    virtual TypeVariant get_type_variant() const override final;
 };
 
 class IntAndInst:public IntBitwiseBinaryInst {
@@ -178,7 +178,7 @@ class VecIntBitwiseBinaryInst:public BitwiseBinaryInst {
     virtual std::size_t get_basetype_bitwidth() const final;//Returns the bit width of the operand basetype. Just a helper function to make life easier
     virtual std::size_t get_num_elements() const final;//Returns the number of elements in the vector. Just a helper function to make life easier
 
-    virtual TypeVarient get_type_varient() const override final;
+    virtual TypeVariant get_type_variant() const override final;
 };
 
 class VecIntAndInst:public VecIntBitwiseBinaryInst {

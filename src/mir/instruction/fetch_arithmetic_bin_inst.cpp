@@ -102,8 +102,8 @@ std::shared_ptr<IR::IntTypeExpr> IntFetchArithmeticBinInst::get_casted_type() co
 std::size_t IntFetchArithmeticBinInst::get_bitwidth() const{
     return this->get_casted_type()->get_bits();
 }
-TypeVarient IntFetchArithmeticBinInst::get_type_varient() const{
-    return TypeVarient::Int;
+TypeVariant IntFetchArithmeticBinInst::get_type_variant() const{
+    return TypeVariant::Int;
 }
 
 

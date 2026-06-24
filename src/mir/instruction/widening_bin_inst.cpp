@@ -67,8 +67,8 @@ std::size_t IntWideningBinaryInst::get_input_bitwidth() const{
 std::size_t IntWideningBinaryInst::get_result_bitwidth() const{
     return this->get_casted_result_type()->get_bits();
 }
-TypeVarient IntWideningBinaryInst::get_type_varient() const{
-    return TypeVarient::Int;
+TypeVariant IntWideningBinaryInst::get_type_variant() const{
+    return TypeVariant::Int;
 }
 
 
@@ -165,8 +165,8 @@ std::size_t VecIntWideningBinaryInst::get_result_base_bitwidth() const{
 std::size_t VecIntWideningBinaryInst::get_num_elements() const{
     return this->get_casted_input_type()->get_size();
 }
-TypeVarient VecIntWideningBinaryInst::get_type_varient() const{
-    return TypeVarient::VecInt;
+TypeVariant VecIntWideningBinaryInst::get_type_variant() const{
+    return TypeVariant::VecInt;
 }
 
 
@@ -243,8 +243,8 @@ bool FloatWideningBinaryInst::is_input_brain_float() const{
 bool FloatWideningBinaryInst::is_result_brain_float() const{
     return this->get_casted_result_type()->is_brain_float();
 }
-TypeVarient FloatWideningBinaryInst::get_type_varient() const{
-    return TypeVarient::Float;
+TypeVariant FloatWideningBinaryInst::get_type_variant() const{
+    return TypeVariant::Float;
 }   
 
 
@@ -315,8 +315,8 @@ std::shared_ptr<IR::FloatTypeExpr> VecFloatWideningBinaryInst::get_casted_input_
 std::shared_ptr<IR::FloatTypeExpr> VecFloatWideningBinaryInst::get_casted_result_basetype() const{
     return std::dynamic_pointer_cast<IR::FloatTypeExpr>(this->get_casted_result_type()->get_basetype());
 }
-TypeVarient VecFloatWideningBinaryInst::get_type_varient() const{
-    return TypeVarient::VecFloat;
+TypeVariant VecFloatWideningBinaryInst::get_type_variant() const{
+    return TypeVariant::VecFloat;
 }   
 
 

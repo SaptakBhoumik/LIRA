@@ -127,7 +127,7 @@ class BroadcastLoadInst:public Inst {
     virtual std::size_t get_dereferenceable_bytes() const final;
 
     virtual InstType get_inst_type() const override final;
-    virtual TypeVarient get_element_type_varient() const = 0;
+    virtual TypeVariant get_element_type_variant() const = 0;
 };
 
 class IntBroadcastLoadInst:public BroadcastLoadInst {
@@ -139,7 +139,7 @@ class IntBroadcastLoadInst:public BroadcastLoadInst {
     std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const;
     std::size_t get_element_bitwidth() const;
 
-    TypeVarient get_element_type_varient() const override;
+    TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
 };
 
@@ -151,7 +151,7 @@ class PtrBroadcastLoadInst:public BroadcastLoadInst {
     
     std::size_t get_element_bitwidth() const;
 
-    TypeVarient get_element_type_varient() const override;
+    TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
 };
 
@@ -165,7 +165,7 @@ class FloatBroadcastLoadInst:public BroadcastLoadInst {
     std::size_t get_element_bitwidth() const;
     bool is_element_brain_float() const;
 
-    TypeVarient get_element_type_varient() const override;
+    TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
 };
 
@@ -203,7 +203,7 @@ class MaskedLoadInst:public Inst {
     virtual std::size_t get_dereferenceable_bytes() const final;
 
     virtual InstType get_inst_type() const override final;
-    virtual TypeVarient get_element_type_varient() const = 0;
+    virtual TypeVariant get_element_type_variant() const = 0;
 };
 
 class IntMaskedLoadInst:public MaskedLoadInst {
@@ -215,7 +215,7 @@ class IntMaskedLoadInst:public MaskedLoadInst {
     std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const;
     std::size_t get_element_bitwidth() const;
 
-    TypeVarient get_element_type_varient() const override;
+    TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
 };
 
@@ -227,7 +227,7 @@ class PtrMaskedLoadInst:public MaskedLoadInst {
     
     std::size_t get_element_bitwidth() const;
 
-    TypeVarient get_element_type_varient() const override;
+    TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
 };
 
@@ -241,7 +241,7 @@ class FloatMaskedLoadInst:public MaskedLoadInst {
     std::size_t get_element_bitwidth() const;
     bool is_element_brain_float() const;
 
-    TypeVarient get_element_type_varient() const override;
+    TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
 };
 
@@ -278,7 +278,7 @@ class MaskedStoreInst:public Inst {
     virtual std::size_t get_dereferenceable_bytes() const final;
 
     virtual InstType get_inst_type() const override final;
-    virtual TypeVarient get_element_type_varient() const = 0;
+    virtual TypeVariant get_element_type_variant() const = 0;
 };
 
 class IntMaskedStoreInst:public MaskedStoreInst {
@@ -290,7 +290,7 @@ class IntMaskedStoreInst:public MaskedStoreInst {
     std::shared_ptr<IR::IntTypeExpr> get_casted_value_basetype() const;
     std::size_t get_value_basetype_bitwidth() const;
 
-    TypeVarient get_element_type_varient() const override;
+    TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
 };
 
@@ -302,7 +302,7 @@ class PtrMaskedStoreInst:public MaskedStoreInst {
     
     std::size_t get_value_basetype_bitwidth() const;
 
-    TypeVarient get_element_type_varient() const override;
+    TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
 };
 
@@ -316,7 +316,7 @@ class FloatMaskedStoreInst:public MaskedStoreInst {
     std::size_t get_value_basetype_bitwidth() const;
     bool is_element_brain_float() const;
 
-    TypeVarient get_element_type_varient() const override;
+    TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
 };
 
@@ -354,7 +354,7 @@ class MaskedGatherInst:public Inst {
     virtual std::size_t get_dereferenceable_bytes() const final;
 
     virtual InstType get_inst_type() const override final;
-    virtual TypeVarient get_element_type_varient() const = 0;
+    virtual TypeVariant get_element_type_variant() const = 0;
 };
 
 class IntMaskedGatherInst:public MaskedGatherInst {
@@ -366,7 +366,7 @@ class IntMaskedGatherInst:public MaskedGatherInst {
     std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const;
     std::size_t get_element_bitwidth() const;
 
-    TypeVarient get_element_type_varient() const override;
+    TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
 };
 
@@ -378,7 +378,7 @@ class PtrMaskedGatherInst:public MaskedGatherInst {
     
     std::size_t get_element_bitwidth() const;
 
-    TypeVarient get_element_type_varient() const override;
+    TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
 };
 
@@ -392,7 +392,7 @@ class FloatMaskedGatherInst:public MaskedGatherInst {
     std::size_t get_element_bitwidth() const;
     bool is_element_brain_float() const;
 
-    TypeVarient get_element_type_varient() const override;
+    TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
 };
 
@@ -429,7 +429,7 @@ class MaskedScatterInst:public Inst {
     virtual std::size_t get_dereferenceable_bytes() const final;
 
     virtual InstType get_inst_type() const override final;
-    virtual TypeVarient get_element_type_varient() const = 0;
+    virtual TypeVariant get_element_type_variant() const = 0;
 };
 
 class IntMaskedScatterInst:public MaskedScatterInst {
@@ -441,7 +441,7 @@ class IntMaskedScatterInst:public MaskedScatterInst {
     std::shared_ptr<IR::IntTypeExpr> get_casted_value_basetype() const;
     std::size_t get_value_basetype_bitwidth() const;
 
-    TypeVarient get_element_type_varient() const override;
+    TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
 };
 
@@ -453,7 +453,7 @@ class PtrMaskedScatterInst:public MaskedScatterInst {
     
     std::size_t get_value_basetype_bitwidth() const;
 
-    TypeVarient get_element_type_varient() const override;
+    TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
 };
 
@@ -467,7 +467,7 @@ class FloatMaskedScatterInst:public MaskedScatterInst {
     std::size_t get_value_basetype_bitwidth() const;
     bool is_element_brain_float() const;
 
-    TypeVarient get_element_type_varient() const override;
+    TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
 };
 

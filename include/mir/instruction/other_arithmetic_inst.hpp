@@ -19,7 +19,7 @@ class DivModInst:public Inst {
 
     virtual bool is_unsigned() const final;
 
-    virtual TypeVarient get_operand_type_varient() const = 0;
+    virtual TypeVariant get_operand_type_variant() const = 0;
     virtual IR::TypeExprPtr get_operand_type() const final;
     virtual IR::LiteralExprPtr get_lhs() const final;
     virtual IR::LiteralExprPtr get_rhs() const final;
@@ -33,7 +33,7 @@ class IntDivModInst:public DivModInst {
 
     std::shared_ptr<IR::IntTypeExpr> get_casted_operand_type() const;
     std::size_t get_bitwidth() const;
-    TypeVarient get_operand_type_varient() const override;
+    TypeVariant get_operand_type_variant() const override;
 
     std::string to_string() const override;
 };
@@ -47,7 +47,7 @@ class VecIntDivModInst:public DivModInst {
     std::shared_ptr<IR::IntTypeExpr> get_casted_operand_basetype() const;
     std::size_t get_operand_basetype_bitwidth() const;
     std::size_t get_vector_size() const;
-    TypeVarient get_operand_type_varient() const override;
+    TypeVariant get_operand_type_variant() const override;
 
     std::string to_string() const override;
 };
@@ -60,7 +60,7 @@ class FloatDivModInst:public DivModInst {
     std::shared_ptr<IR::FloatTypeExpr> get_casted_operand_type() const;
     std::size_t get_bitwidth() const;
     bool is_brain_float() const;
-    TypeVarient get_operand_type_varient() const override;
+    TypeVariant get_operand_type_variant() const override;
 
     std::string to_string() const override;
 };
@@ -73,7 +73,7 @@ class VecFloatDivModInst:public DivModInst {
     std::shared_ptr<IR::SIMDTypeExpr> get_casted_operand_type() const;
     std::shared_ptr<IR::FloatTypeExpr> get_casted_operand_basetype() const;
     std::size_t get_vector_size() const;
-    TypeVarient get_operand_type_varient() const override;
+    TypeVariant get_operand_type_variant() const override;
 
     std::string to_string() const override;
 };
@@ -96,7 +96,7 @@ class WideningDivModInst:public Inst {
     virtual bool is_unsigned() const final;
     virtual bool is_exact() const final;
 
-    virtual TypeVarient get_operand_type_varient() const = 0;
+    virtual TypeVariant get_operand_type_variant() const = 0;
     virtual IR::TypeExprPtr get_operand_type() const final;
     virtual IR::LiteralExprPtr get_dividend_hi() const final;
     virtual IR::LiteralExprPtr get_dividend_lo() const final;
@@ -111,7 +111,7 @@ class IntWideningDivModInst:public WideningDivModInst {
 
     std::shared_ptr<IR::IntTypeExpr> get_casted_operand_type() const;
     std::size_t get_bitwidth() const;
-    TypeVarient get_operand_type_varient() const override;
+    TypeVariant get_operand_type_variant() const override;
 
     std::string to_string() const override;
 };
@@ -125,7 +125,7 @@ class VecIntWideningDivModInst:public WideningDivModInst {
     std::shared_ptr<IR::IntTypeExpr> get_casted_operand_basetype() const;
     std::size_t get_operand_basetype_bitwidth() const;
     std::size_t get_vector_size() const;
-    TypeVarient get_operand_type_varient() const override;
+    TypeVariant get_operand_type_variant() const override;
 
     std::string to_string() const override;
 };
@@ -145,7 +145,7 @@ class MulHiInst:public Inst {
 
     virtual bool is_unsigned() const final;
 
-    virtual TypeVarient get_operand_type_varient() const = 0;
+    virtual TypeVariant get_operand_type_variant() const = 0;
     virtual IR::TypeExprPtr get_operand_type() const final;
     virtual IR::LiteralExprPtr get_lhs() const final;
     virtual IR::LiteralExprPtr get_rhs() const final;
@@ -159,7 +159,7 @@ class IntMulHiInst:public MulHiInst {
 
     std::shared_ptr<IR::IntTypeExpr> get_casted_operand_type() const;
     std::size_t get_bitwidth() const;
-    TypeVarient get_operand_type_varient() const override;
+    TypeVariant get_operand_type_variant() const override;
 
     std::string to_string() const override;
 };
@@ -173,7 +173,7 @@ class VecIntMulHiInst:public MulHiInst {
     std::shared_ptr<IR::IntTypeExpr> get_casted_operand_basetype() const;
     std::size_t get_operand_basetype_bitwidth() const;
     std::size_t get_vector_size() const;
-    TypeVarient get_operand_type_varient() const override;
+    TypeVariant get_operand_type_variant() const override;
 
     std::string to_string() const override;
 };
@@ -203,7 +203,7 @@ class MulFixInst:public Inst {
     virtual bool is_saturating() const final;
     virtual bool is_round() const final;
     
-    virtual TypeVarient get_operand_type_varient() const = 0;
+    virtual TypeVariant get_operand_type_variant() const = 0;
     virtual IR::TypeExprPtr get_operand_type() const final;
     virtual IR::LiteralExprPtr get_lhs() const final;
     virtual IR::LiteralExprPtr get_rhs() const final;
@@ -218,7 +218,7 @@ class IntMulFixInst:public MulFixInst {
 
     std::shared_ptr<IR::IntTypeExpr> get_casted_operand_type() const;
     std::size_t get_bitwidth() const;
-    TypeVarient get_operand_type_varient() const override;
+    TypeVariant get_operand_type_variant() const override;
 
     std::string to_string() const override;
 };
@@ -232,7 +232,7 @@ class VecIntMulFixInst:public MulFixInst {
     std::shared_ptr<IR::IntTypeExpr> get_casted_operand_basetype() const;
     std::size_t get_operand_basetype_bitwidth() const;
     std::size_t get_vector_size() const;
-    TypeVarient get_operand_type_varient() const override;
+    TypeVariant get_operand_type_variant() const override;
 
     std::string to_string() const override;
 };

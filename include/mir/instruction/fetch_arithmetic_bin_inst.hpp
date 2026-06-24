@@ -29,7 +29,7 @@ class FetchArithmeticBinInst:public Inst {
     FetchArithmeticBinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                             std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info, std::optional<FastMathAttr> fast_math_attr);
 
-    virtual TypeVarient get_type_varient() const = 0;
+    virtual TypeVariant get_type_variant() const = 0;
     virtual IR::TypeExprPtr get_type() const final;
     virtual IR::LiteralExprPtr get_pointer() const final;
     virtual IR::LiteralExprPtr get_value() const final;
@@ -69,7 +69,7 @@ class IntFetchArithmeticBinInst:public FetchArithmeticBinInst {
     virtual std::shared_ptr<IR::IntTypeExpr> get_casted_type() const final;//Returns the type casted to IntTypeExpr. Just a helper function to make life easier
     virtual std::size_t get_bitwidth() const final;//Returns the bit width of the type. Calculated automatically
 
-    virtual TypeVarient get_type_varient() const override final;
+    virtual TypeVariant get_type_variant() const override final;
 };
 
 
@@ -207,7 +207,7 @@ class FloatFetchArithmeticBinInst:public FetchArithmeticBinInst {
     virtual std::size_t get_bitwidth() const final;//Returns the bit width of the type. Calculated automatically
     virtual bool is_brain_float() const final;//Whether the type is brain float or not. Just a helper function to make life easier
 
-    virtual TypeVarient get_type_varient() const override final;
+    virtual TypeVariant get_type_variant() const override final;
 };
 
 

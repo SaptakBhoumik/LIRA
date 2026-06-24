@@ -25,8 +25,8 @@ std::pair<std::map<std::string,bool>, std::vector<IR::AttributePtr>> extract_fla
 IR::TypeExprPtr get_sym_reduced_type(VarSymTablePtr var_symtable, IR::Token name);//Get the reduced type of symbol.                                                                                                                                                 // True if flag found. Else false. Assumes the flag attribute has no argument. IF it has error then error
 IR::TypeExprPtr get_reduced_type(TypeSymTablePtr type_symtable, IR::TypeExprPtr type);//Get the reduced type of a type expression. Throws error if unsupported attribute is found or if type defination is wrong
 }
-namespace Pass {
-class SemanticAnalyzer {
+namespace SemanticAnalyzer {
+class IRToMIRSemanticAnalyzer {
     IR::ProgramPtr program;
     std::string filename;
     Utils::VarSymTablePtr var_symtable;
@@ -80,7 +80,7 @@ class SemanticAnalyzer {
     //Destination argument
     MIR::LocalDestRegisterPtr process_local_dest_arg(IR::InstructionStmtPtr inst_stmt);//Reduce type,add symbol to symol table
     public:
-    SemanticAnalyzer(IR::ProgramPtr program);
+    IRToMIRSemanticAnalyzer(IR::ProgramPtr program);
 };
 }
 }

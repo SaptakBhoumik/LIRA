@@ -1,7 +1,7 @@
-#include "semantic_analysis/semantic_analysis.hpp"
+#include "semantic_analysis/ir_to_mir.hpp"
 
 namespace LIRA {
-namespace Pass {
+namespace SemanticAnalyzer {
 bool is_arithmetic_bin_inst(std::string inst_name){
     return inst_name == ".add" || inst_name == ".sub" || inst_name == ".absdiff" || inst_name == ".mul" || inst_name == ".div" || inst_name == ".rem" 
             || inst_name == ".copysign" || inst_name == ".min" || inst_name == ".max" || inst_name == ".avg";
@@ -57,7 +57,7 @@ bool is_call_inst(std::string inst_name){
 bool is_other_inst(std::string inst_name){
     return inst_name == ".select" || inst_name == ".freeze" || inst_name == ".va_arg" || inst_name == ".ptrmask" || inst_name == ".shufflevector" ;
 }
-MIR::InstPtr SemanticAnalyzer::analyze_instruction(IR::InstructionStmtPtr inst_stmt){
+MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_instruction(IR::InstructionStmtPtr inst_stmt){
     IR::Token inst_name = inst_stmt->get_value()->get_token();
     if(is_arithmetic_bin_inst(inst_name.value)){
         return analyze_arithmetic_bin_inst(inst_name,inst_stmt);

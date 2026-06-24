@@ -1,9 +1,9 @@
 #include "ast/ast.hpp"
-#include "semantic_analysis/semantic_analysis.hpp"
+#include "semantic_analysis/ir_to_mir.hpp"
 #include <iostream>
 #include <functional>
 namespace LIRA {
-namespace Pass {
+namespace SemanticAnalyzer {
 using DispatchFuncType = std::function<MIR::InstPtr(std::string, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                                     MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt)>;
  
@@ -29,7 +29,7 @@ MIR::InstPtr analyze_avg_bin_inst(std::string filename, MIR::LocalDestRegisterPt
                                   MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);
 
 
-MIR::InstPtr SemanticAnalyzer::analyze_arithmetic_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt){
+MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_arithmetic_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt){
     //NOTE:Dont use a common templated function for all. The attributes can change in future. It is more code but more maintainable imo+The error messages can be more specific
     const std::unordered_map<std::string, DispatchFuncType> dispatch_map = {
             {".add", analyze_add_bin_inst},

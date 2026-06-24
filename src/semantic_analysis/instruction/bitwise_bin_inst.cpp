@@ -1,11 +1,11 @@
 #include "ast/ast.hpp"
 #include "mir/instruction/_instruction.hpp"
-#include "semantic_analysis/semantic_analysis.hpp"
+#include "semantic_analysis/ir_to_mir.hpp"
 #include <iostream>
 
 namespace LIRA {
-namespace Pass {
-MIR::InstPtr SemanticAnalyzer::analyze_bitwise_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt){
+namespace SemanticAnalyzer {
+MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_bitwise_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt){
     auto args = inst_stmt->get_value()->get_operands();
     auto _dest = inst_stmt->get_name();
     if(!_dest.has_value()){
@@ -59,7 +59,7 @@ MIR::InstPtr SemanticAnalyzer::analyze_bitwise_bin_inst(IR::Token name,IR::Instr
     }
 }
 
-MIR::InstPtr SemanticAnalyzer::analyze_and_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_and_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                                     MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     if(attributes.size()>0){
@@ -73,7 +73,7 @@ MIR::InstPtr SemanticAnalyzer::analyze_and_bin_inst(MIR::LocalDestRegisterPtr de
     }
 }
 
-MIR::InstPtr SemanticAnalyzer::analyze_or_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_or_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                                     MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [flag_attrs,remaining_attrs] = extract_flag_attrs(attributes, {"disjoint"});
@@ -89,7 +89,7 @@ MIR::InstPtr SemanticAnalyzer::analyze_or_bin_inst(MIR::LocalDestRegisterPtr des
     }
 }
 
-MIR::InstPtr SemanticAnalyzer::analyze_xor_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_xor_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                                     MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     if(attributes.size()>0){
@@ -103,7 +103,7 @@ MIR::InstPtr SemanticAnalyzer::analyze_xor_bin_inst(MIR::LocalDestRegisterPtr de
     }
 }
 
-MIR::InstPtr SemanticAnalyzer::analyze_shl_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_shl_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                                     MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [flag_attrs,remaining_attrs] = extract_flag_attrs(attributes, {"nuw", "nsw"});
@@ -120,7 +120,7 @@ MIR::InstPtr SemanticAnalyzer::analyze_shl_bin_inst(MIR::LocalDestRegisterPtr de
     }
 }
 
-MIR::InstPtr SemanticAnalyzer::analyze_lshr_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_lshr_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                                     MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [flag_attrs,remaining_attrs] = extract_flag_attrs(attributes, {"exact"});
@@ -136,7 +136,7 @@ MIR::InstPtr SemanticAnalyzer::analyze_lshr_bin_inst(MIR::LocalDestRegisterPtr d
     }
 }
 
-MIR::InstPtr SemanticAnalyzer::analyze_ashr_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_ashr_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                                     MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [flag_attrs,remaining_attrs] = extract_flag_attrs(attributes, {"exact"});

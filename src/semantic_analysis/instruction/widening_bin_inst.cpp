@@ -1,10 +1,10 @@
 #include "ast/ast.hpp"
-#include "semantic_analysis/semantic_analysis.hpp"
+#include "semantic_analysis/ir_to_mir.hpp"
 #include <cstddef>
 #include <iostream>
 #include <functional>
 namespace LIRA {
-namespace Pass {
+namespace SemanticAnalyzer {
 using DispatchFuncType = std::function<MIR::InstPtr(std::string, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                                     IR::TypeExprPtr input_type, MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt)>;
 
@@ -18,7 +18,7 @@ MIR::InstPtr analyze_widening_absdiff_bin_inst(std::string filename, MIR::LocalD
 MIR::InstPtr analyze_widening_mul_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                            IR::TypeExprPtr input_type, MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);
 
-MIR::InstPtr SemanticAnalyzer::analyze_widening_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt){
+MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_widening_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt){
     const std::unordered_map<std::string, DispatchFuncType> dispatch_map = {
             {".widening_add", analyze_widening_add_bin_inst},
             {".widening_sub", analyze_widening_sub_bin_inst},

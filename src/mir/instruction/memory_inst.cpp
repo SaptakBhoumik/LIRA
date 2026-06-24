@@ -1424,16 +1424,16 @@ ClflushInst::ClflushInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExp
     this->pointer = pointer;
     this->opt = opt;
 }
-IR::LiteralExprPtr ClflushInst::get_pointer() const {
+IR::LiteralExprPtr ClflushInst::get_pointer() const{
     return this->pointer;
 }
-bool ClflushInst::is_opt() const {
+bool ClflushInst::is_opt() const{
     return this->opt;
 }
-InstType ClflushInst::get_inst_type() const {
+InstType ClflushInst::get_inst_type() const{
     return InstType::ClflushInst;
 }
-std::string ClflushInst::to_string() const {
+std::string ClflushInst::to_string() const{
     return ".clflush(ptr:" + this->pointer->to_string() + ")" + (this->opt ? " #[opt]" : "");
 }
 
@@ -1441,13 +1441,13 @@ std::string ClflushInst::to_string() const {
 ClwbInst::ClwbInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr pointer): Inst(instruction_stmt,nullptr,std::nullopt) {
     this->pointer = pointer;
 }
-IR::LiteralExprPtr ClwbInst::get_pointer() const {
+IR::LiteralExprPtr ClwbInst::get_pointer() const{
     return this->pointer;
 }
-InstType ClwbInst::get_inst_type() const {
+InstType ClwbInst::get_inst_type() const{
     return InstType::ClwbInst;
 }
-std::string ClwbInst::to_string() const {
+std::string ClwbInst::to_string() const{
     return ".clwb(ptr:" + this->pointer->to_string() + ")";
 }
 
@@ -1455,13 +1455,13 @@ std::string ClwbInst::to_string() const {
 CldemoteInst::CldemoteInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr pointer): Inst(instruction_stmt,nullptr,std::nullopt) {
     this->pointer = pointer;
 }
-IR::LiteralExprPtr CldemoteInst::get_pointer() const {
+IR::LiteralExprPtr CldemoteInst::get_pointer() const{
     return this->pointer;
 }
-InstType CldemoteInst::get_inst_type() const {
+InstType CldemoteInst::get_inst_type() const{
     return InstType::CldemoteInst;
 }
-std::string CldemoteInst::to_string() const {
+std::string CldemoteInst::to_string() const{
     return ".cldemote(ptr:" + this->pointer->to_string() + ")";
 }
 
@@ -1471,16 +1471,16 @@ LifetimeStartInst::LifetimeStartInst(IR::InstructionStmtPtr instruction_stmt, IR
     this->pointer = pointer;
     this->size = size;
 }
-IR::LiteralExprPtr LifetimeStartInst::get_pointer() const {
+IR::LiteralExprPtr LifetimeStartInst::get_pointer() const{
     return this->pointer;
 }
-std::size_t LifetimeStartInst::get_size() const {
+std::size_t LifetimeStartInst::get_size() const{
     return this->size;
 }
-InstType LifetimeStartInst::get_inst_type() const {
+InstType LifetimeStartInst::get_inst_type() const{
     return InstType::LifetimeStartInst;
 }
-std::string LifetimeStartInst::to_string() const {
+std::string LifetimeStartInst::to_string() const{
     return ".lifetime.start(ptr:" + this->pointer->to_string() + ", i64:" + std::to_string(this->size) + ")";
 }
 
@@ -1489,16 +1489,16 @@ LifetimeEndInst::LifetimeEndInst(IR::InstructionStmtPtr instruction_stmt, IR::Li
     this->pointer = pointer;
     this->size = size;
 }
-IR::LiteralExprPtr LifetimeEndInst::get_pointer() const {
+IR::LiteralExprPtr LifetimeEndInst::get_pointer() const{
     return this->pointer;
 }
-std::size_t LifetimeEndInst::get_size() const {
+std::size_t LifetimeEndInst::get_size() const{
     return this->size;
 }
-InstType LifetimeEndInst::get_inst_type() const {
+InstType LifetimeEndInst::get_inst_type() const{
     return InstType::LifetimeEndInst;
 }
-std::string LifetimeEndInst::to_string() const {
+std::string LifetimeEndInst::to_string() const{
     return ".lifetime.end(ptr:" + this->pointer->to_string() + ", i64:" + std::to_string(this->size) + ")";
 }
 
@@ -1508,16 +1508,16 @@ InvariantStartInst::InvariantStartInst(IR::InstructionStmtPtr instruction_stmt, 
     this->pointer = pointer;
     this->size = size;
 }
-IR::LiteralExprPtr InvariantStartInst::get_pointer() const {
+IR::LiteralExprPtr InvariantStartInst::get_pointer() const{
     return this->pointer;
 }
-std::size_t InvariantStartInst::get_size() const {
+std::size_t InvariantStartInst::get_size() const{
     return this->size;
 }
-InstType InvariantStartInst::get_inst_type() const {
+InstType InvariantStartInst::get_inst_type() const{
     return InstType::InvariantStartInst;
 }
-std::string InvariantStartInst::to_string() const {
+std::string InvariantStartInst::to_string() const{
     return "let " + this->destination->to_string() + " = .invariant.start(ptr:" + this->pointer->to_string() + ", i64:" + std::to_string(this->size) + ")";
 }
 
@@ -1528,19 +1528,19 @@ InvariantEndInst::InvariantEndInst(IR::InstructionStmtPtr instruction_stmt, IR::
     this->pointer = pointer;
     this->size = size;
 }
-IR::LiteralExprPtr InvariantEndInst::get_scope() const {
+IR::LiteralExprPtr InvariantEndInst::get_scope() const{
     return this->scope;
 }
-IR::LiteralExprPtr InvariantEndInst::get_pointer() const {
+IR::LiteralExprPtr InvariantEndInst::get_pointer() const{
     return this->pointer;
 }
-std::size_t InvariantEndInst::get_size() const {
+std::size_t InvariantEndInst::get_size() const{
     return this->size;
 }
-InstType InvariantEndInst::get_inst_type() const {
+InstType InvariantEndInst::get_inst_type() const{
     return InstType::InvariantEndInst;
 }
-std::string InvariantEndInst::to_string() const {
+std::string InvariantEndInst::to_string() const{
     return ".invariant.end(ptr:" + this->scope->to_string() + ", ptr:" + this->pointer->to_string() + ", i64:" + std::to_string(this->size) + ")";
 }
 }

@@ -1,11 +1,11 @@
 #include "ast/ast.hpp"
 #include "mir/instruction/_instruction.hpp"
-#include "semantic_analysis/semantic_analysis.hpp"
+#include "semantic_analysis/ir_to_mir.hpp"
 #include <iostream>
 #include <functional>
 #include <unordered_map>
 namespace LIRA {
-namespace Pass {
+namespace SemanticAnalyzer {
 using DispatchFuncType = std::function<MIR::InstPtr(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                                     IR::TypeExprPtr type, MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt)>; 
 MIR::InstPtr analyze_eq_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
@@ -26,7 +26,7 @@ MIR::InstPtr analyze_neither_nan_bin_inst(std::string filename, MIR::LocalDestRe
                                          IR::TypeExprPtr type, MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);         
 MIR::InstPtr analyze_both_nan_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                         IR::TypeExprPtr type, MIR::TypeVarient type_varient, IR::InstructionStmtPtr inst_stmt);                                             
-MIR::InstPtr SemanticAnalyzer::analyze_cmp_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt){
+MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_cmp_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt){
     const std::unordered_map<std::string, DispatchFuncType> dispatch_map = {
         {".eq", analyze_eq_bin_inst},
         {".neq", analyze_neq_bin_inst},

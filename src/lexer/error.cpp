@@ -6,7 +6,7 @@
 #include <unordered_map>
 namespace LIRA {
 namespace IR {
-bool Lexer::has_errors() const {
+bool Lexer::has_errors() const{
     for (const auto& d : this->diagnostics) {
         if (d.level == Utils::DiagLevel::error) {
             return true;
@@ -15,12 +15,12 @@ bool Lexer::has_errors() const {
     return false;
 }
 
-const std::vector<Utils::Diagnostic>& Lexer::get_diagnostics() const {
+const std::vector<Utils::Diagnostic>& Lexer::get_diagnostics() const{
     return this->diagnostics;
 }
 
 
-Utils::Location Lexer::here() const {
+Utils::Location Lexer::here() const{
     return Utils::Location{
         this->line_num,
         this->col,

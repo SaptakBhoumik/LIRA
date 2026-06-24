@@ -16,7 +16,7 @@ void Parser::advance_on_semicolon(){
         this->advance();
     }
 }
-Token Parser::peek(std::size_t i) const {
+Token Parser::peek(std::size_t i) const{
     std::size_t index = this->curr_index + i;
     if (index < this->toks.size()) {
         return this->toks[index];

@@ -49,30 +49,30 @@ TypeVarient IntBitwiseTrinaryInst::get_operand_type_varient() const{
 
 IntFshlInst::IntFshlInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3)
                          :IntBitwiseTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3){}
-BitwiseTrinaryInst::OpType IntFshlInst::get_op_type() const {
+BitwiseTrinaryInst::OpType IntFshlInst::get_op_type() const{
     return OpType::FSHL;
 }
-std::string IntFshlInst::to_string() const {
+std::string IntFshlInst::to_string() const{
     return this->to_string_helper("int_fshl");
 }
 
 
 IntFshrInst::IntFshrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3)
                          :IntBitwiseTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3){}
-BitwiseTrinaryInst::OpType IntFshrInst::get_op_type() const {
+BitwiseTrinaryInst::OpType IntFshrInst::get_op_type() const{
     return OpType::FSHR;
 }
-std::string IntFshrInst::to_string() const {
+std::string IntFshrInst::to_string() const{
     return this->to_string_helper("int_fshr");
 }
 
 
 IntBitblendInst::IntBitblendInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3)
                                  :IntBitwiseTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3){}
-BitwiseTrinaryInst::OpType IntBitblendInst::get_op_type() const {
+BitwiseTrinaryInst::OpType IntBitblendInst::get_op_type() const{
     return OpType::BITBLEND;
 }
-std::string IntBitblendInst::to_string() const {
+std::string IntBitblendInst::to_string() const{
     return this->to_string_helper("int_bitblend");
 }
 
@@ -98,30 +98,30 @@ TypeVarient VecIntBitwiseTrinaryInst::get_operand_type_varient() const{
 
 VecIntFshlInst::VecIntFshlInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3)
                          :VecIntBitwiseTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3){}
-BitwiseTrinaryInst::OpType VecIntFshlInst::get_op_type() const {
+BitwiseTrinaryInst::OpType VecIntFshlInst::get_op_type() const{
     return OpType::FSHL;
 }
-std::string VecIntFshlInst::to_string() const {
+std::string VecIntFshlInst::to_string() const{
     return this->to_string_helper("vec_int_fshl");
 }
 
 
 VecIntFshrInst::VecIntFshrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3)
                          :VecIntBitwiseTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3){}
-BitwiseTrinaryInst::OpType VecIntFshrInst::get_op_type() const {
+BitwiseTrinaryInst::OpType VecIntFshrInst::get_op_type() const{
     return OpType::FSHR;
 }
-std::string VecIntFshrInst::to_string() const {
+std::string VecIntFshrInst::to_string() const{
     return this->to_string_helper("vec_int_fshr");
 }
 
 
 VecIntBitblendInst::VecIntBitblendInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3)
                                  :VecIntBitwiseTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3){}
-BitwiseTrinaryInst::OpType VecIntBitblendInst::get_op_type() const {
+BitwiseTrinaryInst::OpType VecIntBitblendInst::get_op_type() const{
     return OpType::BITBLEND;
 }
-std::string VecIntBitblendInst::to_string() const {
+std::string VecIntBitblendInst::to_string() const{
     return this->to_string_helper("vec_int_bitblend");
 }
 }

@@ -765,15 +765,15 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
 
 ### Lifetime and Invariant Scope Instructions
 
-- `.lifetime_start(ptr:%ptr, i64:%size)` - Marks the beginning of the live range of a stack allocation. `%ptr` must be the result of an `.alloca`. `%size` is the size in bytes and must be a compile-time constant literal. Between a `lifetime_start` and `lifetime_end`, the memory is considered live; outside this range the optimizer may reuse the stack slot. Reading before start or after end is undefined behavior.
+- `.lifetime.start(ptr:%ptr, i64:%size)` - Marks the beginning of the live range of a stack allocation. `%ptr` must be the result of an `.alloca`. `%size` is the size in bytes and must be a compile-time constant literal. Between a `lifetime.start` and `lifetime.end`, the memory is considered live; outside this range the optimizer may reuse the stack slot. Reading before start or after end is undefined behavior.
 
     - No attributes. No output.
 
-- `.lifetime_end(ptr:%ptr, i64:%size)` - Marks the end of the live range of a stack allocation. Must have a matching `.lifetime_start` on all reaching control-flow paths. Same signature and restrictions. No attributes. No output.
+- `.lifetime.end(ptr:%ptr, i64:%size)` - Marks the end of the live range of a stack allocation. Must have a matching `.lifetime.start` on all reaching control-flow paths. Same signature and restrictions. No attributes. No output.
 
-- `let ptr:%scope = .invariant_start(ptr:%ptr, i64:%size)` - Asserts that the `%size` bytes of memory at `%ptr` will not be modified between this point and the matching `.invariant_end`. Returns an opaque `%scope` handle for the paired end. The size must be a compile-time constant literal. The optimizer may hoist loads, eliminate redundant reloads, and refine aliasing. Writing to the memory between start and end is undefined behavior. No attributes.
+- `let ptr:%scope = .invariant.start(ptr:%ptr, i64:%size)` - Asserts that the `%size` bytes of memory at `%ptr` will not be modified between this point and the matching `.invariant.end`. Returns an opaque `%scope` handle for the paired end. The size must be a compile-time constant literal. The optimizer may hoist loads, eliminate redundant reloads, and refine aliasing. Writing to the memory between start and end is undefined behavior. No attributes.
 
-- `.invariant_end(ptr:%scope, ptr:%ptr, i64:%size)` - Ends the invariant scope established by `.invariant_start`. `%scope` must be the handle returned by the paired start. No additional attributes.
+- `.invariant.end(ptr:%scope, ptr:%ptr, i64:%size)` - Ends the invariant scope established by `.invariant.start`. `%scope` must be the handle returned by the paired start. No additional attributes.
 
 ---
 

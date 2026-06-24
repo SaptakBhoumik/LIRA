@@ -13,7 +13,7 @@ bool Lexer::advance() {
     return false;
 }
 
-char Lexer::peek(std::size_t i) const {
+char Lexer::peek(std::size_t i) const{
     if ((this->curr_index + i) < this->input.size()) {
         return this->input[this->curr_index + i];
     }

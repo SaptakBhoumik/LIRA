@@ -71,14 +71,14 @@ std::ostream& operator<<(std::ostream& os, const Token& tok);
 bool is_identifier(TokenType type);
 
 struct TokenValueEqual {
-    inline bool operator()(const Token& a, const Token& b) const {
+    inline bool operator()(const Token& a, const Token& b) const{
         return a.value == b.value;
     }
 };
 
 // Hash
 struct TokenValueHash {
-    inline std::size_t operator()(const Token& obj) const {
+    inline std::size_t operator()(const Token& obj) const{
         return std::hash<std::string>{}(obj.value);
     }
 };

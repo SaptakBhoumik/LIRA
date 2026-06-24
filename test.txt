@@ -1,10 +1,5 @@
 NOTE:-Implement Call Inst at the end of everything
 
-#### Horizontal Arithmetic SIMD Instructions
-
-## Memory Instructions
-    ### Cache Control Instructions
-    ### Lifetime and Invariant Scope Instructions
 ## Call Instruction
 ## SIMD Instructions
     ### Reduce SIMD Instructions

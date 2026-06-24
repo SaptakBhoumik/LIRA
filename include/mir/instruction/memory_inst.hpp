@@ -163,7 +163,7 @@ class FloatBroadcastLoadInst:public BroadcastLoadInst {
     
     std::shared_ptr<IR::FloatTypeExpr> get_casted_element_type() const;
     std::size_t get_element_bitwidth() const;
-    bool is_brain_float() const;
+    bool is_element_brain_float() const;
 
     TypeVarient get_element_type_varient() const override;
     std::string to_string() const override;
@@ -182,7 +182,7 @@ class MaskedLoadInst:public Inst {
     std::size_t alignment;
     std::size_t dereferenceable_bytes;
 
-    std::string to_string_helper(std::string opname) const;
+    virtual std::string to_string_helper(std::string opname) const;
     public:
     MaskedLoadInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr mask, 
                     IR::LiteralExprPtr passthru, bool volatile_, bool nontemporal, bool nonull, bool zeropassthru, std::size_t alignment, 
@@ -239,7 +239,7 @@ class FloatMaskedLoadInst:public MaskedLoadInst {
     
     std::shared_ptr<IR::FloatTypeExpr> get_casted_element_type() const;
     std::size_t get_element_bitwidth() const;
-    bool is_brain_float() const;
+    bool is_element_brain_float() const;
 
     TypeVarient get_element_type_varient() const override;
     std::string to_string() const override;
@@ -258,7 +258,7 @@ class MaskedStoreInst:public Inst {
     std::size_t alignment;
     std::size_t dereferenceable_bytes;
 
-    std::string to_string_helper(std::string opname) const;
+    virtual std::string to_string_helper(std::string opname) const;
     public:
     MaskedStoreInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     IR::TypeExprPtr value_type, IR::LiteralExprPtr mask, bool volatile_, bool nontemporal, bool nonull, std::size_t alignment, 
@@ -314,7 +314,7 @@ class FloatMaskedStoreInst:public MaskedStoreInst {
     
     std::shared_ptr<IR::FloatTypeExpr> get_casted_value_basetype() const;
     std::size_t get_value_basetype_bitwidth() const;
-    bool is_brain_float() const;
+    bool is_element_brain_float() const;
 
     TypeVarient get_element_type_varient() const override;
     std::string to_string() const override;
@@ -333,7 +333,7 @@ class MaskedGatherInst:public Inst {
     std::size_t alignment;
     std::size_t dereferenceable_bytes;
 
-    std::string to_string_helper(std::string opname) const;
+    virtual std::string to_string_helper(std::string opname) const;
     public:
     MaskedGatherInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vec_of_ptrs, IR::LiteralExprPtr mask, 
                      IR::LiteralExprPtr passthru, bool volatile_, bool nontemporal, bool nonull, bool zeropassthru, std::size_t alignment, 
@@ -354,7 +354,7 @@ class MaskedGatherInst:public Inst {
     virtual std::size_t get_dereferenceable_bytes() const final;
 
     virtual InstType get_inst_type() const override final;
-    virtual TypeVarient get_element_type_var() const = 0;
+    virtual TypeVarient get_element_type_varient() const = 0;
 };
 
 class IntMaskedGatherInst:public MaskedGatherInst {
@@ -366,7 +366,7 @@ class IntMaskedGatherInst:public MaskedGatherInst {
     std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const;
     std::size_t get_element_bitwidth() const;
 
-    TypeVarient get_element_type_var() const override;
+    TypeVarient get_element_type_varient() const override;
     std::string to_string() const override;
 };
 
@@ -378,7 +378,7 @@ class PtrMaskedGatherInst:public MaskedGatherInst {
     
     std::size_t get_element_bitwidth() const;
 
-    TypeVarient get_element_type_var() const override;
+    TypeVarient get_element_type_varient() const override;
     std::string to_string() const override;
 };
 
@@ -390,9 +390,9 @@ class FloatMaskedGatherInst:public MaskedGatherInst {
     
     std::shared_ptr<IR::FloatTypeExpr> get_casted_element_type() const;
     std::size_t get_element_bitwidth() const;
-    bool is_brain_float() const;
+    bool is_element_brain_float() const;
 
-    TypeVarient get_element_type_var() const override;
+    TypeVarient get_element_type_varient() const override;
     std::string to_string() const override;
 };
 
@@ -409,7 +409,7 @@ class MaskedScatterInst:public Inst {
     std::size_t alignment;
     std::size_t dereferenceable_bytes;
 
-    std::string to_string_helper(std::string opname) const;
+    virtual std::string to_string_helper(std::string opname) const;
     public:
     MaskedScatterInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr vec_of_ptrs, IR::LiteralExprPtr value, 
                       IR::TypeExprPtr value_type, IR::LiteralExprPtr mask, bool volatile_, bool nontemporal, bool nonull, std::size_t alignment, 
@@ -429,7 +429,7 @@ class MaskedScatterInst:public Inst {
     virtual std::size_t get_dereferenceable_bytes() const final;
 
     virtual InstType get_inst_type() const override final;
-    virtual TypeVarient get_element_type_var() const = 0;
+    virtual TypeVarient get_element_type_varient() const = 0;
 };
 
 class IntMaskedScatterInst:public MaskedScatterInst {
@@ -441,7 +441,7 @@ class IntMaskedScatterInst:public MaskedScatterInst {
     std::shared_ptr<IR::IntTypeExpr> get_casted_value_basetype() const;
     std::size_t get_value_basetype_bitwidth() const;
 
-    TypeVarient get_element_type_var() const override;
+    TypeVarient get_element_type_varient() const override;
     std::string to_string() const override;
 };
 
@@ -453,7 +453,7 @@ class PtrMaskedScatterInst:public MaskedScatterInst {
     
     std::size_t get_value_basetype_bitwidth() const;
 
-    TypeVarient get_element_type_var() const override;
+    TypeVarient get_element_type_varient() const override;
     std::string to_string() const override;
 };
 
@@ -465,9 +465,9 @@ class FloatMaskedScatterInst:public MaskedScatterInst {
     
     std::shared_ptr<IR::FloatTypeExpr> get_casted_value_basetype() const;
     std::size_t get_value_basetype_bitwidth() const;
-    bool is_brain_float() const;
+    bool is_element_brain_float() const;
 
-    TypeVarient get_element_type_var() const override;
+    TypeVarient get_element_type_varient() const override;
     std::string to_string() const override;
 };
 
@@ -649,12 +649,12 @@ class StackSaveInst:public Inst {
 
 
 class StackRestoreInst:public Inst {
-    IR::LiteralExprPtr value;//The value to restore the stack to. Must be of type ptr and must be a value returned by a StackSaveInst
+    IR::LiteralExprPtr pointer;//The value to restore the stack to. Must be of type ptr and must be a value returned by a StackSaveInst
 
     public:
-    StackRestoreInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr value);
+    StackRestoreInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr pointer);
 
-    IR::LiteralExprPtr get_value() const;
+    IR::LiteralExprPtr get_pointer() const;
 
     InstType get_inst_type() const override;
     std::string to_string() const override;
@@ -670,7 +670,7 @@ class ExtractElementInst:public Inst {
     bool inbounds = false;//Whether it has the inbounds attribute or not
     public:
     ExtractElementInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::LiteralExprPtr index, 
-                        IR::TypeExprPtr value_type,bool inbounds);
+                        IR::TypeExprPtr value_type,bool inbounds, std::optional<FastMathAttr> fast_math_attr);
 
     IR::LiteralExprPtr get_value() const;
     IR::TypeExprPtr get_value_type() const;
@@ -687,19 +687,18 @@ class InsertElementInst:public Inst {
     protected:
     IR::LiteralExprPtr value;
     IR::LiteralExprPtr element;
+    IR::TypeExprPtr element_type;//Reduced type of element. I could have calculated but why bother
     IR::LiteralExprPtr index;
-    IR::TypeExprPtr value_type;//Reduced type of value 
     bool inbounds = false;//Whether it has the inbounds attribute or not
     public:
     InsertElementInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::LiteralExprPtr element, 
-                        IR::LiteralExprPtr index, IR::TypeExprPtr value_type, bool inbounds);
+                        IR::LiteralExprPtr index, IR::TypeExprPtr value_type, IR::TypeExprPtr element_type, bool inbounds, std::optional<FastMathAttr> fast_math_attr);
 
     IR::LiteralExprPtr get_value() const;
-    IR::TypeExprPtr get_value_type() const;
+    IR::TypeExprPtr get_value_type() const;//Same type as the destination type
     IR::LiteralExprPtr get_element() const;
-    IR::TypeExprPtr get_element_Type() const;//Will figure out the type of element on it's own based on type of value
+    IR::TypeExprPtr get_element_Type() const;
     IR::LiteralExprPtr get_index() const;
-    std::shared_ptr<IR::IntTypeExpr> get_casted_index_type() const;
     bool is_inbounds() const;
     bool has_const_index() const;//Whether the index is a constant or not. 
 

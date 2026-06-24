@@ -8,19 +8,19 @@ WideningBinaryInst::WideningBinaryInst(IR::InstructionStmtPtr instruction_stmt, 
     this->rhs = rhs;
     this->input_type = input_type;
 }
-IR::TypeExprPtr WideningBinaryInst::get_input_type() const {
+IR::TypeExprPtr WideningBinaryInst::get_input_type() const{
     return input_type;
 }
-IR::TypeExprPtr WideningBinaryInst::get_result_type() const {
+IR::TypeExprPtr WideningBinaryInst::get_result_type() const{
     return destination->get_type();
 }
-IR::LiteralExprPtr WideningBinaryInst::get_lhs() const {
+IR::LiteralExprPtr WideningBinaryInst::get_lhs() const{
     return lhs;
 }
-IR::LiteralExprPtr WideningBinaryInst::get_rhs() const {
+IR::LiteralExprPtr WideningBinaryInst::get_rhs() const{
     return rhs;
 }
-InstType WideningBinaryInst::get_inst_type() const {
+InstType WideningBinaryInst::get_inst_type() const{
     return InstType::WideningBinaryInst;
 }
 
@@ -33,7 +33,7 @@ IntWideningBinaryInst::IntWideningBinaryInst(IR::InstructionStmtPtr instruction_
     this->nsw = nsw;
     this->unsigned_ = unsigned_;
 }
-std::string IntWideningBinaryInst::to_string_helper(const std::string op_name) const {
+std::string IntWideningBinaryInst::to_string_helper(const std::string op_name) const{
     std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(" + this->lhs->to_string() + ", " + this->rhs->to_string() + ")";
     if(this->nuw){
         res += " #[nuw]";
@@ -46,28 +46,28 @@ std::string IntWideningBinaryInst::to_string_helper(const std::string op_name) c
     }
     return res;
 }
-bool IntWideningBinaryInst::is_nuw() const {
+bool IntWideningBinaryInst::is_nuw() const{
     return this->nuw;
 }
-bool IntWideningBinaryInst::is_nsw() const {
+bool IntWideningBinaryInst::is_nsw() const{
     return this->nsw;
 }
-bool IntWideningBinaryInst::is_unsigned() const {
+bool IntWideningBinaryInst::is_unsigned() const{
     return this->unsigned_;
 }
-std::shared_ptr<IR::IntTypeExpr> IntWideningBinaryInst::get_casted_input_type() const {
+std::shared_ptr<IR::IntTypeExpr> IntWideningBinaryInst::get_casted_input_type() const{
     return std::dynamic_pointer_cast<IR::IntTypeExpr>(this->input_type);
 }
-std::shared_ptr<IR::IntTypeExpr> IntWideningBinaryInst::get_casted_result_type() const {
+std::shared_ptr<IR::IntTypeExpr> IntWideningBinaryInst::get_casted_result_type() const{
     return std::dynamic_pointer_cast<IR::IntTypeExpr>(this->destination->get_type());
 }
-std::size_t IntWideningBinaryInst::get_input_bitwidth() const {
+std::size_t IntWideningBinaryInst::get_input_bitwidth() const{
     return this->get_casted_input_type()->get_bits();
 }
-std::size_t IntWideningBinaryInst::get_result_bitwidth() const {
+std::size_t IntWideningBinaryInst::get_result_bitwidth() const{
     return this->get_casted_result_type()->get_bits();
 }
-TypeVarient IntWideningBinaryInst::get_type_varient() const {
+TypeVarient IntWideningBinaryInst::get_type_varient() const{
     return TypeVarient::Int;
 }
 
@@ -124,7 +124,7 @@ VecIntWideningBinaryInst::VecIntWideningBinaryInst(IR::InstructionStmtPtr instru
     this->nsw = nsw;
     this->unsigned_ = unsigned_;
 }
-std::string VecIntWideningBinaryInst::to_string_helper(const std::string op_name) const {
+std::string VecIntWideningBinaryInst::to_string_helper(const std::string op_name) const{
     std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(" + this->lhs->to_string() + ", " + this->rhs->to_string() + ")";
     if(this->nuw){
         res += " #[nuw]";
@@ -137,35 +137,35 @@ std::string VecIntWideningBinaryInst::to_string_helper(const std::string op_name
     }
     return res;
 }
-bool VecIntWideningBinaryInst::is_nuw() const {
+bool VecIntWideningBinaryInst::is_nuw() const{
     return this->nuw;
 }
-bool VecIntWideningBinaryInst::is_nsw() const {
+bool VecIntWideningBinaryInst::is_nsw() const{
     return this->nsw;
 }
-bool VecIntWideningBinaryInst::is_unsigned() const {
+bool VecIntWideningBinaryInst::is_unsigned() const{
     return this->unsigned_;
 }
-std::shared_ptr<IR::SIMDTypeExpr> VecIntWideningBinaryInst::get_casted_input_type() const {
+std::shared_ptr<IR::SIMDTypeExpr> VecIntWideningBinaryInst::get_casted_input_type() const{
     return std::dynamic_pointer_cast<IR::SIMDTypeExpr>(this->input_type);
 }
-std::shared_ptr<IR::SIMDTypeExpr> VecIntWideningBinaryInst::get_casted_result_type() const {
+std::shared_ptr<IR::SIMDTypeExpr> VecIntWideningBinaryInst::get_casted_result_type() const{
     return std::dynamic_pointer_cast<IR::SIMDTypeExpr>(this->destination->get_type());
 }
-std::size_t VecIntWideningBinaryInst::get_input_base_bitwidth() const {
+std::size_t VecIntWideningBinaryInst::get_input_base_bitwidth() const{
     auto simd_input_type = this->get_casted_input_type();
     auto int_input_type = std::dynamic_pointer_cast<IR::IntTypeExpr>(simd_input_type->get_basetype());
     return int_input_type->get_bits();
 }
-std::size_t VecIntWideningBinaryInst::get_result_base_bitwidth() const {
+std::size_t VecIntWideningBinaryInst::get_result_base_bitwidth() const{
     auto simd_result_type = this->get_casted_result_type();
     auto int_result_type = std::dynamic_pointer_cast<IR::IntTypeExpr>(simd_result_type->get_basetype());
     return int_result_type->get_bits();
 }
-std::size_t VecIntWideningBinaryInst::get_num_elements() const {
+std::size_t VecIntWideningBinaryInst::get_num_elements() const{
     return this->get_casted_input_type()->get_size();
 }
-TypeVarient VecIntWideningBinaryInst::get_type_varient() const {
+TypeVarient VecIntWideningBinaryInst::get_type_varient() const{
     return TypeVarient::VecInt;
 }
 
@@ -218,32 +218,32 @@ std::string VecIntWideningMulInst::to_string() const{
 FloatWideningBinaryInst::FloatWideningBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs,
                                                  IR::LiteralExprPtr rhs, IR::TypeExprPtr input_type, FastMathAttr fast_math_attr)
                                                  :WideningBinaryInst(instruction_stmt, destination, lhs, rhs, input_type, fast_math_attr){}
-std::string FloatWideningBinaryInst::to_string_helper(const std::string op_name) const {
+std::string FloatWideningBinaryInst::to_string_helper(const std::string op_name) const{
     std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(" + this->lhs->to_string() + ", " + this->rhs->to_string() + ")";
     if(this->fast_math_attr.has_value()){
         res+= " " + this->fast_math_attr.value().to_string();
     }
     return res;
 }
-std::shared_ptr<IR::FloatTypeExpr> FloatWideningBinaryInst::get_casted_input_type() const {
+std::shared_ptr<IR::FloatTypeExpr> FloatWideningBinaryInst::get_casted_input_type() const{
     return std::dynamic_pointer_cast<IR::FloatTypeExpr>(this->input_type);
 }
-std::shared_ptr<IR::FloatTypeExpr> FloatWideningBinaryInst::get_casted_result_type() const {
+std::shared_ptr<IR::FloatTypeExpr> FloatWideningBinaryInst::get_casted_result_type() const{
     return std::dynamic_pointer_cast<IR::FloatTypeExpr>(this->destination->get_type());
 }
-std::size_t FloatWideningBinaryInst::get_input_bitwidth() const {
+std::size_t FloatWideningBinaryInst::get_input_bitwidth() const{
     return this->get_casted_input_type()->get_bits();
 }
-std::size_t FloatWideningBinaryInst::get_result_bitwidth() const {
+std::size_t FloatWideningBinaryInst::get_result_bitwidth() const{
     return this->get_casted_result_type()->get_bits();
 }
-bool FloatWideningBinaryInst::is_input_brain_float() const {
+bool FloatWideningBinaryInst::is_input_brain_float() const{
     return this->get_casted_input_type()->is_brain_float();
 }
-bool FloatWideningBinaryInst::is_result_brain_float() const {
+bool FloatWideningBinaryInst::is_result_brain_float() const{
     return this->get_casted_result_type()->is_brain_float();
 }
-TypeVarient FloatWideningBinaryInst::get_type_varient() const {
+TypeVarient FloatWideningBinaryInst::get_type_varient() const{
     return TypeVarient::Float;
 }   
 
@@ -296,26 +296,26 @@ std::string FloatWideningMulInst::to_string() const{
 VecFloatWideningBinaryInst::VecFloatWideningBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs,
                                                  IR::LiteralExprPtr rhs, IR::TypeExprPtr input_type, FastMathAttr fast_math_attr)
                                                  :WideningBinaryInst(instruction_stmt, destination, lhs, rhs, input_type, fast_math_attr){}
-std::string VecFloatWideningBinaryInst::to_string_helper(const std::string op_name) const {
+std::string VecFloatWideningBinaryInst::to_string_helper(const std::string op_name) const{
     std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(" + this->lhs->to_string() + ", " + this->rhs->to_string() + ")";
     if(this->fast_math_attr.has_value()){
         res+= " " + this->fast_math_attr.value().to_string();
     }
     return res;
 }
-std::shared_ptr<IR::SIMDTypeExpr> VecFloatWideningBinaryInst::get_casted_input_type() const {
+std::shared_ptr<IR::SIMDTypeExpr> VecFloatWideningBinaryInst::get_casted_input_type() const{
     return std::dynamic_pointer_cast<IR::SIMDTypeExpr>(this->input_type);
 }
-std::shared_ptr<IR::SIMDTypeExpr> VecFloatWideningBinaryInst::get_casted_result_type() const {
+std::shared_ptr<IR::SIMDTypeExpr> VecFloatWideningBinaryInst::get_casted_result_type() const{
     return std::dynamic_pointer_cast<IR::SIMDTypeExpr>(this->destination->get_type());
 }
-std::shared_ptr<IR::FloatTypeExpr> VecFloatWideningBinaryInst::get_casted_input_basetype() const {
+std::shared_ptr<IR::FloatTypeExpr> VecFloatWideningBinaryInst::get_casted_input_basetype() const{
     return std::dynamic_pointer_cast<IR::FloatTypeExpr>(this->get_casted_input_type()->get_basetype());
 }
-std::shared_ptr<IR::FloatTypeExpr> VecFloatWideningBinaryInst::get_casted_result_basetype() const {
+std::shared_ptr<IR::FloatTypeExpr> VecFloatWideningBinaryInst::get_casted_result_basetype() const{
     return std::dynamic_pointer_cast<IR::FloatTypeExpr>(this->get_casted_result_type()->get_basetype());
 }
-TypeVarient VecFloatWideningBinaryInst::get_type_varient() const {
+TypeVarient VecFloatWideningBinaryInst::get_type_varient() const{
     return TypeVarient::VecFloat;
 }   
 

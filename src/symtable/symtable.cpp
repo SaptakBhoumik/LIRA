@@ -27,7 +27,7 @@ void TypeSymTable::insert(IR::Token name, IR::TypeExprPtr type) {
     }
     this->table[name] = type;
 }
-IR::TypeExprPtr TypeSymTable::lookup(IR::TypeExprPtr name) const {
+IR::TypeExprPtr TypeSymTable::lookup(IR::TypeExprPtr name) const{
     if(name->get_kind() == IR::TypeExprKind::NamedTypeExpr) {
         auto named_type = std::dynamic_pointer_cast<IR::NamedTypeExpr>(name);
         return lookup(named_type->get_name());
@@ -37,7 +37,7 @@ IR::TypeExprPtr TypeSymTable::lookup(IR::TypeExprPtr name) const {
         exit(1);
     }
 }
-IR::TypeExprPtr TypeSymTable::lookup(IR::Token name) const {
+IR::TypeExprPtr TypeSymTable::lookup(IR::Token name) const{
     auto it = this->table.find(name);
     if(it == this->table.end()) {
         error(name, "Undefined type error", "The type '"+name.value+"' is not defined");
@@ -45,7 +45,7 @@ IR::TypeExprPtr TypeSymTable::lookup(IR::Token name) const {
     }
     return it->second;
 }
-bool TypeSymTable::contains(IR::Token name) const {
+bool TypeSymTable::contains(IR::Token name) const{
     return this->table.find(name) != this->table.end();
 }
 
@@ -60,7 +60,7 @@ void TypeSymTable::clear_local_type() {
 }
 
 
-void VarSymTable::error(IR::Token tok, std::string msg,std::string submsg,std::string ecode) const {
+void VarSymTable::error(IR::Token tok, std::string msg,std::string submsg,std::string ecode) const{
     Location loc{tok.line, tok.col, this->filename, tok.source_line};
     Diagnostic err = {loc,
                    std::string(msg),
@@ -81,7 +81,7 @@ void VarSymTable::insert(IR::Token name, IR::TypeExprPtr type) {
     }
     this->table[name] = type;
 }
-IR::TypeExprPtr VarSymTable::lookup(IR::ExprPtr name) const {
+IR::TypeExprPtr VarSymTable::lookup(IR::ExprPtr name) const{
     if(name->get_kind() == IR::ExprKind::LiteralExpr) {
         auto named_lit = name->get_literal();
         if(named_lit->get_kind() != IR::LiteralKind::NamedLiteralExpr) {
@@ -101,7 +101,7 @@ IR::TypeExprPtr VarSymTable::lookup(IR::ExprPtr name) const {
         return lookup(named_type_casted->get_name());
     }
 }
-IR::TypeExprPtr VarSymTable::lookup(IR::Token name) const {
+IR::TypeExprPtr VarSymTable::lookup(IR::Token name) const{
     //TODO:What if builtin name? Decide later how to handle that
     if(name.type == IR::TokenType::builtin_identifier) {
         return nullptr;

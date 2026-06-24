@@ -19,11 +19,11 @@ Lexer::Lexer(const std::string& source, const std::string& filename): input(sour
     this->lex();
     this->finalize();
 }
-std::string Lexer::get_filename() const {
+std::string Lexer::get_filename() const{
     return this->filename;
 }
 
-TokenList Lexer::get_tokens() const {
+TokenList Lexer::get_tokens() const{
     return this->result;
 }
 

@@ -81,6 +81,15 @@ enum class InstType:std::int16_t{
 
     CallInst,
 
+    ShuffleVectorInst,
+    TernLogInst,
+    SplatInst,
+    StepVectorInst,
+    InsertSubVectorInst,
+    ExtractSubVectorInst,
+    ActiveLaneMaskInst,
+    AddSubInst,
+
     ScalarSelectInst,
     LanewiseSelectInst,
     FreezeInst,

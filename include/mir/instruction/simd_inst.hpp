@@ -26,6 +26,7 @@ class ShuffleVectorInst:public Inst {
     virtual TypeVarient get_basetype_varient() const = 0;
     virtual std::size_t get_vec1_elm_count() const final;
     virtual std::size_t get_vec2_elm_count() const final;
+    virtual std::size_t get_mask_elm_count() const final;
 
 
     virtual InstType get_inst_type() const override final;
@@ -82,7 +83,7 @@ class TernLogInst:public Inst {
     IR::LiteralExprPtr get_c() const;
     IR::LiteralExprPtr get_imm() const;
 
-    std::size_t get_vector_size() const;//Operates on <i1,N> vectors
+    std::size_t get_vector_size() const;
 
     InstType get_inst_type() const override;
     std::string to_string() const override;
@@ -158,8 +159,7 @@ class StepVectorInst:public Inst {
 
 class IntStepVectorInst:public StepVectorInst {
     public:
-    IntStepVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr start, IR::LiteralExprPtr step, 
-                      std::optional<FastMathAttr> fast_math_attr);
+    IntStepVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr start, IR::LiteralExprPtr step);
     
     std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const;
     std::size_t get_element_bitwidth() const;
@@ -196,7 +196,7 @@ class InsertSubVectorInst:public Inst {
     virtual IR::LiteralExprPtr get_vector() const final;
     virtual IR::LiteralExprPtr get_subvector() const final;
     virtual IR::LiteralExprPtr get_index() const final;
-
+    virtual IR::TypeExprPtr get_element_type() const final;//From destination. Type of elements of vector and subvector
     virtual std::size_t get_vector_size() const final;//From destination. Size of destination and original vector
     virtual std::size_t get_subvector_size() const final;
 
@@ -207,7 +207,7 @@ class InsertSubVectorInst:public Inst {
 class IntInsertSubVectorInst:public InsertSubVectorInst {
     public:
     IntInsertSubVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
-                           IR::LiteralExprPtr subvector, IR::LiteralExprPtr index, std::size_t subvector_size, std::optional<FastMathAttr> fast_math_attr);
+                           IR::LiteralExprPtr subvector, IR::LiteralExprPtr index, std::size_t subvector_size);
     
     std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const;
     std::size_t get_element_bitwidth() const;
@@ -219,7 +219,7 @@ class IntInsertSubVectorInst:public InsertSubVectorInst {
 class PtrInsertSubVectorInst:public InsertSubVectorInst {
     public:
     PtrInsertSubVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
-                           IR::LiteralExprPtr subvector, IR::LiteralExprPtr index, std::size_t subvector_size, std::optional<FastMathAttr> fast_math_attr);
+                           IR::LiteralExprPtr subvector, IR::LiteralExprPtr index, std::size_t subvector_size);
     
     std::size_t get_element_bitwidth() const;
 
@@ -253,7 +253,7 @@ class ExtractSubVectorInst:public Inst {
     
     virtual IR::LiteralExprPtr get_vector() const final;
     virtual IR::LiteralExprPtr get_index() const final;
-    
+    virtual IR::TypeExprPtr get_element_type() const final;//From destination. Type of elements of vector and subvector
     virtual std::size_t get_vector_size() const final;
     virtual std::size_t get_subvector_size() const final;//From destination. Size of extracted subvector
 
@@ -264,7 +264,7 @@ class ExtractSubVectorInst:public Inst {
 class IntExtractSubVectorInst:public ExtractSubVectorInst {
     public:
     IntExtractSubVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
-                            IR::LiteralExprPtr index, std::size_t vector_size, std::optional<FastMathAttr> fast_math_attr);
+                            IR::LiteralExprPtr index, std::size_t vector_size);
     
     std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const;
     std::size_t get_element_bitwidth() const;
@@ -276,7 +276,7 @@ class IntExtractSubVectorInst:public ExtractSubVectorInst {
 class PtrExtractSubVectorInst:public ExtractSubVectorInst {
     public:
     PtrExtractSubVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
-                            IR::LiteralExprPtr index, std::size_t vector_size, std::optional<FastMathAttr> fast_math_attr);
+                            IR::LiteralExprPtr index, std::size_t vector_size);
     
     std::size_t get_element_bitwidth() const;
 
@@ -324,7 +324,6 @@ class AddSubInst:public Inst {
     IR::LiteralExprPtr lhs;
     IR::LiteralExprPtr rhs;
 
-    virtual std::string to_string_helper(const std::string op_name) const final;
     public:
     AddSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                std::optional<FastMathAttr> fast_math_attr);
@@ -336,7 +335,6 @@ class AddSubInst:public Inst {
     
     virtual TypeVarient get_element_type_varient() const = 0;
     virtual InstType get_inst_type() const override final;
-    std::string to_string() const override;
 };
 
 class IntAddSubInst:public AddSubInst{
@@ -355,9 +353,9 @@ class IntAddSubInst:public AddSubInst{
     bool is_nsw() const;
     bool is_unsigned() const;
     bool is_saturating() const;
-    bool is_floor() const;
 
     TypeVarient get_element_type_varient() const override;
+    std::string to_string() const override;
 };
 
 class FloatAddSubInst:public AddSubInst{
@@ -370,6 +368,7 @@ class FloatAddSubInst:public AddSubInst{
     bool is_brain_float_type() const;
 
     TypeVarient get_element_type_varient() const override;
+    std::string to_string() const override;
 };
 //--------------------------------- Reduce SIMD Instructions ---------------------------------
 //----------------------- Reduce Arithmetic SIMD Instructions -----------------------

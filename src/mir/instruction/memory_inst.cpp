@@ -1,10 +1,4 @@
 #include "mir/instruction/memory_inst.hpp"
-#include "ast/ast.hpp"
-#include "mir/instruction/_instruction.hpp"
-#include <cstddef>
-#include <memory>
-#include <optional>
-#include <string>
 
 namespace LIRA {
 namespace MIR {

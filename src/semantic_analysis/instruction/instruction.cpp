@@ -40,7 +40,8 @@ bool is_unary_inst(std::string inst_name){
     return inst_name == ".neg" || inst_name == ".not" || inst_name == ".abs" || inst_name == ".ceil" || inst_name == ".floor" 
           || inst_name == ".integral_part" || inst_name == ".fractional_part" || inst_name == ".roundnearest" || inst_name == ".roundeven" 
           || inst_name == ".sqrt" || inst_name == ".reciprocal" || inst_name == ".rsqrt" || inst_name == ".popcount" || inst_name == ".clz"
-          || inst_name == ".ctz" || inst_name == ".parity" || inst_name == ".bswap" || inst_name == ".bitreverse" || inst_name == ".clrsb";
+          || inst_name == ".ctz" || inst_name == ".parity" || inst_name == ".bswap" || inst_name == ".bitreverse" || inst_name == ".clrsb"
+          || inst_name == ".blsi" || inst_name == ".blsr" || inst_name == ".blsmask";
 }
 bool is_numerical_classify_inst(std::string inst_name){
     return inst_name == ".isnan" || inst_name == ".isinf" || inst_name == ".isfinite" || inst_name == ".isnormal" || inst_name == ".issubnormal"

@@ -10,7 +10,6 @@ NOTE:-Implement Call Inst at the end of everything
 
 
 ## Conversion Instructions
-## Unary Instructions
 ## Numerical Classification Instructions
     ### Float Classification Instructions
 ## Memory Instructions

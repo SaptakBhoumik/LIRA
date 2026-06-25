@@ -347,9 +347,9 @@ class FloatFloorInst:public FloatUnaryInst {
     std::string to_string() const override;
 };
 
-class FloatIntregralPartInst:public FloatUnaryInst {
+class FloatIntegralPartInst:public FloatUnaryInst {
     public:
-    FloatIntregralPartInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
+    FloatIntegralPartInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
                     FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override;
@@ -474,9 +474,9 @@ class VecFloatFloorInst:public VecFloatUnaryInst {
     std::string to_string() const override;
 };
 
-class VecFloatIntregralPartInst:public VecFloatUnaryInst {
+class VecFloatIntegralPartInst:public VecFloatUnaryInst {
     public:
-    VecFloatIntregralPartInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
+    VecFloatIntegralPartInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
                               FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override;

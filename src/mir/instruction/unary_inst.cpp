@@ -400,12 +400,12 @@ std::string FloatFloorInst::to_string() const{
 }
 
 
-FloatIntregralPartInst::FloatIntregralPartInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
+FloatIntegralPartInst::FloatIntegralPartInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
                                               :FloatUnaryInst(instruction_stmt, destination, value, fast_math_attr,false){}
-UnaryInst::OpType FloatIntregralPartInst::get_op_type() const{
+UnaryInst::OpType FloatIntegralPartInst::get_op_type() const{
     return OpType::INTEGRAL_PART;
 }
-std::string FloatIntregralPartInst::to_string() const{
+std::string FloatIntegralPartInst::to_string() const{
     return this->to_string_helper("float_integral_part");
 }
 
@@ -553,12 +553,12 @@ std::string VecFloatFloorInst::to_string() const{
 }
 
 
-VecFloatIntregralPartInst::VecFloatIntregralPartInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
+VecFloatIntegralPartInst::VecFloatIntegralPartInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
                                               :VecFloatUnaryInst(instruction_stmt, destination, value, fast_math_attr,false){}
-UnaryInst::OpType VecFloatIntregralPartInst::get_op_type() const{
+UnaryInst::OpType VecFloatIntegralPartInst::get_op_type() const{
     return OpType::INTEGRAL_PART;
 }
-std::string VecFloatIntregralPartInst::to_string() const{
+std::string VecFloatIntegralPartInst::to_string() const{
     return this->to_string_helper("vec_float_integral_part");
 }
 

@@ -15,6 +15,7 @@ bool type_ge(std::string filename, IR::TypeExprPtr t1, IR::TypeExprPtr t2);//Che
                                                                            //If vector then we expect the same number of elements(Error otherwise) and expects the base type to have same TypeVariant(Else error)
                                                                            //If same number of element we compare size of basetype
 bool type_compatible(VarSymTablePtr var_symtable, IR::TypeExprPtr type, IR::ExprPtr literal);//Check if a reduced type is compatible with a literal. This is used to check if a literal can be assigned to a variable of a certain type.
+std::size_t get_type_size(IR::TypeExprPtr type);//Get the size of a reduced type in bits.
 [[noreturn]] void error(std::string filename, IR::Token tok, std::string msg,std::string submsg="",std::string ecode="");
 //extract_flag_attrs and extract_fastmath_attrs may throw error if duplicate of the attribute is found. Like if they are asked to search for "attr_name" and "attr_name"
 //is present twice then error. Note no error if "attr_name" is present twice if we dont ask to search for "attr_name". So we check duplicate only for the attributes asked

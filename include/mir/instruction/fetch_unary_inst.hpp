@@ -250,9 +250,9 @@ class FloatFetchFloorInst:public FloatFetchUnaryInst {
     std::string to_string() const override;
 };
 
-class FloatFetchIntregralPartInst:public FloatFetchUnaryInst {
+class FloatFetchIntegralPartInst:public FloatFetchUnaryInst {
     public:
-    FloatFetchIntregralPartInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
+    FloatFetchIntegralPartInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
                                 std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info,
                                 FastMathAttr fast_math_attr);
 

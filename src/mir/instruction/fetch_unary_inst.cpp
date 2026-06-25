@@ -320,14 +320,14 @@ std::string FloatFetchFloorInst::to_string() const{
 }
 
 
-FloatFetchIntregralPartInst::FloatFetchIntregralPartInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
+FloatFetchIntegralPartInst::FloatFetchIntegralPartInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
                                                          std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info,
                                                          FastMathAttr fast_math_attr)
                                                          :FloatFetchUnaryInst(instruction_stmt, destination, value, alignment, volatile_, atomic_info, fast_math_attr,false){}
-FetchUnaryInst::OpType FloatFetchIntregralPartInst::get_op_type() const{
+FetchUnaryInst::OpType FloatFetchIntegralPartInst::get_op_type() const{
     return OpType::FETCH_INTEGRAL_PART;
 }
-std::string FloatFetchIntregralPartInst::to_string() const{
+std::string FloatFetchIntegralPartInst::to_string() const{
     return to_string_helper("float_fetch_integral_part");
 }
 

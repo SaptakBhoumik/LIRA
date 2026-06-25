@@ -155,6 +155,7 @@ class AssumeInst:public Inst {
     std::string get_varname() const;
     std::vector<IR::LiteralExprPtr> get_assumed_values() const;
     IR::TypeExprPtr get_type() const;
+    bool is_nopoison() const;
 
     InstType get_inst_type() const override;
     std::string to_string() const override;

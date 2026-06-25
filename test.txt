@@ -1,14 +1,7 @@
 NOTE:-Implement Call Inst at the end of everything
 
 ## Call Instruction
-## SIMD Instructions
-    ### Reduce SIMD Instructions
-    ### Horizontal SIMD Instructions
-    ### Dot Product Instruction
-    ### Absolute Difference Instructions
-    ### Pack / Unpack Instructions
-    ### Vector Layout Instructions
-    ### Lane Mask Conversion Instructions
+
 
 
 ## Other Arithmetic Instructions

@@ -530,17 +530,17 @@ InstType SyscallInst::get_inst_type() const{
 }
 std::string SyscallInst::to_string() const{
     std::string res = "let " + this->destination->to_string() + " = .syscall(i64:" + this->nr->to_string();
-    for (const auto& arg : this->args) {
+    for (const auto& arg : this->args){
         res += ", i64:" + arg->to_string();
     }
     res += ")";
-    if (this->noreturn_) {
+    if (this->noreturn_){
         res += " #[noreturn]";
     }
-    if (this->nosideeffect) {
+    if (this->nosideeffect){
         res += " #[nosideeffect]";
     }
-    if (this->pure) {
+    if (this->pure){
         res += " #[pure]";
     }
     return res;

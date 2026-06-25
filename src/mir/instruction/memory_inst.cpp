@@ -4,7 +4,7 @@ namespace LIRA {
 namespace MIR {
 //--------------------------------- Uncategorized Memory Instructions ---------------------------------
 LocalInst::LocalInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value,
-                     std::optional<FastMathAttr> fast_math_attr):Inst(instruction_stmt,destination,fast_math_attr) {
+                     std::optional<FastMathAttr> fast_math_attr):Inst(instruction_stmt,destination,fast_math_attr){
     this->value = value;
 }
 IR::LiteralExprPtr LocalInst::get_value() const{
@@ -22,7 +22,7 @@ std::string LocalInst::to_string() const{
 
 
 AllocaInst::AllocaInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,IR::LiteralExprPtr size, std::size_t alignment)
-                       :Inst(instruction_stmt,destination,std::nullopt) {
+                       :Inst(instruction_stmt,destination,std::nullopt){
     this->size = size;
     this->alignment = alignment;
 }
@@ -37,7 +37,7 @@ InstType AllocaInst::get_inst_type() const{
 }
 std::string AllocaInst::to_string() const{
     std::string str = "let " + this->destination->to_string() + " = .alloca(i64:" + this->size->to_string() + ")";
-    if(this->alignment != 0) {
+    if(this->alignment != 0){
         str += " #[align(" + std::to_string(this->alignment)+")]";
     }
     return str;
@@ -47,7 +47,7 @@ std::string AllocaInst::to_string() const{
 LoadInst::LoadInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, 
              bool volatile_, bool invariant_load, bool nontemporal, bool nonull, bool nopoison, 
              std::size_t alignment, std::size_t dereferenceable_bytes, std::optional<FastMathAttr> fast_math_attr, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info)
-             :Inst(instruction_stmt,destination,fast_math_attr) {
+             :Inst(instruction_stmt,destination,fast_math_attr){
     this->pointer = pointer;
     this->volatile_ = volatile_;
     this->invariant_load = invariant_load;
@@ -96,31 +96,31 @@ InstType LoadInst::get_inst_type() const{
 }
 std::string LoadInst::to_string() const{
     std::string str = "let " + this->destination->to_string() + " = .load(ptr:" + this->pointer->to_string() + ")";
-    if(this->volatile_) {
+    if(this->volatile_){
         str += " #[volatile]";
     }
-    if(this->invariant_load) {
+    if(this->invariant_load){
         str += " #[invariant.load]";
     }
-    if(this->nontemporal) {
+    if(this->nontemporal){
         str += " #[nontemporal]";
     }
-    if(this->nonull) {
+    if(this->nonull){
         str += " #[nonnull]";
     }   
-    if(this->nopoison) {
+    if(this->nopoison){
         str += " #[nopoison]";
     }
-    if(this->alignment != 0) {
+    if(this->alignment != 0){
         str += " #[align(" + std::to_string(this->alignment)+")]";
     }
-    if(this->dereferenceable_bytes != 0) {
+    if(this->dereferenceable_bytes != 0){
         str += " #[dereferenceable(" + std::to_string(this->dereferenceable_bytes)+")]";
     }
-    if(this->fast_math_attr.has_value()) {
+    if(this->fast_math_attr.has_value()){
         str += " " + this->fast_math_attr.value().to_string();
     }
-    if(this->atomic_info.has_value()) {
+    if(this->atomic_info.has_value()){
         str += " #[atomic(" + MIR::to_string(this->atomic_info.value().first) + ")]"
                 + " #[syncscope(" + MIR::to_string(this->atomic_info.value().second) + ")]";
     }
@@ -130,7 +130,7 @@ std::string LoadInst::to_string() const{
 StoreInst::StoreInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, IR::TypeExprPtr type, 
                      bool volatile_, bool nontemporal, bool nonull, bool nopoison, 
                      std::size_t alignment, std::size_t dereferenceable_bytes,std::optional<FastMathAttr> fast_math_attr, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info)
-                     :Inst(instruction_stmt,nullptr,fast_math_attr) {
+                     :Inst(instruction_stmt,nullptr,fast_math_attr){
     this->pointer = pointer;
     this->value = value;
     this->type = type;
@@ -177,28 +177,28 @@ InstType StoreInst::get_inst_type() const{
 }
 std::string StoreInst::to_string() const{
     std::string str = ".store(" + this->type->to_string() + ":" + this->value->to_string() + ", ptr:" + this->pointer->to_string() + ")";
-    if(this->volatile_) {
+    if(this->volatile_){
         str += " #[volatile]";
     }
-    if(this->nontemporal) {
+    if(this->nontemporal){
         str += " #[nontemporal]";
     }
-    if(this->nonull) {
+    if(this->nonull){
         str += " #[nonnull]";
     }
-    if(this->nopoison) {
+    if(this->nopoison){
         str += " #[nopoison]";
     }
-    if(this->alignment != 0) {
+    if(this->alignment != 0){
         str += " #[align(" + std::to_string(this->alignment)+")]";
     }
-    if(this->dereferenceable_bytes != 0) {
+    if(this->dereferenceable_bytes != 0){
         str += " #[dereferenceable(" + std::to_string(this->dereferenceable_bytes)+")]";
     }
-    if(this->fast_math_attr.has_value()) {
+    if(this->fast_math_attr.has_value()){
         str += " " + this->fast_math_attr.value().to_string();
     }
-    if(this->atomic_info.has_value()) {
+    if(this->atomic_info.has_value()){
         str += " #[atomic(" + MIR::to_string(this->atomic_info.value().first) + ")]"
                 + " #[syncscope(" + MIR::to_string(this->atomic_info.value().second) + ")]";
     }
@@ -209,7 +209,7 @@ std::string StoreInst::to_string() const{
 BroadcastLoadInst::BroadcastLoadInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr src, 
                       bool volatile_, bool nontemporal, bool nonull, std::size_t alignment, 
                       std::size_t dereferenceable_bytes, std::optional<FastMathAttr> fast_math_attr)
-                      :Inst(instruction_stmt,destination,fast_math_attr) {
+                      :Inst(instruction_stmt,destination,fast_math_attr){
     this->src = src;
     this->volatile_ = volatile_;
     this->nontemporal = nontemporal;
@@ -219,22 +219,22 @@ BroadcastLoadInst::BroadcastLoadInst(IR::InstructionStmtPtr instruction_stmt, Lo
 };
 std::string BroadcastLoadInst::to_string_helper(const std::string op_name) const{
     std::string str = "let " + this->destination->to_string() + " = ." + op_name + "(ptr:" + this->src->to_string() + ")";
-    if(this->volatile_) {
+    if(this->volatile_){
         str += " #[volatile]";
     }
-    if(this->nontemporal) {
+    if(this->nontemporal){
         str += " #[nontemporal]";
     }
-    if(this->nonull) {
+    if(this->nonull){
         str += " #[nonnull]";
     }
-    if(this->alignment != 0) {
+    if(this->alignment != 0){
         str += " #[align(" + std::to_string(this->alignment)+")]";
     }
-    if(this->dereferenceable_bytes != 0) {
+    if(this->dereferenceable_bytes != 0){
         str += " #[dereferenceable(" + std::to_string(this->dereferenceable_bytes)+")]";
     }
-    if(this->fast_math_attr.has_value()) {
+    if(this->fast_math_attr.has_value()){
         str += " " + this->fast_math_attr.value().to_string();
     }
     return str;
@@ -275,7 +275,7 @@ InstType BroadcastLoadInst::get_inst_type() const{
 IntBroadcastLoadInst::IntBroadcastLoadInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr src, 
                          bool volatile_, bool nontemporal, bool nonull, std::size_t alignment, 
                          std::size_t dereferenceable_bytes)
-                         :BroadcastLoadInst(instruction_stmt,destination,src,volatile_,nontemporal,nonull,alignment,dereferenceable_bytes,std::nullopt) {}
+                         :BroadcastLoadInst(instruction_stmt,destination,src,volatile_,nontemporal,nonull,alignment,dereferenceable_bytes,std::nullopt){}
 std::shared_ptr<IR::IntTypeExpr> IntBroadcastLoadInst::get_casted_element_type() const{
     return std::dynamic_pointer_cast<IR::IntTypeExpr>(this->get_element_type());
 }
@@ -293,7 +293,7 @@ std::string IntBroadcastLoadInst::to_string() const{
 PtrBroadcastLoadInst::PtrBroadcastLoadInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr src, 
                          bool volatile_, bool nontemporal, bool nonull, std::size_t alignment, 
                          std::size_t dereferenceable_bytes)
-                         :BroadcastLoadInst(instruction_stmt,destination,src,volatile_,nontemporal,nonull,alignment,dereferenceable_bytes,std::nullopt) {}
+                         :BroadcastLoadInst(instruction_stmt,destination,src,volatile_,nontemporal,nonull,alignment,dereferenceable_bytes,std::nullopt){}
 std::size_t PtrBroadcastLoadInst::get_element_bitwidth() const{
     return 64; //Assuming 64 bit pointers
 }
@@ -308,7 +308,7 @@ std::string PtrBroadcastLoadInst::to_string() const{
 FloatBroadcastLoadInst::FloatBroadcastLoadInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr src, 
                            bool volatile_, bool nontemporal, bool nonull, std::size_t alignment, 
                            std::size_t dereferenceable_bytes, FastMathAttr fast_math_attr)
-                           :BroadcastLoadInst(instruction_stmt,destination,src,volatile_,nontemporal,nonull,alignment,dereferenceable_bytes,fast_math_attr) {}
+                           :BroadcastLoadInst(instruction_stmt,destination,src,volatile_,nontemporal,nonull,alignment,dereferenceable_bytes,fast_math_attr){}
 std::shared_ptr<IR::FloatTypeExpr> FloatBroadcastLoadInst::get_casted_element_type() const{
     return std::dynamic_pointer_cast<IR::FloatTypeExpr>(this->get_element_type());
 }
@@ -329,7 +329,7 @@ std::string FloatBroadcastLoadInst::to_string() const{
 MaskedLoadInst::MaskedLoadInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr mask, 
                     IR::LiteralExprPtr passthru, bool volatile_, bool nontemporal, bool nonull, bool zeropassthru, std::size_t alignment, 
                     std::size_t dereferenceable_bytes, std::optional<FastMathAttr> fast_math_attr)
-                    :Inst(instruction_stmt,destination,fast_math_attr) {
+                    :Inst(instruction_stmt,destination,fast_math_attr){
     this->pointer = pointer;
     this->mask = mask;
     this->passthru = passthru;
@@ -342,32 +342,32 @@ MaskedLoadInst::MaskedLoadInst(IR::InstructionStmtPtr instruction_stmt, LocalDes
 };
 std::string MaskedLoadInst::to_string_helper(std::string opname) const{
     std::string str = "let " + this->destination->to_string() + " = ." + opname + "(ptr:" + this->pointer->to_string();
-    if(this->mask != nullptr) {
+    if(this->mask != nullptr){
         str +=  ", <i1," + std::to_string(this->get_vector_size()) + ">:" + this->mask->to_string(); 
     }
-    if(this->passthru != nullptr) {
+    if(this->passthru != nullptr){
         str +=  ", <" + this->get_element_type()->to_string() + "," + std::to_string(this->get_vector_size()) + ">:" + this->passthru->to_string(); 
     }
     str+= ")";
-    if(this->volatile_) {
+    if(this->volatile_){
         str += " #[volatile]";
     }
-    if(this->nontemporal) {
+    if(this->nontemporal){
         str += " #[nontemporal]";
     }
-    if(this->nonull) {
+    if(this->nonull){
         str += " #[nonnull]";
     }
-    if(this->zeropassthru) {
+    if(this->zeropassthru){
         str += " #[zeropassthru]";
     }
-    if(this->alignment != 0) {
+    if(this->alignment != 0){
         str += " #[align(" + std::to_string(this->alignment)+")]";
     }
-    if(this->dereferenceable_bytes != 0) {
+    if(this->dereferenceable_bytes != 0){
         str += " #[dereferenceable(" + std::to_string(this->dereferenceable_bytes)+")]";
     }
-    if(this->fast_math_attr.has_value()) {
+    if(this->fast_math_attr.has_value()){
         str += " " + this->fast_math_attr.value().to_string();
     }
     return str;
@@ -416,7 +416,7 @@ InstType MaskedLoadInst::get_inst_type() const{
 IntMaskedLoadInst::IntMaskedLoadInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr mask, 
                     IR::LiteralExprPtr passthru, bool volatile_, bool nontemporal, bool nonull, bool zeropassthru, std::size_t alignment, 
                     std::size_t dereferenceable_bytes)
-                    :MaskedLoadInst(instruction_stmt,destination,pointer,mask,passthru,volatile_,nontemporal,nonull,zeropassthru,alignment,dereferenceable_bytes,std::nullopt) {}
+                    :MaskedLoadInst(instruction_stmt,destination,pointer,mask,passthru,volatile_,nontemporal,nonull,zeropassthru,alignment,dereferenceable_bytes,std::nullopt){}
 std::shared_ptr<IR::IntTypeExpr> IntMaskedLoadInst::get_casted_element_type() const{
     return std::dynamic_pointer_cast<IR::IntTypeExpr>(this->get_element_type());
 }
@@ -434,7 +434,7 @@ std::string IntMaskedLoadInst::to_string() const{
 PtrMaskedLoadInst::PtrMaskedLoadInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr mask, 
                     IR::LiteralExprPtr passthru, bool volatile_, bool nontemporal, bool nonull, bool zeropassthru, std::size_t alignment, 
                     std::size_t dereferenceable_bytes)
-                    :MaskedLoadInst(instruction_stmt,destination,pointer,mask,passthru,volatile_,nontemporal,nonull,zeropassthru,alignment,dereferenceable_bytes,std::nullopt) {}
+                    :MaskedLoadInst(instruction_stmt,destination,pointer,mask,passthru,volatile_,nontemporal,nonull,zeropassthru,alignment,dereferenceable_bytes,std::nullopt){}
 std::size_t PtrMaskedLoadInst::get_element_bitwidth() const{
     return 64; //Assuming 64 bit pointers
 }
@@ -449,7 +449,7 @@ std::string PtrMaskedLoadInst::to_string() const{
 FloatMaskedLoadInst::FloatMaskedLoadInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr mask, 
                     IR::LiteralExprPtr passthru, bool volatile_, bool nontemporal, bool nonull, bool zeropassthru, std::size_t alignment, 
                     std::size_t dereferenceable_bytes, FastMathAttr fast_math_attr)
-                    :MaskedLoadInst(instruction_stmt,destination,pointer,mask,passthru,volatile_,nontemporal,nonull,zeropassthru,alignment,dereferenceable_bytes,fast_math_attr) {}
+                    :MaskedLoadInst(instruction_stmt,destination,pointer,mask,passthru,volatile_,nontemporal,nonull,zeropassthru,alignment,dereferenceable_bytes,fast_math_attr){}
 std::shared_ptr<IR::FloatTypeExpr> FloatMaskedLoadInst::get_casted_element_type() const{
     return std::dynamic_pointer_cast<IR::FloatTypeExpr>(this->get_element_type());
 }
@@ -470,7 +470,7 @@ std::string FloatMaskedLoadInst::to_string() const{
 MaskedStoreInst::MaskedStoreInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                                  IR::TypeExprPtr value_type, IR::LiteralExprPtr mask, bool volatile_, bool nontemporal, bool nonull, std::size_t alignment, 
                                  std::size_t dereferenceable_bytes, std::optional<FastMathAttr> fast_math_attr)
-                                 :Inst(instruction_stmt,nullptr,fast_math_attr) {
+                                 :Inst(instruction_stmt,nullptr,fast_math_attr){
     this->pointer = pointer;
     this->value = value;
     this->value_type = value_type;
@@ -483,26 +483,26 @@ MaskedStoreInst::MaskedStoreInst(IR::InstructionStmtPtr instruction_stmt, IR::Li
 }
 std::string MaskedStoreInst::to_string_helper(std::string opname) const{
     std::string str = "." + opname + "(" + this->value_type->to_string() + ":" + this->value->to_string() + ", ptr:" + this->pointer->to_string();
-    if(this->mask != nullptr) {
+    if(this->mask != nullptr){
         str +=  ", <i1," + std::to_string(this->get_vector_size()) + ">:" + this->mask->to_string(); 
     }
     str+= ")";
-    if(this->volatile_) {
+    if(this->volatile_){
         str += " #[volatile]";
     }
-    if(this->nontemporal) {
+    if(this->nontemporal){
         str += " #[nontemporal]";
     }
-    if(this->nonull) {
+    if(this->nonull){
         str += " #[nonnull]";
     }
-    if(this->alignment != 0) {
+    if(this->alignment != 0){
         str += " #[align(" + std::to_string(this->alignment)+")]";
     }
-    if(this->dereferenceable_bytes != 0) {
+    if(this->dereferenceable_bytes != 0){
         str += " #[dereferenceable(" + std::to_string(this->dereferenceable_bytes)+")]";
     }
-    if(this->fast_math_attr.has_value()) {
+    if(this->fast_math_attr.has_value()){
         str += " " + this->fast_math_attr.value().to_string();
     }
     return str;
@@ -548,7 +548,7 @@ InstType MaskedStoreInst::get_inst_type() const{
 IntMaskedStoreInst::IntMaskedStoreInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                        IR::TypeExprPtr value_type, IR::LiteralExprPtr mask, bool volatile_, bool nontemporal, bool nonull, std::size_t alignment, 
                        std::size_t dereferenceable_bytes)
-                       :MaskedStoreInst(instruction_stmt,pointer,value,value_type,mask,volatile_,nontemporal,nonull,alignment,dereferenceable_bytes,std::nullopt) {}
+                       :MaskedStoreInst(instruction_stmt,pointer,value,value_type,mask,volatile_,nontemporal,nonull,alignment,dereferenceable_bytes,std::nullopt){}
 std::shared_ptr<IR::IntTypeExpr> IntMaskedStoreInst::get_casted_value_basetype() const{
     return std::dynamic_pointer_cast<IR::IntTypeExpr>(this->get_value_basetype());
 }
@@ -566,7 +566,7 @@ std::string IntMaskedStoreInst::to_string() const{
 PtrMaskedStoreInst::PtrMaskedStoreInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                        IR::TypeExprPtr value_type, IR::LiteralExprPtr mask, bool volatile_, bool nontemporal, bool nonull, std::size_t alignment, 
                        std::size_t dereferenceable_bytes)
-                       :MaskedStoreInst(instruction_stmt,pointer,value,value_type,mask,volatile_,nontemporal,nonull,alignment,dereferenceable_bytes,std::nullopt) {}
+                       :MaskedStoreInst(instruction_stmt,pointer,value,value_type,mask,volatile_,nontemporal,nonull,alignment,dereferenceable_bytes,std::nullopt){}
 std::size_t PtrMaskedStoreInst::get_value_basetype_bitwidth() const{
     return 64; //Assuming 64 bit pointers
 }
@@ -581,7 +581,7 @@ std::string PtrMaskedStoreInst::to_string() const{
 FloatMaskedStoreInst::FloatMaskedStoreInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                          IR::TypeExprPtr value_type, IR::LiteralExprPtr mask, bool volatile_, bool nontemporal, bool nonull, std::size_t alignment, 
                          std::size_t dereferenceable_bytes, FastMathAttr fast_math_attr)
-                         :MaskedStoreInst(instruction_stmt,pointer,value,value_type,mask,volatile_,nontemporal,nonull,alignment,dereferenceable_bytes,fast_math_attr) {}
+                         :MaskedStoreInst(instruction_stmt,pointer,value,value_type,mask,volatile_,nontemporal,nonull,alignment,dereferenceable_bytes,fast_math_attr){}
 std::shared_ptr<IR::FloatTypeExpr> FloatMaskedStoreInst::get_casted_value_basetype() const{
     return std::dynamic_pointer_cast<IR::FloatTypeExpr>(this->get_value_basetype());
 }
@@ -602,7 +602,7 @@ std::string FloatMaskedStoreInst::to_string() const{
 MaskedGatherInst::MaskedGatherInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vec_of_ptrs, IR::LiteralExprPtr mask, 
                                    IR::LiteralExprPtr passthru, bool volatile_, bool nontemporal, bool nonull, bool zeropassthru, std::size_t alignment, 
                                    std::size_t dereferenceable_bytes, std::optional<FastMathAttr> fast_math_attr)
-                                   :Inst(instruction_stmt,destination,fast_math_attr) {
+                                   :Inst(instruction_stmt,destination,fast_math_attr){
     this->vec_of_ptrs = vec_of_ptrs;
     this->mask = mask;
     this->passthru = passthru;
@@ -615,32 +615,32 @@ MaskedGatherInst::MaskedGatherInst(IR::InstructionStmtPtr instruction_stmt, Loca
 }
 std::string MaskedGatherInst::to_string_helper(std::string opname) const{
     std::string str = "let " + this->destination->to_string() + " = ." + opname + "(<ptr," + std::to_string(this->get_vector_size()) + ">:" + this->vec_of_ptrs->to_string();
-    if(this->mask != nullptr) {
+    if(this->mask != nullptr){
         str +=  ", <i1," + std::to_string(this->get_vector_size()) + ">:" + this->mask->to_string(); 
     }
-    if(this->passthru != nullptr) {
+    if(this->passthru != nullptr){
         str +=  ", <" + this->get_element_type()->to_string() + "," + std::to_string(this->get_vector_size()) + ">:" + this->passthru->to_string(); 
     }
     str+= ")";
-    if(this->volatile_) {
+    if(this->volatile_){
         str += " #[volatile]";
     }
-    if(this->nontemporal) {
+    if(this->nontemporal){
         str += " #[nontemporal]";
     }
-    if(this->nonull) {
+    if(this->nonull){
         str += " #[nonnull]";
     }
-    if(this->zeropassthru) {
+    if(this->zeropassthru){
         str += " #[zeropassthru]";
     }
-    if(this->alignment != 0) {
+    if(this->alignment != 0){
         str += " #[align(" + std::to_string(this->alignment)+")]";
     }
-    if(this->dereferenceable_bytes != 0) {
+    if(this->dereferenceable_bytes != 0){
         str += " #[dereferenceable(" + std::to_string(this->dereferenceable_bytes)+")]";
     }
-    if(this->fast_math_attr.has_value()) {
+    if(this->fast_math_attr.has_value()){
         str += " " + this->fast_math_attr.value().to_string();
     }
     return str;
@@ -689,7 +689,7 @@ InstType MaskedGatherInst::get_inst_type() const{
 IntMaskedGatherInst::IntMaskedGatherInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vec_of_ptrs, IR::LiteralExprPtr mask, 
                                    IR::LiteralExprPtr passthru, bool volatile_, bool nontemporal, bool nonull, bool zeropassthru, std::size_t alignment, 
                                    std::size_t dereferenceable_bytes)
-                                   :MaskedGatherInst(instruction_stmt,destination,vec_of_ptrs,mask,passthru,volatile_,nontemporal,nonull,zeropassthru,alignment,dereferenceable_bytes,std::nullopt) {}
+                                   :MaskedGatherInst(instruction_stmt,destination,vec_of_ptrs,mask,passthru,volatile_,nontemporal,nonull,zeropassthru,alignment,dereferenceable_bytes,std::nullopt){}
 std::shared_ptr<IR::IntTypeExpr> IntMaskedGatherInst::get_casted_element_type() const{
     return std::dynamic_pointer_cast<IR::IntTypeExpr>(this->get_element_type());
 }
@@ -707,7 +707,7 @@ std::string IntMaskedGatherInst::to_string() const{
 PtrMaskedGatherInst::PtrMaskedGatherInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vec_of_ptrs, IR::LiteralExprPtr mask, 
                                    IR::LiteralExprPtr passthru, bool volatile_, bool nontemporal, bool nonull, bool zeropassthru, std::size_t alignment, 
                                    std::size_t dereferenceable_bytes)
-                                   :MaskedGatherInst(instruction_stmt,destination,vec_of_ptrs,mask,passthru,volatile_,nontemporal,nonull,zeropassthru,alignment,dereferenceable_bytes,std::nullopt) {}
+                                   :MaskedGatherInst(instruction_stmt,destination,vec_of_ptrs,mask,passthru,volatile_,nontemporal,nonull,zeropassthru,alignment,dereferenceable_bytes,std::nullopt){}
 std::size_t PtrMaskedGatherInst::get_element_bitwidth() const{
     return 64; //Assuming 64 bit pointers
 }
@@ -722,7 +722,7 @@ std::string PtrMaskedGatherInst::to_string() const{
 FloatMaskedGatherInst::FloatMaskedGatherInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vec_of_ptrs, IR::LiteralExprPtr mask, 
                                    IR::LiteralExprPtr passthru, bool volatile_, bool nontemporal, bool nonull, bool zeropassthru, std::size_t alignment, 
                                    std::size_t dereferenceable_bytes, FastMathAttr fast_math_attr)
-                                   :MaskedGatherInst(instruction_stmt,destination,vec_of_ptrs,mask,passthru,volatile_,nontemporal,nonull,zeropassthru,alignment,dereferenceable_bytes,fast_math_attr) {}
+                                   :MaskedGatherInst(instruction_stmt,destination,vec_of_ptrs,mask,passthru,volatile_,nontemporal,nonull,zeropassthru,alignment,dereferenceable_bytes,fast_math_attr){}
 std::shared_ptr<IR::FloatTypeExpr> FloatMaskedGatherInst::get_casted_element_type() const{
     return std::dynamic_pointer_cast<IR::FloatTypeExpr>(this->get_element_type());
 }
@@ -743,7 +743,7 @@ std::string FloatMaskedGatherInst::to_string() const{
 MaskedScatterInst::MaskedScatterInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr vec_of_ptrs, IR::LiteralExprPtr value, 
                                      IR::TypeExprPtr value_type, IR::LiteralExprPtr mask, bool volatile_, bool nontemporal, bool nonull, std::size_t alignment, 
                                      std::size_t dereferenceable_bytes, std::optional<FastMathAttr> fast_math_attr)
-                                     :Inst(instruction_stmt,nullptr,fast_math_attr) {
+                                     :Inst(instruction_stmt,nullptr,fast_math_attr){
     this->vec_of_ptrs = vec_of_ptrs;
     this->value = value;
     this->value_type = value_type;
@@ -756,26 +756,26 @@ MaskedScatterInst::MaskedScatterInst(IR::InstructionStmtPtr instruction_stmt, IR
 }
 std::string MaskedScatterInst::to_string_helper(std::string opname) const{
     std::string str = "." + opname + "(<ptr," + std::to_string(this->get_vector_size()) + ">:" + this->vec_of_ptrs->to_string() + ", " + this->value_type->to_string() + ":" + this->value->to_string();
-    if(this->mask != nullptr) {
+    if(this->mask != nullptr){
         str +=  ", <i1," + std::to_string(this->get_vector_size()) + ">:" + this->mask->to_string(); 
     }
     str+= ")";
-    if(this->volatile_) {
+    if(this->volatile_){
         str += " #[volatile]";
     }
-    if(this->nontemporal) {
+    if(this->nontemporal){
         str += " #[nontemporal]";
     }
-    if(this->nonull) {
+    if(this->nonull){
         str += " #[nonnull]";
     }
-    if(this->alignment != 0) {
+    if(this->alignment != 0){
         str += " #[align(" + std::to_string(this->alignment)+")]";
     }
-    if(this->dereferenceable_bytes != 0) {
+    if(this->dereferenceable_bytes != 0){
         str += " #[dereferenceable(" + std::to_string(this->dereferenceable_bytes)+")]";
     }
-    if(this->fast_math_attr.has_value()) {
+    if(this->fast_math_attr.has_value()){
         str += " " + this->fast_math_attr.value().to_string();
     }
     return str;
@@ -821,7 +821,7 @@ InstType MaskedScatterInst::get_inst_type() const{
 IntMaskedScatterInst::IntMaskedScatterInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr vec_of_ptrs, IR::LiteralExprPtr value, 
                                      IR::TypeExprPtr value_type, IR::LiteralExprPtr mask, bool volatile_, bool nontemporal, bool nonull, std::size_t alignment, 
                                      std::size_t dereferenceable_bytes)
-                                     :MaskedScatterInst(instruction_stmt,vec_of_ptrs,value,value_type,mask,volatile_,nontemporal,nonull,alignment,dereferenceable_bytes,std::nullopt) {}
+                                     :MaskedScatterInst(instruction_stmt,vec_of_ptrs,value,value_type,mask,volatile_,nontemporal,nonull,alignment,dereferenceable_bytes,std::nullopt){}
 std::shared_ptr<IR::IntTypeExpr> IntMaskedScatterInst::get_casted_value_basetype() const{
     return std::dynamic_pointer_cast<IR::IntTypeExpr>(this->get_value_basetype());
 }
@@ -839,7 +839,7 @@ std::string IntMaskedScatterInst::to_string() const{
 PtrMaskedScatterInst::PtrMaskedScatterInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr vec_of_ptrs, IR::LiteralExprPtr value, 
                                      IR::TypeExprPtr value_type, IR::LiteralExprPtr mask, bool volatile_, bool nontemporal, bool nonull, std::size_t alignment, 
                                      std::size_t dereferenceable_bytes)
-                                     :MaskedScatterInst(instruction_stmt,vec_of_ptrs,value,value_type,mask,volatile_,nontemporal,nonull,alignment,dereferenceable_bytes,std::nullopt) {}
+                                     :MaskedScatterInst(instruction_stmt,vec_of_ptrs,value,value_type,mask,volatile_,nontemporal,nonull,alignment,dereferenceable_bytes,std::nullopt){}
 std::size_t PtrMaskedScatterInst::get_value_basetype_bitwidth() const{
     return 64; //Assuming 64 bit pointers
 }
@@ -854,7 +854,7 @@ std::string PtrMaskedScatterInst::to_string() const{
 FloatMaskedScatterInst::FloatMaskedScatterInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr vec_of_ptrs, IR::LiteralExprPtr value, 
                                      IR::TypeExprPtr value_type, IR::LiteralExprPtr mask, bool volatile_, bool nontemporal, bool nonull, std::size_t alignment, 
                                      std::size_t dereferenceable_bytes, FastMathAttr fast_math_attr)
-                                     :MaskedScatterInst(instruction_stmt,vec_of_ptrs,value,value_type,mask,volatile_,nontemporal,nonull,alignment,dereferenceable_bytes,fast_math_attr) {}
+                                     :MaskedScatterInst(instruction_stmt,vec_of_ptrs,value,value_type,mask,volatile_,nontemporal,nonull,alignment,dereferenceable_bytes,fast_math_attr){}
 std::shared_ptr<IR::FloatTypeExpr> FloatMaskedScatterInst::get_casted_value_basetype() const{
     return std::dynamic_pointer_cast<IR::FloatTypeExpr>(this->get_value_basetype());
 }
@@ -873,7 +873,7 @@ std::string FloatMaskedScatterInst::to_string() const{
 
 
 PrefetchInst::PrefetchInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr pointer, bool write, bool instruction, std::size_t prefetch_locality)
-                            :Inst(instruction_stmt,nullptr,std::nullopt) {
+                            :Inst(instruction_stmt,nullptr,std::nullopt){
     this->pointer = pointer;
     this->write = write;
     this->instruction = instruction;
@@ -896,10 +896,10 @@ InstType PrefetchInst::get_inst_type() const{
 }
 std::string PrefetchInst::to_string() const{
     std::string str = ".prefetch(ptr:" + this->pointer->to_string() + ")";
-    if(this->write) {
+    if(this->write){
         str += " #[write]";
     }
-    if(this->instruction) {
+    if(this->instruction){
         str += " #[instruction]";
     }
     str+= " #[locality(i8" + std::to_string(this->prefetch_locality) + ")]";
@@ -911,7 +911,7 @@ MemcopyInst::MemcopyInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExp
                          IR::LiteralExprPtr size, bool nooverlap, bool volatile_, 
                          std::pair<bool,bool> nontemporal, std::pair<bool,bool> nonnull, std::pair<bool,bool> nopoison,
                          std::pair<size_t, size_t> alignment, std::pair<size_t, size_t> dereferenceable_bytes):
-                         Inst(instruction_stmt,nullptr,std::nullopt) {   
+                         Inst(instruction_stmt,nullptr,std::nullopt){   
     this->dest = dest;
     this->src = src;
     this->size = size;
@@ -958,10 +958,10 @@ InstType MemcopyInst::get_inst_type() const{
 }
 std::string MemcopyInst::to_string() const{
     std::string str = ".memcopy(ptr:" + this->dest->to_string() + ", ptr:" + this->src->to_string() + ", i64:" + this->size->to_string() + ")";
-    if(this->nooverlap) {
+    if(this->nooverlap){
         str += " #[nooverlap]";
     }
-    if(this->volatile_) {
+    if(this->volatile_){
         str += " #[volatile]";
     }
     str += " #[nontemporal(" + std::to_string(this->nontemporal.first) + "," + std::to_string(this->nontemporal.second) + ")]";
@@ -976,7 +976,7 @@ std::string MemcopyInst::to_string() const{
 MemsetInst::MemsetInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr dest, IR::LiteralExprPtr value, 
                        IR::LiteralExprPtr size, bool volatile_, bool nontemporal, bool nonnull, bool nopoison,
                        std::size_t alignment, std::size_t dereferenceable_bytes):
-                       Inst(instruction_stmt,nullptr,std::nullopt) {
+                       Inst(instruction_stmt,nullptr,std::nullopt){
     this->dest = dest;
     this->value = value;
     this->size = size;
@@ -1019,22 +1019,22 @@ InstType MemsetInst::get_inst_type() const{
 }
 std::string MemsetInst::to_string() const{
     std::string str = ".memset(ptr:" + this->dest->to_string() + ", i8:" + this->value->to_string() + ", i64:" + this->size->to_string() + ")";
-    if(this->volatile_) {
+    if(this->volatile_){
         str += " #[volatile]";
     }
-    if(this->nontemporal) {
+    if(this->nontemporal){
         str += " #[nontemporal]";
     }
-    if(this->nonnull) {
+    if(this->nonnull){
         str += " #[nonnull]";
     }
-    if(this->nopoison) {
+    if(this->nopoison){
         str += " #[nopoison]";
     }
-    if(this->alignment != 0) {
+    if(this->alignment != 0){
         str += " #[align(" + std::to_string(this->alignment)+")]";
     }
-    if(this->dereferenceable_bytes != 0) {
+    if(this->dereferenceable_bytes != 0){
         str += " #[dereferenceable(" + std::to_string(this->dereferenceable_bytes)+")]";
     }
     return str;
@@ -1044,7 +1044,7 @@ std::string MemsetInst::to_string() const{
 MemcmpInst::MemcmpInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr ptr1, IR::LiteralExprPtr ptr2, IR::LiteralExprPtr size, 
                        bool volatile_, std::pair<bool,bool> nontemporal, std::pair<bool,bool> nonnull, std::pair<bool,bool> nopoison, 
                        std::pair<size_t, size_t> alignment, std::pair<size_t, size_t> dereferenceable_bytes):
-                       Inst(instruction_stmt,destination,std::nullopt) {
+                       Inst(instruction_stmt,destination,std::nullopt){
     this->ptr1 = ptr1;
     this->ptr2 = ptr2;
     this->size = size;
@@ -1087,7 +1087,7 @@ InstType MemcmpInst::get_inst_type() const{
 }
 std::string MemcmpInst::to_string() const{
     std::string str = "let " + this->destination->to_string() + " = .memcmp(ptr:" + this->ptr1->to_string() + ", ptr:" + this->ptr2->to_string() + ", i64:" + this->size->to_string() + ")";
-    if(this->volatile_) {
+    if(this->volatile_){
         str += " #[volatile]";
     }
     str += " #[nontemporal(" + std::to_string(this->nontemporal.first) + "," + std::to_string(this->nontemporal.second) + ")]";
@@ -1101,7 +1101,7 @@ std::string MemcmpInst::to_string() const{
 
 GetAddressInst::GetAddressInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                                IR::LiteralExprPtr offset, bool unsigned_, bool nsw, bool nuw, bool inbounds, std::optional<FastMathAttr> fast_math_attr):
-                               Inst(instruction_stmt,destination,fast_math_attr) {
+                               Inst(instruction_stmt,destination,fast_math_attr){
     this->value = value;
     this->value_type = value_type;
     this->offset = offset;
@@ -1136,19 +1136,19 @@ InstType GetAddressInst::get_inst_type() const{
 }
 std::string GetAddressInst::to_string() const{
     std::string str = "let " + this->destination->to_string() + " = .getaddress(" + this->value_type->to_string() + ":" + this->value->to_string() + ", i64:" + this->offset->to_string() + ")";
-    if(this->unsigned_) {
+    if(this->unsigned_){
         str += " #[unsigned]";
     }
-    if(this->nsw) {
+    if(this->nsw){
         str += " #[nsw]";
     }
-    if(this->nuw) {
+    if(this->nuw){
         str += " #[nuw]";
     }
-    if(this->inbounds) {
+    if(this->inbounds){
         str += " #[inbounds]";
     }
-    if(this->fast_math_attr.has_value()) {
+    if(this->fast_math_attr.has_value()){
         str += " " + this->fast_math_attr.value().to_string();
     }
     return str;
@@ -1156,7 +1156,7 @@ std::string GetAddressInst::to_string() const{
 
 
 PtrOffsetInst::PtrOffsetInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, 
-                            IR::LiteralExprPtr offset, bool unsigned_, bool nsw, bool nuw, bool inbounds):Inst(instruction_stmt,destination,std::nullopt) {
+                            IR::LiteralExprPtr offset, bool unsigned_, bool nsw, bool nuw, bool inbounds):Inst(instruction_stmt,destination,std::nullopt){
     this->pointer = pointer;
     this->offset = offset;
     this->unsigned_ = unsigned_;
@@ -1187,16 +1187,16 @@ InstType PtrOffsetInst::get_inst_type() const{
 }
 std::string PtrOffsetInst::to_string() const{
     std::string str = "let " + this->destination->to_string() + " = .ptroffset(ptr:" + this->pointer->to_string() + ", i64:" + this->offset->to_string() + ")";
-    if(this->unsigned_) {
+    if(this->unsigned_){
         str += " #[unsigned]";
     }
-    if(this->nsw) {
+    if(this->nsw){
         str += " #[nsw]";
     }
-    if(this->nuw) {
+    if(this->nuw){
         str += " #[nuw]";
     }
-    if(this->inbounds) {
+    if(this->inbounds){
         str += " #[inbounds]";
     }
     return str;
@@ -1204,7 +1204,7 @@ std::string PtrOffsetInst::to_string() const{
 
 
 StackSaveInst::StackSaveInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination):
-                             Inst(instruction_stmt,destination,std::nullopt) {}
+                             Inst(instruction_stmt,destination,std::nullopt){}
 InstType StackSaveInst::get_inst_type() const{
     return InstType::StackSaveInst;
 }
@@ -1215,7 +1215,7 @@ std::string StackSaveInst::to_string() const{
 
 
 StackRestoreInst::StackRestoreInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr pointer):
-                             Inst(instruction_stmt,nullptr,std::nullopt) {
+                             Inst(instruction_stmt,nullptr,std::nullopt){
     this->pointer = pointer;    
 }
 IR::LiteralExprPtr StackRestoreInst::get_pointer() const{
@@ -1232,7 +1232,7 @@ std::string StackRestoreInst::to_string() const{
 
 ExtractElementInst::ExtractElementInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::LiteralExprPtr index, 
                                         IR::TypeExprPtr value_type,bool inbounds, std::optional<FastMathAttr> fast_math_attr):
-                                        Inst(instruction_stmt,destination,fast_math_attr) {
+                                        Inst(instruction_stmt,destination,fast_math_attr){
     this->value = value;
     this->index = index;
     this->value_type = value_type;
@@ -1258,10 +1258,10 @@ InstType ExtractElementInst::get_inst_type() const{
 }
 std::string ExtractElementInst::to_string() const{
     std::string str = "let " + this->destination->to_string() + " = .extractelement(" + this->value_type->to_string() + ":" + this->value->to_string() + ", i64:" + this->index->to_string() + ")";
-    if(this->inbounds) {
+    if(this->inbounds){
         str += " #[inbounds]";
     }
-    if(this->fast_math_attr.has_value()) {
+    if(this->fast_math_attr.has_value()){
         str += " " + this->fast_math_attr.value().to_string();
     }
     return str;
@@ -1269,7 +1269,7 @@ std::string ExtractElementInst::to_string() const{
 
 InsertElementInst::InsertElementInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::LiteralExprPtr element, 
                                      IR::LiteralExprPtr index, IR::TypeExprPtr value_type, IR::TypeExprPtr element_type, bool inbounds, std::optional<FastMathAttr> fast_math_attr):
-                                    Inst(instruction_stmt,destination,fast_math_attr) {
+                                    Inst(instruction_stmt,destination,fast_math_attr){
     this->value = value;
     this->element = element;
     this->index = index;
@@ -1302,10 +1302,10 @@ InstType InsertElementInst::get_inst_type() const{
 }
 std::string InsertElementInst::to_string() const{
     std::string str = "let " + this->destination->to_string() + " = .insertelement(" + this->get_value_type()->to_string() + ":" + this->value->to_string() + ", " + this->element_type->to_string() + ":" + this->element->to_string() + ", i64:" + this->index->to_string() + ")";
-    if(this->inbounds) {
+    if(this->inbounds){
         str += " #[inbounds]";
     }
-    if(this->fast_math_attr.has_value()) {
+    if(this->fast_math_attr.has_value()){
         str += " " + this->fast_math_attr.value().to_string();
     }
     return str;
@@ -1313,7 +1313,7 @@ std::string InsertElementInst::to_string() const{
 
 
 FenceInst::FenceInst(IR::InstructionStmtPtr instruction_stmt, SyncScope sync_scope, AtomicOrdering ordering, bool store_only, bool load_only):
-                     Inst(instruction_stmt,nullptr,std::nullopt) {
+                     Inst(instruction_stmt,nullptr,std::nullopt){
     this->sync_scope = sync_scope;
     this->ordering = ordering;
     this->store_only = store_only;
@@ -1337,10 +1337,10 @@ InstType FenceInst::get_inst_type() const{
 std::string FenceInst::to_string() const{
     std::string str = ".fence(str:" + MIR::to_string(this->ordering) + ")";
     str += " #[sync_scope(" + MIR::to_string(this->sync_scope) + ")]";
-    if(this->store_only) {
+    if(this->store_only){
         str += " #[store_only]";
     }
-    if(this->load_only) {
+    if(this->load_only){
         str += " #[load_only]";
     }
     return str;
@@ -1350,7 +1350,7 @@ std::string FenceInst::to_string() const{
 CmpXchgInst::CmpXchgInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr expected, 
                          IR::LiteralExprPtr desired, AtomicOrdering success_ordering, AtomicOrdering failure_ordering, 
                          bool volatile_, bool weak, std::size_t alignment, SyncScope sync_scope, std::optional<FastMathAttr> fast_math_attr):
-                         Inst(instruction_stmt,destination,fast_math_attr) {
+                         Inst(instruction_stmt,destination,fast_math_attr){
     this->pointer = pointer;
     this->expected = expected;
     this->desired = desired;
@@ -1398,23 +1398,23 @@ InstType CmpXchgInst::get_inst_type() const{
 std::string CmpXchgInst::to_string() const{
     std::string str = "let " + this->destination->to_string() + " = .cmpxchg(ptr:" + this->pointer->to_string() + ", " + this->get_type()->to_string() + ":" + this->expected->to_string() + ", " + this->get_type()->to_string() + ":" + this->desired->to_string()
                                                                              + ", str:" + MIR::to_string(this->success_ordering) + ", str:" + MIR::to_string(this->failure_ordering) + ")";
-    if(this->volatile_) {
+    if(this->volatile_){
         str += " #[volatile]";
     }
-    if(this->weak) {
+    if(this->weak){
         str += " #[weak]";
     }
-    if(this->alignment != 0) {
+    if(this->alignment != 0){
         str += " #[align(" + std::to_string(this->alignment)+")]";
     }
     str += " #[sync_scope(" + MIR::to_string(this->sync_scope) + ")]";
-    if(this->fast_math_attr.has_value()) {
+    if(this->fast_math_attr.has_value()){
         str += " " + this->fast_math_attr.value().to_string();
     }
     return str;
 }
 //--------------------------------- Cache Control Instructions ---------------------------------
-ClflushInst::ClflushInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr pointer, bool opt): Inst(instruction_stmt,nullptr,std::nullopt) {
+ClflushInst::ClflushInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr pointer, bool opt): Inst(instruction_stmt,nullptr,std::nullopt){
     this->pointer = pointer;
     this->opt = opt;
 }
@@ -1432,7 +1432,7 @@ std::string ClflushInst::to_string() const{
 }
 
 
-ClwbInst::ClwbInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr pointer): Inst(instruction_stmt,nullptr,std::nullopt) {
+ClwbInst::ClwbInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr pointer): Inst(instruction_stmt,nullptr,std::nullopt){
     this->pointer = pointer;
 }
 IR::LiteralExprPtr ClwbInst::get_pointer() const{
@@ -1446,7 +1446,7 @@ std::string ClwbInst::to_string() const{
 }
 
 
-CldemoteInst::CldemoteInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr pointer): Inst(instruction_stmt,nullptr,std::nullopt) {
+CldemoteInst::CldemoteInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr pointer): Inst(instruction_stmt,nullptr,std::nullopt){
     this->pointer = pointer;
 }
 IR::LiteralExprPtr CldemoteInst::get_pointer() const{
@@ -1461,7 +1461,7 @@ std::string CldemoteInst::to_string() const{
 
 
 //--------------------------------- Lifetime and Invariant Scope Instructions ---------------------------------
-LifetimeStartInst::LifetimeStartInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr pointer, std::size_t size): Inst(instruction_stmt,nullptr,std::nullopt) {
+LifetimeStartInst::LifetimeStartInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr pointer, std::size_t size): Inst(instruction_stmt,nullptr,std::nullopt){
     this->pointer = pointer;
     this->size = size;
 }
@@ -1479,7 +1479,7 @@ std::string LifetimeStartInst::to_string() const{
 }
 
 
-LifetimeEndInst::LifetimeEndInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr pointer, std::size_t size): Inst(instruction_stmt,nullptr,std::nullopt) {
+LifetimeEndInst::LifetimeEndInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr pointer, std::size_t size): Inst(instruction_stmt,nullptr,std::nullopt){
     this->pointer = pointer;
     this->size = size;
 }
@@ -1498,7 +1498,7 @@ std::string LifetimeEndInst::to_string() const{
 
 
 InvariantStartInst::InvariantStartInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, std::size_t size):
-                                        Inst(instruction_stmt,destination,std::nullopt) {
+                                        Inst(instruction_stmt,destination,std::nullopt){
     this->pointer = pointer;
     this->size = size;
 }
@@ -1517,7 +1517,7 @@ std::string InvariantStartInst::to_string() const{
 
 
 InvariantEndInst::InvariantEndInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr scope, IR::LiteralExprPtr pointer, std::size_t size)
-                                      : Inst(instruction_stmt, nullptr, std::nullopt) {
+                                      : Inst(instruction_stmt, nullptr, std::nullopt){
     this->scope = scope;
     this->pointer = pointer;
     this->size = size;

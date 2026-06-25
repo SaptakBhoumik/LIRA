@@ -2,10 +2,10 @@
 
 namespace LIRA {
 namespace IR {
-std::string to_string(TokenType type) {
+std::string to_string(TokenType type){
     //Dont use map. Use switch case because in case u forget to add a case the compiler will warn u even before u run the code, 
     //whereas with a map it will just return an empty string/throw error and u might not notice the bug until runtime
-    switch (type) {
+    switch (type){
         case TokenType::eof: return "<EOF>";
 
         case TokenType::number: return "<number>";

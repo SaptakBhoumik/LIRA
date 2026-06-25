@@ -64,7 +64,7 @@ TypeExprPtr Parser::parse_named_type_expr(bool has_attribute){
     else if(name.value == "f16" || name.value == "bf16" || name.value == "f32" || name.value == "f64" || name.value == "f80" || name.value == "f128"){
         bool is_brain_float = name.value == "bf16";
         std::size_t bits = 0;
-        if(name.value[0] == 'f') {
+        if(name.value[0] == 'f'){
             bits = Utils::to_numeric<std::size_t>(name.value.substr(1));
         }
         else{
@@ -131,7 +131,7 @@ TypeExprPtr Parser::parse_struct_type_expr(bool has_attribute){
     bool is_packed = false;
     Token tok = this->curr_tok;//the { or < token
     std::vector<TypeExprPtr> fields;
-    if (this->curr_tok.type == TokenType::langel) {
+    if (this->curr_tok.type == TokenType::langel){
         is_packed = true;
         advance();//After the < token
     }

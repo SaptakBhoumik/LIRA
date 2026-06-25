@@ -1314,8 +1314,8 @@ The following are defined only on integer
 
 ### Vector Layout Instructions
 
-- `let <T,N>:%out = .compress(<T,N>:%src, <i1,N>:%mask)` - Packs active lanes (where `mask` is true) contiguously into the low lanes of the output. Inactive output lanes are zeroed unless `#[undef_inactive]` is set. Mirrors `VPCOMPRESSPS`/`VPCOMPRESSQ`/`VPCOMPRESSB`. `T` can be any integer, float, or bfloat or ptr.
-    - `#[undef_inactive]` - inactive output lanes are undefined (allows the backend to skip zeroing)
+- `let <T,N>:%out = .compress(<T,N>:%src, <i1,N>:%mask)` - Packs active lanes (where `mask` is true) contiguously into the low lanes of the output. Inactive output lanes are zeroed unless `#[poison_inactive]` is set. Mirrors `VPCOMPRESSPS`/`VPCOMPRESSQ`/`VPCOMPRESSB`. `T` can be any integer, float, or bfloat or ptr.
+    - `#[poison_inactive]` - inactive output lanes are undefined (allows the backend to skip zeroing)
 
     If T is float:
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
@@ -1383,24 +1383,18 @@ The following are defined only on integer
 For the following if T is float/bfloat/vector of float: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 - `.assume(T:%var, T:compile_time_value)` - Tells the optimizer that `%var` holds `compile_time_value` at this program point. The compiler may propagate this as a known value. Undefined behavior if the assumption is false. `T` can be any type as long as represented as compile time value. `compile_time_value` must be a literal.
-    - `#[noundef]` - additionally asserts that `%var` is not poison or undef
 
 - `.assume(T:%var, T:v0, T:v1, ...)` - Asserts that `%var` is one of the listed compile-time values. Undefined behavior if wrong. `T` can be any type as long as represented as compile time value. At least one value required.
-    - `#[noundef]` - additionally asserts `%var` is not poison
 
 - `.assume_range(T:%var, T:compile_time_lo, T:compile_time_hi)` - Asserts that `%var` lies in the closed interval `[lo, hi]`. Undefined behavior if wrong. `T` must be integer or float scalar; `lo` and `hi` must be compile-time literals.
     - `#[unsigned]` - interval interpreted as unsigned (integer only); default is signed
-    - `#[noundef]` - additionally asserts the value is not poison
 
 - `.assume_not(T:%var, T:compile_time_value)` - Tells the optimizer that `%var` does not hold `compile_time_value` at this program point. Undefined behavior if the assumption is false. `T` can be any type as long as represented as compile time value. `compile_time_value` must be a literal.
-    - `#[noundef]` - additionally asserts that `%var` is not poison or undef
 
 - `.assume_not(T:%var, T:v0, T:v1, ...)` - Asserts that `%var` is not any of the listed compile-time values. Undefined behavior if wrong. `T` can be any type as long as represented as compile time value. At least one value required.
-    - `#[noundef]` - additionally asserts `%var` is not poison
 
 - `.assume_not_range(T:%var, T:compile_time_lo, T:compile_time_hi)` - Asserts that `%var` does not lie in the closed interval `[lo, hi]`. Undefined behavior if wrong. `T` must be integer or float scalar; `lo` and `hi` must be compile-time literals.
     - `#[unsigned]` - interval interpreted as unsigned (integer only); default is signed
-    - `#[noundef]` - additionally asserts the value is not poison
 
 #### Non-Binding Expectation Hints(No UB if violated. Even if the prob is 100%, the optimizer may still generate code for other cases.)
 

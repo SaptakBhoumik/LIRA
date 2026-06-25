@@ -79,7 +79,7 @@ std::string ArrayLiteralExpr::to_string() const{
     std::string res = "[";
     for(size_t i=0;i<this->elements.size();i++){
         res += this->elements[i]->to_string();
-        if(i!=this->elements.size()-1) {
+        if(i!=this->elements.size()-1){
             res += ", ";
         }
     }
@@ -106,7 +106,7 @@ std::string SIMDLiteralExpr::to_string() const{
     std::string res = "<";
     for(size_t i=0;i<this->elements.size();i++){
         res += this->elements[i]->to_string();
-        if(i!=this->elements.size()-1) {
+        if(i!=this->elements.size()-1){
             res += ", ";
         }
     }
@@ -133,7 +133,7 @@ std::string StructLiteralExpr::to_string() const{
     std::string res = "{";
     for(size_t i=0;i<this->fields.size();i++){
         res += this->fields[i]->to_string();
-        if(i!=this->fields.size()-1) {
+        if(i!=this->fields.size()-1){
             res += ", ";
         }
     }

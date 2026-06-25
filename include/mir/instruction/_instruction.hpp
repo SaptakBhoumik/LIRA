@@ -91,6 +91,19 @@ enum class InstType:std::int16_t{
     AddSubInst,
     ReduceArithmeticSIMDInst,
     IntReduceBitwiseSIMDInst,
+    HArithmeticSIMDInst,
+    IntHBitwiseSIMDInst,
+    DotInst,
+    SADInst,
+    PackSatInst,
+    UnpackLoInst,
+    UnpackHiInst,
+    CompressInst,
+    ExpandInst,
+    InterleaveInst,
+    DeinterleaveInst,
+    MaskToIntInst,
+    IntToMaskInst,
 
     ScalarSelectInst,
     LanewiseSelectInst,
@@ -214,7 +227,7 @@ std::optional<TypeVariant> get_type_variant_from_type(const IR::TypeExprPtr type
 
 template<typename E>
     requires (std::is_enum_v<E> && (!std::is_same_v<E, TypeVariant>))
-constexpr std::uint64_t operator|(TypeVariant a, E b) {
+constexpr std::uint64_t operator|(TypeVariant a, E b){
     return static_cast<std::uint64_t>(a) | static_cast<std::uint64_t>(b);
 }
 

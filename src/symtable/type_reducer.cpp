@@ -26,7 +26,7 @@ IR::TypeExprPtr reduce_type_expr(IR::TypeExprPtr type, TypeSymTablePtr symtable)
             auto label_type = std::dynamic_pointer_cast<IR::LabelTypeExpr>(type);
             std::vector<IR::TypeExprPtr> reduced_param_types;
             const auto& param_types = label_type->get_params();
-            for(const auto& param_type : param_types) {
+            for(const auto& param_type : param_types){
                 reduced_param_types.push_back(reduce_type_expr(param_type, symtable));
             }
             return std::make_shared<IR::LabelTypeExpr>(label_type->get_token(), reduced_param_types, label_type->get_attributes());
@@ -45,7 +45,7 @@ IR::TypeExprPtr reduce_type_expr(IR::TypeExprPtr type, TypeSymTablePtr symtable)
             auto struct_type = std::dynamic_pointer_cast<IR::StructTypeExpr>(type);
             std::vector<IR::TypeExprPtr> reduced_field_types;
             const auto& field_types = struct_type->get_fields();
-            for(auto field_type : field_types) {
+            for(auto field_type : field_types){
                 reduced_field_types.push_back(reduce_type_expr(field_type, symtable));
             }
             return std::make_shared<IR::StructTypeExpr>(struct_type->get_token(), reduced_field_types, struct_type->is_packed(), struct_type->get_attributes());
@@ -54,7 +54,7 @@ IR::TypeExprPtr reduce_type_expr(IR::TypeExprPtr type, TypeSymTablePtr symtable)
             auto func_type = std::dynamic_pointer_cast<IR::FuncTypeExpr>(type);
             std::vector<IR::TypeExprPtr> reduced_param_types;
             const auto& param_types = func_type->get_param_types();
-            for(const auto& param_type : param_types) {
+            for(const auto& param_type : param_types){
                 reduced_param_types.push_back(reduce_type_expr(param_type, symtable));
             }
             auto reduced_return_type = reduce_type_expr(func_type->get_return_type(), symtable);

@@ -7,8 +7,8 @@
 namespace LIRA {
 namespace IR {
 bool Lexer::has_errors() const{
-    for (const auto& d : this->diagnostics) {
-        if (d.level == Utils::DiagLevel::error) {
+    for (const auto& d : this->diagnostics){
+        if (d.level == Utils::DiagLevel::error){
             return true;
         }
     }
@@ -29,7 +29,7 @@ Utils::Location Lexer::here() const{
     };
 }
 
-void Lexer::report(Utils::DiagLevel level,const std::string& message,const std::string& sub_message,const std::string& code) {
+void Lexer::report(Utils::DiagLevel level,const std::string& message,const std::string& sub_message,const std::string& code){
     this->diagnostics.push_back(Utils::Diagnostic{
         this->here(),
         message,
@@ -39,11 +39,11 @@ void Lexer::report(Utils::DiagLevel level,const std::string& message,const std::
     });
 }
 
-void Lexer::report_error(const std::string& msg, const std::string& sub) {
+void Lexer::report_error(const std::string& msg, const std::string& sub){
     this->report(Utils::DiagLevel::error, msg, sub);
 }
 
-void Lexer::report_warning(const std::string& msg, const std::string& sub) {
+void Lexer::report_warning(const std::string& msg, const std::string& sub){
     this->report(Utils::DiagLevel::warning, msg, sub);
 }
 }

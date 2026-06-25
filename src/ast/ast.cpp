@@ -54,13 +54,13 @@ std::string Attribute::to_string() const{
     res += "(";
     for(size_t i=0;i<this->args.size();i++){
         res += this->args[i].second->to_string()+":"+this->args[i].first->to_string();
-        if(i!=this->args.size()-1 || this->kwargs.size()>0) { 
+        if(i!=this->args.size()-1 || this->kwargs.size()>0){ 
             res += ", ";
         }
     }
     for(size_t i=0;i<this->kwargs.size();i++){
         res += this->kwargs[i].first.value+"="+this->kwargs[i].third->to_string()+":"+this->kwargs[i].second->to_string();
-        if(i!=this->kwargs.size()-1) {
+        if(i!=this->kwargs.size()-1){
             res += ", ";
         }
     }
@@ -70,14 +70,14 @@ std::string Attribute::to_string() const{
 
 
 Expr::Expr(LiteralExprPtr literal){
-    if(literal == nullptr) {
+    if(literal == nullptr){
         throw std::invalid_argument("LiteralExprPtr cannot be null");
     }
     this->literal = literal;
     this->type = nullptr;
 }
 Expr::Expr(TypeExprPtr type){
-    if(type == nullptr) {
+    if(type == nullptr){
         throw std::invalid_argument("TypeExprPtr cannot be null");
     }
     this->type = type;
@@ -85,7 +85,7 @@ Expr::Expr(TypeExprPtr type){
 }
 
 ExprKind Expr::get_kind() const{
-    if(this->literal!=nullptr) {
+    if(this->literal!=nullptr){
         return ExprKind::LiteralExpr;
     } 
     else {
@@ -93,7 +93,7 @@ ExprKind Expr::get_kind() const{
     }
 }
 Token Expr::get_token() const{
-    if(this->literal!=nullptr) {
+    if(this->literal!=nullptr){
         return this->literal->get_token();
     } 
     else {
@@ -107,7 +107,7 @@ TypeExprPtr Expr::get_type() const{
     return this->type;
 }
 std::string Expr::to_string() const{
-    if(this->literal!=nullptr) {
+    if(this->literal!=nullptr){
         return this->literal->to_string();
     } 
     else {
@@ -139,7 +139,7 @@ std::string InstructionStmt::InstructionCall::to_string() const{
     std::string res = this->tok.value+"(";
     for(size_t i=0;i<this->operands.size();i++){
         res += this->operands[i].second->to_string()+":"+this->operands[i].first->to_string();
-        if(i!=this->operands.size()-1) {
+        if(i!=this->operands.size()-1){
             res += ", ";
         }
     }
@@ -147,7 +147,7 @@ std::string InstructionStmt::InstructionCall::to_string() const{
     for(const auto& attr: this->attributes){
         res += " "+attr->to_string();
     }
-    if(this->debug_info!=nullptr) {
+    if(this->debug_info!=nullptr){
         res += " ! "+this->debug_info->to_string();
     }
     return res;
@@ -172,16 +172,16 @@ Token InstructionStmt::get_token() const{
 }
 std::string InstructionStmt::to_string() const{
     std::string res;
-    if(this->name.has_value()) {
+    if(this->name.has_value()){
         res = "let " + this->name.value().third->to_string() + ":" + this->name.value().first.value;
         for(const auto& attr: this->name.value().second){
             res += " "+attr->to_string();
         }
-        if(this->value.has_value()) {
+        if(this->value.has_value()){
             res += " = ";
         }
     }
-    if(value.has_value()) {
+    if(value.has_value()){
         res += this->value->to_string();
     }
     return res;
@@ -216,7 +216,7 @@ std::string Label::to_string() const{
         for(const auto& attr: this->params[i].second){
             res += " "+attr->to_string();
         }
-        if(i!=this->params.size()-1) {
+        if(i!=this->params.size()-1){
             res += ", ";
         }
     }
@@ -264,29 +264,29 @@ Token Scope::get_token() const{
 std::string Scope::to_string() const{
     std::string res = "\tscope ";
     res += this->scope_var_name.value + " = ";
-    if(this->scope_type == ScopeType::FunctionScope) {
+    if(this->scope_type == ScopeType::FunctionScope){
         res += "function(";
     } 
-    else if(this->scope_type == ScopeType::BlockScope) {
+    else if(this->scope_type == ScopeType::BlockScope){
         res += "block(";
     }
-    else if(this->scope_type == ScopeType::InlineScope) {
+    else if(this->scope_type == ScopeType::InlineScope){
         res += "inline(";
     }
-    if(this->scope_name.has_value()) {
+    if(this->scope_name.has_value()){
         res += "scope_name = \"" + this->scope_name.value().value + "\", ";
     }
-    if(this->parent_scope_name.has_value()) {
+    if(this->parent_scope_name.has_value()){
         res += "parent_scope = " + this->parent_scope_name.value().value + ", ";
     }
-    if(this->scope_loc.has_value()) {
+    if(this->scope_loc.has_value()){
         res += "scope_loc = \"" + this->scope_loc.value().first.value + "\":" + this->scope_loc.value().second.value + ":" + this->scope_loc.value().third.value  + ", ";
     }
-    if(this->callsite_loc.has_value()) {
+    if(this->callsite_loc.has_value()){
         res += "callsite_loc = \"" + this->callsite_loc.value().first.value + "\":" + this->callsite_loc.value().second.value + ":" + this->callsite_loc.value().third.value  + ", ";
     }
     //Remove the last ", " if it exists
-    if(res.size() >= 2 && res.substr(res.size() - 2) == ", ") {
+    if(res.size() >= 2 && res.substr(res.size() - 2) == ", "){
         res = res.substr(0, res.size() - 2);
     }
     res += ");";
@@ -343,22 +343,22 @@ std::string Function::to_string() const{
         for(const auto& attr: this->params[i].second){
             res += " "+attr->to_string();
         }
-        if(i!=this->params.size()-1) {
+        if(i!=this->params.size()-1){
             res += ", ";
         }
     }
-    if(this->varargs) {
-        if(!this->params.empty()) {
+    if(this->varargs){
+        if(!this->params.empty()){
             res += ", ";
         }
         res += "...";
     }
     res += ")";
     res += " -> "+this->return_type->to_string();
-    if(this->debug_info!=nullptr) {
+    if(this->debug_info!=nullptr){
         res += " ! "+this->debug_info->to_string();
     }
-    if(this->body.size() > 0) {
+    if(this->body.size() > 0){
         res += " {\n";
         for(const auto& scope: this->scopes){
             res += scope->to_string() + "\n";
@@ -373,7 +373,7 @@ std::string Function::to_string() const{
 
 
 GlobalItem::GlobalItem(FunctionPtr function){
-    if (function == nullptr) {
+    if (function == nullptr){
         throw std::invalid_argument("FunctionPtr cannot be null");
     }
     this->function = function;
@@ -381,7 +381,7 @@ GlobalItem::GlobalItem(FunctionPtr function){
     this->global_var = nullptr;
 }
 GlobalItem::GlobalItem(AttributePtr attribute){
-    if(attribute == nullptr) {
+    if(attribute == nullptr){
         throw std::invalid_argument("AttributePtr cannot be null");
     }
     this->function = nullptr;
@@ -389,7 +389,7 @@ GlobalItem::GlobalItem(AttributePtr attribute){
     this->global_var = nullptr;
 }
 GlobalItem::GlobalItem(InstructionStmtPtr global_var){
-    if(global_var == nullptr) {
+    if(global_var == nullptr){
         throw std::invalid_argument("InstructionStmtPtr cannot be null");
     }
     this->function = nullptr;

@@ -10,31 +10,31 @@ std::string FastMathAttr::to_string() const{
 
     std::string result;
     std::string prefix = "";
-    if(this->nnans) {
+    if(this->nnans){
         result += "#[nnans]";
         prefix = " ";
     }
-    if(this->ninfs) {
+    if(this->ninfs){
         result += prefix + "#[ninfs]";
         prefix = " ";
     }
-    if(this->nsz) {
+    if(this->nsz){
         result += prefix + "#[nsz]";
         prefix = " ";
     }
-    if(this->arcp) {
+    if(this->arcp){
         result += prefix + "#[arcp]";
         prefix = " ";
     }
-    if(this->contract) {
+    if(this->contract){
         result += prefix + "#[contract]";
         prefix = " ";
     }
-    if(this->afns) {
+    if(this->afns){
         result += prefix + "#[afns]";
         prefix = " ";
     }
-    if(this->reassoc) {
+    if(this->reassoc){
         result += prefix + "#[reassoc]";
     }
     return result;
@@ -58,19 +58,19 @@ IR::DebugInfoPtr Inst::get_debug_info() const{
 }
 
 
-bool is_vector_typevariant(const TypeVariant var) {
+bool is_vector_typevariant(const TypeVariant var){
     return var == TypeVariant::VecInt || var == TypeVariant::VecFloat || var == TypeVariant::VecPtr;
 }
-bool is_scalar_typevariant(const TypeVariant var) {
+bool is_scalar_typevariant(const TypeVariant var){
     return var == TypeVariant::Int || var == TypeVariant::Float || var == TypeVariant::Ptr;
 }
-bool is_ptr_typevariant(const TypeVariant var) {
+bool is_ptr_typevariant(const TypeVariant var){
     return var == TypeVariant::Ptr || var == TypeVariant::VecPtr;
 }
-bool is_float_typevariant(const TypeVariant var) {
+bool is_float_typevariant(const TypeVariant var){
     return var == TypeVariant::Float || var == TypeVariant::VecFloat;
 }
-bool is_int_typevariant(const TypeVariant var) {
+bool is_int_typevariant(const TypeVariant var){
     return var == TypeVariant::Int || var == TypeVariant::VecInt;
 }
 

@@ -66,38 +66,38 @@ std::size_t LocalDestRegister::get_alignment() const{
 
 std::string LocalDestRegister::to_string() const{
     std::string result = type->to_string() + ":" + dest_register_name;
-    if(artificial) {
+    if(artificial){
         result += " #[artificial]";
     }
-    if(synthetic) {
+    if(synthetic){
         result += " #[synthetic]";
     }
-    if(nonnull) {
+    if(nonnull){
         result += " #[nonnull]";
     }
-    if(nopoison) {
+    if(nopoison){
         result += " #[nopoison]";
     }
-    if(nnan) {
+    if(nnan){
         result += " #[nnan]";
     }
-    if(ninf) {
+    if(ninf){
         result += " #[ninf]";
     }
-    if(noalias) {
+    if(noalias){
         result += " #[noalias]";
     }
 
-    if(!original_name.empty()) {
+    if(!original_name.empty()){
         result += " #[name(str:" + original_name + ")]";
     }
-    if(!scope.empty()) {
+    if(!scope.empty()){
         result += " #[set_scope(scope:" + scope + ")]";
     }
-    if(dereferenceable_bytes > 0) {
+    if(dereferenceable_bytes > 0){
         result += " #[dereferenceable_bytes(i64:" + std::to_string(dereferenceable_bytes) + ")]";
     }
-    if(alignment > 0) {
+    if(alignment > 0){
         result += " #[alignment(i64:" + std::to_string(alignment) + ")]";
     }
     return result;

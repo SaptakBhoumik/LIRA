@@ -10,14 +10,14 @@
 #include <filesystem>
 #include <chrono>
 
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[]){
     if(argc < 2){
         std::cerr << "Usage: " << argv[0] << " <source_file.luna>" << std::endl;
         return 1;
     }
     std::string filename = std::filesystem::canonical(argv[1]).string();
     std::ifstream file(filename);
-    if (!file.is_open()) {
+    if (!file.is_open()){
         std::cerr << "Error: Could not open file " << filename << std::endl;
         return 1;
     }

@@ -365,7 +365,7 @@ class FloatAddSubInst:public AddSubInst{
     
     std::shared_ptr<IR::FloatTypeExpr> get_casted_element_type() const;
     std::size_t get_element_bitwidth() const;
-    bool is_brain_float_type() const;
+    bool is_element_brain_float_type() const;
 
     TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
@@ -483,7 +483,7 @@ class FloatReduceArithmeticSIMDInst:public ReduceArithmeticSIMDInst {
     
     virtual std::shared_ptr<IR::FloatTypeExpr> get_casted_element_type() const final;
     virtual std::size_t get_element_bitwidth() const final;
-    virtual bool is_brain_float_type() const final;
+    virtual bool is_element_brain_float_type() const final;
 
     virtual bool is_ieee754_2019() const final;
     virtual bool is_unordered() const final;
@@ -741,11 +741,11 @@ class FloatHArithmeticSIMDInst:public HArithmeticSIMDInst {
     virtual std::string to_string_helper(const std::string op_name) const final;
     public:
     FloatHArithmeticSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
-                             std::optional<FastMathAttr> fast_math_attr, bool ieee754_2019, bool unordered);
+                             FastMathAttr fast_math_attr, bool ieee754_2019, bool unordered);
     
     virtual std::shared_ptr<IR::FloatTypeExpr> get_casted_element_type() const final;
     virtual std::size_t get_element_bitwidth() const final;
-    virtual bool is_brain_float_type() const final;
+    virtual bool is_element_brain_float_type() const final;
 
     virtual bool is_ieee754_2019() const final;
     virtual bool is_unordered() const final;
@@ -920,11 +920,11 @@ class DotInst:public Inst {
     
     virtual IR::LiteralExprPtr get_lhs() const final;
     virtual IR::LiteralExprPtr get_rhs() const final;
-    virtual IR::TypeExprPtr get_element_type() const final;//From input_vector_type
+    virtual IR::TypeExprPtr get_input_basetype() const final;//From input_vector_type
     virtual std::size_t get_vector_size() const final;//From input_vector_type
     virtual IR::TypeExprPtr get_output_type() const final;// From destination
 
-    virtual TypeVariant get_element_type_variant() const = 0;
+    virtual TypeVariant get_basetype_variant() const = 0;
     virtual InstType get_inst_type() const override final;
 };
 
@@ -943,12 +943,12 @@ class IntDotInst:public DotInst {
     bool is_unsigned() const;
     bool is_saturating() const;
     
-    std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const;
-    std::size_t get_element_bitwidth() const;
+    std::shared_ptr<IR::IntTypeExpr> get_casted_input_basetype() const;
+    std::size_t get_input_basetype_bitwidth() const;
     std::shared_ptr<IR::IntTypeExpr> get_casted_output_type() const;
     std::size_t get_output_bitwidth() const;
 
-    TypeVariant get_element_type_variant() const override;
+    TypeVariant get_basetype_variant() const override;
     std::string to_string() const override;
 };
 
@@ -957,14 +957,14 @@ class FloatDotInst:public DotInst {
     FloatDotInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr input_vector_type,
                  FastMathAttr fast_math_attr);
 
-    std::shared_ptr<IR::FloatTypeExpr> get_casted_element_type() const;
-    std::size_t get_element_bitwidth() const;
-    bool is_element_brain_float() const;
+    std::shared_ptr<IR::FloatTypeExpr> get_casted_input_basetype() const;
+    std::size_t get_input_basetype_bitwidth() const;
+    bool is_input_basetype_brain_float() const;
     std::shared_ptr<IR::FloatTypeExpr> get_casted_output_type() const;
     std::size_t get_output_bitwidth() const;
     bool is_output_brain_float() const;
 
-    TypeVariant get_element_type_variant() const override;
+    TypeVariant get_basetype_variant() const override;
     std::string to_string() const override;
 };
 
@@ -982,11 +982,11 @@ class SADInst:public Inst {
     
     virtual IR::LiteralExprPtr get_lhs() const final;
     virtual IR::LiteralExprPtr get_rhs() const final;
-    virtual IR::TypeExprPtr get_element_type() const final;//From input_vector_type
+    virtual IR::TypeExprPtr get_input_basetype() const final;//From input_vector_type
     virtual std::size_t get_vector_size() const final;//From input_vector_type
     virtual IR::TypeExprPtr get_output_type() const final;// From destination
 
-    virtual TypeVariant get_element_type_variant() const = 0;
+    virtual TypeVariant get_basetype_variant() const = 0;
     virtual InstType get_inst_type() const override final;
 };
 
@@ -1005,12 +1005,12 @@ class IntSADInst:public SADInst {
     bool is_unsigned() const;
     bool is_saturating() const;
     
-    std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const;
-    std::size_t get_element_bitwidth() const;
+    std::shared_ptr<IR::IntTypeExpr> get_casted_input_basetype() const;
+    std::size_t get_input_basetype_bitwidth() const;
     std::shared_ptr<IR::IntTypeExpr> get_casted_output_type() const;
     std::size_t get_output_bitwidth() const;
 
-    TypeVariant get_element_type_variant() const override;
+    TypeVariant get_basetype_variant() const override;
     std::string to_string() const override;
 };
 
@@ -1019,14 +1019,14 @@ class FloatSADInst:public SADInst {
     FloatSADInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr input_vector_type,
                   FastMathAttr fast_math_attr);
 
-    std::shared_ptr<IR::FloatTypeExpr> get_casted_element_type() const;
-    std::size_t get_element_bitwidth() const;
-    bool is_element_brain_float() const;
+    std::shared_ptr<IR::FloatTypeExpr> get_casted_input_basetype() const;
+    std::size_t get_input_basetype_bitwidth() const;
+    bool is_input_basetype_brain_float() const;
     std::shared_ptr<IR::FloatTypeExpr> get_casted_output_type() const;
     std::size_t get_output_bitwidth() const;
     bool is_output_brain_float() const;
 
-    TypeVariant get_element_type_variant() const override;
+    TypeVariant get_basetype_variant() const override;
     std::string to_string() const override;
 };
 
@@ -1036,7 +1036,7 @@ class PackSatInst:public Inst {
     protected:
     IR::LiteralExprPtr lhs;
     IR::LiteralExprPtr rhs;
-    IR::TypeExprPtr input_vector_type;//Type of lhs and rhs. Must be same type
+    IR::TypeExprPtr input_vector_type;//Type of lhs and rhs.
     
     bool unsigned_;
     public:
@@ -1049,10 +1049,10 @@ class PackSatInst:public Inst {
     IR::LiteralExprPtr get_rhs() const;
     std::size_t get_input_vector_size() const;//From input_vector_type
     std::size_t get_output_vector_size() const;//From destination
-    std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const;//From input_vector_type
-    std::size_t get_element_bitwidth() const;//From input_vector_type
-    std::shared_ptr<IR::IntTypeExpr> get_casted_output_type() const;//From destination
-    std::size_t get_output_bitwidth() const;//From destination
+    std::shared_ptr<IR::IntTypeExpr> get_casted_input_basetype() const;//From input_vector_type
+    std::size_t get_input_basetype_bitwidth() const;//From input_vector_type
+    std::shared_ptr<IR::IntTypeExpr> get_casted_output_basetype() const;//From destination
+    std::size_t get_output_basetype_bitwidth() const;//From destination
 
     InstType get_inst_type() const override;
     std::string to_string() const override;
@@ -1063,7 +1063,7 @@ class UnpackLoInst:public Inst {
     protected:
     IR::LiteralExprPtr lhs;
     IR::LiteralExprPtr rhs;
-    IR::TypeExprPtr input_vector_type;//Type of lhs and rhs. Must be same type
+    IR::TypeExprPtr input_vector_type;//Type of lhs and rhs.
     
     bool unsigned_;
     public:
@@ -1076,10 +1076,10 @@ class UnpackLoInst:public Inst {
     IR::LiteralExprPtr get_rhs() const;
     std::size_t get_input_vector_size() const;//From input_vector_type
     std::size_t get_output_vector_size() const;//From destination
-    std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const;//From input_vector_type
-    std::size_t get_element_bitwidth() const;//From input_vector_type
-    std::shared_ptr<IR::IntTypeExpr> get_casted_output_type() const;//From destination
-    std::size_t get_output_bitwidth() const;//From destination
+    std::shared_ptr<IR::IntTypeExpr> get_casted_input_basetype() const;//From input_vector_type
+    std::size_t get_input_basetype_bitwidth() const;//From input_vector_type
+    std::shared_ptr<IR::IntTypeExpr> get_casted_output_basetype() const;//From destination
+    std::size_t get_output_basetype_bitwidth() const;//From destination
 
     InstType get_inst_type() const override;
     std::string to_string() const override;
@@ -1090,7 +1090,7 @@ class UnpackHiInst:public Inst {
     protected:
     IR::LiteralExprPtr lhs;
     IR::LiteralExprPtr rhs;
-    IR::TypeExprPtr input_vector_type;//Type of lhs and rhs. Must be same type
+    IR::TypeExprPtr input_vector_type;//Type of lhs and rhs.
     
     bool unsigned_;
     public:
@@ -1103,10 +1103,10 @@ class UnpackHiInst:public Inst {
     IR::LiteralExprPtr get_rhs() const;
     std::size_t get_input_vector_size() const;//From input_vector_type
     std::size_t get_output_vector_size() const;//From destination
-    std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const;//From input_vector_type
-    std::size_t get_element_bitwidth() const;//From input_vector_type
-    std::shared_ptr<IR::IntTypeExpr> get_casted_output_type() const;//From destination
-    std::size_t get_output_bitwidth() const;//From destination
+    std::shared_ptr<IR::IntTypeExpr> get_casted_input_basetype() const;//From input_vector_type
+    std::size_t get_input_basetype_bitwidth() const;//From input_vector_type
+    std::shared_ptr<IR::IntTypeExpr> get_casted_output_basetype() const;//From destination
+    std::size_t get_output_basetype_bitwidth() const;//From destination
 
     InstType get_inst_type() const override;
     std::string to_string() const override;
@@ -1117,16 +1117,16 @@ class CompressInst:public Inst {
     protected:
     IR::LiteralExprPtr src;
     IR::LiteralExprPtr mask;
-    bool undef_inactive;
+    bool poison_inactive;
 
     virtual std::string to_string_helper(const std::string op_name) const final;
     public:
     CompressInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask,
-                 bool undef_inactive, std::optional<FastMathAttr> fast_math_attr);
+                 bool poison_inactive, std::optional<FastMathAttr> fast_math_attr);
 
     virtual IR::LiteralExprPtr get_src() const final;
     virtual IR::LiteralExprPtr get_mask() const final;
-    virtual bool is_undef_inactive() const final;
+    virtual bool is_poison_inactive() const final;
     virtual IR::TypeExprPtr get_element_type() const final;//From destination
     virtual std::size_t get_vector_size() const final;//From destination
 
@@ -1137,7 +1137,7 @@ class CompressInst:public Inst {
 class IntCompressInst:public CompressInst {
     public:
     IntCompressInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask,
-                    bool undef_inactive);
+                    bool poison_inactive);
 
     std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const;
     std::size_t get_element_bitwidth() const;
@@ -1149,7 +1149,7 @@ class IntCompressInst:public CompressInst {
 class PtrCompressInst:public CompressInst {
     public:
     PtrCompressInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask,
-                    bool undef_inactive);
+                    bool poison_inactive);
 
     std::size_t get_element_bitwidth() const;
 
@@ -1160,11 +1160,11 @@ class PtrCompressInst:public CompressInst {
 class FloatCompressInst:public CompressInst {
     public:
     FloatCompressInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask,
-                      bool undef_inactive, FastMathAttr fast_math_attr);
+                      bool poison_inactive, FastMathAttr fast_math_attr);
 
     std::shared_ptr<IR::FloatTypeExpr> get_casted_element_type() const;
     std::size_t get_element_bitwidth() const;
-    bool is_brain_float_type() const;
+    bool is_element_brain_float_type() const;
 
     TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
@@ -1223,7 +1223,7 @@ class FloatExpandInst:public ExpandInst {
 
     std::shared_ptr<IR::FloatTypeExpr> get_casted_element_type() const;
     std::size_t get_element_bitwidth() const;
-    bool is_brain_float_type() const;
+    bool is_element_brain_float_type() const;
 
     TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
@@ -1276,7 +1276,7 @@ class FloatInterleaveInst:public InterleaveInst {
 
     std::shared_ptr<IR::FloatTypeExpr> get_casted_element_type() const;
     std::size_t get_element_bitwidth() const;
-    bool is_brain_float_type() const;
+    bool is_element_brain_float_type() const;
 
     TypeVariant get_element_type_variant() const override;
     std::string to_string() const override;
@@ -1290,7 +1290,7 @@ class DeinterleaveInst:public Inst {
     
     virtual std::string to_string_helper(const std::string op_name) const final;
     public:
-    DeinterleaveInst(IR::InstructionStmtPtr instruction_stmt, IR::LiteralExprPtr arg, IR::TypeExprPtr arg_type, IR::LiteralExprPtr channel,
+    DeinterleaveInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg, IR::TypeExprPtr arg_type, IR::LiteralExprPtr channel,
                      std::optional<FastMathAttr> fast_math_attr);
 
     virtual IR::LiteralExprPtr get_arg() const final;
@@ -1304,6 +1304,39 @@ class DeinterleaveInst:public Inst {
     virtual InstType get_inst_type() const override final;
 };
 
+class IntDeinterleaveInst:public DeinterleaveInst {
+    public:
+    IntDeinterleaveInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg, IR::TypeExprPtr arg_type, IR::LiteralExprPtr channel);
+
+    std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const;
+    std::size_t get_element_bitwidth() const;
+
+    TypeVariant get_element_type_variant() const override;
+    std::string to_string() const override;
+};
+
+class PtrDeinterleaveInst:public DeinterleaveInst {
+    public:
+    PtrDeinterleaveInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg, IR::TypeExprPtr arg_type, IR::LiteralExprPtr channel);
+
+    std::size_t get_element_bitwidth() const;
+
+    TypeVariant get_element_type_variant() const override;
+    std::string to_string() const override;
+};
+
+class FloatDeinterleaveInst:public DeinterleaveInst {
+    public:
+    FloatDeinterleaveInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg, IR::TypeExprPtr arg_type, IR::LiteralExprPtr channel,
+                          FastMathAttr fast_math_attr);
+
+    std::shared_ptr<IR::FloatTypeExpr> get_casted_element_type() const;
+    std::size_t get_element_bitwidth() const;
+    bool is_element_brain_float_type() const;
+
+    TypeVariant get_element_type_variant() const override;
+    std::string to_string() const override;
+};
 
 //--------------------------------- Lane Mask Conversion Instructions --------------------------------
 class MaskToIntInst:public Inst {
@@ -1313,11 +1346,11 @@ class MaskToIntInst:public Inst {
     public:
     MaskToIntInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr mask, IR::TypeExprPtr mask_type);
 
-    virtual IR::LiteralExprPtr get_mask() const final;
-    virtual std::size_t get_mask_size() const final;
-    virtual std::size_t get_output_int_bitwidth() const final;
+    IR::LiteralExprPtr get_mask() const;
+    std::size_t get_mask_size() const;
+    std::size_t get_output_int_bitwidth() const;
 
-    virtual InstType get_inst_type() const override final;
+    InstType get_inst_type() const override final;
     std::string to_string() const override;
 };
 
@@ -1328,11 +1361,11 @@ class IntToMaskInst:public Inst {
     public:
     IntToMaskInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr input, IR::TypeExprPtr input_type);
 
-    virtual IR::LiteralExprPtr get_input() const final;
-    virtual std::size_t get_input_int_bitwidth() const final;
-    virtual std::size_t get_output_mask_size() const final;
+    IR::LiteralExprPtr get_input() const;
+    std::size_t get_input_int_bitwidth() const;
+    std::size_t get_output_mask_size() const;
 
-    virtual InstType get_inst_type() const override final;
+    InstType get_inst_type() const override;
     std::string to_string() const override;
 };
 }

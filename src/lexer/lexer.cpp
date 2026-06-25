@@ -9,7 +9,7 @@
 namespace LIRA {
 namespace IR {
 Lexer::Lexer(const std::string& source, const std::string& filename): input(source), filename(filename){
-    if (this->input.empty()) {
+    if (this->input.empty()){
         this->result.push_back(Token{0, "", "<eof>", 0, 0, 1, TokenType::eof});
         return;
     }
@@ -27,7 +27,7 @@ TokenList Lexer::get_tokens() const{
     return this->result;
 }
 
-void Lexer::push(const std::string& value, TokenType type, size_t start, size_t end) {
+void Lexer::push(const std::string& value, TokenType type, size_t start, size_t end){
     this->result.emplace_back(Token{
         this->col,
         this->curr_line,
@@ -39,7 +39,7 @@ void Lexer::push(const std::string& value, TokenType type, size_t start, size_t 
     });
 }
 
-void Lexer::push_current(TokenType type) {
+void Lexer::push_current(TokenType type){
     this->push(
         std::string(1, this->curr_char),
         type,
@@ -48,7 +48,7 @@ void Lexer::push_current(TokenType type) {
     );
 }
 
-void Lexer::flush_keyword() {
+void Lexer::flush_keyword(){
     if (this->curr_keyword.empty()){
         return;
     }
@@ -58,7 +58,7 @@ void Lexer::flush_keyword() {
     const size_t end = this->curr_index;
 
     // raw string prefix: the 'r' immediately before a quote
-    if (kw == "r" && (this->curr_char == '"' || this->curr_char == '\'')) {
+    if (kw == "r" && (this->curr_char == '"' || this->curr_char == '\'')){
         this->push(kw, TokenType::raw, start, end);
         this->curr_keyword.clear();
         return;
@@ -77,10 +77,10 @@ void Lexer::flush_keyword() {
 
     TokenType type;
     auto it = keywords.find(kw);
-    if (it != keywords.end()) {
+    if (it != keywords.end()){
         type = it->second;
     } 
-    else if (Lexer::is_num(kw)) {
+    else if (Lexer::is_num(kw)){
         type = TokenType::number;
     } 
     else {
@@ -92,18 +92,18 @@ void Lexer::flush_keyword() {
 }
 
 
-void Lexer::handle_newline_tracking() {
+void Lexer::handle_newline_tracking(){
     this->line_num++;
     this->col = 0;
-    if (this->line_num <= this->source_lines.size()) {
+    if (this->line_num <= this->source_lines.size()){
         this->curr_line = this->source_lines[this->line_num - 1];
     }
 }
 
 
-void Lexer::lex() {
-    while (true) {
-        switch (this->curr_char) {
+void Lexer::lex(){
+    while (true){
+        switch (this->curr_char){
             // ---- string literals ----
             case '/':{
                 this->lex_slash();
@@ -125,7 +125,7 @@ void Lexer::lex() {
             }
             case ')': {
                 this->flush_keyword();
-                if (this->paren_depth == 0) {
+                if (this->paren_depth == 0){
                     this->report_error("')' without matching '('");
                 } 
                 else {
@@ -144,7 +144,7 @@ void Lexer::lex() {
             }
             case ']': {
                 this->flush_keyword();
-                if (this->bracket_depth == 0) {
+                if (this->bracket_depth == 0){
                     this->report_error("']' without matching '['");
                 } 
                 else {
@@ -163,7 +163,7 @@ void Lexer::lex() {
             }
             case '}': {
                 this->flush_keyword();
-                if (this->brace_depth == 0) {
+                if (this->brace_depth == 0){
                     this->report_error("'}' without matching '{'");
                 } 
                 else {
@@ -181,7 +181,7 @@ void Lexer::lex() {
             }
             case '>': {
                 this->flush_keyword();
-                if (this->angel_depth == 0) {
+                if (this->angel_depth == 0){
                     this->report_error("'>' without matching '<'");
                 } 
                 else {
@@ -203,7 +203,7 @@ void Lexer::lex() {
                 break;
             }
             case '-' : {
-                if(peek() == '>') {
+                if(peek() == '>'){
                     this->flush_keyword();
                     this->advance();
                     this->push("->", TokenType::arrow, this->curr_index - 1, this->curr_index + 1);
@@ -225,7 +225,7 @@ void Lexer::lex() {
                 break;
             }
             case '.' : {
-                if(peek() == '.' && peek(2) == '.') {
+                if(peek() == '.' && peek(2) == '.'){
                     this->flush_keyword();
                     this->advance();
                     this->advance();
@@ -258,7 +258,7 @@ void Lexer::lex() {
             }
             case '\r': {
                 this->flush_keyword();
-                if (this->peek() == '\n') {
+                if (this->peek() == '\n'){
                     this->advance();  // consume the \n of \r\n
                 }
                 this->handle_newline_tracking();
@@ -266,8 +266,8 @@ void Lexer::lex() {
             }
             case ';': {
                 this->flush_keyword();
-                if(!this->result.empty()) {
-                    if(this->result.back().type == TokenType::semicolon) {
+                if(!this->result.empty()){
+                    if(this->result.back().type == TokenType::semicolon){
                         this->result.pop_back();//We want the last semicolon to be the one we just encountered, not some random one from before. 
                     }
                 }   
@@ -289,7 +289,7 @@ void Lexer::lex() {
     }
 }
 
-void Lexer::finalize() {
+void Lexer::finalize(){
     this->flush_keyword();
     if (this->paren_depth != 0){
         this->report_error("Unclosed '('", "expected a matching ')'");
@@ -306,8 +306,8 @@ void Lexer::finalize() {
     // Let display_all handle printing + exit(1) if there are errors.
     display_all(this->diagnostics);
 
-    // if (!this->result.empty()) {
-    //     if(this->result.back().type != TokenType::semicolon) {
+    // if (!this->result.empty()){
+    //     if(this->result.back().type != TokenType::semicolon){
     //         this->push(";", TokenType::semicolon,this->curr_index, this->curr_index + 1);
     //     }
     // }
@@ -316,35 +316,35 @@ void Lexer::finalize() {
 }
 
 
-void Lexer::lex_string() {
+void Lexer::lex_string(){
     const char quote = this->curr_char;
     const size_t start = this->curr_index + 1;
     std::string str;
 
-    if (!this->advance()) {
+    if (!this->advance()){
         this->report_error("Unexpected end of file: unterminated string literal");
         return;
     }
 
-    while (this->curr_char != quote) {
-        if (this->curr_char == '\\') {
+    while (this->curr_char != quote){
+        if (this->curr_char == '\\'){
             // Escape sequence: unconditionally consume the next character.
             // This correctly handles \\, \", \n, \t, etc. without any
             // back-tracking or goto tricks.
             str += this->curr_char;                          // '\'
-            if (!this->advance()) {
+            if (!this->advance()){
                 this->report_error("Unexpected end of file inside string escape sequence");
                 return;
             }
             str += this->curr_char;                          // escaped char
         } 
-        else if (this->curr_char == '\n') {
+        else if (this->curr_char == '\n'){
             str += this->curr_char;
             this->handle_newline_tracking();
         } 
-        else if (this->curr_char == '\r') {
+        else if (this->curr_char == '\r'){
             str += this->curr_char;
-            if (this->peek() == '\n') {
+            if (this->peek() == '\n'){
                 this->advance();
                 str += this->curr_char;
             }
@@ -354,12 +354,12 @@ void Lexer::lex_string() {
             str += this->curr_char;
         }
 
-        if (!this->advance()) {
+        if (!this->advance()){
             this->report_error("Unexpected end of file: unterminated string literal");
             return;
         }
     }
-    if(this->result.back().type == TokenType::raw) {
+    if(this->result.back().type == TokenType::raw){
         result.pop_back();
         this->push(str, TokenType::raw_string, start-1, this->curr_index);
     }
@@ -368,39 +368,39 @@ void Lexer::lex_string() {
     }
 }
 
-void Lexer::lex_slash() {
-    if (this->peek() == '/') {
+void Lexer::lex_slash(){
+    if (this->peek() == '/'){
         this->flush_keyword();
         // Line comment: consume everything up to (but not including) the newline.
         // The newline itself will be processed normally on the next iteration.
         this->advance();  // consume second '/'
-        while (this->peek() != '\n' && this->peek() != '\r' && this->peek() != '\0') {
-            if (!this->advance()) {
+        while (this->peek() != '\n' && this->peek() != '\r' && this->peek() != '\0'){
+            if (!this->advance()){
                 return;
             }
         }
         return;  // no token emitted
     }
 
-    else if (this->peek() == '*') {
+    else if (this->peek() == '*'){
         this->flush_keyword();
         // Block comment
         this->advance();  // consume '*'
-        while (true) {
-            if (!this->advance()) {
+        while (true){
+            if (!this->advance()){
                 this->report_error("Unexpected end of file: unterminated block comment");
                 return;
             }
-            if (this->curr_char == '\n') {
+            if (this->curr_char == '\n'){
                 this->handle_newline_tracking();
             } 
-            else if (this->curr_char == '\r') {
-                if (this->peek() == '\n') { 
+            else if (this->curr_char == '\r'){
+                if (this->peek() == '\n'){ 
                     this->advance();
                 }
                 this->handle_newline_tracking();
             } 
-            else if (this->curr_char == '*' && this->peek() == '/') {
+            else if (this->curr_char == '*' && this->peek() == '/'){
                 this->advance();  // consume '/'
                 return;
             }

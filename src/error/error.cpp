@@ -7,8 +7,8 @@
 
 namespace LIRA {
 namespace Utils {
-static const char* level_colour(DiagLevel level) {
-    switch (level) {
+static const char* level_colour(DiagLevel level){
+    switch (level){
         case DiagLevel::error:{
             return colour::bold_red;
         }   
@@ -22,8 +22,8 @@ static const char* level_colour(DiagLevel level) {
     return colour::reset;
 }
 
-static const char* level_label(DiagLevel level) {
-    switch (level) {
+static const char* level_label(DiagLevel level){
+    switch (level){
         case DiagLevel::error:{
             return "error";
         }
@@ -39,17 +39,17 @@ static const char* level_label(DiagLevel level) {
 
 // Produce a caret string "   ^~~~~" that points at column `col`
 // with `len` tildes following the caret (len >= 1).
-static std::string make_caret(size_t col, size_t len = 1) {
+static std::string make_caret(size_t col, size_t len = 1){
     std::string out(col > 0 ? col - 1 : 0, ' ');
     out += '^';
-    if (len > 1) {
+    if (len > 1){
         out += std::string(len - 1, '~');
     }
     return out;
 }
 
 
-static void _display_impl(const Diagnostic& diag) {
+static void _display_impl(const Diagnostic& diag){
     const auto& lc = level_colour(diag.level);
     const auto& lbl = level_label(diag.level);
 
@@ -63,7 +63,7 @@ static void _display_impl(const Diagnostic& diag) {
 
     std::cerr << lc << colour::bold << lbl;
 
-    if (!diag.code.empty()) {
+    if (!diag.code.empty()){
         std::cerr << '[' << diag.code << ']';
     }
 
@@ -72,7 +72,7 @@ static void _display_impl(const Diagnostic& diag) {
               << colour::reset << '\n';
 
     // ---- source line ----
-    if (!diag.loc.source_line.empty()) {
+    if (!diag.loc.source_line.empty()){
         // Line number gutter
         std::string line_no = std::to_string(diag.loc.line);
         std::cerr << colour::dim
@@ -90,14 +90,14 @@ static void _display_impl(const Diagnostic& diag) {
                   << colour::reset;
 
         // Optional sub-message on same caret line
-        if (!diag.sub_message.empty()) {
+        if (!diag.sub_message.empty()){
             std::cerr << ' '
                       << colour::dim << diag.sub_message
                       << colour::reset;
         }
         std::cerr << '\n';
     } 
-    else if (!diag.sub_message.empty()) {
+    else if (!diag.sub_message.empty()){
         // No source line available, but we still have a note
         std::cerr << colour::dim
                   << "    note: " << diag.sub_message
@@ -113,11 +113,11 @@ void display(const Diagnostic& diag){
     std::lock_guard<std::mutex> lock(_diag_mutex);
     _display_impl(diag);
 }
-void display_all(const std::vector<Diagnostic>& diags) {
+void display_all(const std::vector<Diagnostic>& diags){
     bool has_error = false;
     {
         std::lock_guard<std::mutex> lock(_diag_mutex);
-        for (const auto& d : diags) {
+        for (const auto& d : diags){
             _display_impl(d);
             if (d.level == DiagLevel::error){
                 has_error = true;
@@ -131,15 +131,15 @@ void display_all(const std::vector<Diagnostic>& diags) {
 
 
 
-Diagnostic make_error(const Location& loc,const std::string& message,const std::string& sub_message,const std::string& code) {
+Diagnostic make_error(const Location& loc,const std::string& message,const std::string& sub_message,const std::string& code){
     return Diagnostic{loc, message, sub_message, code, DiagLevel::error};
 }
 
-Diagnostic make_warning(const Location& loc,const std::string& message,const std::string& sub_message) {
+Diagnostic make_warning(const Location& loc,const std::string& message,const std::string& sub_message){
     return Diagnostic{loc, message, sub_message, "", DiagLevel::warning};
 }
 
-Diagnostic make_note(const Location& loc, const std::string& message) {
+Diagnostic make_note(const Location& loc, const std::string& message){
     return Diagnostic{loc, message, "", "", DiagLevel::note};
 }
 }

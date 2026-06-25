@@ -8,7 +8,7 @@ namespace IR {
 Parser::Parser(const std::vector<Token>& toks, const std::string& filename){
     this->toks = toks;
     this->filename = filename;
-    if (!toks.empty()) {
+    if (!toks.empty()){
         this->curr_tok = toks[0];
     }
 }

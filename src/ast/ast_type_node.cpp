@@ -26,7 +26,7 @@ std::string NamedTypeExpr::to_string() const{
     for(const auto& attr: this->attributes){
         res += " "+attr->to_string();
     }
-    if(!this->attributes.empty()) {
+    if(!this->attributes.empty()){
         res = "("+res+")";
     }
     return res;
@@ -57,7 +57,7 @@ std::string IntTypeExpr::to_string() const{
     for(const auto& attr: this->attributes){
         res += " "+attr->to_string();
     }
-    if(!this->attributes.empty()) {
+    if(!this->attributes.empty()){
         res = "("+res+")";
     }
     return res;
@@ -90,7 +90,7 @@ std::string FloatTypeExpr::to_string() const{
     for(const auto& attr: this->attributes){
         res += " "+attr->to_string();
     }
-    if(!this->attributes.empty()) {
+    if(!this->attributes.empty()){
         res = "("+res+")";
     }
     return res;
@@ -116,7 +116,7 @@ std::string VoidTypeExpr::to_string() const{
     for(const auto& attr: this->attributes){
         res += " "+attr->to_string();
     }
-    if(!this->attributes.empty()) {
+    if(!this->attributes.empty()){
         res = "("+res+")";
     }
     return res;
@@ -141,7 +141,7 @@ std::string PtrTypeExpr::to_string() const{
     for(const auto& attr: this->attributes){
         res += " "+attr->to_string();
     }
-    if(!this->attributes.empty()) {
+    if(!this->attributes.empty()){
         res = "("+res+")";
     }
     return res;
@@ -167,7 +167,7 @@ std::string MetaTypeExpr::to_string() const{
     for(const auto& attr: this->attributes){
         res += " "+attr->to_string();
     }
-    if(!this->attributes.empty()) {
+    if(!this->attributes.empty()){
         res = "("+res+")";
     }
     return res;
@@ -202,7 +202,7 @@ std::string ArrayTypeExpr::to_string() const{
     for(const auto& attr: this->attributes){
         res += " "+attr->to_string();
     }
-    if(!this->attributes.empty()) {
+    if(!this->attributes.empty()){
         res = "("+res+")";
     }
     return res;
@@ -237,7 +237,7 @@ std::string SIMDTypeExpr::to_string() const{
     for(const auto& attr: this->attributes){
         res += " "+attr->to_string();
     }
-    if(!this->attributes.empty()) {
+    if(!this->attributes.empty()){
         res = "("+res+")";
     }
     return res;
@@ -269,7 +269,7 @@ std::vector<AttributePtr> StructTypeExpr::get_attributes() const{
 }
 std::string StructTypeExpr::to_string() const{
     std::string res;
-    if(this->packed) {
+    if(this->packed){
         res = "<{";
     } 
     else {
@@ -277,11 +277,11 @@ std::string StructTypeExpr::to_string() const{
     }
     for(size_t i=0;i<this->fields.size();i++){
         res += this->fields[i]->to_string();
-        if(i!=this->fields.size()-1) {
+        if(i!=this->fields.size()-1){
             res += ", ";
         }
     }
-    if(this->packed) {
+    if(this->packed){
         res += "}>"; 
     } 
     else {
@@ -290,7 +290,7 @@ std::string StructTypeExpr::to_string() const{
     for(const auto& attr: this->attributes){
         res += " "+attr->to_string();
     }
-    if(!this->attributes.empty()) {
+    if(!this->attributes.empty()){
         res = "("+res+")";
     }
     return res;
@@ -328,12 +328,12 @@ std::string FuncTypeExpr::to_string() const{
     std::string res = "fn(";
     for(size_t i=0;i<this->param_types.size();i++){
         res += this->param_types[i]->to_string();
-        if(i!=this->param_types.size()-1) {
+        if(i!=this->param_types.size()-1){
             res += ", ";
         }
     }
-    if(this->varargs) {
-        if(!this->param_types.empty()) {
+    if(this->varargs){
+        if(!this->param_types.empty()){
             res += ", ";
         }
         res += "...";
@@ -342,7 +342,7 @@ std::string FuncTypeExpr::to_string() const{
     for(const auto& attr: this->attributes){
         res += " "+attr->to_string();
     }
-    if(!this->attributes.empty()) {
+    if(!this->attributes.empty()){
         res = "("+res+")";
     }
     return res;
@@ -373,7 +373,7 @@ std::string LabelTypeExpr::to_string() const{
     std::string res = "label(";
     for(size_t i=0;i<this->params.size();i++){
         res += this->params[i]->to_string();
-        if(i!=this->params.size()-1) {
+        if(i!=this->params.size()-1){
             res += ", ";
         }
     }
@@ -381,7 +381,7 @@ std::string LabelTypeExpr::to_string() const{
     for(const auto& attr: this->attributes){
         res += " "+attr->to_string();
     }
-    if(!this->attributes.empty()) {
+    if(!this->attributes.empty()){
         res = "("+res+")";
     }
     return res;

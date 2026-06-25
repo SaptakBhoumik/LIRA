@@ -166,7 +166,11 @@
 
 - `let T:%out = .mulhi(T:%a, T:%b)` - Returns the **high half** of the full `NxN->2N` product of `a` and `b`. Equivalent to `widening_mul(a, b) >> bitwidth(T)` but does not require a `2xbitwidth(T)` output type - useful when `T` is `i64` and no `i128` type exists(I mean we do emulate i128 but why bother). `T` must be of the form `T0` or `<T0,M>` where `T0` is an integer. For vectors, the operation is lanewise.
 
+    - `#[nuw]` - no unsigned wrap; default is signed
+    - `#[nsw]` - no signed wrap; default is signed
     - `#[unsigned]` - unsigned multiply; default is signed
+    - `#[saturating]` - saturating multiply; default is signed
+    - `#[round]` - round to nearest instead of truncating toward zero; default is truncation
 
 ---
 

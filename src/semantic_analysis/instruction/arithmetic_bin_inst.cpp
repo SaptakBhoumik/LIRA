@@ -58,8 +58,8 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_arithmetic_bin_inst(IR::Token name
         if(!Utils::type_eq(type,arg.second)){
             Utils::error(this->filename, arg.first->get_token(), "Argument type " + arg.second->to_string() + " is not the same as destination type " + type->to_string());
         }
-        else if(!Utils::type_compatible(this->var_symtable, type,arg.first)){
-            Utils::error(this->filename, arg.first->get_token(), "Argument type " + arg.second->get_token().value + " is not compatible with destination type " + type->to_string());
+        else if(!Utils::type_compatible(this->var_symtable, arg.second,arg.first)){
+            Utils::error(this->filename, arg.first->get_token(), "Argument type " + arg.second->get_token().value + " is not compatible with assigned type " + arg.second->to_string());
         }
     }
     auto type_variant = MIR::get_type_variant_from_type(type);

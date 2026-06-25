@@ -46,8 +46,8 @@ class IRToMIRSemanticAnalyzer {
     MIR::InstPtr analyze_instruction(IR::InstructionStmtPtr inst_stmt);//Analyze an instruction statement, add symbols to the symbol table and return the corresponding MIR instruction.
     MIR::InstPtr analyze_arithmetic_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
     MIR::InstPtr analyze_arithmetic_tri_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
-    //## Fixed-Point Arithmetic Instructions
     MIR::InstPtr analyze_widening_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
+    MIR::InstPtr analyze_other_arithmetic_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
     // ## Carry/Borrowing instructions
     // ## Combined Quotient and Remainder (`divmod`)
     // ## Overflow-Wrap (Checked Arithmetic) Instructions

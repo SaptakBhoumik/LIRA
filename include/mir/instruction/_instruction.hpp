@@ -10,14 +10,12 @@ enum class InstType:std::int16_t{
 
     ArithmeticTrinaryInst,
 
-
     WideningBinaryInst,
     
-    DivModInst,
-    WideningDivModInst,
+    DivmodInst,
+    WideningDivmodInst,
     MulHiInst,
     MulFixInst,
-
 
     CarrBorrType1Inst,
     CarrBorrType2Inst,

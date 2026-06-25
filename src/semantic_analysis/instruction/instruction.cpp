@@ -9,14 +9,12 @@ bool is_arithmetic_bin_inst(std::string inst_name){
 bool is_arithmetic_tri_inst(std::string inst_name){
     return inst_name == ".fma" || inst_name == ".fms" || inst_name == ".fnma" || inst_name == ".fnms" || inst_name == ".clamp";
 }
-//## Fixed-Point Arithmetic Instructions
 bool is_widening_bin_inst(std::string inst_name){
     return inst_name == ".widening_add" || inst_name == ".widening_sub" || inst_name == ".widening_absdiff" || inst_name == ".widening_mul";
 }
-// ## Carry/Borrowing instructions
-// ## Combined Quotient and Remainder (`divmod`)
-// ## Overflow-Wrap (Checked Arithmetic) Instructions
-// ## High-Half Multiply
+bool is_other_arithmetic_inst(std::string inst_name){
+    return inst_name == ".divmod" || inst_name == ".widening_divmod" || inst_name == ".mulhi" || inst_name == ".mulfix";
+}
 bool is_bitwise_bin_inst(std::string inst_name){
     return inst_name == ".and" || inst_name == ".or" || inst_name == ".xor" || inst_name == ".shl" || inst_name == ".lshr" || inst_name == ".ashr";
 }
@@ -65,14 +63,12 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_instruction(IR::InstructionStmtPtr
     else if(is_arithmetic_tri_inst(inst_name.value)){
         return analyze_arithmetic_tri_inst(inst_name,inst_stmt);
     }
-    // ## Fixed-Point Arithmetic Instructions
     else if(is_widening_bin_inst(inst_name.value)){
         return analyze_widening_bin_inst(inst_name,inst_stmt);
     }
-    // ## Carry/Borrowing instructions
-    // ## Combined Quotient and Remainder (`divmod`)
-    // ## Overflow-Wrap (Checked Arithmetic) Instructions
-    // ## High-Half Multiply
+    else if(is_other_arithmetic_inst(inst_name.value)){
+        return analyze_other_arithmetic_inst(inst_name,inst_stmt);
+    }
     else if(is_bitwise_bin_inst(inst_name.value)){
         return analyze_bitwise_bin_inst(inst_name,inst_stmt);
     }

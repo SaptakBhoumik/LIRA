@@ -4,10 +4,6 @@ NOTE:-Implement Call Inst at the end of everything
 
 
 
-## Other Arithmetic Instructions
-    ### Combined Quotient and Remainder (`divmod`)
-    ### High-Half Arithmetic Instructions
-    ### Fixed-Point Arithmetic Instructions
 
 ## Carry/Borrowing instructions
 ## Overflow-Wrap (Checked Arithmetic) Instructions

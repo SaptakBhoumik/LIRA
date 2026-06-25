@@ -5,7 +5,7 @@
 namespace LIRA {
 namespace MIR {
 // ---------------------------- Combined Quotient and Remainder instructions ---------------------------
-class DivModInst:public Inst {
+class DivmodInst:public Inst {
     // Return {T,T} i.e the output is {quotient,remainder}. This instruction is for cases where we want both quotient and remainder.}
     protected:
     IR::LiteralExprPtr lhs;
@@ -14,7 +14,7 @@ class DivModInst:public Inst {
 
     virtual std::string to_string_helper(const std::string op_name) const final;
     public:
-    DivModInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    DivmodInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                 bool unsigned_, std::optional<FastMathAttr> fast_math_attr);
 
     virtual bool is_unsigned() const final;
@@ -24,11 +24,11 @@ class DivModInst:public Inst {
     virtual IR::LiteralExprPtr get_lhs() const final;
     virtual IR::LiteralExprPtr get_rhs() const final;
     virtual InstType get_inst_type() const override final;
-};
+}; 
 
-class IntDivModInst:public DivModInst {
+class IntDivmodInst:public DivmodInst {
     public:
-    IntDivModInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    IntDivmodInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                   bool unsigned_);
 
     std::shared_ptr<IR::IntTypeExpr> get_casted_operand_type() const;
@@ -38,9 +38,9 @@ class IntDivModInst:public DivModInst {
     std::string to_string() const override;
 };
 
-class VecIntDivModInst:public DivModInst {
+class VecIntDivmodInst:public DivmodInst {
     public:
-    VecIntDivModInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    VecIntDivmodInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                      bool unsigned_);
 
     std::shared_ptr<IR::SIMDTypeExpr> get_casted_operand_type() const;
@@ -52,9 +52,9 @@ class VecIntDivModInst:public DivModInst {
     std::string to_string() const override;
 };
 
-class FloatDivModInst:public DivModInst {
+class FloatDivmodInst:public DivmodInst {
     public:
-    FloatDivModInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    FloatDivmodInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                     FastMathAttr fast_math_attr);
 
     std::shared_ptr<IR::FloatTypeExpr> get_casted_operand_type() const;
@@ -65,9 +65,9 @@ class FloatDivModInst:public DivModInst {
     std::string to_string() const override;
 };
 
-class VecFloatDivModInst:public DivModInst {
+class VecFloatDivmodInst:public DivmodInst {
     public:
-    VecFloatDivModInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    VecFloatDivmodInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                        FastMathAttr fast_math_attr);
 
     std::shared_ptr<IR::SIMDTypeExpr> get_casted_operand_type() const;
@@ -79,7 +79,7 @@ class VecFloatDivModInst:public DivModInst {
 };
 
 
-class WideningDivModInst:public Inst {
+class WideningDivmodInst:public Inst {
     // Return {T,T} i.e the output is {quotient,remainder}. This instruction is for cases where we want both quotient and remainder.}
     protected:
     IR::LiteralExprPtr dividend_hi;
@@ -90,7 +90,7 @@ class WideningDivModInst:public Inst {
 
     virtual std::string to_string_helper(const std::string op_name) const final;
     public:
-    WideningDivModInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr dividend_hi, IR::LiteralExprPtr dividend_lo, 
+    WideningDivmodInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr dividend_hi, IR::LiteralExprPtr dividend_lo, 
                        IR::LiteralExprPtr divisor, bool unsigned_, bool exact);
 
     virtual bool is_unsigned() const final;
@@ -104,9 +104,9 @@ class WideningDivModInst:public Inst {
     virtual InstType get_inst_type() const override final;
 };
 
-class IntWideningDivModInst:public WideningDivModInst {
+class IntWideningDivmodInst:public WideningDivmodInst {
     public:
-    IntWideningDivModInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr dividend_hi, IR::LiteralExprPtr dividend_lo,
+    IntWideningDivmodInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr dividend_hi, IR::LiteralExprPtr dividend_lo,
                           IR::LiteralExprPtr divisor, bool unsigned_, bool exact);
 
     std::shared_ptr<IR::IntTypeExpr> get_casted_operand_type() const;
@@ -116,9 +116,9 @@ class IntWideningDivModInst:public WideningDivModInst {
     std::string to_string() const override;
 };
 
-class VecIntWideningDivModInst:public WideningDivModInst {
+class VecIntWideningDivmodInst:public WideningDivmodInst {
     public:
-    VecIntWideningDivModInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr dividend_hi, IR::LiteralExprPtr dividend_lo,
+    VecIntWideningDivmodInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr dividend_hi, IR::LiteralExprPtr dividend_lo,
                              IR::LiteralExprPtr divisor, bool unsigned_, bool exact);
 
     std::shared_ptr<IR::SIMDTypeExpr> get_casted_operand_type() const;
@@ -214,7 +214,7 @@ class MulFixInst:public Inst {
 class IntMulFixInst:public MulFixInst {
     public:
     IntMulFixInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                    IR::LiteralExprPtr scale, bool unsigned_, bool saturating, bool nsw, bool nuw, bool round);
+                    IR::LiteralExprPtr scale, bool nuw, bool nsw, bool unsigned_, bool saturating, bool round);
 
     std::shared_ptr<IR::IntTypeExpr> get_casted_operand_type() const;
     std::size_t get_bitwidth() const;
@@ -226,7 +226,7 @@ class IntMulFixInst:public MulFixInst {
 class VecIntMulFixInst:public MulFixInst {
     public:
     VecIntMulFixInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                        IR::LiteralExprPtr scale, bool unsigned_, bool saturating, bool nsw, bool nuw, bool round);
+                        IR::LiteralExprPtr scale, bool nuw, bool nsw, bool unsigned_, bool saturating, bool round);
 
     std::shared_ptr<IR::SIMDTypeExpr> get_casted_operand_type() const;
     std::shared_ptr<IR::IntTypeExpr> get_casted_operand_basetype() const;

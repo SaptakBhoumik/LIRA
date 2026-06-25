@@ -41,11 +41,14 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_other_arithmetic_inst(IR::Token na
     IR::TypeExprPtr type = dest->get_type();//Already reduced type by process_local_dest_arg
     if(name.value == ".divmod" || name.value == ".widening_divmod"){
         if(type->get_kind() != IR::TypeExprKind::StructTypeExpr){
-            Utils::error(this->filename, name, "Destination type of divmod instruction must be a struct type");
+            Utils::error(this->filename, name, "Destination type for this instruction must be a struct type");
         }
         auto struct_type = std::dynamic_pointer_cast<IR::StructTypeExpr>(type);
-        if(!Utils::type_eq(struct_type->get_fields()[0], struct_type->get_fields()[1])){
-            Utils::error(this->filename, name, "Destination type of divmod instruction must be a struct type with 2 fields of the same type");
+        if(struct_type->get_fields().size() != 2){
+            Utils::error(this->filename, name, "Destination type for this instruction must be a struct type with 2 fields");
+        }
+        else if(!Utils::type_eq(struct_type->get_fields()[0], struct_type->get_fields()[1])){
+            Utils::error(this->filename, name, "Destination type for this instruction must be a struct type with 2 fields of the same type");
         }
         type = struct_type->get_fields()[0];//The type of the quotient and remainder is the type of the first field of the struct
     }

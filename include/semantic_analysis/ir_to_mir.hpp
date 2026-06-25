@@ -48,10 +48,8 @@ class IRToMIRSemanticAnalyzer {
     MIR::InstPtr analyze_arithmetic_tri_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
     MIR::InstPtr analyze_widening_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
     MIR::InstPtr analyze_other_arithmetic_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
-    // ## Carry/Borrowing instructions
-    // ## Combined Quotient and Remainder (`divmod`)
-    // ## Overflow-Wrap (Checked Arithmetic) Instructions
-    // ## High-Half Multiply
+    
+    MIR::InstPtr analyze_wrap_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
 
     MIR::InstPtr analyze_bitwise_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
     MIR::InstPtr analyze_and_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 

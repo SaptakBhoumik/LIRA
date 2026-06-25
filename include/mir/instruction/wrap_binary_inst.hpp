@@ -109,8 +109,7 @@ class IntWrapRemInst:public IntWrapBinaryInst {
 
 class IntWrapCopysignInst:public IntWrapBinaryInst {
     public:
-    IntWrapCopysignInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                        bool unsigned_, bool saturating);
+    IntWrapCopysignInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, bool saturating);
 
     OpType get_op_type() const override;
     std::string to_string() const override;
@@ -118,8 +117,7 @@ class IntWrapCopysignInst:public IntWrapBinaryInst {
 
 class IntWrapShlInst:public IntWrapBinaryInst {
     public:
-    IntWrapShlInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                   bool unsigned_, bool saturating);
+    IntWrapShlInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, bool saturating);
 
     OpType get_op_type() const override;
     std::string to_string() const override;
@@ -127,8 +125,7 @@ class IntWrapShlInst:public IntWrapBinaryInst {
 
 class IntWrapLshrInst:public IntWrapBinaryInst {
     public:
-    IntWrapLshrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                    bool unsigned_, bool saturating);
+    IntWrapLshrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, bool saturating);
 
     OpType get_op_type() const override;
     std::string to_string() const override;
@@ -136,8 +133,7 @@ class IntWrapLshrInst:public IntWrapBinaryInst {
 
 class IntWrapAshrInst:public IntWrapBinaryInst {
     public:
-    IntWrapAshrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                    bool unsigned_, bool saturating);
+    IntWrapAshrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, bool saturating);
 
     OpType get_op_type() const override;
     std::string to_string() const override;
@@ -215,8 +211,7 @@ class VecIntWrapRemInst:public VecIntWrapBinaryInst {
 
 class VecIntWrapCopysignInst:public VecIntWrapBinaryInst {
     public:
-    VecIntWrapCopysignInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                           bool unsigned_, bool saturating);
+    VecIntWrapCopysignInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, bool saturating);
 
     OpType get_op_type() const override;
     std::string to_string() const override;
@@ -224,8 +219,7 @@ class VecIntWrapCopysignInst:public VecIntWrapBinaryInst {
 
 class VecIntWrapShlInst:public VecIntWrapBinaryInst {
     public:
-    VecIntWrapShlInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                      bool unsigned_, bool saturating);
+    VecIntWrapShlInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, bool saturating);
 
     OpType get_op_type() const override;
     std::string to_string() const override;
@@ -233,8 +227,7 @@ class VecIntWrapShlInst:public VecIntWrapBinaryInst {
 
 class VecIntWrapLshrInst:public VecIntWrapBinaryInst {
     public:
-    VecIntWrapLshrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                       bool unsigned_, bool saturating);
+    VecIntWrapLshrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, bool saturating);
 
     OpType get_op_type() const override;
     std::string to_string() const override;
@@ -242,8 +235,7 @@ class VecIntWrapLshrInst:public VecIntWrapBinaryInst {
 
 class VecIntWrapAshrInst:public VecIntWrapBinaryInst {
     public:
-    VecIntWrapAshrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
-                       bool unsigned_, bool saturating);
+    VecIntWrapAshrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, bool saturating);
 
     OpType get_op_type() const override;
     std::string to_string() const override;

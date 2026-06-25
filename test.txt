@@ -7,7 +7,6 @@ NOTE:-Implement Call Inst at the end of everything
 
 ## Carry/Borrowing instructions
 
-## Bitwise Binary Instructions
 
 ## Bitwise Trinary Instructions
 

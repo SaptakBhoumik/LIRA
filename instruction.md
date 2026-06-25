@@ -309,15 +309,15 @@ These return `{T, i1}` - the wrapped result paired with an overflow flag (`1` if
 
 - `let T:%output_var = .and(T:%input_var1, T:%input_var2)` - Bitwise AND. T must be `i<N>` or `<i<N>,M>`. No attributes.
 
+- `let T:%output_var = .nand(T:%input_var1, T:%input_var2)` - Bitwise NAND. T must be `i<N>` or `<i<N>,M>`. No attributes.
+
 - `let T:%output_var = .or(T:%input_var1, T:%input_var2)` - Bitwise OR. T must be `i<N>` or `<i<N>,M>`.
     - `#[disjoint]` - asserts that no bit is set in both inputs (i.e. inputs have no bits in common); poison if violated
 
-- `let T:%output_var = .xor(T:%input_var1, T:%input_var2)` - Bitwise XOR. T must be `i<N>` or `<i<N>,M>`. No attributes.
-
-- `let T:%output_var = .nand(T:%input_var1, T:%input_var2)` - Bitwise NAND. T must be `i<N>` or `<i<N>,M>`. No attributes.
-
 - `let T:%output_var = .nor(T:%input_var1, T:%input_var2)` - Bitwise NOR. T must be `i<N>` or `<i<N>,M>`.
     - `#[disjoint]` - asserts that no bit is set in both inputs; poison if violated
+
+- `let T:%output_var = .xor(T:%input_var1, T:%input_var2)` - Bitwise XOR. T must be `i<N>` or `<i<N>,M>`. No attributes.
 
 - `let T:%output_var = .xnor(T:%input_var1, T:%input_var2)` - Bitwise XNOR. T must be `i<N>` or `<i<N>,M>`. No attributes.
 

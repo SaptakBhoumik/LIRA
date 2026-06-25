@@ -1,56 +1,87 @@
 #include "ast/ast.hpp"
-#include "mir/instruction/_instruction.hpp"
 #include "semantic_analysis/ir_to_mir.hpp"
 #include <iostream>
-
+#include <functional>
 namespace LIRA {
 namespace SemanticAnalyzer {
+using DispatchFuncType = std::function<MIR::InstPtr(std::string, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                                                    MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt)>;
+ 
+MIR::InstPtr analyze_and_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                                  MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
+MIR::InstPtr analyze_nand_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                                   MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
+MIR::InstPtr analyze_or_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                                 MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
+MIR::InstPtr analyze_nor_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                                  MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
+MIR::InstPtr analyze_xor_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                                  MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
+MIR::InstPtr analyze_xnor_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                                   MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
+MIR::InstPtr analyze_shl_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                                  MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
+MIR::InstPtr analyze_lshr_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                                   MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
+MIR::InstPtr analyze_ashr_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                                   MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
+MIR::InstPtr analyze_rotl_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                                   MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
+MIR::InstPtr analyze_rotr_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                                   MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
+MIR::InstPtr analyze_pext_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                                   MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
+MIR::InstPtr analyze_pdep_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+                                   MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
+
 MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_bitwise_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt){
+    //NOTE:Dont use a common templated function for all. The attributes can change in future. It is more code but more maintainable imo+The error messages can be more specific
+    const std::unordered_map<std::string, DispatchFuncType> dispatch_map = {
+        {".and", analyze_and_bin_inst},
+        {".nand", analyze_nand_bin_inst},
+        {".or", analyze_or_bin_inst},
+        {".nor", analyze_nor_bin_inst},
+        {".xor", analyze_xor_bin_inst},
+        {".xnor", analyze_xnor_bin_inst},
+        {".shl", analyze_shl_bin_inst},
+        {".lshr", analyze_lshr_bin_inst},
+        {".ashr", analyze_ashr_bin_inst},
+        {".rotl", analyze_rotl_bin_inst},
+        {".rotr", analyze_rotr_bin_inst},
+        {".pext", analyze_pext_bin_inst},
+        {".pdep", analyze_pdep_bin_inst}
+    };
     auto args = inst_stmt->get_value()->get_operands();
     auto _dest = inst_stmt->get_name();
     if(!_dest.has_value()){
-        error(name,"Bitwise binary instruction must have a destination i.e assign this instruction to a variable");
+        Utils::error(this->filename, name, "Bitwise binary instruction must have a destination i.e assign this instruction to a variable");
     }
     if(args.size() != 2){
-        error(name,"Bitwise binary instruction must have 2 arguments");
+        Utils::error(this->filename, name, "Bitwise binary instruction must have 2 arguments");
     }
     auto dest = process_local_dest_arg(inst_stmt);
     IR::TypeExprPtr type = dest->get_type();//Already reduced type by process_local_dest_arg
     for(auto arg:args){
-        arg.second = get_reduced_type(arg.second);
-        if(!type_eq(type,arg.second)){
-            error(arg.first->get_token(),"Argument type " + arg.second->to_string() + " is not the same as destination type " + type->to_string());
+        arg.second = Utils::get_reduced_type(this->type_symtable,arg.second);
+        if(!Utils::type_eq(type,arg.second)){
+            Utils::error(this->filename, arg.first->get_token(), "Argument type " + arg.second->to_string() + " is not the same as destination type " + type->to_string());
         }
-        else if(!type_compatible(type,arg.first)){
-            error(arg.first->get_token(),"Argument type " + arg.second->get_token().value + " is not compatible with destination type " + type->to_string());
+        else if(!Utils::type_compatible(this->var_symtable, arg.second,arg.first)){
+            Utils::error(this->filename, arg.first->get_token(), "Argument type " + arg.second->get_token().value + " is not compatible with assigned type " + arg.second->to_string());
         }
     }
     auto type_variant = MIR::get_type_variant_from_type(type);
     if(!type_variant.has_value()){
-        error(name,"Unsupported type for bitwise binary instruction: " + type->to_string());
+        Utils::error(this->filename, name, "Unsupported type for bitwise binary instruction: " + type->to_string());
     }
-    else if(!MIR::is_int_typevariant(type_variant.value())){
-        error(name,"Only int types are supported for bitwise binary instruction");
+    if(!MIR::is_int_typevariant(type_variant.value())){
+        Utils::error(this->filename, name, "Only int types are supported for bitwise binary instruction");
     }
 
     //After this stage, type variant can only be int or it's vector. So the args are literal expr. No need to check if they are literal expr or not cuz gurrentee
-    if(name.value == ".and"){
-        return analyze_and_bin_inst(dest,args[0].first->get_literal(),args[1].first->get_literal(),type_variant.value(),inst_stmt);
-    }
-    else if(name.value == ".or"){
-        return analyze_or_bin_inst(dest,args[0].first->get_literal(),args[1].first->get_literal(),type_variant.value(),inst_stmt);
-    }
-    else if(name.value == ".xor"){
-        return analyze_xor_bin_inst(dest,args[0].first->get_literal(),args[1].first->get_literal(),type_variant.value(),inst_stmt);
-    }
-    else if(name.value == ".shl"){
-        return analyze_shl_bin_inst(dest,args[0].first->get_literal(),args[1].first->get_literal(),type_variant.value(),inst_stmt);
-    }
-    else if(name.value == ".lshr"){
-        return analyze_lshr_bin_inst(dest,args[0].first->get_literal(),args[1].first->get_literal(),type_variant.value(),inst_stmt);
-    }
-    else if(name.value == ".ashr"){
-        return analyze_ashr_bin_inst(dest,args[0].first->get_literal(),args[1].first->get_literal(),type_variant.value(),inst_stmt);
+    auto it = dispatch_map.find(name.value);
+    if(it != dispatch_map.end()){
+        return it->second(this->filename,dest,args[0].first->get_literal(),args[1].first->get_literal(),type_variant.value(),inst_stmt);
     }
     else{
         std::cerr << "Unknown bitwise binary instruction: " << name.value << std::endl;
@@ -59,96 +90,178 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_bitwise_bin_inst(IR::Token name,IR
     }
 }
 
-MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_and_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
-                                                    MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
+MIR::InstPtr analyze_and_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                                  MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
-    if(attributes.size()>0){
-        error(inst_stmt->get_token(),"Bitwise and instruction cannot have attributes");
+    if(attributes.size() > 0){
+        Utils::error(filename, attributes[0]->get_token(), "Unsupported attribute for int bitwise binary instruction: " + attributes[0]->to_string());
     }
     if(type_variant == MIR::TypeVariant::Int){
-        return std::make_shared<MIR::IntANDInst>(inst_stmt,dest,lhs,rhs);
+        return std::make_shared<MIR::IntAndInst>(inst_stmt,dest,lhs,rhs);
     }
-    else {
-        return std::make_shared<MIR::VecIntANDInst>(inst_stmt,dest,lhs,rhs);
+    else{
+        return std::make_shared<MIR::VecIntAndInst>(inst_stmt,dest,lhs,rhs);
     }
 }
-
-MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_or_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
-                                                    MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
+MIR::InstPtr analyze_nand_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                                   MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
-    auto [flag_attrs,remaining_attrs] = extract_flag_attrs(attributes, {"disjoint"});
+    if(attributes.size() > 0){
+        Utils::error(filename, attributes[0]->get_token(), "Unsupported attribute for int bitwise binary instruction: " + attributes[0]->to_string());
+    }
+    if(type_variant == MIR::TypeVariant::Int){
+        return std::make_shared<MIR::IntNandInst>(inst_stmt,dest,lhs,rhs);
+    }
+    else{
+        return std::make_shared<MIR::VecIntNandInst>(inst_stmt,dest,lhs,rhs);
+    }
+}
+MIR::InstPtr analyze_or_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                                 MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
+    std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
+    auto [flag_attrs,remaining_attrs] = Utils::extract_flag_attrs(filename,attributes, {"disjoint"});
     if(remaining_attrs.size() > 0){
-        error(remaining_attrs[0]->get_token(),"Unsupported attribute for int bitwise or instruction: " + remaining_attrs[0]->to_string());
-    }
-    bool disjoint = flag_attrs["disjoint"];
-    if(type_variant == MIR::TypeVariant::Int){
-        return std::make_shared<MIR::IntORInst>(inst_stmt,dest,lhs,rhs,disjoint);
-    }
-    else {
-        return std::make_shared<MIR::VecIntORInst>(inst_stmt,dest,lhs,rhs,disjoint);
-    }
-}
-
-MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_xor_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
-                                                    MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
-    std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
-    if(attributes.size()>0){
-        error(inst_stmt->get_token(),"Bitwise xor instruction cannot have attributes");
+        Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for int bitwise binary instruction: " + remaining_attrs[0]->to_string());
     }
     if(type_variant == MIR::TypeVariant::Int){
-        return std::make_shared<MIR::IntXORInst>(inst_stmt,dest,lhs,rhs);
+        return std::make_shared<MIR::IntOrInst>(inst_stmt,dest,lhs,rhs,flag_attrs["disjoint"]);
     }
-    else {
-        return std::make_shared<MIR::VecIntXORInst>(inst_stmt,dest,lhs,rhs);
+    else{
+        return std::make_shared<MIR::VecIntOrInst>(inst_stmt,dest,lhs,rhs,flag_attrs["disjoint"]);
     }
 }
-
-MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_shl_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
-                                                    MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
+MIR::InstPtr analyze_nor_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                                  MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
-    auto [flag_attrs,remaining_attrs] = extract_flag_attrs(attributes, {"nuw", "nsw"});
+    auto [flag_attrs,remaining_attrs] = Utils::extract_flag_attrs(filename,attributes, {"disjoint"});
     if(remaining_attrs.size() > 0){
-        error(remaining_attrs[0]->get_token(),"Unsupported attribute for int bitwise shl instruction: " + remaining_attrs[0]->to_string());
+        Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for int bitwise binary instruction: " + remaining_attrs[0]->to_string());
     }
-    bool nuw = flag_attrs["nuw"];
-    bool nsw = flag_attrs["nsw"];
     if(type_variant == MIR::TypeVariant::Int){
-        return std::make_shared<MIR::IntSHLInst>(inst_stmt,dest,lhs,rhs,nuw,nsw);
+        return std::make_shared<MIR::IntNorInst>(inst_stmt,dest,lhs,rhs,flag_attrs["disjoint"]);
     }
-    else {
-        return std::make_shared<MIR::VecIntSHLInst>(inst_stmt,dest,lhs,rhs,nuw,nsw);
+    else{
+        return std::make_shared<MIR::VecIntNorInst>(inst_stmt,dest,lhs,rhs,flag_attrs["disjoint"]);
     }
 }
-
-MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_lshr_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
-                                                    MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
+MIR::InstPtr analyze_xor_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                                  MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
-    auto [flag_attrs,remaining_attrs] = extract_flag_attrs(attributes, {"exact"});
-    if(remaining_attrs.size() > 0){
-        error(remaining_attrs[0]->get_token(),"Unsupported attribute for int bitwise lshr instruction: " + remaining_attrs[0]->to_string());
+    if(attributes.size() > 0){
+        Utils::error(filename, attributes[0]->get_token(), "Unsupported attribute for int bitwise binary instruction: " + attributes[0]->to_string());
     }
-    bool exact = flag_attrs["exact"];
     if(type_variant == MIR::TypeVariant::Int){
-        return std::make_shared<MIR::IntLSHRInst>(inst_stmt,dest,lhs,rhs,exact);
+        return std::make_shared<MIR::IntXorInst>(inst_stmt,dest,lhs,rhs);
     }
-    else {
-        return std::make_shared<MIR::VecIntLSHRInst>(inst_stmt,dest,lhs,rhs,exact);
+    else{
+        return std::make_shared<MIR::VecIntXorInst>(inst_stmt,dest,lhs,rhs);
     }
 }
-
-MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_ashr_bin_inst(MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
-                                                    MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
+MIR::InstPtr analyze_xnor_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                                   MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
-    auto [flag_attrs,remaining_attrs] = extract_flag_attrs(attributes, {"exact"});
-    if(remaining_attrs.size() > 0){
-        error(remaining_attrs[0]->get_token(),"Unsupported attribute for int bitwise ashr instruction: " + remaining_attrs[0]->to_string());
+    if(attributes.size() > 0){
+        Utils::error(filename, attributes[0]->get_token(), "Unsupported attribute for int bitwise binary instruction: " + attributes[0]->to_string());
     }
-    bool exact = flag_attrs["exact"];
     if(type_variant == MIR::TypeVariant::Int){
-        return std::make_shared<MIR::IntASHRInst>(inst_stmt,dest,lhs,rhs,exact);
+        return std::make_shared<MIR::IntXnorInst>(inst_stmt,dest,lhs,rhs);
     }
-    else {
-        return std::make_shared<MIR::VecIntASHRInst>(inst_stmt,dest,lhs,rhs,exact);
+    else{
+        return std::make_shared<MIR::VecIntXnorInst>(inst_stmt,dest,lhs,rhs);
+    }
+}
+MIR::InstPtr analyze_shl_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                                  MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
+    std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
+    auto [flag_attrs,remaining_attrs] = Utils::extract_flag_attrs(filename,attributes, {"nuw", "nsw"});
+    if(remaining_attrs.size() > 0){
+        Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for int bitwise binary instruction: " + remaining_attrs[0]->to_string());
+    }
+    if(type_variant == MIR::TypeVariant::Int){
+        return std::make_shared<MIR::IntShlInst>(inst_stmt,dest,lhs,rhs,flag_attrs["nuw"],flag_attrs["nsw"]);
+    }
+    else{
+        return std::make_shared<MIR::VecIntShlInst>(inst_stmt,dest,lhs,rhs,flag_attrs["nuw"],flag_attrs["nsw"]);
+    }
+}
+MIR::InstPtr analyze_lshr_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                                   MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
+    std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
+    auto [flag_attrs,remaining_attrs] = Utils::extract_flag_attrs(filename,attributes, {"exact"});
+    if(remaining_attrs.size() > 0){
+        Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for int bitwise binary instruction: " + remaining_attrs[0]->to_string());
+    }
+    if(type_variant == MIR::TypeVariant::Int){
+        return std::make_shared<MIR::IntLshrInst>(inst_stmt,dest,lhs,rhs,flag_attrs["exact"]);
+    }
+    else{
+        return std::make_shared<MIR::VecIntLshrInst>(inst_stmt,dest,lhs,rhs,flag_attrs["exact"]);
+    }
+}
+MIR::InstPtr analyze_ashr_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                                   MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
+    std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
+    auto [flag_attrs,remaining_attrs] = Utils::extract_flag_attrs(filename,attributes, {"exact"});
+    if(remaining_attrs.size() > 0){
+        Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for int bitwise binary instruction: " + remaining_attrs[0]->to_string());
+    }
+    if(type_variant == MIR::TypeVariant::Int){
+        return std::make_shared<MIR::IntAshrInst>(inst_stmt,dest,lhs,rhs,flag_attrs["exact"]);
+    }
+    else{
+        return std::make_shared<MIR::VecIntAshrInst>(inst_stmt,dest,lhs,rhs,flag_attrs["exact"]);
+    }
+}
+MIR::InstPtr analyze_rotl_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                                   MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
+    std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
+    if(attributes.size() > 0){
+        Utils::error(filename, attributes[0]->get_token(), "Unsupported attribute for int bitwise binary instruction: " + attributes[0]->to_string());
+    }
+    if(type_variant == MIR::TypeVariant::Int){
+        return std::make_shared<MIR::IntRotlInst>(inst_stmt,dest,lhs,rhs);
+    }
+    else{
+        return std::make_shared<MIR::VecIntRotlInst>(inst_stmt,dest,lhs,rhs);
+    }
+}
+MIR::InstPtr analyze_rotr_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                                   MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
+    std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
+    if(attributes.size() > 0){
+        Utils::error(filename, attributes[0]->get_token(), "Unsupported attribute for int bitwise binary instruction: " + attributes[0]->to_string());
+    }
+    if(type_variant == MIR::TypeVariant::Int){
+        return std::make_shared<MIR::IntRotrInst>(inst_stmt,dest,lhs,rhs);
+    }
+    else{
+        return std::make_shared<MIR::VecIntRotrInst>(inst_stmt,dest,lhs,rhs);
+    }
+}
+MIR::InstPtr analyze_pext_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+                                   MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
+    std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
+    if(attributes.size() > 0){
+        Utils::error(filename, attributes[0]->get_token(), "Unsupported attribute for int bitwise binary instruction: " + attributes[0]->to_string());
+    }
+    if(type_variant == MIR::TypeVariant::Int){
+        return std::make_shared<MIR::IntPextInst>(inst_stmt,dest,lhs,rhs);
+    }
+    else{
+        return std::make_shared<MIR::VecIntPextInst>(inst_stmt,dest,lhs,rhs);
+    }
+}
+MIR::InstPtr analyze_pdep_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+                                   MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
+    std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
+    if(attributes.size() > 0){
+        Utils::error(filename, attributes[0]->get_token(), "Unsupported attribute for int bitwise binary instruction: " + attributes[0]->to_string());
+    }
+    if(type_variant == MIR::TypeVariant::Int){
+        return std::make_shared<MIR::IntPdepInst>(inst_stmt,dest,lhs,rhs);
+    }
+    else{
+        return std::make_shared<MIR::VecIntPdepInst>(inst_stmt,dest,lhs,rhs);
     }
 }
 }

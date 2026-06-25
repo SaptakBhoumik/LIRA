@@ -15,8 +15,15 @@ bool is_widening_bin_inst(std::string inst_name){
 bool is_other_arithmetic_inst(std::string inst_name){
     return inst_name == ".divmod" || inst_name == ".widening_divmod" || inst_name == ".mulhi" || inst_name == ".mulfix";
 }
+bool is_wrap_bin_inst(std::string inst_name){
+    return inst_name ==".wrap_add" || inst_name == ".wrap_sub" || inst_name == ".wrap_absdiff" || inst_name == ".wrap_mul" || inst_name == ".wrap_div" 
+            || inst_name == ".wrap_rem" || inst_name == ".wrap_copysign" || inst_name == ".wrap_shl" || inst_name == ".wrap_lshr" 
+            || inst_name == ".wrap_ashr";
+}
 bool is_bitwise_bin_inst(std::string inst_name){
-    return inst_name == ".and" || inst_name == ".or" || inst_name == ".xor" || inst_name == ".shl" || inst_name == ".lshr" || inst_name == ".ashr";
+    return inst_name == ".and" || inst_name == ".nand" || inst_name == ".or" || inst_name == ".nor" || inst_name == ".xor" || inst_name == ".xnor" 
+            || inst_name == ".shl" || inst_name == ".lshr" || inst_name == ".ashr" || inst_name == ".rotl" || inst_name == ".rotr"
+            || inst_name == ".pext" || inst_name == ".pdep";
 }
 // ## Bitwise Trinary Instructions
 bool is_cmp_bin_inst(std::string inst_name){
@@ -68,6 +75,9 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_instruction(IR::InstructionStmtPtr
     }
     else if(is_other_arithmetic_inst(inst_name.value)){
         return analyze_other_arithmetic_inst(inst_name,inst_stmt);
+    }
+    else if(is_wrap_bin_inst(inst_name.value)){
+        return analyze_wrap_bin_inst(inst_name,inst_stmt);
     }
     else if(is_bitwise_bin_inst(inst_name.value)){
         return analyze_bitwise_bin_inst(inst_name,inst_stmt);

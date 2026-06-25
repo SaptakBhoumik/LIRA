@@ -25,7 +25,9 @@ bool is_bitwise_bin_inst(std::string inst_name){
             || inst_name == ".shl" || inst_name == ".lshr" || inst_name == ".ashr" || inst_name == ".rotl" || inst_name == ".rotr"
             || inst_name == ".pext" || inst_name == ".pdep";
 }
-// ## Bitwise Trinary Instructions
+bool is_bitwise_tri_inst(std::string inst_name){
+    return inst_name == ".fshl" || inst_name == ".fshr" || inst_name == ".bitblend";
+}
 bool is_cmp_bin_inst(std::string inst_name){
     return inst_name == ".eq" || inst_name == ".neq" || inst_name == ".gt" || inst_name == ".ge" || inst_name == ".lt" || inst_name == ".le" 
             || inst_name == ".either_nan" || inst_name == ".neither_nan" || inst_name == ".both_nan";
@@ -82,7 +84,9 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_instruction(IR::InstructionStmtPtr
     else if(is_bitwise_bin_inst(inst_name.value)){
         return analyze_bitwise_bin_inst(inst_name,inst_stmt);
     }
-    // ## Bitwise Trinary Instructions
+    else if(is_bitwise_tri_inst(inst_name.value)){
+        return analyze_bitwise_tri_inst(inst_name,inst_stmt);
+    }
     else if(is_cmp_bin_inst(inst_name.value)){
         return analyze_cmp_bin_inst(inst_name,inst_stmt);
     }

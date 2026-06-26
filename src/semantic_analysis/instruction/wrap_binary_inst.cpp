@@ -62,10 +62,17 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_wrap_bin_inst(IR::Token name,IR::I
             Utils::error(this->filename, name, "Wrap binary instruction destination type must be a struct type with 2 fields");
         }
         else{
-            auto type = struct_type->get_fields()[0];
+            type = struct_type->get_fields()[0];
             auto field2_type = struct_type->get_fields()[1];
             if(field2_type->get_kind()==IR::TypeExprKind::SIMDTypeExpr){
+                if(type->get_kind() != IR::TypeExprKind::SIMDTypeExpr){
+                    Utils::error(this->filename, name, "Wrap binary instruction destination type must be a struct type with 2 fields where the first field is a vector type if the second field is a vector type");
+                }
                 auto simd_type = std::dynamic_pointer_cast<IR::SIMDTypeExpr>(field2_type);
+                auto simd_dest_type = std::dynamic_pointer_cast<IR::SIMDTypeExpr>(type);
+                if(simd_dest_type->get_size() != simd_type->get_size()){
+                    Utils::error(this->filename, name, "Wrap binary instruction destination type must be a struct type with 2 fields where the first field is a vector type of the same size as the second field if the second field is a vector type");
+                }
                 field2_type = simd_type->get_basetype();
             }
             if(field2_type->get_kind() != IR::TypeExprKind::IntTypeExpr){

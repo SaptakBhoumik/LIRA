@@ -61,9 +61,9 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_cmp_bin_inst(IR::Token name,IR::In
         if(dest->get_type()->get_kind() != IR::TypeExprKind::SIMDTypeExpr){
             Utils::error(this->filename,name,"Destination of comparison binary instruction must be a <i1, N> if the operand type is a vector type");
         }
-        auto simd_type = std::dynamic_pointer_cast<IR::SIMDTypeExpr>(type);
+        auto arg_simd_type = std::dynamic_pointer_cast<IR::SIMDTypeExpr>(type);
         auto simd_dest_type = std::dynamic_pointer_cast<IR::SIMDTypeExpr>(dest->get_type());
-        if(simd_dest_type->get_size() != simd_type->get_size()){
+        if(simd_dest_type->get_size() != arg_simd_type->get_size()){
             Utils::error(this->filename,name,"Destination of comparison binary instruction must be a <i1, N> "\
                                 "where N is the same as the size of the operand type if the operand type is a vector type");
         }

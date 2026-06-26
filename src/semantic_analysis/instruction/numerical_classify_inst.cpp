@@ -7,7 +7,7 @@
 #include <unordered_set>
 namespace LIRA {
 namespace SemanticAnalyzer {
-using DispatchFuncType = std::function<MIR::InstPtr(std::string, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, IR::TypeExprPtr value_type, 
+using DispatchFuncType = std::function<MIR::InstPtr(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, IR::TypeExprPtr value_type, 
                                                     MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt)>;
 
 MIR::InstPtr analyze_isnan_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
@@ -64,10 +64,17 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_numerical_classify_inst(IR::Token 
     }
 
     if(MIR::is_vector_typevariant(type_variant.value())){
-        auto simd_type = std::dynamic_pointer_cast<IR::SIMDTypeExpr>(dest->get_type());
-        auto basetype = simd_type->get_basetype();
+        if(dest->get_type()->get_kind() != IR::TypeExprKind::SIMDTypeExpr){
+            Utils::error(this->filename, name, "Destination type for numerical classification instruction must be a vector type");
+        }
+        auto dest_simd_type = std::dynamic_pointer_cast<IR::SIMDTypeExpr>(dest->get_type());
+        auto arg_simd_type = std::dynamic_pointer_cast<IR::SIMDTypeExpr>(args[0].second);
+        auto basetype = dest_simd_type->get_basetype();
         if(basetype->get_kind() != IR::TypeExprKind::IntTypeExpr){
             Utils::error(this->filename, name, "Unsupported vector base type for numerical classification instruction: " + basetype->to_string());
+        }
+        if(arg_simd_type->get_size() != dest_simd_type->get_size()){
+            Utils::error(this->filename, name, "Vector size mismatch between destination type " + dest_simd_type->to_string() + " and argument type " + arg_simd_type->to_string());
         }
         auto int_type = std::dynamic_pointer_cast<IR::IntTypeExpr>(basetype);
         if(int_type->get_bits() != 1){

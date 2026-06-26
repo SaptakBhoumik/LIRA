@@ -1,16 +1,15 @@
 #include "mir/instruction/fetch_bitwise_bin_inst.hpp"
+#include "mir/instruction/_instruction.hpp"
 
 namespace LIRA {
 namespace MIR {
 FetchBitwiseBinInst::FetchBitwiseBinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                           std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info,
+                           CommonFetchInstAttrs common_fetch_inst_attrs,
                            bool nuw, bool nsw, bool exact, bool disjoint)
                            :Inst(instruction_stmt, destination, std::nullopt){
     this->pointer = pointer;
     this->value = value;
-    this->alignment = alignment;
-    this->volatile_ = volatile_;
-    this->atomic_info = atomic_info;
+    this->common_fetch_inst_attrs = common_fetch_inst_attrs;
     this->nuw = nuw;
     this->nsw = nsw;
     this->exact = exact;
@@ -18,16 +17,7 @@ FetchBitwiseBinInst::FetchBitwiseBinInst(IR::InstructionStmtPtr instruction_stmt
 };
 std::string FetchBitwiseBinInst::to_string_helper(const std::string op_name) const{
     std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(ptr:" + this->pointer->to_string() + ", " + this->destination->get_type()->to_string() + ":" + this->value->to_string() + ")";
-    if(this->volatile_){
-        res += " #[volatile]";
-    }
-    if(alignment != 0){
-        res += " #[align(i64:" + std::to_string(alignment) + "}]";
-    }
-    if(atomic_info.has_value()){
-        res += " #[atomic(str:\"" + LIRA::MIR::to_string(atomic_info->first) + "\")]";
-        res += " #[syncscope(str:\"" + LIRA::MIR::to_string(atomic_info->second) + "\")]";
-    }
+    res += this->common_fetch_inst_attrs.to_string();
     if(this->nuw){
         res += " #[nuw]";
     }
@@ -54,14 +44,8 @@ IR::LiteralExprPtr FetchBitwiseBinInst::get_pointer() const{
 IR::LiteralExprPtr FetchBitwiseBinInst::get_value() const{
     return this->value;
 }
-std::size_t FetchBitwiseBinInst::get_alignment() const{
-    return this->alignment;
-}
-bool FetchBitwiseBinInst::is_volatile() const{
-    return this->volatile_;
-}
-std::optional<std::pair<AtomicOrdering,SyncScope>> FetchBitwiseBinInst::get_atomic_info() const{
-    return this->atomic_info;
+CommonFetchInstAttrs FetchBitwiseBinInst::get_common_fetch_inst_attrs() const{
+    return this->common_fetch_inst_attrs;
 }
 bool FetchBitwiseBinInst::is_nuw() const{
     return this->nuw;
@@ -82,9 +66,8 @@ InstType FetchBitwiseBinInst::get_inst_type() const{
 
 // --------------------------- Integer read modify operations ---------------------------
 IntFetchBitwiseBinInst::IntFetchBitwiseBinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                           std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info,
-                           bool nuw, bool nsw, bool exact, bool disjoint)
-                           :FetchBitwiseBinInst(instruction_stmt, destination, pointer, value, alignment, volatile_, atomic_info, nuw, nsw, exact, disjoint){}
+                           CommonFetchInstAttrs common_fetch_inst_attrs, bool nuw, bool nsw, bool exact, bool disjoint)
+                           :FetchBitwiseBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, nuw, nsw, exact, disjoint){}
 std::shared_ptr<IR::IntTypeExpr> IntFetchBitwiseBinInst::get_casted_type() const{
     return std::dynamic_pointer_cast<IR::IntTypeExpr>(this->get_type());
 }
@@ -97,8 +80,8 @@ TypeVariant IntFetchBitwiseBinInst::get_type_variant() const{
 
 
 IntFetchAndInst::IntFetchAndInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                    std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info)
-                    :IntFetchBitwiseBinInst(instruction_stmt, destination, pointer, value, alignment, volatile_, atomic_info, false, false, false, false){}
+                    CommonFetchInstAttrs common_fetch_inst_attrs)
+                    :IntFetchBitwiseBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, false, false, false, false){}
 FetchBitwiseBinInst::OpType IntFetchAndInst::get_op_type() const{
     return OpType::FETCH_AND;
 }
@@ -108,8 +91,8 @@ std::string IntFetchAndInst::to_string() const{
 
 
 IntFetchNandInst::IntFetchNandInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                    std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info)
-                    :IntFetchBitwiseBinInst(instruction_stmt, destination, pointer, value, alignment, volatile_, atomic_info, false, false, false, false){}
+                    CommonFetchInstAttrs common_fetch_inst_attrs)
+                    :IntFetchBitwiseBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, false, false, false, false){}
 FetchBitwiseBinInst::OpType IntFetchNandInst::get_op_type() const{
     return OpType::FETCH_NAND;
 }
@@ -119,9 +102,8 @@ std::string IntFetchNandInst::to_string() const{
 
 
 IntFetchOrInst::IntFetchOrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                    std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info,
-                    bool disjoint)
-                    :IntFetchBitwiseBinInst(instruction_stmt, destination, pointer, value, alignment, volatile_, atomic_info, false, false, false, disjoint){}
+                    CommonFetchInstAttrs common_fetch_inst_attrs, bool disjoint)
+                    :IntFetchBitwiseBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, false, false, false, disjoint){}
 FetchBitwiseBinInst::OpType IntFetchOrInst::get_op_type() const{
     return OpType::FETCH_OR;
 }
@@ -131,9 +113,8 @@ std::string IntFetchOrInst::to_string() const{
 
 
 IntFetchNorInst::IntFetchNorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                    std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info,
-                    bool disjoint)
-                    :IntFetchBitwiseBinInst(instruction_stmt, destination, pointer, value, alignment, volatile_, atomic_info, false, false, false, disjoint){}
+                    CommonFetchInstAttrs common_fetch_inst_attrs, bool disjoint)
+                    :IntFetchBitwiseBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, false, false, false, disjoint){}
 FetchBitwiseBinInst::OpType IntFetchNorInst::get_op_type() const{
     return OpType::FETCH_NOR;
 }
@@ -143,8 +124,8 @@ std::string IntFetchNorInst::to_string() const{
 
 
 IntFetchXorInst::IntFetchXorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                    std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info)
-                    :IntFetchBitwiseBinInst(instruction_stmt, destination, pointer, value, alignment, volatile_, atomic_info, false, false, false, false){}
+                    CommonFetchInstAttrs common_fetch_inst_attrs)
+                    :IntFetchBitwiseBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, false, false, false, false){}
 FetchBitwiseBinInst::OpType IntFetchXorInst::get_op_type() const{
     return OpType::FETCH_XOR;
 }
@@ -154,8 +135,8 @@ std::string IntFetchXorInst::to_string() const{
 
 
 IntFetchXnorInst::IntFetchXnorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                    std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info)
-                    :IntFetchBitwiseBinInst(instruction_stmt, destination, pointer, value, alignment, volatile_, atomic_info, false, false, false, false){}
+                    CommonFetchInstAttrs common_fetch_inst_attrs)
+                    :IntFetchBitwiseBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, false, false, false, false){}
 FetchBitwiseBinInst::OpType IntFetchXnorInst::get_op_type() const{
     return OpType::FETCH_XNOR;
 }
@@ -165,8 +146,8 @@ std::string IntFetchXnorInst::to_string() const{
 
 
 IntFetchShlInst::IntFetchShlInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                    std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info, bool nuw, bool nsw)
-                    :IntFetchBitwiseBinInst(instruction_stmt, destination, pointer, value, alignment, volatile_, atomic_info, nuw, nsw, false, false){}
+                    CommonFetchInstAttrs common_fetch_inst_attrs, bool nuw, bool nsw)
+                    :IntFetchBitwiseBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, nuw, nsw, false, false){}
 FetchBitwiseBinInst::OpType IntFetchShlInst::get_op_type() const{
     return OpType::FETCH_SHL;
 }
@@ -175,8 +156,8 @@ std::string IntFetchShlInst::to_string() const{
 }
 
 IntFetchLshrInst::IntFetchLshrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                    std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info, bool exact)
-                    :IntFetchBitwiseBinInst(instruction_stmt, destination, pointer, value, alignment, volatile_, atomic_info, false, false, exact, false){}
+                    CommonFetchInstAttrs common_fetch_inst_attrs, bool exact)
+                    :IntFetchBitwiseBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, false, false, exact, false){}
 FetchBitwiseBinInst::OpType IntFetchLshrInst::get_op_type() const{
     return OpType::FETCH_LSHR;
 }
@@ -186,8 +167,8 @@ std::string IntFetchLshrInst::to_string() const{
 
 
 IntFetchAshrInst::IntFetchAshrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                    std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info, bool exact)
-                    :IntFetchBitwiseBinInst(instruction_stmt, destination, pointer, value, alignment, volatile_, atomic_info, false, false, exact, false){}
+                    CommonFetchInstAttrs common_fetch_inst_attrs, bool exact)
+                    :IntFetchBitwiseBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, false, false, exact, false){}
 FetchBitwiseBinInst::OpType IntFetchAshrInst::get_op_type() const{
     return OpType::FETCH_ASHR;
 }
@@ -197,8 +178,8 @@ std::string IntFetchAshrInst::to_string() const{
 
 
 IntFetchRotlInst::IntFetchRotlInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                    std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info)
-                    :IntFetchBitwiseBinInst(instruction_stmt, destination, pointer, value, alignment, volatile_, atomic_info, false, false, false, false){}
+                    CommonFetchInstAttrs common_fetch_inst_attrs)
+                    :IntFetchBitwiseBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, false, false, false, false){}
 FetchBitwiseBinInst::OpType IntFetchRotlInst::get_op_type() const{
     return OpType::FETCH_ROTL;
 }
@@ -208,8 +189,8 @@ std::string IntFetchRotlInst::to_string() const{
 
 
 IntFetchRotrInst::IntFetchRotrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                    std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info)
-                    :IntFetchBitwiseBinInst(instruction_stmt, destination, pointer, value, alignment, volatile_, atomic_info, false, false, false, false){}
+                    CommonFetchInstAttrs common_fetch_inst_attrs)
+                    :IntFetchBitwiseBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, false, false, false, false){}
 FetchBitwiseBinInst::OpType IntFetchRotrInst::get_op_type() const{
     return OpType::FETCH_ROTR;
 }
@@ -219,8 +200,8 @@ std::string IntFetchRotrInst::to_string() const{
 
 
 IntFetchPextInst::IntFetchPextInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                    std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info)
-                    :IntFetchBitwiseBinInst(instruction_stmt, destination, pointer, value, alignment, volatile_, atomic_info, false, false, false, false){}
+                    CommonFetchInstAttrs common_fetch_inst_attrs)
+                    :IntFetchBitwiseBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, false, false, false, false){}
 FetchBitwiseBinInst::OpType IntFetchPextInst::get_op_type() const{
     return OpType::FETCH_PEXT;
 }
@@ -230,8 +211,8 @@ std::string IntFetchPextInst::to_string() const{
 
 
 IntFetchPdepInst::IntFetchPdepInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
-                    std::size_t alignment, bool volatile_, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info)
-                    :IntFetchBitwiseBinInst(instruction_stmt, destination, pointer, value, alignment, volatile_, atomic_info, false, false, false, false){}
+                    CommonFetchInstAttrs common_fetch_inst_attrs)
+                    :IntFetchBitwiseBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, false, false, false, false){}
 FetchBitwiseBinInst::OpType IntFetchPdepInst::get_op_type() const{
     return OpType::FETCH_PDEP;
 }

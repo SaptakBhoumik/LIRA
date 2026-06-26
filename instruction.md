@@ -931,7 +931,7 @@ Read-modify-write instructions that read a value from memory, apply a binary ope
 - `let T:%old = .fetch_pext(ptr:%ptr, T:%mask)` - Does what you would expect.`T` must be `i<N>`. No attributes.
 
 - `let T:%old = .fetch_pdep(ptr:%ptr, T:%mask)` - Does what you would expect.`T` must be `i<N>`. No attributes.
-
+ 
 ---
 
 ## Unary Fetch Modify Instructions
@@ -955,7 +955,6 @@ Read-modify-write instructions that apply a unary operation to the value at a me
 
     If T is integer:
     - `#[nsw]` - poison if input is `INT_MIN`
-    - `#[nuw]` - poison if input is negative
 
     If T is float/bfloat: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 

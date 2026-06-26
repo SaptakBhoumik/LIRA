@@ -147,6 +147,22 @@ std::string to_string(AtomicOrdering ordering){
 }
 
 
+std::string CommonFetchInstAttrs::to_string() const{
+    std::string result;
+    if(this->atomic_ordering.has_value()){
+        result += " #[atomic_ordering(str:\"" + MIR::to_string(this->atomic_ordering.value().first) + "\")]";
+        result += " #[sync_scope(str:\"" + MIR::to_string(this->atomic_ordering.value().second) + "\")]";
+    }
+    if(this->alignment != 0){
+        result += " #[align(i64:" + std::to_string(this->alignment) + ")]";
+    }
+    if(this->volatile_flag){
+        result += " #[volatile]";
+    }
+    return result;
+}
+
+
 std::string to_string(CallingConv ordering){
     switch(ordering){
         case CallingConv::CCC:{

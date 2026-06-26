@@ -15,7 +15,6 @@ NOTE:-Implement Call Inst at the end of everything
     ### Lifetime and Invariant Scope Instructions
 ## Binary Arithmetic Fetch Modify Instructions
 ## Binary Bitwise Fetch Modify Instructions
-## Unary Fetch Modify Instructions
 ## Terminator Instructions
 ## Call Instruction
 ## SIMD Instructions

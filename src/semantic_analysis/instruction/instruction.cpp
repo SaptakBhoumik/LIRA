@@ -51,11 +51,18 @@ bool is_mem_inst(std::string inst_name){
     return inst_name == ".local" || inst_name == ".alloca" || inst_name == ".load" || inst_name == ".store" || inst_name == ".getaddress" || inst_name == ".ptroffset"
             || inst_name == ".extractelement" || inst_name == ".insertelement" || inst_name == ".fence" || inst_name == ".cmpxchg";
 }
-bool is_fetch_inst(std::string inst_name){
-    return inst_name == ".fetchxchg" || inst_name == ".fetchadd" || inst_name == ".fetchsub" || inst_name == ".fetchand" 
-            || inst_name == ".fetchnand" || inst_name == ".fetchor" || inst_name == ".fetchxor" || inst_name == ".fetchmin" 
-            || inst_name == ".fetchmax";
+bool is_fetch_unary_inst(std::string inst_name){
+    return inst_name == ".fetch_neg" || inst_name == ".fetch_not" || inst_name == ".fetch_abs" || inst_name == ".fetch_ceil" || inst_name == ".fetch_floor" 
+          || inst_name == ".fetch_integral_part" || inst_name == ".fetch_fractional_part" || inst_name == ".fetch_roundnearest" || inst_name == ".fetch_roundeven" 
+          || inst_name == ".fetch_sqrt" || inst_name == ".fetch_reciprocal" || inst_name == ".fetch_rsqrt" || inst_name == ".fetch_popcount" || inst_name == ".fetch_clz"
+          || inst_name == ".fetch_ctz" || inst_name == ".fetch_parity" || inst_name == ".fetch_bswap" || inst_name == ".fetch_bitreverse" || inst_name == ".fetch_clrsb"
+          || inst_name == ".fetch_blsi" || inst_name == ".fetch_blsr" || inst_name == ".fetch_blsmask";
 }
+// bool is_fetch_inst(std::string inst_name){
+//     return inst_name == ".fetchxchg" || inst_name == ".fetchadd" || inst_name == ".fetchsub" || inst_name == ".fetchand" 
+//             || inst_name == ".fetchnand" || inst_name == ".fetchor" || inst_name == ".fetchxor" || inst_name == ".fetchmin" 
+//             || inst_name == ".fetchmax";
+// }
 bool is_terminator_inst(std::string inst_name){
     return inst_name == ".ret" || inst_name == ".unreachable" || inst_name == ".br" || inst_name == ".switch" || inst_name == ".indirectbr";
 }
@@ -103,8 +110,11 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_instruction(IR::InstructionStmtPtr
     else if(is_mem_inst(inst_name.value)){
         return analyze_mem_inst(inst_name,inst_stmt);
     }
-    else if(is_fetch_inst(inst_name.value)){
-        return analyze_fetch_inst(inst_name,inst_stmt);
+    // else if(is_fetch_inst(inst_name.value)){
+    //     return analyze_fetch_inst(inst_name,inst_stmt);
+    // }
+    else if(is_fetch_unary_inst(inst_name.value)){
+        return analyze_unary_fetch_inst(inst_name,inst_stmt);
     }
     else if(is_terminator_inst(inst_name.value)){
         return analyze_terminator_inst(inst_name,inst_stmt);

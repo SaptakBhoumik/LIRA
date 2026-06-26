@@ -1,5 +1,6 @@
 #pragma once
 #include "ast/ast.hpp"
+#include <cstddef>
 #include <string>
 #include <sys/cdefs.h>
 #include "mir/destregister.hpp"
@@ -245,6 +246,14 @@ enum class AtomicOrdering:std::uint64_t{
     SEQUENTIALLY_CONSISTENT = 1 << 5 // seq_cst
 };
 std::string to_string(AtomicOrdering ordering);
+
+struct CommonFetchInstAttrs{
+    std::optional<std::pair<AtomicOrdering, SyncScope>> atomic_ordering;
+    std::size_t alignment = 0;
+    bool volatile_flag = false;
+
+    std::string to_string() const;
+};
 
 enum class CallingConv:std::uint64_t{
     CCC = 1 << 0,

@@ -4,7 +4,7 @@
 #include <functional>
 namespace LIRA {
 namespace SemanticAnalyzer {
-using DispatchFuncType = std::function<MIR::InstPtr(std::string, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+using DispatchFuncType = std::function<MIR::InstPtr(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                                     MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt)>;
  
 MIR::InstPtr analyze_add_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 

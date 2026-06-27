@@ -21,6 +21,7 @@ std::size_t get_type_size(IR::TypeExprPtr type);//Get the size of a reduced type
 //extract_flag_attrs, extract_common_atomic_inst and extract_fastmath_attrs may throw error if duplicate of the attribute is found. Like if they are asked to search for "attr_name" and "attr_name"
 //is present twice then error. Note no error if "attr_name" is present twice if we dont ask to search for "attr_name". So we check duplicate only for the attributes asked
 //for error they both need std::string
+//Combining ieee754_2019 with nsz is compile time error. ``extract_fastmath_attrs`` checks that
 std::pair<MIR::FastMathAttr, std::vector<IR::AttributePtr>> extract_fastmath_attrs(std::string filename, const std::vector<IR::AttributePtr>& attributes);//Extract fast math attributes from the given attributes and return them as a pair of FastMathAttr and the remaining attributes. 
 std::pair<std::map<std::string,bool>, std::vector<IR::AttributePtr>> extract_flag_attrs(std::string filename, const std::vector<IR::AttributePtr>& attributes,
                                                                                         std::vector<std::string> flags_to_extract);//Extract flag attributes from the given attributes and return them as a map of flag name to the corresponding attributes and the remaining attributes.
@@ -62,7 +63,7 @@ class IRToMIRSemanticAnalyzer {
     MIR::InstPtr analyze_numerical_classify_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
     
     MIR::InstPtr analyze_mem_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
-
+    MIR::InstPtr analyze_arithmetic_fetch_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
 
     MIR::InstPtr analyze_unary_fetch_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
     MIR::InstPtr analyze_terminator_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);

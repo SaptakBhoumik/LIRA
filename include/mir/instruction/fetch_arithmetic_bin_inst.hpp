@@ -68,9 +68,9 @@ class IntFetchArithmeticBinInst:public FetchArithmeticBinInst {
 };
 
 
-class IntXchgInst:public IntFetchArithmeticBinInst {
+class IntFetchXchgInst:public IntFetchArithmeticBinInst {
     public:
-    IntXchgInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+    IntFetchXchgInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                 CommonFetchInstAttrs attrs);
 
     OpType get_op_type() const override;
@@ -195,9 +195,9 @@ class FloatFetchArithmeticBinInst:public FetchArithmeticBinInst {
 };
 
 
-class FloatXchgInst:public FloatFetchArithmeticBinInst {
+class FloatFetchXchgInst:public FloatFetchArithmeticBinInst {
     public:
-    FloatXchgInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+    FloatFetchXchgInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                 CommonFetchInstAttrs attrs, FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override;

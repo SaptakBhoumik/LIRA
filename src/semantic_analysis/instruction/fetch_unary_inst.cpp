@@ -102,15 +102,15 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_unary_fetch_inst(IR::Token name,IR
     if(Utils::get_type_size(type) > 128 && common_fetch_attrs.atomic_ordering.has_value()){
         Utils::error(this->filename, name, "Atomic unary fetch instruction destination type size must be less than or equal to 128 bits. Found: " + std::to_string(Utils::get_type_size(type)) + " bits");
     }
-
-    args[0].second = Utils::get_reduced_type(this->type_symtable,args[0].second);
-    if(args[0].second->get_kind() != IR::TypeExprKind::PtrTypeExpr){
-        Utils::error(this->filename, args[0].first->get_token(), "Argument type " + args[0].second->to_string() + " is not a pointer type");
+    {
+        args[0].second = Utils::get_reduced_type(this->type_symtable,args[0].second);
+        if(args[0].second->get_kind() != IR::TypeExprKind::PtrTypeExpr){
+            Utils::error(this->filename, args[0].first->get_token(), "Argument type " + args[0].second->to_string() + " is not a pointer type");
+        }
+        else if(!Utils::type_compatible(this->var_symtable, args[0].second,args[0].first)){
+            Utils::error(this->filename, args[0].first->get_token(), "Argument type ptr is not compatible with assigned type " + args[0].first->to_string());
+        }
     }
-    else if(!Utils::type_compatible(this->var_symtable, args[0].second,args[0].first)){
-        Utils::error(this->filename, args[0].first->get_token(), "Argument type ptr is not compatible with assigned type " + args[0].first->to_string());
-    }
-
     auto type_variant = MIR::get_type_variant_from_type(type);
     if(!type_variant.has_value()){
         Utils::error(this->filename, name, "Unsupported type for unary fetch instruction: " + type->to_string());

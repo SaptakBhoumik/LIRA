@@ -89,13 +89,13 @@ TypeVariant IntFetchArithmeticBinInst::get_type_variant() const{
 }
 
 
-IntXchgInst::IntXchgInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+IntFetchXchgInst::IntFetchXchgInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                          CommonFetchInstAttrs common_fetch_inst_attrs)
                         :IntFetchArithmeticBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, false, false, false, false, false, false){}
-FetchArithmeticBinInst::OpType IntXchgInst::get_op_type() const{
+FetchArithmeticBinInst::OpType IntFetchXchgInst::get_op_type() const{
     return OpType::FETCH_XCHG;
 }
-std::string IntXchgInst::to_string() const{
+std::string IntFetchXchgInst::to_string() const{
     return this->to_string_helper("int_fetch_xchg");
 }
 
@@ -232,13 +232,13 @@ std::string FloatFetchArithmeticBinInst::to_string_helper(const std::string op_n
 }
 
 
-FloatXchgInst::FloatXchgInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+FloatFetchXchgInst::FloatFetchXchgInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     CommonFetchInstAttrs common_fetch_inst_attrs, FastMathAttr fast_math_attr)
                     :FloatFetchArithmeticBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, fast_math_attr, false, false){}
-FetchArithmeticBinInst::OpType FloatXchgInst::get_op_type() const{
+FetchArithmeticBinInst::OpType FloatFetchXchgInst::get_op_type() const{
     return OpType::FETCH_XCHG;
 }
-std::string FloatXchgInst::to_string() const{
+std::string FloatFetchXchgInst::to_string() const{
     return this->to_string_helper("float_fetch_xchg");
 }
 

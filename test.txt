@@ -13,7 +13,6 @@ NOTE:-Implement Call Inst at the end of everything
 ## Memory Instructions
     ### Cache Control Instructions
     ### Lifetime and Invariant Scope Instructions
-## Binary Bitwise Fetch Modify Instructions
 ## Terminator Instructions
 ## Call Instruction
 ## SIMD Instructions

@@ -64,7 +64,7 @@ class IRToMIRSemanticAnalyzer {
     
     MIR::InstPtr analyze_mem_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
     MIR::InstPtr analyze_arithmetic_fetch_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
-
+    MIR::InstPtr analyze_bitwise_fetch_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
     MIR::InstPtr analyze_unary_fetch_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
     MIR::InstPtr analyze_terminator_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
     MIR::InstPtr analyze_call_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);

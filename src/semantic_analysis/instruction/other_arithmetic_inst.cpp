@@ -17,10 +17,10 @@ MIR::InstPtr analyze_mulfix_inst(std::string filename, MIR::LocalDestRegisterPtr
 
 MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_other_arithmetic_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt){
     std::map<std::string, DispatchFuncType> dispatch_map = {
-            {".divmod", analyze_divmod_inst},
-            {".widening_divmod", analyze_widening_divmod_inst},
-            {".mulhi", analyze_mulhi_inst},
-            {".mulfix", analyze_mulfix_inst}
+        {".divmod", analyze_divmod_inst},
+        {".widening_divmod", analyze_widening_divmod_inst},
+        {".mulhi", analyze_mulhi_inst},
+        {".mulfix", analyze_mulfix_inst}
     };
     auto args = inst_stmt->get_value()->get_operands();
     if(args.size() != 2){

@@ -32,16 +32,16 @@ MIR::InstPtr analyze_avg_bin_inst(std::string filename, MIR::LocalDestRegisterPt
 MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_arithmetic_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt){
     //NOTE:Dont use a common templated function for all. The attributes can change in future. It is more code but more maintainable imo+The error messages can be more specific
     const std::unordered_map<std::string, DispatchFuncType> dispatch_map = {
-            {".add", analyze_add_bin_inst},
-            {".sub", analyze_sub_bin_inst},
-            {".absdiff", analyze_absdiff_bin_inst},
-            {".mul", analyze_mul_bin_inst},
-            {".div", analyze_div_bin_inst},
-            {".rem", analyze_rem_bin_inst},
-            {".copysign", analyze_copysign_bin_inst},
-            {".min", analyze_min_bin_inst},
-            {".max", analyze_max_bin_inst},
-            {".avg", analyze_avg_bin_inst}
+        {".add", analyze_add_bin_inst},
+        {".sub", analyze_sub_bin_inst},
+        {".absdiff", analyze_absdiff_bin_inst},
+        {".mul", analyze_mul_bin_inst},
+        {".div", analyze_div_bin_inst},
+        {".rem", analyze_rem_bin_inst},
+        {".copysign", analyze_copysign_bin_inst},
+        {".min", analyze_min_bin_inst},
+        {".max", analyze_max_bin_inst},
+        {".avg", analyze_avg_bin_inst}
     };
     auto args = inst_stmt->get_value()->get_operands();
     auto _dest = inst_stmt->get_name();

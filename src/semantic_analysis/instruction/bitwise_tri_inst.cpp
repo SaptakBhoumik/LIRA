@@ -18,9 +18,9 @@ MIR::InstPtr analyze_bitblend_tri_inst(std::string filename, MIR::LocalDestRegis
 MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_bitwise_tri_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt){
     //NOTE:Dont use a common templated function for all. The attributes can change in future. It is more code but more maintainable imo+The error messages can be more specific
     const std::unordered_map<std::string, DispatchFuncType> dispatch_map = {
-            {".fshl", analyze_fshl_tri_inst},
-            {".fshr", analyze_fshr_tri_inst},
-            {".bitblend", analyze_bitblend_tri_inst}
+        {".fshl", analyze_fshl_tri_inst},
+        {".fshr", analyze_fshr_tri_inst},
+        {".bitblend", analyze_bitblend_tri_inst}
     };
     auto args = inst_stmt->get_value()->get_operands();
     auto _dest = inst_stmt->get_name();

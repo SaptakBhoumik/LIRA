@@ -20,10 +20,10 @@ MIR::InstPtr analyze_widening_mul_bin_inst(std::string filename, MIR::LocalDestR
 
 MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_widening_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt){
     const std::unordered_map<std::string, DispatchFuncType> dispatch_map = {
-            {".widening_add", analyze_widening_add_bin_inst},
-            {".widening_sub", analyze_widening_sub_bin_inst},
-            {".widening_absdiff", analyze_widening_absdiff_bin_inst},
-            {".widening_mul", analyze_widening_mul_bin_inst}
+        {".widening_add", analyze_widening_add_bin_inst},
+        {".widening_sub", analyze_widening_sub_bin_inst},
+        {".widening_absdiff", analyze_widening_absdiff_bin_inst},
+        {".widening_mul", analyze_widening_mul_bin_inst}
     };
 
     auto args = inst_stmt->get_value()->get_operands();

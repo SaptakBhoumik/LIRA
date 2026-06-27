@@ -32,16 +32,16 @@ MIR::InstPtr analyze_wrap_ashr_inst(std::string filename, MIR::LocalDestRegister
 MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_wrap_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt){
     //NOTE:Dont use a common templated function for all. The attributes can change in future. It is more code but more maintainable imo+The error messages can be more specific
     const std::unordered_map<std::string, DispatchFuncType> dispatch_map = {
-            {".add", analyze_wrap_add_inst},
-            {".sub", analyze_wrap_sub_inst},
-            {".absdiff", analyze_wrap_absdiff_inst},
-            {".mul", analyze_wrap_mul_inst},
-            {".div", analyze_wrap_div_inst},
-            {".rem", analyze_wrap_rem_inst},
-            {".copysign", analyze_wrap_copysign_inst},
-            {".shl", analyze_wrap_shl_inst},
-            {".lshr", analyze_wrap_lshr_inst},
-            {".ashr", analyze_wrap_ashr_inst},
+        {".add", analyze_wrap_add_inst},
+        {".sub", analyze_wrap_sub_inst},
+        {".absdiff", analyze_wrap_absdiff_inst},
+        {".mul", analyze_wrap_mul_inst},
+        {".div", analyze_wrap_div_inst},
+        {".rem", analyze_wrap_rem_inst},
+        {".copysign", analyze_wrap_copysign_inst},
+        {".shl", analyze_wrap_shl_inst},
+        {".lshr", analyze_wrap_lshr_inst},
+        {".ashr", analyze_wrap_ashr_inst},
     };
     auto args = inst_stmt->get_value()->get_operands();
     auto _dest = inst_stmt->get_name();

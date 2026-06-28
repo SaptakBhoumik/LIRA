@@ -75,12 +75,8 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_wrap_bin_inst(IR::Token name,IR::I
                 }
                 field2_type = simd_type->get_basetype();
             }
-            if(field2_type->get_kind() != IR::TypeExprKind::IntTypeExpr){
-                Utils::error(this->filename, name, "Wrap binary instruction destination type must be a struct type with 2 fields where the second field is i1");
-            }
-            auto int_type = std::dynamic_pointer_cast<IR::IntTypeExpr>(field2_type);
-            if(int_type->get_bits() != 1){
-                Utils::error(this->filename, name, "Wrap binary instruction destination type must be a struct type with 2 fields where the second field is i1");
+            if(!Utils::is_int(field2_type,1)){
+                Utils::error(this->filename, name, "Wrap binary instruction destination type must be a struct type with 2 fields where the second field is a boolean type");
             }
         }
     }

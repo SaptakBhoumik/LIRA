@@ -67,20 +67,13 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_cmp_bin_inst(IR::Token name,IR::In
             Utils::error(this->filename,name,"Destination of comparison binary instruction must be a <i1, N> "\
                                 "where N is the same as the size of the operand type if the operand type is a vector type");
         }
-        else if(simd_dest_type->get_basetype()->get_kind() != IR::TypeExprKind::IntTypeExpr){
-            Utils::error(this->filename,name,"Destination of comparison binary instruction must be a <i1, N> if the operand type is a vector type");
-        }
-        else if(std::dynamic_pointer_cast<IR::IntTypeExpr>(simd_dest_type->get_basetype())->get_bits() != 1){
-            Utils::error(this->filename,name,"Destination of comparison binary instruction must be a <i1, N> if the operand type is a vector type");
+        else if(Utils::is_int(simd_dest_type->get_basetype(),1) == false){
+            Utils::error(this->filename,name,"Destination of comparison binary instruction must be a <i1, N> "\
+                                "where N is the same as the size of the operand type if the operand type is a vector type");
         }
     }
-    else{
-        if(dest->get_type()->get_kind() != IR::TypeExprKind::IntTypeExpr){
-            Utils::error(this->filename,name,"Destination of comparison binary instruction must be a i1 if the operand type is not a vector type");
-        }
-        else if(std::dynamic_pointer_cast<IR::IntTypeExpr>(dest->get_type())->get_bits() != 1){
-            Utils::error(this->filename,name,"Destination of comparison binary instruction must be a i1 if the operand type is not a vector type");
-        }
+    else if(!Utils::is_int(dest->get_type(),1)){
+        Utils::error(this->filename,name,"Destination of comparison binary instruction must be i1 if the operand type is not a vector type");
     }
 
     auto type_variant = MIR::get_type_variant_from_type(type);

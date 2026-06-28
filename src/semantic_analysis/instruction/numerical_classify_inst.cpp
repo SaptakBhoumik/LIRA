@@ -76,19 +76,12 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_numerical_classify_inst(IR::Token 
         if(arg_simd_type->get_size() != dest_simd_type->get_size()){
             Utils::error(this->filename, name, "Vector size mismatch between destination type " + dest_simd_type->to_string() + " and argument type " + arg_simd_type->to_string());
         }
-        auto int_type = std::dynamic_pointer_cast<IR::IntTypeExpr>(basetype);
-        if(int_type->get_bits() != 1){
-            Utils::error(this->filename, name, "Unsupported vector base type for numerical classification instruction: " + basetype->to_string() + ". Only i1 type is supported");
+        if(!Utils::is_int(basetype,1)){
+            Utils::error(this->filename, name, "Destination type for numerical classification instruction must be a vector type with base type i1");
         }
     }
-    else{
-        if(dest->get_type()->get_kind() != IR::TypeExprKind::IntTypeExpr){
-            Utils::error(this->filename, name, "Destination type for numerical classification instruction must be i1 type");
-        }
-        auto int_type = std::dynamic_pointer_cast<IR::IntTypeExpr>(dest->get_type());
-        if(int_type->get_bits() != 1){
-            Utils::error(this->filename, name, "Destination type for numerical classification instruction must be i1 type");
-        }
+    else if(!Utils::is_int(dest->get_type(),1)){
+        Utils::error(this->filename, name, "Destination type for numerical classification instruction must be i1 if the argument type is not a vector type");
     }
 
     if(MIR::is_float_typevariant(type_variant.value()) && inst_that_support_float.find(name.value) == inst_that_support_float.end()){

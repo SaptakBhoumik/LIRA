@@ -62,7 +62,7 @@ AttributePtr Parser::parse_attribute(){
     expect(TokenType::builtin_identifier, "Expected a buildin identifier after '#' for attribute name");
     Token name = this->curr_tok;
     std::vector<std::pair<ExprPtr,TypeExprPtr>> args;
-    std::vector<triplet<Token,ExprPtr,TypeExprPtr>> kwargs;
+    std::vector<Utils::triplet<Token,ExprPtr,TypeExprPtr>> kwargs;
     if(this->peek().type == TokenType::lparen){
         advance();//on '('
         while(peek().type != TokenType::rparen){
@@ -111,7 +111,7 @@ InstructionStmtPtr Parser::parse_instruction_stmt(bool is_global){
         error(this->curr_tok, "Expected 'let' for global variable declaration");
     }
     Token tok = this->curr_tok;
-    std::optional<triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> name;
+    std::optional<Utils::triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> name;
     if(tok.type == TokenType::kw_let){
         advance();
         TypeExprPtr type = parse_type_expr(true);
@@ -125,10 +125,10 @@ InstructionStmtPtr Parser::parse_instruction_stmt(bool is_global){
         Token name_tok = this->curr_tok;
         if(peek().type == TokenType::hash){
             advance();//advance on the '#' token to the first attribute
-            name = triplet(name_tok, parse_attributes(), type);
+            name = Utils::triplet(name_tok, parse_attributes(), type);
         }
         else{
-            name = triplet(name_tok, std::vector<AttributePtr>{}, type);
+            name = Utils::triplet(name_tok, std::vector<AttributePtr>{}, type);
         }
         if(peek().type == TokenType::assign){
             advance();//on the '=' token
@@ -192,8 +192,8 @@ ScopePtr Parser::parse_scope(){
     }
     std::optional<Token> scope_name = std::nullopt;
     std::optional<Token> parent_scope_name;
-    std::optional<triplet<Token,Token,Token>> scope_loc;
-    std::optional<triplet<Token,Token,Token>> callsite_loc;
+    std::optional<Utils::triplet<Token,Token,Token>> scope_loc;
+    std::optional<Utils::triplet<Token,Token,Token>> callsite_loc;
     if(peek().type == TokenType::lparen){
         advance();//on the '(' token
         while(peek().type != TokenType::rparen){
@@ -232,7 +232,7 @@ ScopePtr Parser::parse_scope(){
                 Token line = this->curr_tok;
                 expect(TokenType::colon, "Expected ':' after line number in scope_loc");
                 expect(TokenType::number, "Expected a number literal for column number in scope_loc");
-                scope_loc = triplet(file_name, line, this->curr_tok);
+                scope_loc = Utils::triplet(file_name, line, this->curr_tok);
             }
             else if(this->curr_tok.value == "callsite_loc"){
                 if(callsite_loc.has_value()){
@@ -249,7 +249,7 @@ ScopePtr Parser::parse_scope(){
                 Token line = this->curr_tok;
                 expect(TokenType::colon, "Expected ':' after line number in callsite_loc");
                 expect(TokenType::number, "Expected a number literal for column number in callsite_loc");
-                callsite_loc = triplet(file_name, line, this->curr_tok);
+                callsite_loc = Utils::triplet(file_name, line, this->curr_tok);
             }
             else{
                 error(this->curr_tok, "Unexpected keyword in scope definition. Expected 'scope_name', 'parent_scope', 'scope_loc' or 'callsite_loc'");
@@ -270,7 +270,7 @@ LabelPtr Parser::parse_label(){
     Token tok = this->curr_tok;//the label token
     expect(TokenType::label_identifier, "Expected a label identifier after 'label'");
     Token name = this->curr_tok;
-    std::vector<triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> params;
+    std::vector<Utils::triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> params;
     if(peek().type == TokenType::lparen){
         advance();//on the '(' token
         while(peek().type != TokenType::rparen){
@@ -344,7 +344,7 @@ FunctionPtr Parser::parse_function(){
     expect(TokenType::global_identifier, "Expected a global identifier for function name");
     Token name = this->curr_tok;
     expect(TokenType::lparen, "Expected '(' after function name");
-    std::vector<triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> params;
+    std::vector<Utils::triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> params;
     bool varargs = false;
     while(peek().type != TokenType::rparen){
         advance();//After `,` or after '(' for the first parameter

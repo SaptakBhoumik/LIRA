@@ -178,7 +178,7 @@
     
 - `let T:%out = .mulfix(T:%a, T:%b, i64:%scale)` - Fixed-point multiply. Multiplies `a` and `b` as if they were fixed-point values with `scale` fractional bits, returning the correctly rounded result in the same type. Concretely: computes `(a * b) >> scale` with the intermediate product computed at double width to avoid overflow. Scale must be a compile-time/run-time constant.
 
-    T must be of the form `T0` or `<T0,M>` where T0 is an integer type. `i64:%scale` must be a compile-time/run-time; must satisfy `0 <= scale <= bitwidth(T0)`.
+    T must be of the form `T0` or `<T0,M>` where T0 is an integer type. `i64:%scale` must be a compile-time/run-time scalar(not vector cuz dont make sense); must satisfy `0 <= scale <= bitwidth(T0)`.
 
     - `#[unsigned]` - treat `a` and `b` as unsigned fixed-point values; default is signed
     - `#[saturating]` - if the shifted result does not fit in T, clamp to the type range instead of producing poison; pair with `#[unsigned]` for unsigned saturation; default is signed saturation when this flag is set
@@ -415,16 +415,12 @@ These return `{T, i1}` - the wrapped result paired with an overflow flag (`1` if
     - `#[unsigned]` - produce an unsigned integer; default is signed
     - `#[nsb]` - only valid with `#[unsigned]`; asserts the result's sign bit is 0
     - `#[saturating]` - clamp to the integer type range instead of UB when the float value is out of range or NaN; pair with `#[unsigned]` for unsigned saturation; default is signed saturation when this flag is set
-
-    If base type is float:
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 - `let T2:%output_var = .int_to_float(T1:%input_var)` - Converts integer (or vector thereof) T1 to float/bfloat (or vector thereof) T2. Output type determines the target float kind.
 
     - `#[unsigned]` - treat the source integer as unsigned; default is signed
     - `#[nsb]` - only valid with `#[unsigned]`; asserts the source integer's sign bit is 0
-
-    If base type is float:
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 - `let T2:%output_var = .ptr_to_int(T1:%input_var)` - Converts pointer/vector-of-pointer T1 to `i64`/`<i64,M>` T2. Only `i64` is valid (64-bit systems only). Use `.trunc` after if a narrower integer is needed. No attributes.

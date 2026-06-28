@@ -97,15 +97,16 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_unary_inst(IR::Token name,IR::Inst
     }
     auto dest = process_local_dest_arg(inst_stmt);
     IR::TypeExprPtr type = dest->get_type();//Already reduced type by process_local_dest_arg
-
-    args[0].second = Utils::get_reduced_type(this->type_symtable,args[0].second);
-    if(!Utils::type_eq(type,args[0].second)){
-        Utils::error(this->filename, args[0].first->get_token(), "Argument type " + args[0].second->to_string() + " is not the same as destination type " + type->to_string());
+    
+    {
+        args[0].second = Utils::get_reduced_type(this->type_symtable,args[0].second);
+        if(!Utils::type_eq(type,args[0].second)){
+            Utils::error(this->filename, args[0].first->get_token(), "Argument type " + args[0].second->to_string() + " is not the same as destination type " + type->to_string());
+        }
+        else if(!Utils::type_compatible(this->var_symtable, args[0].second,args[0].first)){
+            Utils::error(this->filename, args[0].first->get_token(), "Argument type " + args[0].second->get_token().value + " is not compatible with assigned type " + args[0].second->to_string());
+        }
     }
-    else if(!Utils::type_compatible(this->var_symtable, args[0].second,args[0].first)){
-        Utils::error(this->filename, args[0].first->get_token(), "Argument type " + args[0].second->get_token().value + " is not compatible with assigned type " + args[0].second->to_string());
-    }
-
     auto type_variant = MIR::get_type_variant_from_type(type);
     if(!type_variant.has_value()){
         Utils::error(this->filename, name, "Unsupported type for unary instruction: " + type->to_string());

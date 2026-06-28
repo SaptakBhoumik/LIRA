@@ -56,11 +56,7 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_other_arithmetic_inst(IR::Token na
         args[i].second = Utils::get_reduced_type(this->type_symtable,args[i].second);
         if(!Utils::type_eq(type,args[i].second)){
             if(i==2 && name.value == ".mulfix"){
-                if(args[i].second->get_kind() != IR::TypeExprKind::IntTypeExpr){
-                    Utils::error(this->filename, args[i].first->get_token(), "Scale argument of mulfix instruction must be a 64 bit integer");
-                }
-                auto int_type = std::dynamic_pointer_cast<IR::IntTypeExpr>(args[i].second);
-                if(int_type->get_bits() != 64){
+                if(!Utils::is_int(args[2].second,64)){
                     Utils::error(this->filename, args[i].first->get_token(), "Scale argument of mulfix instruction must be a 64-bit integer");
                 }
             }

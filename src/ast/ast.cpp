@@ -29,7 +29,7 @@ std::string DebugInfo::to_string() const{
 }
 
 
-Attribute::Attribute(Token tok, Token name, std::vector<std::pair<ExprPtr,TypeExprPtr>> args, std::vector<triplet<Token,ExprPtr,TypeExprPtr>> kwargs){
+Attribute::Attribute(Token tok, Token name, std::vector<std::pair<ExprPtr,TypeExprPtr>> args, std::vector<Utils::triplet<Token,ExprPtr,TypeExprPtr>> kwargs){
     this->tok = tok;
     this->name = name;
     this->args = args;
@@ -42,7 +42,7 @@ Token Attribute::get_name() const{
 std::vector<std::pair<ExprPtr,TypeExprPtr>> Attribute::get_args() const{
     return this->args;
 }
-std::vector<triplet<Token,ExprPtr,TypeExprPtr>> Attribute::get_kwargs() const{
+std::vector<Utils::triplet<Token,ExprPtr,TypeExprPtr>> Attribute::get_kwargs() const{
     return this->kwargs;
 }
 
@@ -155,13 +155,13 @@ std::string InstructionStmt::InstructionCall::to_string() const{
 
 
 
-InstructionStmt::InstructionStmt(Token tok, std::optional<triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> name,std::optional<InstructionCall> value){
+InstructionStmt::InstructionStmt(Token tok, std::optional<Utils::triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> name,std::optional<InstructionCall> value){
     this->tok = tok;
     this->name = name;
     this->value = value;
 }
 
-std::optional<triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> InstructionStmt::get_name() const{
+std::optional<Utils::triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> InstructionStmt::get_name() const{
     return this->name;
 }
 std::optional<InstructionStmt::InstructionCall> InstructionStmt::get_value() const{
@@ -189,7 +189,7 @@ std::string InstructionStmt::to_string() const{
 
 
 
-Label::Label(Token tok, Token name, std::vector<InstructionStmtPtr> statements, std::vector<triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> params){
+Label::Label(Token tok, Token name, std::vector<InstructionStmtPtr> statements, std::vector<Utils::triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> params){
     this->tok = tok;
     this->name = name;
     this->statements = statements;
@@ -205,7 +205,7 @@ Token Label::get_token() const{
 std::vector<InstructionStmtPtr> Label::get_statements() const{
     return this->statements;
 }
-std::vector<triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> Label::get_params() const{
+std::vector<Utils::triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> Label::get_params() const{
     return this->params;
 }
 
@@ -230,7 +230,7 @@ std::string Label::to_string() const{
 
 
 Scope::Scope(Token tok, ScopeType scope_type, std::optional<Token> scope_name, Token scope_var_name, std::optional<Token> parent_scope_name, 
-            std::optional<triplet<Token,Token,Token>> scope_loc, std::optional<triplet<Token,Token,Token>> callsite_loc){
+            std::optional<Utils::triplet<Token,Token,Token>> scope_loc, std::optional<Utils::triplet<Token,Token,Token>> callsite_loc){
     this->tok = tok;
     this->scope_type = scope_type;
     this->scope_name = scope_name;
@@ -252,10 +252,10 @@ Token Scope::get_scope_var_name() const{
 std::optional<Token> Scope::get_parent_scope_name() const{
     return this->parent_scope_name;
 }
-std::optional<triplet<Token,Token,Token>> Scope::get_scope_loc() const{
+std::optional<Utils::triplet<Token,Token,Token>> Scope::get_scope_loc() const{
     return this->scope_loc;
 }
-std::optional<triplet<Token,Token,Token>> Scope::get_callsite_loc() const{
+std::optional<Utils::triplet<Token,Token,Token>> Scope::get_callsite_loc() const{
     return this->callsite_loc;
 }
 Token Scope::get_token() const{
@@ -294,7 +294,7 @@ std::string Scope::to_string() const{
 }
 
 
-Function::Function(Token tok, Token name, std::vector<AttributePtr> attributes, std::vector<triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> params, 
+Function::Function(Token tok, Token name, std::vector<AttributePtr> attributes, std::vector<Utils::triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> params, 
                    bool varargs, TypeExprPtr return_type, DebugInfoPtr debug_info, std::vector<ScopePtr> scopes, std::vector<LabelPtr> body){
     this->tok = tok;
     this->name = name;
@@ -313,7 +313,7 @@ Token Function::get_name() const{
 std::vector<AttributePtr> Function::get_attributes() const{
     return this->attributes;
 }
-std::vector<triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> Function::get_params() const{
+std::vector<Utils::triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> Function::get_params() const{
     return this->params;
 }
 TypeExprPtr Function::get_return_type() const{

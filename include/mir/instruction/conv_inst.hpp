@@ -307,8 +307,6 @@ class VecPtrToIntInst:public VecConvInst{
 
 class VecIntToPtrInst:public VecConvInst{
     public:
-    //We already know the in type(<ptr,N>) and out type(<i64,N>). But we need to know N. That is why we take the type here
-    //Why not just the number? No partiqular reason. It works. Thought it will make the code cleaner(It doesnt. It is the same either way)
     VecIntToPtrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type);
 
     std::shared_ptr<IR::IntTypeExpr> get_casted_in_basetype() const;

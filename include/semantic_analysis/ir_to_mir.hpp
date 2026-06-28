@@ -15,6 +15,8 @@ bool type_ge(std::string filename, IR::TypeExprPtr t1, IR::TypeExprPtr t2);//Che
                                                                            //If scaler float/int then return if basetype size is greater or equal. 
                                                                            //If vector then we expect the same number of elements(Error otherwise) and expects the base type to have same TypeVariant(Else error)
                                                                            //If same number of element we compare size of basetype
+bool is_int(IR::TypeExprPtr type, std::size_t bits);//Check if the type is an integer type of the given bit width. Expects reduced type. Returns false if type is not int type
+bool is_float(IR::TypeExprPtr type, std::size_t bits, bool is_brain_float);//Check if the type is an float type of the given bit width. Expects reduced type. Returns false if type is not float type
 bool type_compatible(VarSymTablePtr var_symtable, IR::TypeExprPtr type, IR::ExprPtr literal);//Check if a reduced type is compatible with a literal. This is used to check if a literal can be assigned to a variable of a certain type.
 std::size_t get_type_size(IR::TypeExprPtr type);//Get the size of a reduced type in bits.
 [[noreturn]] void error(std::string filename, IR::Token tok, std::string msg,std::string submsg="",std::string ecode="");

@@ -8,14 +8,6 @@
 #include <optional>
 namespace LIRA {
 namespace IR{
-template<typename T1, typename T2, typename T3>
-struct triplet{
-    T1 first;
-    T2 second;
-    T3 third;
-    triplet(T1 first, T2 second, T3 third): first(first), second(second), third(third){}
-};
-
 class DebugInfo{
     Token tok;//the '!' token for error reporting
     Token file_name;//A string literal
@@ -44,13 +36,13 @@ class Attribute{
     Token name;
     //The args are supposed to be const literal anyways
     std::vector<std::pair<ExprPtr,TypeExprPtr>> args;
-    std::vector<triplet<Token,ExprPtr,TypeExprPtr>> kwargs;//Expects constant literal tokens as values and constant identtifier token as keys
+    std::vector<Utils::triplet<Token,ExprPtr,TypeExprPtr>> kwargs;//Expects constant literal tokens as values and constant identtifier token as keys
     public:
-    Attribute(Token tok, Token name, std::vector<std::pair<ExprPtr,TypeExprPtr>> args, std::vector<triplet<Token,ExprPtr,TypeExprPtr>> kwargs);
+    Attribute(Token tok, Token name, std::vector<std::pair<ExprPtr,TypeExprPtr>> args, std::vector<Utils::triplet<Token,ExprPtr,TypeExprPtr>> kwargs);
 
     Token get_name() const;
     std::vector<std::pair<ExprPtr,TypeExprPtr>> get_args() const;
-    std::vector<triplet<Token,ExprPtr,TypeExprPtr>> get_kwargs() const;
+    std::vector<Utils::triplet<Token,ExprPtr,TypeExprPtr>> get_kwargs() const;
     Token get_token() const;
     std::string to_string() const;
 };
@@ -476,13 +468,13 @@ class InstructionStmt{
     private:
     //let type:$name #[attr1] #[attr2]= ...
     Token tok;//the 'let'/instruction token for error reporting
-    std::optional<triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> name;//Empty if we dont assign the InstructionCall statement to a variable
+    std::optional<Utils::triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> name;//Empty if we dont assign the InstructionCall statement to a variable
 
     std::optional<InstructionCall> value;//Empty if it is just a declaration without initialization. Do let type:type = .assign_value(type:<4 x i32>) if u want type def
     public:
-    InstructionStmt(Token tok, std::optional<triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> name, std::optional<InstructionCall> value);
+    InstructionStmt(Token tok, std::optional<Utils::triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> name, std::optional<InstructionCall> value);
 
-    std::optional<triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> get_name() const;
+    std::optional<Utils::triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> get_name() const;
     std::optional<InstructionCall> get_value() const;
     Token get_token() const;
     std::string to_string() const;
@@ -498,15 +490,15 @@ class Label {
     */
     Token tok;//The 'label' token for error reporting
     Token name;//The ``@name`` token for error reporting and identifying the label. Note that the value of this token includes the @ prefix (e.g. @loop)
-    std::vector<triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> params;
+    std::vector<Utils::triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> params;
     std::vector<InstructionStmtPtr> statements;
     public:
-    Label(Token tok, Token name, std::vector<InstructionStmtPtr> statements, std::vector<triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> params);
+    Label(Token tok, Token name, std::vector<InstructionStmtPtr> statements, std::vector<Utils::triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> params);
 
     Token get_name() const;
     Token get_token() const;
     std::vector<InstructionStmtPtr> get_statements() const;
-    std::vector<triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> get_params() const;
+    std::vector<Utils::triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> get_params() const;
     std::string to_string() const;
 };
 
@@ -524,18 +516,18 @@ class Scope {
     std::optional<Token> scope_name;
     Token scope_var_name;//The variable that stores the scope.
     std::optional<Token> parent_scope_name;//Empty if it is a function scope.
-    std::optional<triplet<Token,Token,Token>> scope_loc;// <'main.c', '10', '5'> for error reporting. Empty if not available
-    std::optional<triplet<Token,Token,Token>> callsite_loc;// Only for InlineScope. Else std::nullopt
+    std::optional<Utils::triplet<Token,Token,Token>> scope_loc;// <'main.c', '10', '5'> for error reporting. Empty if not available
+    std::optional<Utils::triplet<Token,Token,Token>> callsite_loc;// Only for InlineScope. Else std::nullopt
     public:
     Scope(Token tok, ScopeType scope_type, std::optional<Token> scope_name, Token scope_var_name, std::optional<Token> parent_scope_name, 
-            std::optional<triplet<Token,Token,Token>> scope_loc, std::optional<triplet<Token,Token,Token>> callsite_loc);
+            std::optional<Utils::triplet<Token,Token,Token>> scope_loc, std::optional<Utils::triplet<Token,Token,Token>> callsite_loc);
 
     ScopeType get_scope_type() const;
     std::optional<Token> get_scope_name() const;
     Token get_scope_var_name() const;
     std::optional<Token> get_parent_scope_name() const;
-    std::optional<triplet<Token,Token,Token>> get_scope_loc() const;
-    std::optional<triplet<Token,Token,Token>> get_callsite_loc() const;
+    std::optional<Utils::triplet<Token,Token,Token>> get_scope_loc() const;
+    std::optional<Utils::triplet<Token,Token,Token>> get_callsite_loc() const;
     Token get_token() const;
     std::string to_string() const;
 };
@@ -551,7 +543,7 @@ class Function {
     Token tok;//The ``fn`` token for error reporting
     Token name;//The function name token for error reporting and identifying the function
     std::vector<AttributePtr> attributes;
-    std::vector<triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> params;
+    std::vector<Utils::triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> params;
     bool varargs;//whether the function has a ... varargs at the end.
     TypeExprPtr return_type;
     DebugInfoPtr debug_info = nullptr;
@@ -560,12 +552,12 @@ class Function {
                                //The first label is the entry point
 
     public:
-    Function(Token tok, Token name, std::vector<AttributePtr> attributes, std::vector<triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> params, 
+    Function(Token tok, Token name, std::vector<AttributePtr> attributes, std::vector<Utils::triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> params, 
              bool varargs, TypeExprPtr return_type, DebugInfoPtr debug_info, std::vector<ScopePtr> scopes, std::vector<LabelPtr> body);
 
     Token get_name() const;
     std::vector<AttributePtr> get_attributes() const;
-    std::vector<triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> get_params() const;
+    std::vector<Utils::triplet<Token, std::vector<AttributePtr>, TypeExprPtr>> get_params() const;
     bool has_varargs() const;
     TypeExprPtr get_return_type() const;
     DebugInfoPtr get_debug_info() const;

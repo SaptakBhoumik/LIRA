@@ -70,13 +70,10 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_numerical_classify_inst(IR::Token 
         auto dest_simd_type = std::dynamic_pointer_cast<IR::SIMDTypeExpr>(dest->get_type());
         auto arg_simd_type = std::dynamic_pointer_cast<IR::SIMDTypeExpr>(args[0].second);
         auto basetype = dest_simd_type->get_basetype();
-        if(basetype->get_kind() != IR::TypeExprKind::IntTypeExpr){
-            Utils::error(this->filename, name, "Unsupported vector base type for numerical classification instruction: " + basetype->to_string());
-        }
         if(arg_simd_type->get_size() != dest_simd_type->get_size()){
             Utils::error(this->filename, name, "Vector size mismatch between destination type " + dest_simd_type->to_string() + " and argument type " + arg_simd_type->to_string());
         }
-        if(!Utils::is_int(basetype,1)){
+        else if(!Utils::is_int(basetype,1)){
             Utils::error(this->filename, name, "Destination type for numerical classification instruction must be a vector type with base type i1");
         }
     }

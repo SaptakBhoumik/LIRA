@@ -196,7 +196,7 @@ CarrBorrType2Inst::CarrBorrType2Inst(IR::InstructionStmtPtr instruction_stmt, Lo
 std::string CarrBorrType2Inst::to_string_helper(const std::string op_name) const{
     std::string type_str = this->get_operand_type()->to_string();
     std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(" + type_str + ":" + this->lhs->to_string() + ", " +
-                                                                                                 (this->rhs != nullptr ? type_str + ":" + this->rhs->to_string() + ", " : "") +
+                                                                                                 type_str + ":" + this->rhs->to_string() + ", " +
                                                                                                  type_str + ":" + this->carr_borr_val->to_string() + ")";                                       
     if(this->unsigned_){
         res += " #[unsigned]";
@@ -248,34 +248,34 @@ std::string IntMacWideInst::to_string() const{
 }
 
 
-IntCarryShlNInst::IntCarryShlNInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs,
+IntCarrShlNInst::IntCarrShlNInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                    IR::LiteralExprPtr carr_borr_val)
-                                   :IntCarrBorrType2Inst(instruction_stmt, destination, lhs, nullptr, carr_borr_val, false){}
-CarrBorrType2Inst::OpType IntCarryShlNInst::get_op_type() const{
+                                   :IntCarrBorrType2Inst(instruction_stmt, destination, lhs, rhs, carr_borr_val, false){}
+CarrBorrType2Inst::OpType IntCarrShlNInst::get_op_type() const{
     return OpType::CARRY_SHL_N;
 }
-std::string IntCarryShlNInst::to_string() const{
+std::string IntCarrShlNInst::to_string() const{
     return this->to_string_helper("int_carry_shl_n");
 }
 
 
-IntCarryLshrNInst::IntCarryLshrNInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs,
+IntCarrLshrNInst::IntCarrLshrNInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                      IR::LiteralExprPtr carr_borr_val)
-                                     :IntCarrBorrType2Inst(instruction_stmt, destination, lhs, nullptr, carr_borr_val, false){}
-CarrBorrType2Inst::OpType IntCarryLshrNInst::get_op_type() const{
+                                     :IntCarrBorrType2Inst(instruction_stmt, destination, lhs, rhs, carr_borr_val, false){}
+CarrBorrType2Inst::OpType IntCarrLshrNInst::get_op_type() const{
     return OpType::CARRY_LSHL_N;
 }
-std::string IntCarryLshrNInst::to_string() const{
+std::string IntCarrLshrNInst::to_string() const{
     return this->to_string_helper("int_carry_lshr_n");
 }
 
-IntCarryAshrNInst::IntCarryAshrNInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs,
+IntCarrAshrNInst::IntCarrAshrNInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                      IR::LiteralExprPtr carr_borr_val)
-                                     :IntCarrBorrType2Inst(instruction_stmt, destination, lhs, nullptr, carr_borr_val, false){}
-CarrBorrType2Inst::OpType IntCarryAshrNInst::get_op_type() const{
+                                     :IntCarrBorrType2Inst(instruction_stmt, destination, lhs, rhs, carr_borr_val, false){}
+CarrBorrType2Inst::OpType IntCarrAshrNInst::get_op_type() const{
     return OpType::CARRY_ASHL_N;
 }
-std::string IntCarryAshrNInst::to_string() const{
+std::string IntCarrAshrNInst::to_string() const{
     return this->to_string_helper("int_carry_ashr_n");
 }
 // ---------------------------- Vec Int Carry/Borrowing Type 1 instructions ---------------------------
@@ -310,34 +310,34 @@ std::string VecIntMacWideInst::to_string() const{
 }
 
 
-VecIntCarryShlNInst::VecIntCarryShlNInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs,
+VecIntCarrShlNInst::VecIntCarrShlNInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                          IR::LiteralExprPtr carr_borr_val)
-                                         :VecIntCarrBorrType2Inst(instruction_stmt, destination, lhs, nullptr, carr_borr_val, false){}
-CarrBorrType2Inst::OpType VecIntCarryShlNInst::get_op_type() const{
+                                         :VecIntCarrBorrType2Inst(instruction_stmt, destination, lhs, rhs, carr_borr_val, false){}
+CarrBorrType2Inst::OpType VecIntCarrShlNInst::get_op_type() const{
     return OpType::CARRY_SHL_N;
 }
-std::string VecIntCarryShlNInst::to_string() const{
+std::string VecIntCarrShlNInst::to_string() const{
     return this->to_string_helper("vec_int_carry_shl_n");
 }
 
 
-VecIntCarryLshrNInst::VecIntCarryLshrNInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs,
+VecIntCarrLshrNInst::VecIntCarrLshrNInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                           IR::LiteralExprPtr carr_borr_val)
-                                          :VecIntCarrBorrType2Inst(instruction_stmt, destination, lhs, nullptr, carr_borr_val, false){}
-CarrBorrType2Inst::OpType VecIntCarryLshrNInst::get_op_type() const{
+                                          :VecIntCarrBorrType2Inst(instruction_stmt, destination, lhs, rhs, carr_borr_val, false){}
+CarrBorrType2Inst::OpType VecIntCarrLshrNInst::get_op_type() const{
     return OpType::CARRY_LSHL_N;
 }
-std::string VecIntCarryLshrNInst::to_string() const{
+std::string VecIntCarrLshrNInst::to_string() const{
     return this->to_string_helper("vec_int_carry_lshr_n");
 }
 
-VecIntCarryAshrNInst::VecIntCarryAshrNInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs,
+VecIntCarrAshrNInst::VecIntCarrAshrNInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                            IR::LiteralExprPtr carr_borr_val)
-                                           :VecIntCarrBorrType2Inst(instruction_stmt, destination, lhs, nullptr, carr_borr_val, false){}
-CarrBorrType2Inst::OpType VecIntCarryAshrNInst::get_op_type() const{
+                                           :VecIntCarrBorrType2Inst(instruction_stmt, destination, lhs, rhs, carr_borr_val, false){}
+CarrBorrType2Inst::OpType VecIntCarrAshrNInst::get_op_type() const{
     return OpType::CARRY_ASHL_N;
 }
-std::string VecIntCarryAshrNInst::to_string() const{
+std::string VecIntCarrAshrNInst::to_string() const{
     return this->to_string_helper("vec_int_carry_ashr_n");
 }
 }

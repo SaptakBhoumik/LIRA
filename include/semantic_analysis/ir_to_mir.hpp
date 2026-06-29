@@ -54,6 +54,7 @@ class IRToMIRSemanticAnalyzer {
     MIR::InstPtr analyze_arithmetic_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
     MIR::InstPtr analyze_arithmetic_tri_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
     MIR::InstPtr analyze_widening_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
+    MIR::InstPtr analyze_carry_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
     MIR::InstPtr analyze_other_arithmetic_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
     
     MIR::InstPtr analyze_wrap_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);

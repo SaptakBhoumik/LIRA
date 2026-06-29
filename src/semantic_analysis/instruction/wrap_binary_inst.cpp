@@ -73,9 +73,11 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_wrap_bin_inst(IR::Token name,IR::I
                 if(simd_dest_type->get_size() != simd_type->get_size()){
                     Utils::error(this->filename, name, "Wrap binary instruction destination type must be a struct type with 2 fields where the first field is a vector type of the same size as the second field if the second field is a vector type");
                 }
-                field2_type = simd_type->get_basetype();
+                else if(!Utils::is_int(simd_type->get_basetype(),1)){
+                    Utils::error(this->filename, name, "Wrap binary instruction destination type must be a struct type with 2 fields where the second field is a vector type with base type i1");
+                }
             }
-            if(!Utils::is_int(field2_type,1)){
+            else if(!Utils::is_int(field2_type,1)){
                 Utils::error(this->filename, name, "Wrap binary instruction destination type must be a struct type with 2 fields where the second field is a boolean type");
             }
         }

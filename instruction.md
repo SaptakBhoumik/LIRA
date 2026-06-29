@@ -212,7 +212,6 @@ Widening instructions compute `a OP b` at the full precision of the *output* typ
 ---
 
 ## Carry/Borrowing instructions
-### Carrying / Borrow Arithmetic Instructions
 
 These instructions thread a carry or borrow bit in and out, enabling multi-word arithmetic. All inputs and outputs are scalar; the carry/borrow is always `i1`. There are no direct vector forms - carry semantics are inherently sequential across words, so a carry chain over a vector is expressed as a loop over scalar words. Lanewise application is valid and expected: apply the instruction to one lane (word) per loop iteration, feeding the carry-out of iteration `i` as the carry-in of iteration `i+1`. The carry-in `%cin` must be `i1`; typically `0i1` for the least-significant word and the carry-out of the previous word for higher words. NOTE: You can use vector types also. We just convert it to a loop of scalar ops or to unrolled loops of scalar ops under the hood. This allows you to write more natural code when dealing with vectors of multi-word integers
 

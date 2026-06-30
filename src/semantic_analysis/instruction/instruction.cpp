@@ -77,8 +77,14 @@ bool is_terminator_inst(std::string inst_name){
 bool is_call_inst(std::string inst_name){
     return inst_name == ".call";
 }
-bool is_other_inst(std::string inst_name){
-    return inst_name == ".select" || inst_name == ".freeze" || inst_name == ".va_arg" || inst_name == ".ptrmask" || inst_name == ".shufflevector" ;
+bool is_other_inst(std::string inst_name) {
+    return inst_name == ".select" || inst_name == ".freeze" || inst_name == ".va_start" || inst_name == ".va_end" || inst_name == ".va_copy" || 
+           inst_name == ".va_arg" || inst_name == ".ptrmask" || inst_name == ".pause" || inst_name == ".assume" || inst_name == ".assume_range" || 
+           inst_name == ".assume_not" || inst_name == ".assume_not_range" || inst_name == ".expect" || inst_name == ".expect_range" || inst_name == ".nop" || 
+           inst_name == ".annotation" || inst_name == ".endbr64" || inst_name == ".launder" || inst_name == ".strip_invariant_group";
+}
+bool is_global_inst(std::string inst_name){
+    return inst_name == ".global" || inst_name == ".assign_type";
 }
 MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_instruction(IR::InstructionStmtPtr inst_stmt){
     IR::Token inst_name = inst_stmt->get_value()->get_token();
@@ -138,6 +144,9 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_instruction(IR::InstructionStmtPtr
     }
     else if(is_other_inst(inst_name.value)){
         return analyze_other_inst(inst_name,inst_stmt);
+    }
+    else if(is_global_inst(inst_name.value)){
+        Utils::error(this->filename,inst_stmt->get_value()->get_token(),"Instruction " + inst_name.value + " is a global instruction and cannot be used within a label");
     }
     else{
         Utils::error(this->filename,inst_stmt->get_value()->get_token(),"Unknown instruction: " + inst_name.value);

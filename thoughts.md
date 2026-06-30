@@ -7,3 +7,4 @@
 - Should I allow i<N> for any N for mulhi scale?
 - Should I cread min/max variant for regular min/max, reduce min/max, horizontal min/max etc that also returns the index of min/max
 - Should I have widening variant for reduce and horizontal simd operations?
+- SHould I have expect not just for consistancy?

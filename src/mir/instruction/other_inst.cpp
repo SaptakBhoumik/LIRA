@@ -248,12 +248,13 @@ std::string AssumeInst::to_string() const{
 
 
 AssumeRangeInst::AssumeRangeInst(IR::InstructionStmtPtr instruction_stmt, std::string varname, IR::LiteralExprPtr min_value, IR::LiteralExprPtr max_value, 
-                                 IR::TypeExprPtr type, std::optional<FastMathAttr> fast_math_attr):
+                                 IR::TypeExprPtr type, bool unsigned_, std::optional<FastMathAttr> fast_math_attr):
                                   Inst(instruction_stmt, nullptr, fast_math_attr){
     this->min_value = min_value;
     this->max_value = max_value;
     this->type = type;
     this->varname = varname;
+    this->unsigned_ = unsigned_;
 }
 std::string AssumeRangeInst::get_varname() const{
     return this->varname;
@@ -267,6 +268,9 @@ IR::LiteralExprPtr AssumeRangeInst::get_max_value() const{
 IR::TypeExprPtr AssumeRangeInst::get_type() const{
     return this->type;
 }
+bool AssumeRangeInst::is_unsigned() const{
+    return this->unsigned_;
+}
 InstType AssumeRangeInst::get_inst_type() const{
     return InstType::AssumeRangeInst;
 }
@@ -275,6 +279,9 @@ std::string AssumeRangeInst::to_string() const{
                       this->type->to_string() + ":" + this->max_value->to_string() + ")";
     if(this->fast_math_attr.has_value()){
         res += " " + this->fast_math_attr.value().to_string();
+    }
+    if(this->unsigned_){
+        res += " #[unsigned]";
     }
     return res;
 }
@@ -313,12 +320,13 @@ std::string AssumeNotInst::to_string() const{
 
 
 AssumeNotRangeInst::AssumeNotRangeInst(IR::InstructionStmtPtr instruction_stmt, std::string varname, IR::LiteralExprPtr min_value, IR::LiteralExprPtr max_value, 
-                                        IR::TypeExprPtr type, std::optional<FastMathAttr> fast_math_attr):
+                                        IR::TypeExprPtr type, bool unsigned_, std::optional<FastMathAttr> fast_math_attr):
                                         Inst(instruction_stmt, nullptr, fast_math_attr){
     this->min_value = min_value;
     this->max_value = max_value;
     this->type = type;
     this->varname = varname;
+    this->unsigned_ = unsigned_;
 }
 std::string AssumeNotRangeInst::get_varname() const{
     return this->varname;
@@ -332,6 +340,9 @@ IR::LiteralExprPtr AssumeNotRangeInst::get_max_value() const{
 IR::TypeExprPtr AssumeNotRangeInst::get_type() const{
     return this->type;
 }
+bool AssumeNotRangeInst::is_unsigned() const{
+    return this->unsigned_;
+}
 InstType AssumeNotRangeInst::get_inst_type() const{
     return InstType::AssumeNotRangeInst;
 }
@@ -340,6 +351,9 @@ std::string AssumeNotRangeInst::to_string() const{
                       this->type->to_string() + ":" + this->max_value->to_string() + ")";
     if(this->fast_math_attr.has_value()){
         res += " " + this->fast_math_attr.value().to_string();
+    }
+    if(this->unsigned_){
+        res += " #[unsigned]";
     }
     return res;
 }
@@ -386,13 +400,14 @@ std::string ExpectInst::to_string() const{
 
 
 ExpectRangeInst::ExpectRangeInst(IR::InstructionStmtPtr instruction_stmt, std::string varname, IR::LiteralExprPtr min_value, IR::LiteralExprPtr max_value, 
-                                 IR::TypeExprPtr type, std::optional<double> probability, std::optional<FastMathAttr> fast_math_attr):
+                                 IR::TypeExprPtr type, std::optional<double> probability, bool unsigned_, std::optional<FastMathAttr> fast_math_attr):
                                   Inst(instruction_stmt, nullptr, fast_math_attr){
     this->min_value = min_value;
     this->max_value = max_value;
     this->type = type;
     this->varname = varname;
     this->probability = probability;
+    this->unsigned_ = unsigned_;
 }
 std::string ExpectRangeInst::get_varname() const{
     return this->varname;
@@ -409,6 +424,9 @@ std::optional<double> ExpectRangeInst::get_probability() const{
 IR::TypeExprPtr ExpectRangeInst::get_type() const{
     return this->type;
 }
+bool ExpectRangeInst::is_unsigned() const{
+    return this->unsigned_;
+}
 InstType ExpectRangeInst::get_inst_type() const{
     return InstType::ExpectRangeInst;
 }
@@ -420,6 +438,9 @@ std::string ExpectRangeInst::to_string() const{
     }
     if(this->probability.has_value()){
         res += " #[probability(f64:" + std::to_string(this->probability.value()) + ")]";
+    }
+    if(this->unsigned_){
+        res += " #[unsigned]";
     }
     return res;
 }

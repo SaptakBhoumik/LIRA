@@ -58,7 +58,7 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_arithmetic_fetch_bin_inst(IR::Toke
     auto dest = process_local_dest_arg(inst_stmt);
     IR::TypeExprPtr type = dest->get_type();//Already reduced type by process_local_dest_arg
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
-    auto [common_fetch_attrs,remaining_attrs] = Utils::extract_common_atomic_inst(this->filename,attributes);
+    auto [common_fetch_attrs,remaining_attrs] = Utils::extract_common_atomic_attrs(this->filename,attributes);
     if(Utils::get_type_size(type) > 128 && common_fetch_attrs.atomic_ordering.has_value()){
         Utils::error(this->filename, name, "Atomic arithmetic binary fetch instruction destination type size must be less than or equal to 128 bits. Found: " + std::to_string(Utils::get_type_size(type)) + " bits");
     }

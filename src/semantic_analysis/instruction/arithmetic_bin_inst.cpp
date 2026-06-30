@@ -53,13 +53,13 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_arithmetic_bin_inst(IR::Token name
     }
     auto dest = process_local_dest_arg(inst_stmt);
     IR::TypeExprPtr type = dest->get_type();//Already reduced type by process_local_dest_arg
-    for(auto arg:args){
-        arg.second = Utils::get_reduced_type(this->type_symtable,arg.second);
-        if(!Utils::type_eq(type,arg.second)){
-            Utils::error(this->filename, arg.first->get_token(), "Argument type " + arg.second->to_string() + " is not the same as destination type " + type->to_string());
+    for(size_t i = 0; i < args.size(); i++){
+        args[i].second = Utils::get_reduced_type(this->type_symtable,args[i].second);
+        if(!Utils::type_eq(type,args[i].second)){
+            Utils::error(this->filename, args[i].first->get_token(), "Argument type " + args[i].second->to_string() + " is not the same as destination type " + type->to_string());
         }
-        else if(!Utils::type_compatible(this->var_symtable, arg.second,arg.first)){
-            Utils::error(this->filename, arg.first->get_token(), "Argument type " + arg.second->get_token().value + " is not compatible with assigned type " + arg.second->to_string());
+        else if(!Utils::type_compatible(this->var_symtable, args[i].second,args[i].first)){
+            Utils::error(this->filename, args[i].first->get_token(), "Argument type " + args[i].second->get_token().value + " is not compatible with assigned type " + args[i].second->to_string());
         }
     }
     auto type_variant = MIR::get_type_variant_from_type(type);

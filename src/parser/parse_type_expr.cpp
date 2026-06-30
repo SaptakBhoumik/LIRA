@@ -55,6 +55,9 @@ TypeExprPtr Parser::parse_named_type_expr(bool has_attribute){
     if(name.value == "void"){
         return std::make_shared<VoidTypeExpr>(name, attributes);
     }
+    if(name.value == "str"){
+        return std::make_shared<StrTypeExpr>(name, attributes);
+    }
     else if(name.value == "ptr"){
         return std::make_shared<PtrTypeExpr>(name, attributes);
     }

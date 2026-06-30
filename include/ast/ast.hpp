@@ -54,6 +54,7 @@ enum class TypeExprKind:std::uint8_t{
     IntTypeExpr,
     FloatTypeExpr,
     VoidTypeExpr,
+    StrTypeExpr,
     PtrTypeExpr,    
     MetaTypeExpr,
     ArrayTypeExpr,
@@ -135,6 +136,19 @@ class VoidTypeExpr : public TypeExpr{
     std::vector<AttributePtr> attributes;
     public:
     VoidTypeExpr(Token tok, std::vector<AttributePtr> attributes);
+
+    Token get_token() const override;
+    TypeExprKind get_kind() const override;
+    std::vector<AttributePtr> get_attributes() const override;
+    std::string to_string() const override;
+};
+
+class StrTypeExpr : public TypeExpr{
+    //str #[attributes]
+    Token tok;//the str token for error reporting
+    std::vector<AttributePtr> attributes;
+    public:
+    StrTypeExpr(Token tok, std::vector<AttributePtr> attributes);
 
     Token get_token() const override;
     TypeExprKind get_kind() const override;

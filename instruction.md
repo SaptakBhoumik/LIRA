@@ -1355,7 +1355,7 @@ The following are defined only on integer
     If T0 is float/bfloat/vector of float: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 - `let T:%output_var = .freeze(T:%input_var)` - Freezes a poison or otherwise indeterminate value. The result is an arbitrary but fixed value of type T; the compiler may not make assumptions about which value. Prevents optimizations that rely on poison semantics from propagating through this point. T can be any type. 
-
+ 
     If T is float/bfloat/vector of float: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 - `.va_start(ptr:%input_var)` - Initializes a variable-argument list. `input_var` must point to an allocated `{i32,i32,ptr,ptr}` struct (the `va_list`). Separated from allocation so the caller can allocate and optionally inspect the struct before initialization.
@@ -1370,17 +1370,17 @@ The following are defined only on integer
 
 - `let T:%output_var = .ptrmask(T:%input_var, T1:%mask)` - Masks a pointer with an integer mask. T must be `ptr` or `<ptr,M>`. T1 must be an integer or vector of integer. If T1 is a vector, T must be a vector of the same size. No attributes. T1 must be i64 or <i64,M>.
 
-- `let type:%type_name = .assign_type(type:<type_definition>)` - Creates a type alias. Not a real instruction; ignored by MIR. Present only to simplify the parser.
+- `let type:%type_name = .assign_type(type:<type_definition>)` - Creates a type alias. Not a real instruction; ignored by MIR. Present only to simplify the parser. Present only at global scope and not inside a function
 
 - `.pause` - Emits the x86 `PAUSE` instruction, which is a hint to the processor that the current thread is in a spin-wait loop. On out-of-order CPUs this prevents the speculative execution pipeline from being flooded with iterations of a tight spin loop, reducing power consumption and improving performance when the lock is released (the pipeline does not need to be flushed). On hyperthreaded cores it also yields the execution resources to the sibling thread. Has no observable effect on program semantics; the CPU may treat it as a no-op on cores that do not support it. No inputs. No output. No attributes.
-
+ 
 ### Optimizer Hint Instructions
 
 #### Binding Assumptions (May cause UB if violated)
 
 For the following if T is float/bfloat/vector of float: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
-- `.assume(T:%var, T:compile_time_value)` - Tells the optimizer that `%var` holds `compile_time_value` at this program point. The compiler may propagate this as a known value. Undefined behavior if the assumption is false. `T` can be any type as long as represented as compile time value. `compile_time_value` must be a literal.
+- `.assume(T:%var, T:compile_time_value)` - Tells the optimizer that `%var` holds `compile_time_value` at this program point. The compiler may propagate this as a known value. Undefined behavior if the assumption is false. `T` can be any type as long as represented as compile time value. `compile_time_value` must be a literal.f64
 
 - `.assume(T:%var, T:v0, T:v1, ...)` - Asserts that `%var` is one of the listed compile-time values. Undefined behavior if wrong. `T` can be any type as long as represented as compile time value. At least one value required.
 
@@ -1399,14 +1399,14 @@ For the following if T is float/bfloat/vector of float: `#[fast]`, `#[nnan]`, `#
 For the following if T is float/bfloat/vector of float: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 - `.expect(T:%var, T:compile_time_value)` - Hints that `%var` most commonly holds `compile_time_value`. No UB if wrong. Analogous to `__builtin_expect`. `T` can be any type as long as represented as compile time value.
-    - `#[probability(f32:P)]` - probability the value matches (0.0–1.0); default unspecified
+    - `#[probability(f64:P)]` - probability the value matches (0.0–1.0); default unspecified
 
 - `.expect(T:%var, T:v0, T:v1, ...)` - Hints that `%var` is most likely one of the listed values. `T` can be any type as long as represented as compile time value. No UB if wrong.
-    - `#[probability(f32:P)]` - probability the value is in the list
+    - `#[probability(f64:P)]` - probability the value is in the list
 
 - `.expect_range(T:%var, T:compile_time_lo, T:compile_time_hi)` - Hints that `%var` most commonly falls in `[lo, hi]`. T is integer or float. No UB if wrong.
     - `#[unsigned]` - interval unsigned
-    - `#[probability(f32:P)]` - probability the value is in range
+    - `#[probability(f64:P)]` - probability the value is in range
 
 There are no expect_not variants, since they are equivalent to the corresponding expect variant with the probability inverted (1 - P).
 

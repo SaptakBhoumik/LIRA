@@ -165,15 +165,17 @@ class AssumeRangeInst:public Inst {
     IR::LiteralExprPtr min_value;
     IR::LiteralExprPtr max_value;
     IR::TypeExprPtr type;
+    bool unsigned_;
     std::string varname;
     public:
     AssumeRangeInst(IR::InstructionStmtPtr instruction_stmt, std::string varname, IR::LiteralExprPtr min_value, IR::LiteralExprPtr max_value, 
-                    IR::TypeExprPtr type, std::optional<FastMathAttr> fast_math_attr);  
+                    IR::TypeExprPtr type, bool unsigned_, std::optional<FastMathAttr> fast_math_attr);  
 
     std::string get_varname() const;
     IR::LiteralExprPtr get_min_value() const;
     IR::LiteralExprPtr get_max_value() const;
     IR::TypeExprPtr get_type() const;
+    bool is_unsigned() const;
 
     InstType get_inst_type() const override;
     std::string to_string() const override;
@@ -199,15 +201,17 @@ class AssumeNotRangeInst:public Inst {
     IR::LiteralExprPtr min_value;
     IR::LiteralExprPtr max_value;
     IR::TypeExprPtr type;
+    bool unsigned_;
     std::string varname;
     public:
     AssumeNotRangeInst(IR::InstructionStmtPtr instruction_stmt, std::string varname, IR::LiteralExprPtr min_value, IR::LiteralExprPtr max_value, 
-                       IR::TypeExprPtr type, std::optional<FastMathAttr> fast_math_attr);  
+                       IR::TypeExprPtr type, bool unsigned_, std::optional<FastMathAttr> fast_math_attr);  
 
     std::string get_varname() const;
     IR::LiteralExprPtr get_min_value() const;
     IR::LiteralExprPtr get_max_value() const;
     IR::TypeExprPtr get_type() const;
+    bool is_unsigned() const;
 
     InstType get_inst_type() const override;
     std::string to_string() const override;
@@ -238,16 +242,18 @@ class ExpectRangeInst:public Inst {
     IR::LiteralExprPtr max_value;
     IR::TypeExprPtr type;
     std::optional<double> probability;
+    bool unsigned_;
     std::string varname;
     public:
     ExpectRangeInst(IR::InstructionStmtPtr instruction_stmt, std::string varname, IR::LiteralExprPtr min_value, IR::LiteralExprPtr max_value, 
-                    IR::TypeExprPtr type, std::optional<double> probability, std::optional<FastMathAttr> fast_math_attr);  
+                    IR::TypeExprPtr type, std::optional<double> probability, bool unsigned_, std::optional<FastMathAttr> fast_math_attr);  
 
     std::string get_varname() const;
     IR::LiteralExprPtr get_min_value() const;
     IR::LiteralExprPtr get_max_value() const;
     std::optional<double> get_probability() const;
     IR::TypeExprPtr get_type() const;
+    bool is_unsigned() const;
 
     InstType get_inst_type() const override;
     std::string to_string() const override;

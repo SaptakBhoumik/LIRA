@@ -2,6 +2,7 @@
 #include "ast/ast.hpp"
 #include <sys/cdefs.h>
 #include <optional>
+#include "symtable/symtable.hpp"
 namespace LIRA {
 namespace MIR{
 class LocalDestRegister{

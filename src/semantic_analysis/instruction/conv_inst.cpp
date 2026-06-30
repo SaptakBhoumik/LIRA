@@ -48,15 +48,13 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_conv_inst(IR::Token name,IR::Instr
         {".int_to_ptr",   analyze_int_to_ptr_inst},
     };
     auto args = inst_stmt->get_value()->get_operands();
-    auto _dest = inst_stmt->get_name();
-    if(!_dest.has_value()){
-        Utils::error(this->filename, name, "Conversion instruction must have a destination i.e assign this instruction to a variable");
-    }
     if(args.size() != 1){
         Utils::error(this->filename, name, "Conversion instruction must have 1 argument");
     }
     auto dest = process_local_dest_arg(inst_stmt);
-    
+    if(dest == nullptr){
+        Utils::error(this->filename, name, "Conversion instruction must have a destination i.e assign this instruction to a variable");
+    }
     {
         args[0].second = Utils::get_reduced_type(this->type_symtable,args[0].second);
         if(!Utils::type_compatible(this->var_symtable, args[0].second,args[0].first)){

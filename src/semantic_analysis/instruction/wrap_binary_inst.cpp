@@ -44,14 +44,13 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_wrap_bin_inst(IR::Token name,IR::I
         {".wrap_ashr", analyze_wrap_ashr_inst},
     };
     auto args = inst_stmt->get_value()->get_operands();
-    auto _dest = inst_stmt->get_name();
-    if(!_dest.has_value()){
-        Utils::error(this->filename, name, "Wrap binary instruction must have a destination i.e assign this instruction to a variable");
-    }
     if(args.size() != 2){
         Utils::error(this->filename, name, "Wrap binary instruction must have 2 arguments");
     }
     auto dest = process_local_dest_arg(inst_stmt);
+    if(dest == nullptr){
+        Utils::error(this->filename, name, "Wrap binary instruction must have a destination i.e assign this instruction to a variable");
+    }
     IR::TypeExprPtr type = dest->get_type();//Already reduced type by process_local_dest_arg
     if(type->get_kind()!=IR::TypeExprKind::StructTypeExpr){
         Utils::error(this->filename, name, "Wrap binary instruction destination type must be a struct type");

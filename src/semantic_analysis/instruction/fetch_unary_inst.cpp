@@ -88,14 +88,13 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_unary_fetch_inst(IR::Token name,IR
         ".fetch_neg",".fetch_abs",".fetch_ceil",".fetch_floor",".fetch_integral_part",".fetch_fractional_part",".fetch_roundnearest",".fetch_roundeven",".fetch_sqrt",".fetch_reciprocal",".fetch_rsqrt", ".fetch_bswap"
     };
     auto args = inst_stmt->get_value()->get_operands();
-    auto _dest = inst_stmt->get_name();
-    if(!_dest.has_value()){
-        Utils::error(this->filename, name, "Unary fetch instruction must have a destination i.e assign this instruction to a variable");
-    }
     if(args.size() != 1){
         Utils::error(this->filename, name, "Unary fetch instruction must have 1 argument");
     }
     auto dest = process_local_dest_arg(inst_stmt);
+    if(dest == nullptr){
+        Utils::error(this->filename, name, "Unary fetch instruction must have a destination i.e assign this instruction to a variable");
+    }
     IR::TypeExprPtr type = dest->get_type();//Already reduced type by process_local_dest_arg
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [common_fetch_attrs,remaining_attrs] = Utils::extract_common_atomic_attrs(this->filename,attributes);

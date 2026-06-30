@@ -88,62 +88,63 @@ bool is_global_inst(std::string inst_name){
 }
 MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_instruction(IR::InstructionStmtPtr inst_stmt){
     IR::Token inst_name = inst_stmt->get_value()->get_token();
+    MIR::InstPtr inst = nullptr;
     if(is_arithmetic_bin_inst(inst_name.value)){
-        return analyze_arithmetic_bin_inst(inst_name,inst_stmt);
+        inst = analyze_arithmetic_bin_inst(inst_name,inst_stmt);
     }
     else if(is_arithmetic_tri_inst(inst_name.value)){
-        return analyze_arithmetic_tri_inst(inst_name,inst_stmt);
+        inst = analyze_arithmetic_tri_inst(inst_name,inst_stmt);
     }
     else if(is_widening_bin_inst(inst_name.value)){
-        return analyze_widening_bin_inst(inst_name,inst_stmt);
+        inst = analyze_widening_bin_inst(inst_name,inst_stmt);
     }
     else if(is_carry_inst(inst_name.value)){
-        return analyze_carry_inst(inst_name,inst_stmt);
+        inst = analyze_carry_inst(inst_name,inst_stmt);
     }
     else if(is_other_arithmetic_inst(inst_name.value)){
-        return analyze_other_arithmetic_inst(inst_name,inst_stmt);
+        inst = analyze_other_arithmetic_inst(inst_name,inst_stmt);
     }
     else if(is_wrap_bin_inst(inst_name.value)){
-        return analyze_wrap_bin_inst(inst_name,inst_stmt);
+        inst = analyze_wrap_bin_inst(inst_name,inst_stmt);
     }
     else if(is_bitwise_bin_inst(inst_name.value)){
-        return analyze_bitwise_bin_inst(inst_name,inst_stmt);
+        inst = analyze_bitwise_bin_inst(inst_name,inst_stmt);
     }
     else if(is_bitwise_tri_inst(inst_name.value)){
-        return analyze_bitwise_tri_inst(inst_name,inst_stmt);
+        inst = analyze_bitwise_tri_inst(inst_name,inst_stmt);
     }
     else if(is_cmp_bin_inst(inst_name.value)){
-        return analyze_cmp_bin_inst(inst_name,inst_stmt);
+        inst = analyze_cmp_bin_inst(inst_name,inst_stmt);
     }
     else if(is_conv_inst(inst_name.value)){
-        return analyze_conv_inst(inst_name,inst_stmt);
+        inst = analyze_conv_inst(inst_name,inst_stmt);
     }
     else if(is_unary_inst(inst_name.value)){
-        return analyze_unary_inst(inst_name,inst_stmt);
+        inst = analyze_unary_inst(inst_name,inst_stmt);
     }
     else if(is_numerical_classify_inst(inst_name.value)){
-        return analyze_numerical_classify_inst(inst_name,inst_stmt);
+        inst = analyze_numerical_classify_inst(inst_name,inst_stmt);
     }
     else if(is_mem_inst(inst_name.value)){
-        return analyze_mem_inst(inst_name,inst_stmt);
+        inst = analyze_mem_inst(inst_name,inst_stmt);
     }
     else if(is_arithmetic_fetch_bin_inst(inst_name.value)){
-        return analyze_arithmetic_fetch_bin_inst(inst_name,inst_stmt);
+        inst = analyze_arithmetic_fetch_bin_inst(inst_name,inst_stmt);
     }
     else if(is_bitwise_fetch_bin_inst(inst_name.value)){
-        return analyze_bitwise_fetch_bin_inst(inst_name,inst_stmt);
+        inst = analyze_bitwise_fetch_bin_inst(inst_name,inst_stmt);
     }
     else if(is_unary_fetch_inst(inst_name.value)){
-        return analyze_unary_fetch_inst(inst_name,inst_stmt);
+        inst = analyze_unary_fetch_inst(inst_name,inst_stmt);
     }
     else if(is_terminator_inst(inst_name.value)){
-        return analyze_terminator_inst(inst_name,inst_stmt);
+        inst = analyze_terminator_inst(inst_name,inst_stmt);
     }
     else if(is_call_inst(inst_name.value)){
-        return analyze_call_inst(inst_name,inst_stmt);
+        inst = analyze_call_inst(inst_name,inst_stmt);
     }
     else if(is_other_inst(inst_name.value)){
-        return analyze_other_inst(inst_name,inst_stmt);
+        inst = analyze_other_inst(inst_name,inst_stmt);
     }
     else if(is_global_inst(inst_name.value)){
         Utils::error(this->filename,inst_stmt->get_value()->get_token(),"Instruction " + inst_name.value + " is a global instruction and cannot be used within a label");
@@ -151,6 +152,8 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_instruction(IR::InstructionStmtPtr
     else{
         Utils::error(this->filename,inst_stmt->get_value()->get_token(),"Unknown instruction: " + inst_name.value);
     }
+    add_dest_to_symtable(inst->get_destination());
+    return inst;
 }
 }
 }

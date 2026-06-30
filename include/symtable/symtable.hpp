@@ -1,3 +1,4 @@
+#pragma once
 #include "ast/ast.hpp"
 #include <unordered_map>
 
@@ -14,8 +15,8 @@ class TypeSymTable {
     public:
     TypeSymTable(std::string filename);
     void insert(IR::Token name, IR::TypeExprPtr type);//Expects u to run reduce_type_expr on the type before inserting it into the table. 
-    IR::TypeExprPtr lookup(IR::TypeExprPtr name) const;//If it is a built in type then return it. If not found then error. Dont exit if error. Just add to errors. Return an AnyTypeExpr in case of error to avoid spamming follow up errors.
-    IR::TypeExprPtr lookup(IR::Token name) const;//If it is a built in type then return it. If not found then error. Dont exit if error. Just add to errors. Return an AnyTypeExpr in case of error to avoid spamming follow up errors.
+    IR::TypeExprPtr lookup(IR::TypeExprPtr name) const;//If it is a built in type then return it. If not found then error. 
+    IR::TypeExprPtr lookup(IR::Token name) const;//If it is a built in type then return it. If not found then error. 
     bool contains(IR::Token name) const;//Check if the type is in the table (either built in or user defined)
 
     void clear_local_type();
@@ -31,9 +32,10 @@ class VarSymTable {
     public:
     VarSymTable(std::string filename);
     void insert(IR::Token name, IR::TypeExprPtr type);//Expects u to run reduce_type_expr on the type before inserting it into the table.TODO: Make sure to add the ``labels``
+    void update(IR::Token name, IR::TypeExprPtr type);//Updates the type of the variable in the table. Expects u to run reduce_type_expr on the type before inserting it into the table. If not found then error. 
     //lookup returns nulptr if the variable is builtin and doenst create error.TODO: Up to caler to determine how to handle it?
-    IR::TypeExprPtr lookup(IR::ExprPtr name) const;//If not found then error. Dont exit if error. Just add to errors. Return an AnyTypeExpr in case of error to avoid spamming follow up errors.
-    IR::TypeExprPtr lookup(IR::Token name) const;//If not found then error. Dont exit if error. Just add to errors. Return an AnyTypeExpr in case of error to avoid spamming follow up errors.
+    IR::TypeExprPtr lookup(IR::ExprPtr name) const;//If not found then error. 
+    IR::TypeExprPtr lookup(IR::Token name) const;//If not found then error. 
     bool exists(IR::ExprPtr name) const;//Check if the variable is in the table.
     bool exists(IR::Token name) const;//Check if the variable is in the table
 

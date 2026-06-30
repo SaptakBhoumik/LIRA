@@ -44,14 +44,13 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_arithmetic_bin_inst(IR::Token name
         {".avg", analyze_avg_bin_inst}
     };
     auto args = inst_stmt->get_value()->get_operands();
-    auto _dest = inst_stmt->get_name();
-    if(!_dest.has_value()){
-        Utils::error(this->filename, name, "Arithmetic binary instruction must have a destination i.e assign this instruction to a variable");
-    }
     if(args.size() != 2){
         Utils::error(this->filename, name, "Arithmetic binary instruction must have 2 arguments");
     }
     auto dest = process_local_dest_arg(inst_stmt);
+    if(dest == nullptr){
+        Utils::error(this->filename, name, "Arithmetic binary instruction must have a destination i.e assign this instruction to a variable");
+    }
     IR::TypeExprPtr type = dest->get_type();//Already reduced type by process_local_dest_arg
     for(size_t i = 0; i < args.size(); i++){
         args[i].second = Utils::get_reduced_type(this->type_symtable,args[i].second);

@@ -33,11 +33,10 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_other_arithmetic_inst(IR::Token na
             Utils::error(this->filename, name, "Arithmetic binary instruction must have 2 arguments");
         }
     }
-    auto _dest = inst_stmt->get_name();
-    if(!_dest.has_value()){
+    auto dest = process_local_dest_arg(inst_stmt);
+    if(dest == nullptr){
         Utils::error(this->filename, name, "Arithmetic binary instruction must have a destination i.e assign this instruction to a variable");
     }
-    auto dest = process_local_dest_arg(inst_stmt);
     IR::TypeExprPtr type = dest->get_type();//Already reduced type by process_local_dest_arg
     if(name.value == ".divmod" || name.value == ".widening_divmod"){
         if(type->get_kind() != IR::TypeExprKind::StructTypeExpr){

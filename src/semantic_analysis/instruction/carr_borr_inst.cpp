@@ -44,10 +44,6 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_carry_inst(IR::Token name,IR::Inst
     std::unordered_set<std::string> type1_carry = {".carry_add", ".carry_sub",".carry_shl",".carry_lshr",".carry_ashr"};//The carry is returned as i1 or vec of i1
     std::unordered_set<std::string> type2_carry = {".mac_wide", ".carry_shl_n", ".carry_lshr_n", ".carry_ashr_n"};//The carry is returned as int or vec of int and same type as the first struct field
     auto args = inst_stmt->get_value()->get_operands();
-    auto _dest = inst_stmt->get_name();
-    if(!_dest.has_value()){
-        Utils::error(this->filename, name, "Carry binary instruction must have a destination i.e assign this instruction to a variable");
-    }
     if(args.size() != 3){
         if(args.size() == 2 && (name.value == ".carry_shl" || name.value == ".carry_lshr" || name.value == ".carry_ashr")){
             args.push_back(args[1]);
@@ -59,6 +55,9 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_carry_inst(IR::Token name,IR::Inst
         }
     }
     auto dest = process_local_dest_arg(inst_stmt);
+    if(dest == nullptr){
+        Utils::error(this->filename, name, "Carry binary instruction must have a destination i.e assign this instruction to a variable");
+    }
     IR::TypeExprPtr temp_type = dest->get_type();//Already reduced type by process_local_dest_arg
     IR::TypeExprPtr field1_type = nullptr;
     IR::TypeExprPtr field2_type = nullptr;

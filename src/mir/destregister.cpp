@@ -22,6 +22,10 @@ LocalDestRegister::LocalDestRegister(std::string dest_register_name, IR::TypeExp
     this->alignment = alignment;    
 }
 
+void LocalDestRegister::change_type(IR::TypeExprPtr new_type){
+    this->type = new_type;
+}
+
 std::string LocalDestRegister::get_dest_register_name() const{
     return dest_register_name;
 }

@@ -39,14 +39,13 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_cmp_bin_inst(IR::Token name,IR::In
         {".both_nan", analyze_both_nan_bin_inst}
     };
     auto args = inst_stmt->get_value()->get_operands();
-    auto _dest = inst_stmt->get_name();
-    if(!_dest.has_value()){
-        Utils::error(this->filename,name,"Comparison binary instruction must have a destination i.e assign this instruction to a variable");
-    }
     if(args.size() != 2){
         Utils::error(this->filename,name,"Comparison binary instruction must have 2 arguments");
     }
     auto dest = process_local_dest_arg(inst_stmt);
+    if(dest == nullptr){
+        Utils::error(this->filename,name,"Comparison binary instruction must have a destination i.e assign this instruction to a variable");
+    }
 
     args[0].second = Utils::get_reduced_type(this->type_symtable, args[0].second);
     args[1].second = Utils::get_reduced_type(this->type_symtable, args[1].second);

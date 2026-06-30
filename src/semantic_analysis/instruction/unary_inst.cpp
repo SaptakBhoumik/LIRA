@@ -88,16 +88,14 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_unary_inst(IR::Token name,IR::Inst
         ".neg",".abs",".ceil",".floor",".integral_part",".fractional_part",".roundnearest",".roundeven",".sqrt",".reciprocal",".rsqrt", ".bswap"
     };
     auto args = inst_stmt->get_value()->get_operands();
-    auto _dest = inst_stmt->get_name();
-    if(!_dest.has_value()){
-        Utils::error(this->filename, name, "Unary instruction must have a destination i.e assign this instruction to a variable");
-    }
     if(args.size() != 1){
         Utils::error(this->filename, name, "Unary instruction must have 1 argument");
     }
     auto dest = process_local_dest_arg(inst_stmt);
+    if(dest == nullptr){
+        Utils::error(this->filename, name, "Unary instruction must have a destination i.e assign this instruction to a variable");
+    }
     IR::TypeExprPtr type = dest->get_type();//Already reduced type by process_local_dest_arg
-    
     {
         args[0].second = Utils::get_reduced_type(this->type_symtable,args[0].second);
         if(!Utils::type_eq(type,args[0].second)){

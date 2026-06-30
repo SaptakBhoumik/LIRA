@@ -81,6 +81,14 @@ void VarSymTable::insert(IR::Token name, IR::TypeExprPtr type){
     }
     this->table[name] = type;
 }
+void VarSymTable::update(IR::Token name, IR::TypeExprPtr type){
+    if(!exists(name)){
+        error(name, "Variable update error", "The variable '"+name.value+"' is not defined in this scope");
+        // this->table[name] = std::make_shared<IR::AnyTypeExpr>(type);
+        // return;
+    }
+    this->table[name] = type;
+}
 IR::TypeExprPtr VarSymTable::lookup(IR::ExprPtr name) const{
     if(name->get_kind() == IR::ExprKind::LiteralExpr){
         auto named_lit = name->get_literal();

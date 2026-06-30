@@ -44,14 +44,13 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_numerical_classify_inst(IR::Token 
         ".isnan", ".isinf", ".isfinite", ".isnormal", ".issubnormal", ".iszero", ".isnegative", ".ispositive"
     };
     auto args = inst_stmt->get_value()->get_operands();
-    auto _dest = inst_stmt->get_name();
-    if(!_dest.has_value()){
-        Utils::error(this->filename, name, "Numerical classification instruction must have a destination i.e assign this instruction to a variable");
-    }
     if(args.size() != 1){
         Utils::error(this->filename, name, "Numerical classification instruction must have 1 argument");
     }
     auto dest = process_local_dest_arg(inst_stmt);
+    if(dest == nullptr){
+        Utils::error(this->filename, name, "Numerical classification instruction must have a destination i.e assign this instruction to a variable");
+    }
 
     args[0].second = Utils::get_reduced_type(this->type_symtable,args[0].second);
     if(!Utils::type_compatible(this->var_symtable, args[0].second,args[0].first)){

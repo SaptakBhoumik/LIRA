@@ -54,14 +54,13 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_bitwise_fetch_bin_inst(IR::Token n
         {".fetch_pdep", analyze_fetch_pdep_bin_inst},
     };
     auto args = inst_stmt->get_value()->get_operands();
-    auto _dest = inst_stmt->get_name();
-    if(!_dest.has_value()){
-        Utils::error(this->filename, name, "Bitwise binary fetch instruction must have a destination i.e assign this instruction to a variable");
-    }
     if(args.size() != 2){
         Utils::error(this->filename, name, "Bitwise binary fetch instruction must have 2 arguments");
     }
     auto dest = process_local_dest_arg(inst_stmt);
+    if(dest == nullptr){
+        Utils::error(this->filename, name, "Bitwise binary fetch instruction must have a destination i.e assign this instruction to a variable");
+    }
     IR::TypeExprPtr type = dest->get_type();//Already reduced type by process_local_dest_arg
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [common_fetch_attrs,remaining_attrs] = Utils::extract_common_atomic_attrs(this->filename,attributes);

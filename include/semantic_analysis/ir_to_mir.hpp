@@ -59,6 +59,7 @@ class IRToMIRSemanticAnalyzer {
     std::string filename;
     Utils::VarSymTablePtr var_symtable;
     Utils::TypeSymTablePtr type_symtable;
+    IR::TypeExprPtr curr_func_ret_type;//Return type of the current function being analyzed. Nullptr if not in a function.
     //Utils.
     //type_eq,type_compatible,add_global_type all expect reduced types. So the caller should call get_reduced_type before calling these functions.
     //Throws error if name is already defined in the current scope.
@@ -87,10 +88,10 @@ class IRToMIRSemanticAnalyzer {
     MIR::InstPtr analyze_numerical_classify_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
     
     MIR::InstPtr analyze_mem_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
+    MIR::InstPtr analyze_terminator_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
     MIR::InstPtr analyze_arithmetic_fetch_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
     MIR::InstPtr analyze_bitwise_fetch_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
     MIR::InstPtr analyze_unary_fetch_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
-    MIR::InstPtr analyze_terminator_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
     MIR::InstPtr analyze_call_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
     MIR::InstPtr analyze_other_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
 

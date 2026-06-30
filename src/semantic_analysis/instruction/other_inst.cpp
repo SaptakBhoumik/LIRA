@@ -17,9 +17,6 @@ MIR::InstPtr analyze_select_inst(std::string filename, Utils::VarSymTablePtr var
 MIR::InstPtr analyze_freeze_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
                                  std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
                                  IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_ptrmask_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
-                                  std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
-                                  IR::InstructionStmtPtr inst_stmt);
 MIR::InstPtr analyze_va_start_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
                                    std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
                                    IR::InstructionStmtPtr inst_stmt);
@@ -32,18 +29,12 @@ MIR::InstPtr analyze_va_copy_inst(std::string filename, Utils::VarSymTablePtr va
 MIR::InstPtr analyze_va_arg_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
                                  std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
                                  IR::InstructionStmtPtr inst_stmt);
+MIR::InstPtr analyze_ptrmask_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
+                                  std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
+                                  IR::InstructionStmtPtr inst_stmt);
 MIR::InstPtr analyze_pause_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
                                 IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_nop_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
-                              std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
-                              IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_annotation_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
-                                     std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
-                                     IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_endbr64_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
-                                  std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
-                                  IR::InstructionStmtPtr inst_stmt);
 MIR::InstPtr analyze_assume_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
                                  std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
                                  IR::InstructionStmtPtr inst_stmt);
@@ -62,6 +53,15 @@ MIR::InstPtr analyze_expect_inst(std::string filename, Utils::VarSymTablePtr var
 MIR::InstPtr analyze_expect_range_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
                                        std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
                                        IR::InstructionStmtPtr inst_stmt);
+MIR::InstPtr analyze_nop_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
+                              std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
+                              IR::InstructionStmtPtr inst_stmt);
+MIR::InstPtr analyze_annotation_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
+                                     std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
+                                     IR::InstructionStmtPtr inst_stmt);
+MIR::InstPtr analyze_endbr64_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
+                                  std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
+                                  IR::InstructionStmtPtr inst_stmt);
 MIR::InstPtr analyze_launder_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
                                   std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
                                   IR::InstructionStmtPtr inst_stmt);
@@ -230,50 +230,6 @@ MIR::InstPtr analyze_freeze_inst(std::string filename, Utils::VarSymTablePtr var
     }
     return std::make_shared<MIR::FreezeInst>(inst_stmt, dest, args[0].first->get_literal(), std::nullopt);
 }
-MIR::InstPtr analyze_ptrmask_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
-                                  std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
-                                  IR::InstructionStmtPtr inst_stmt){
-    auto attributes = inst_stmt->get_value()->get_attributes();
-    if(args.size() != 2){
-        Utils::error(filename, name, "Instruction .ptrmask takes exactly two arguments");
-    }
-    if(dest == nullptr){
-        Utils::error(filename, name, "Instruction .ptrmask requires a destination argument");
-    }
-    if(attributes.size() > 0){
-        Utils::error(filename, attributes[0]->get_token(), "Unsupported attribute for .ptrmask instruction: " + attributes[0]->to_string());
-    }
-    if(!Utils::type_eq(args[0].second, dest->get_type())){
-        Utils::error(filename, name, "Instruction .ptrmask takes an argument of the same type as the destination");
-    }
-    auto type_varient = MIR::get_type_variant_from_type(dest->get_type());
-    if(!type_varient.has_value()){
-        Utils::error(filename, name, "Instruction .ptrmask takes a pointer type argument");
-    }
-    if(!MIR::is_ptr_typevariant(type_varient.value())){
-        Utils::error(filename, name, "Instruction .ptrmask takes a pointer type argument");
-    }
-    if(type_varient.value() == MIR::TypeVariant::Ptr){
-        if(!Utils::is_int(args[1].second, 64)){
-            Utils::error(filename, name, "Instruction .ptrmask takes a second argument of type i64");
-        }
-        return std::make_shared<MIR::IntPtrMaskInst>(inst_stmt, dest, args[0].first->get_literal(), args[1].first->get_literal());
-    }
-    else{
-        auto simd_dest_type = std::dynamic_pointer_cast<IR::SIMDTypeExpr>(dest->get_type());
-        if(args[1].second->get_kind() != IR::TypeExprKind::SIMDTypeExpr){
-            Utils::error(filename, name, "Instruction .ptrmask takes a second argument of type <i64,M> where M is the same as the first argument");
-        }
-        auto simd_arg_type = std::dynamic_pointer_cast<IR::SIMDTypeExpr>(args[1].second);
-        if(!Utils::is_int(simd_arg_type->get_basetype(), 64)){
-            Utils::error(filename, name, "Instruction .ptrmask takes a second argument of type <i64,M> where M is the same as the first argument");
-        }
-        if(simd_dest_type->get_size() != simd_arg_type->get_size()){
-            Utils::error(filename, name, "Instruction .ptrmask takes a second argument of type <i64,M> where M is the same as the first argument");
-        }
-        return std::make_shared<MIR::VecIntPtrMaskInst>(inst_stmt, dest, args[0].first->get_literal(), args[1].first->get_literal());
-    }
-}
 MIR::InstPtr analyze_va_start_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
                                    std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
                                    IR::InstructionStmtPtr inst_stmt){
@@ -362,6 +318,50 @@ MIR::InstPtr analyze_va_arg_inst(std::string filename, Utils::VarSymTablePtr var
     }
     return std::make_shared<MIR::VaargInst>(inst_stmt, dest, args[0].first->get_literal(), std::nullopt);
 }
+MIR::InstPtr analyze_ptrmask_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
+                                  std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
+                                  IR::InstructionStmtPtr inst_stmt){
+    auto attributes = inst_stmt->get_value()->get_attributes();
+    if(args.size() != 2){
+        Utils::error(filename, name, "Instruction .ptrmask takes exactly two arguments");
+    }
+    if(dest == nullptr){
+        Utils::error(filename, name, "Instruction .ptrmask requires a destination argument");
+    }
+    if(attributes.size() > 0){
+        Utils::error(filename, attributes[0]->get_token(), "Unsupported attribute for .ptrmask instruction: " + attributes[0]->to_string());
+    }
+    if(!Utils::type_eq(args[0].second, dest->get_type())){
+        Utils::error(filename, name, "Instruction .ptrmask takes an argument of the same type as the destination");
+    }
+    auto type_varient = MIR::get_type_variant_from_type(dest->get_type());
+    if(!type_varient.has_value()){
+        Utils::error(filename, name, "Instruction .ptrmask takes a pointer type argument");
+    }
+    if(!MIR::is_ptr_typevariant(type_varient.value())){
+        Utils::error(filename, name, "Instruction .ptrmask takes a pointer type argument");
+    }
+    if(type_varient.value() == MIR::TypeVariant::Ptr){
+        if(!Utils::is_int(args[1].second, 64)){
+            Utils::error(filename, name, "Instruction .ptrmask takes a second argument of type i64");
+        }
+        return std::make_shared<MIR::IntPtrMaskInst>(inst_stmt, dest, args[0].first->get_literal(), args[1].first->get_literal());
+    }
+    else{
+        auto simd_dest_type = std::dynamic_pointer_cast<IR::SIMDTypeExpr>(dest->get_type());
+        if(args[1].second->get_kind() != IR::TypeExprKind::SIMDTypeExpr){
+            Utils::error(filename, name, "Instruction .ptrmask takes a second argument of type <i64,M> where M is the same as the first argument");
+        }
+        auto simd_arg_type = std::dynamic_pointer_cast<IR::SIMDTypeExpr>(args[1].second);
+        if(!Utils::is_int(simd_arg_type->get_basetype(), 64)){
+            Utils::error(filename, name, "Instruction .ptrmask takes a second argument of type <i64,M> where M is the same as the first argument");
+        }
+        if(simd_dest_type->get_size() != simd_arg_type->get_size()){
+            Utils::error(filename, name, "Instruction .ptrmask takes a second argument of type <i64,M> where M is the same as the first argument");
+        }
+        return std::make_shared<MIR::VecIntPtrMaskInst>(inst_stmt, dest, args[0].first->get_literal(), args[1].first->get_literal());
+    }
+}
 MIR::InstPtr analyze_pause_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
                                 IR::InstructionStmtPtr inst_stmt){
@@ -376,70 +376,6 @@ MIR::InstPtr analyze_pause_inst(std::string filename, Utils::VarSymTablePtr var_
         Utils::error(filename, name, "Instruction .pause takes no attributes");
     }
     return std::make_shared<MIR::PauseInst>(inst_stmt);
-}
-MIR::InstPtr analyze_nop_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
-                              std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
-                              IR::InstructionStmtPtr inst_stmt){
-    auto attributes = inst_stmt->get_value()->get_attributes();
-    auto [flag_attrs,remaining_attrs] = Utils::extract_flag_attrs(filename,attributes, {"multi_byte"});
-    if(args.size() != 1){
-        Utils::error(filename, name, "Instruction .nop takes exactly one argument");
-    }
-    if(dest != nullptr){
-        Utils::error(filename, name, "Instruction .nop has no destination");
-    }
-    if(remaining_attrs.size() > 0){
-        Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for .nop instruction: " + remaining_attrs[0]->to_string());
-    }
-    auto [size_expr, size_type] = args[0];
-    if(!Utils::is_int(size_type,8)){
-        Utils::error(filename, size_expr->get_token(), "Instruction .nop takes an integer type argument of size 8 bits");
-    }
-    if(!Utils::is_constexpr(size_expr)){
-        Utils::error(filename, size_expr->get_token(), "Instruction .nop takes a const expression integer type argument");
-    }
-    auto size_value = Utils::to_numeric<std::uint8_t>(filename, size_expr, size_type, true, true);
-    if(size_value < 1 || size_value > 15){
-        Utils::error(filename, size_expr->get_token(), "Instruction .nop takes a const expression integer type argument in the range [1, 15]");
-    }
-    return std::make_shared<MIR::NopInst>(inst_stmt, size_value, flag_attrs["multi_byte"]);
-}
-MIR::InstPtr analyze_annotation_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
-                                     std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
-                                     IR::InstructionStmtPtr inst_stmt){
-    auto attributes = inst_stmt->get_value()->get_attributes();
-    if(args.size() != 1){
-        Utils::error(filename, name, "Instruction .annotation takes exactly one argument");
-    }
-    if(dest != nullptr){
-        Utils::error(filename, name, "Instruction .annotation has no destination");
-    }
-    if(attributes.size() != 0){
-        Utils::error(filename, name, "Instruction .annotation takes no attributes");
-    }
-    auto str = Utils::reduce_str_value_and_type(var_symtable, args[0].second, args[0].first);
-    if(str.first == nullptr){
-        Utils::error(filename, name, "Instruction .annotation takes a string literal argument");
-    }
-    if(!str.second.has_value()){
-        Utils::error(filename, name, "Instruction .annotation takes a const expression string literal argument");
-    }
-    return std::make_shared<MIR::AnnotationInst>(inst_stmt, str.second.value());
-}
-MIR::InstPtr analyze_endbr64_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
-                                  std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
-                                  IR::InstructionStmtPtr inst_stmt){
-    auto attributes = inst_stmt->get_value()->get_attributes();
-    if(args.size() != 0){
-        Utils::error(filename, name, "Instruction .endbr64 takes no arguments");
-    }
-    if(dest != nullptr){
-        Utils::error(filename, name, "Instruction .endbr64 has no destination");    
-    }
-    if(attributes.size() != 0){
-        Utils::error(filename, name, "Instruction .endbr64 takes no attributes");
-    }
-    return std::make_shared<MIR::Endbr64Inst>(inst_stmt);
 }
 MIR::InstPtr analyze_assume_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
                                  std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
@@ -723,6 +659,70 @@ MIR::InstPtr analyze_expect_range_inst(std::string filename, Utils::VarSymTableP
     return std::make_shared<MIR::ExpectRangeInst>(inst_stmt, var_name.value(), args[1].first->get_literal(), args[2].first->get_literal(), type_expr, 
                                                   (attrs_with_num_args["probability"].size() == 0 ? std::nullopt : std::make_optional(attrs_with_num_args["probability"][0])), 
                                                   flag_attrs["unsigned"], fast_math_attr);
+}
+MIR::InstPtr analyze_nop_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
+                              std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
+                              IR::InstructionStmtPtr inst_stmt){
+    auto attributes = inst_stmt->get_value()->get_attributes();
+    auto [flag_attrs,remaining_attrs] = Utils::extract_flag_attrs(filename,attributes, {"multi_byte"});
+    if(args.size() != 1){
+        Utils::error(filename, name, "Instruction .nop takes exactly one argument");
+    }
+    if(dest != nullptr){
+        Utils::error(filename, name, "Instruction .nop has no destination");
+    }
+    if(remaining_attrs.size() > 0){
+        Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for .nop instruction: " + remaining_attrs[0]->to_string());
+    }
+    auto [size_expr, size_type] = args[0];
+    if(!Utils::is_int(size_type,8)){
+        Utils::error(filename, size_expr->get_token(), "Instruction .nop takes an integer type argument of size 8 bits");
+    }
+    if(!Utils::is_constexpr(size_expr)){
+        Utils::error(filename, size_expr->get_token(), "Instruction .nop takes a const expression integer type argument");
+    }
+    auto size_value = Utils::to_numeric<std::uint8_t>(filename, size_expr, size_type, true, true);
+    if(size_value < 1 || size_value > 15){
+        Utils::error(filename, size_expr->get_token(), "Instruction .nop takes a const expression integer type argument in the range [1, 15]");
+    }
+    return std::make_shared<MIR::NopInst>(inst_stmt, size_value, flag_attrs["multi_byte"]);
+}
+MIR::InstPtr analyze_annotation_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
+                                     std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
+                                     IR::InstructionStmtPtr inst_stmt){
+    auto attributes = inst_stmt->get_value()->get_attributes();
+    if(args.size() != 1){
+        Utils::error(filename, name, "Instruction .annotation takes exactly one argument");
+    }
+    if(dest != nullptr){
+        Utils::error(filename, name, "Instruction .annotation has no destination");
+    }
+    if(attributes.size() != 0){
+        Utils::error(filename, name, "Instruction .annotation takes no attributes");
+    }
+    auto str = Utils::reduce_str_value_and_type(var_symtable, args[0].second, args[0].first);
+    if(str.first == nullptr){
+        Utils::error(filename, name, "Instruction .annotation takes a string literal argument");
+    }
+    if(!str.second.has_value()){
+        Utils::error(filename, name, "Instruction .annotation takes a const expression string literal argument");
+    }
+    return std::make_shared<MIR::AnnotationInst>(inst_stmt, str.second.value());
+}
+MIR::InstPtr analyze_endbr64_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
+                                  std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
+                                  IR::InstructionStmtPtr inst_stmt){
+    auto attributes = inst_stmt->get_value()->get_attributes();
+    if(args.size() != 0){
+        Utils::error(filename, name, "Instruction .endbr64 takes no arguments");
+    }
+    if(dest != nullptr){
+        Utils::error(filename, name, "Instruction .endbr64 has no destination");    
+    }
+    if(attributes.size() != 0){
+        Utils::error(filename, name, "Instruction .endbr64 takes no attributes");
+    }
+    return std::make_shared<MIR::Endbr64Inst>(inst_stmt);
 }
 MIR::InstPtr analyze_launder_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
                                   std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,

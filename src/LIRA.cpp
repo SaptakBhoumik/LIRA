@@ -17,7 +17,7 @@ int main(int argc, char* argv[]){
     }
     std::string filename = std::filesystem::canonical(argv[1]).string();
     std::ifstream file(filename);
-    if (!file.is_open()){
+    if(!file.is_open()){
         std::cerr << "Error: Could not open file " << filename << std::endl;
         return 1;
     }

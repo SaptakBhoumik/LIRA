@@ -131,7 +131,7 @@ TypeExprPtr Parser::parse_struct_type_expr(bool has_attribute){
     bool is_packed = false;
     Token tok = this->curr_tok;//the { or < token
     std::vector<TypeExprPtr> fields;
-    if (this->curr_tok.type == TokenType::langel){
+    if(this->curr_tok.type == TokenType::langel){
         is_packed = true;
         advance();//After the < token
     }

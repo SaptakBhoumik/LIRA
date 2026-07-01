@@ -8,7 +8,6 @@ NOTE:-Implement Call Inst at the end of everything
 
 
 
-## Memory Instructions
 ## Call Instruction
 ## SIMD Instructions
     ### Reduce SIMD Instructions
@@ -18,7 +17,6 @@ NOTE:-Implement Call Inst at the end of everything
     ### Pack / Unpack Instructions
     ### Vector Layout Instructions
     ### Lane Mask Conversion Instructions
-## Hardware-Specific Instructions
 
 
 

@@ -16,7 +16,7 @@ T to_numeric(const std::string& str, bool allow_hex = false, bool allow_binary =
     std::istringstream iss(str);
     T num;
     iss >> num;
-    if (iss.fail()){
+    if(iss.fail()){
         throw std::invalid_argument("Invalid numeric string: " + str);
     }
     return num;

@@ -272,7 +272,7 @@ std::string StructTypeExpr::to_string() const{
     if(this->packed){
         res = "<{";
     } 
-    else {
+    else{
         res = "{"; 
     }
     for(size_t i=0;i<this->fields.size();i++){
@@ -284,7 +284,7 @@ std::string StructTypeExpr::to_string() const{
     if(this->packed){
         res += "}>"; 
     } 
-    else {
+    else{
         res += "}"; 
     }
     for(const auto& attr: this->attributes){

@@ -4,7 +4,7 @@
 namespace LIRA {
 namespace IR {
 bool Lexer::advance(){
-    if (this->curr_index < this->input.size() - 1){
+    if(this->curr_index < this->input.size() - 1){
         this->curr_index++;
         this->col++;
         this->curr_char = this->input[this->curr_index];
@@ -14,7 +14,7 @@ bool Lexer::advance(){
 }
 
 char Lexer::peek(std::size_t i) const{
-    if ((this->curr_index + i) < this->input.size()){
+    if((this->curr_index + i) < this->input.size()){
         return this->input[this->curr_index + i];
     }
     return '\0';
@@ -26,19 +26,19 @@ std::vector<std::string> Lexer::split_lines(const std::string& code){
     char prev = '\0';
 
     for (char c : code){
-        if (c == '\n' || c == '\r'){
-            if (prev == '\r' && c == '\n'){
+        if(c == '\n' || c == '\r'){
+            if(prev == '\r' && c == '\n'){
                 // \r\n counts as a single line ending; already pushed on '\r'
             } 
-            else {
+            else{
                 lines.push_back(line);
                 line.clear();
             }
         } 
-        else if (c == '"'){
+        else if(c == '"'){
             line += "\\\"";   // escape embedded quotes for diagnostic display
         }
-        else {
+        else{
             line += c;
         }
         prev = c;
@@ -50,21 +50,21 @@ std::vector<std::string> Lexer::split_lines(const std::string& code){
 
 bool Lexer::is_num(const std::string& s){
     //Yes we expect u to convert stuff like hex,binary etc to correct form before hand
-    if (s.empty()) return false;
+    if(s.empty()) return false;
     size_t start = 0;
-    if (s[0] == '-' || s[0] == '+'){
-        if (s.size() == 1) return false; // just a sign is not a number
+    if(s[0] == '-' || s[0] == '+'){
+        if(s.size() == 1) return false; // just a sign is not a number
         start = 1;
     }
     bool has_decimal_point = false;
     for (size_t i = start; i < s.size(); i++){
-        if (s[i] == '.'){
-            if (has_decimal_point){
+        if(s[i] == '.'){
+            if(has_decimal_point){
                 return false; // multiple decimal points
             }
             has_decimal_point = true;
         } 
-        else if (!std::isdigit(s[i])){
+        else if(!std::isdigit(s[i])){
             return false; // non-digit character
         }
     }
@@ -87,7 +87,7 @@ TokenType Lexer::get_identifier_type(const std::string& s){
     else if(s[0] == '^'){
         return TokenType::scope_identifier;
     }
-    else {
+    else{
         return TokenType::builtin_identifier;
     }
 }

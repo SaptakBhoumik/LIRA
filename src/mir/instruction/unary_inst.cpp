@@ -333,7 +333,7 @@ FloatUnaryInst::FloatUnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDes
 }
 std::string FloatUnaryInst::to_string_helper(const std::string op_name) const{
     std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(" + this->value->to_string() + ")";
-    if (this->fast_math_attr){
+    if(this->fast_math_attr){
         res += " " + this->fast_math_attr.value().to_string();
     }
     if(this->approx){
@@ -487,7 +487,7 @@ VecFloatUnaryInst::VecFloatUnaryInst(IR::InstructionStmtPtr instruction_stmt, Lo
 }
 std::string VecFloatUnaryInst::to_string_helper(const std::string op_name) const{
     std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(" + this->value->to_string() + ")";
-    if (this->fast_math_attr){
+    if(this->fast_math_attr){
         res += " " + this->fast_math_attr.value().to_string();
     }
     if(this->approx){

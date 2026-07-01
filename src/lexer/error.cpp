@@ -8,7 +8,7 @@ namespace LIRA {
 namespace IR {
 bool Lexer::has_errors() const{
     for (const auto& d : this->diagnostics){
-        if (d.level == Utils::DiagLevel::error){
+        if(d.level == Utils::DiagLevel::error){
             return true;
         }
     }

@@ -625,7 +625,7 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
 - `let <T,N>:%out = .masked_gather(<ptr,N>:%ptrs [,<i1,N>:%mask, <T,N>:%passthru])` - Loads one scalar element per lane from a distinct pointer. Each lane `i` loads from `ptrs[i]`. Inactive lanes (where mask is false) take their value from `passthru`.
 
     - `<ptr,N>:%ptrs` - vector of N pointers, one per lane
-    - `<T,N>:%passthru` - fallback values for inactive lanes; T can be any integer, float, or bfloat. It is optional. If mask is set then passthru  must be set unless you use the `#[zeropassthru]` attribute which lets you omit it. If mask is not set then passthru must not be set.
+    - `<T,N>:%passthru` - fallback values for inactive lanes; T can be any integer, float, or bfloat or ptr. It is optional. If mask is set then passthru  must be set unless you use the `#[zeropassthru]` attribute which lets you omit it. If mask is not set then passthru must not be set.
     - `<i1,N>:%mask` - per-lane predicate; true = load from `ptrs[i]`, false = use `passthru[i]`. It is optional. If not set equivalent to all lanes of mask = 1
 
     Attributes:
@@ -641,7 +641,7 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
 
 - `.masked_scatter(<ptr,N>:%ptrs, <T,N>:%val [, <i1,N>:%mask])` - Stores one scalar element per lane to a distinct pointer. Each lane `i` stores `val[i]` to `ptrs[i]`. Inactive lanes produce no write. If two active lanes write to the same address, the result is undefined (no ordering guarantee). 
 
-    - `<T,N>:%val` - values to scatter; T can be any integer, float, or bfloat
+    - `<T,N>:%val` - values to scatter; T can be any integer, float, or bfloat or ptr
     - `<ptr,N>:%ptrs` - vector of N destination pointers
     - `<i1,N>:%mask` - per-lane predicate. It is optional. If not set equivalent to all lanes of mask = 1
 
@@ -672,7 +672,7 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
         - `3` - high locality; `PREFETCHT0` (L1); this is the default
     - `#[instruction]` - prefetch into the instruction cache rather than the data cache; `#[write]` is invalid when `#[instruction]` is set; `#[locality]` still applies
 
-- `.memcopy(ptr:%dest, ptr:%src, i64:%size)` - Copies `size` bytes from `src` to `dest`. The index `0` refers to `src` and `1` refers to `dest` in per-pointer attributes.
+- `.memcopy(ptr:%dest, ptr:%src, i64:%size)` - Copies `size` bytes from `src` to `dest`. The index `0` refers to `dest` and `1` refers to `src` in per-pointer attributes.
 
     - `#[nooverlap]` - asserts the source and destination regions do not overlap; allows for a more efficient copy implementation when true
     - `#[volatile]` - volatile copy
@@ -726,14 +726,14 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
 
     - `#[inbounds]` - valid for array and vector only; asserts index is within bounds; not valid for struct (struct access is always in bounds)
 
-    If T2 is float/vec of float:
+    If T1 contains float type:
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 - `let T1:%output_var = .insertelement(T1:%input, T2:%element, i64:%index)` - Returns a copy of the aggregate with the element at `index` replaced by `element`. Output type equals input aggregate type. For structs, index must be an integer literal. For arrays and vectors, index can be a literal or variable.
 
     - `#[inbounds]` - valid for array and vector only; not valid for struct
 
-    If T2 is float/vec of float:
+    If T1 contains float type:
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 - `.fence(str:ordering)` - Memory fence. Ordering and syncscope must be constant expressions. Valid orderings: `acquire`, `release`, `acq_rel`, `seq_cst`. Has no input or output; acts purely as a barrier.

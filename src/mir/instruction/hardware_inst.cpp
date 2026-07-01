@@ -534,13 +534,13 @@ std::string SyscallInst::to_string() const{
         res += ", i64:" + arg->to_string();
     }
     res += ")";
-    if (this->noreturn_){
+    if(this->noreturn_){
         res += " #[noreturn]";
     }
-    if (this->nosideeffect){
+    if(this->nosideeffect){
         res += " #[nosideeffect]";
     }
-    if (this->pure){
+    if(this->pure){
         res += " #[pure]";
     }
     return res;

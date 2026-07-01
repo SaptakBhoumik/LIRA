@@ -132,7 +132,7 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_mem_inst(IR::Token name,IR::Instru
     for(size_t i = 0; i < args.size(); i++){
         args[i].second = Utils::get_reduced_type(this->type_symtable,args[i].second);
         if(!Utils::type_compatible(this->var_symtable, args[i].second,args[i].first)){
-            Utils::error(this->filename, args[i].first->get_token(), "Argument type " + args[i].second->get_token().value + " is not compatible with assigned type " + args[i].second->to_string());
+            Utils::error(this->filename, args[i].first->get_token(), "Argument type " + args[i].first->to_string() + " is not compatible with assigned type " + args[i].second->to_string());
         }
     }
 
@@ -267,7 +267,7 @@ MIR::InstPtr analyze_store_inst(std::string filename, MIR::LocalDestRegisterPtr 
     auto [atomic_info, remaining_attrs2] = Utils::extract_atomic_info_attr(filename, remaining_attrs);
     auto [flag_attrs, remaining_attrs3] = Utils::extract_flag_attrs(filename, remaining_attrs2, {"nopoison"});
     std::optional<MIR::FastMathAttr> fast_math_attr = std::nullopt;
-    if(Utils::contains_float(dest->get_type())){
+    if(Utils::contains_float(args[1].second)){
         auto val = Utils::extract_fastmath_attrs(filename,remaining_attrs3);
         remaining_attrs3 = val.second;
         fast_math_attr = val.first;
@@ -297,7 +297,7 @@ MIR::InstPtr analyze_broadcast_load_inst(std::string filename, MIR::LocalDestReg
     if(!type_varient.has_value()){
         Utils::error(filename, name, "Instruction .broadcast_load expects the destination type to be a vector of integers/ptr/float");
     }
-    if(type_varient.value() != MIR::TypeVariant::VecInt){
+    if(type_varient.value() == MIR::TypeVariant::VecInt){
         if(remaining_attrs.size() > 0){
             Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for .broadcast_load instruction: " + remaining_attrs[0]->to_string());
         }
@@ -327,21 +327,278 @@ MIR::InstPtr analyze_masked_load_inst(std::string filename, MIR::LocalDestRegist
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                 IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
+    if(args.size() < 1 || args.size() > 3){
+        Utils::error(filename, name, "Instruction .masked_load expects 1 to 3 arguments, but got " + std::to_string(args.size()));
+    }
+    if(dest == nullptr){
+        Utils::error(filename, name, "Instruction .masked_load expects a destination argument, but got none");
+    }
+    if(args[0].second->get_kind() != IR::TypeExprKind::PtrTypeExpr){
+        Utils::error(filename, name, "Instruction .masked_load expects the first argument to be a pointer type");
+    }
+    auto type_varient = MIR::get_type_variant_from_type(dest->get_type());
+    if(!type_varient.has_value()){
+        Utils::error(filename, name, "Instruction .masked_load expects the destination type to be a vector of integers/ptr/float");
+    }
+    if(!MIR::is_vector_typevariant(type_varient.value())){
+        Utils::error(filename, name, "Instruction .masked_load expects the destination type to be a vector of integers/ptr/float");
+    }
+    auto dest_size = std::dynamic_pointer_cast<IR::SIMDTypeExpr>(dest->get_type())->get_size();
+    IR::ExprPtr mask_expr = nullptr;
+    IR::ExprPtr passthru_expr = nullptr;
+    if(args.size() >= 2){
+        if(!Utils::is_vector_of_int(args[1].second, 1, dest_size)){
+            Utils::error(filename, name, "Instruction .masked_load expects the second argument to be of type <i1,N>");
+        }
+        mask_expr = args[1].first;
+    }
+    if(args.size() == 3){
+        if(!Utils::type_eq(args[2].second, dest->get_type())){
+            Utils::error(filename, name, "Instruction .masked_load expects the third argument to be of the same type as the destination");
+        }
+        passthru_expr = args[2].first;
+    }
+
+    auto [common_memory_attrs, remaining_attrs] = Utils::extract_common_memory_attrs(filename, attributes);
+    auto [flag_attrs, remaining_attrs2] = Utils::extract_flag_attrs(filename, remaining_attrs, {"zeropassthru"});
+    if(flag_attrs["zeropassthru"]){
+        if(args.size() == 3){
+            Utils::error(filename, name, "Instruction .masked_load cannot have both 'zeropassthru' attribute and a passthru argument");
+        }
+        if(args.size() < 2){
+            Utils::error(filename, name, "Instruction .masked_load 'zeropassthru' attribute requires a mask argument");
+        }
+    }
+    else if(args.size() == 2){
+        Utils::error(filename, name, "Instruction .masked_load requires a passthru argument when a mask is provided, unless the 'zeropassthru' attribute is used");
+    }
+
+    std::optional<MIR::FastMathAttr> fast_math_attr = std::nullopt;
+    if(type_varient.value() == MIR::TypeVariant::VecFloat){
+        auto val = Utils::extract_fastmath_attrs(filename, remaining_attrs2);
+        remaining_attrs2 = val.second;
+        fast_math_attr = val.first;
+    }
+    if(remaining_attrs2.size() > 0){
+        Utils::error(filename, remaining_attrs2[0]->get_token(), "Unsupported attribute for .masked_load instruction: " + remaining_attrs2[0]->to_string());
+    }
+
+    IR::LiteralExprPtr mask_lit = mask_expr ? mask_expr->get_literal() : nullptr;
+    IR::LiteralExprPtr passthru_lit = passthru_expr ? passthru_expr->get_literal() : nullptr;
+
+    if(type_varient.value() == MIR::TypeVariant::VecInt){
+        return std::make_shared<MIR::IntMaskedLoadInst>(inst_stmt, dest, args[0].first->get_literal(), mask_lit, passthru_lit,
+                                                        common_memory_attrs.volatile_, common_memory_attrs.nontemporal, common_memory_attrs.nonull, flag_attrs["zeropassthru"],
+                                                        common_memory_attrs.alignment, common_memory_attrs.dereferenceable_bytes);
+    }
+    else if(type_varient.value() == MIR::TypeVariant::VecPtr){
+        return std::make_shared<MIR::PtrMaskedLoadInst>(inst_stmt, dest, args[0].first->get_literal(), mask_lit, passthru_lit,
+                                                        common_memory_attrs.volatile_, common_memory_attrs.nontemporal, common_memory_attrs.nonull, flag_attrs["zeropassthru"],
+                                                        common_memory_attrs.alignment, common_memory_attrs.dereferenceable_bytes);
+    }
+    else{
+        return std::make_shared<MIR::FloatMaskedLoadInst>(inst_stmt, dest, args[0].first->get_literal(), mask_lit, passthru_lit,
+                                                          common_memory_attrs.volatile_, common_memory_attrs.nontemporal, common_memory_attrs.nonull, flag_attrs["zeropassthru"],
+                                                          common_memory_attrs.alignment, common_memory_attrs.dereferenceable_bytes, fast_math_attr.value());
+    }
 }
 MIR::InstPtr analyze_masked_store_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                 IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
+    if(args.size() != 2 && args.size() != 3){
+        Utils::error(filename, name, "Instruction .masked_store expects 2 or 3 arguments, but got " + std::to_string(args.size()));
+    }
+    if(dest != nullptr){
+        Utils::error(filename, name, "Instruction .masked_store does not expect a destination argument, but got one");
+    }
+    auto type_varient = MIR::get_type_variant_from_type(args[0].second);
+    if(!type_varient.has_value()){
+        Utils::error(filename, name, "Instruction .masked_store expects the first argument to be a vector of integers/ptr/float");
+    }
+    if(!MIR::is_vector_typevariant(type_varient.value())){
+        Utils::error(filename, name, "Instruction .masked_store expects the first argument to be a vector of integers/ptr/float");
+    }
+    if(args[1].second->get_kind() != IR::TypeExprKind::PtrTypeExpr){
+        Utils::error(filename, name, "Instruction .masked_store expects the second argument to be a pointer type");
+    }
+    IR::ExprPtr mask_expr = nullptr;
+    if(args.size() == 3){
+        auto val_size = std::dynamic_pointer_cast<IR::SIMDTypeExpr>(args[0].second)->get_size();
+        if(!Utils::is_vector_of_int(args[2].second, 1, val_size)){
+            Utils::error(filename, name, "Instruction .masked_store expects the third argument to be of type <i1,N>");
+        }
+        mask_expr = args[2].first;
+    }
+    auto [common_memory_attrs, remaining_attrs] = Utils::extract_common_memory_attrs(filename, attributes);
+    std::optional<MIR::FastMathAttr> fast_math_attr = std::nullopt;
+    if(type_varient.value() == MIR::TypeVariant::VecFloat){
+        auto val = Utils::extract_fastmath_attrs(filename, remaining_attrs);
+        remaining_attrs = val.second;
+        fast_math_attr = val.first;
+    }
+    if(remaining_attrs.size() > 0){
+        Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for .masked_store instruction: " + remaining_attrs[0]->to_string());
+    }
+    IR::LiteralExprPtr mask_lit = mask_expr ? mask_expr->get_literal() : nullptr;
+
+    if(type_varient.value() == MIR::TypeVariant::VecInt){
+        return std::make_shared<MIR::IntMaskedStoreInst>(inst_stmt, args[1].first->get_literal(), args[0].first->get_literal(), args[0].second, mask_lit,
+                                                         common_memory_attrs.volatile_, common_memory_attrs.nontemporal, common_memory_attrs.nonull,
+                                                         common_memory_attrs.alignment, common_memory_attrs.dereferenceable_bytes);
+    }
+    else if(type_varient.value() == MIR::TypeVariant::VecPtr){
+        return std::make_shared<MIR::PtrMaskedStoreInst>(inst_stmt, args[1].first->get_literal(), args[0].first->get_literal(), args[0].second, mask_lit,
+                                                         common_memory_attrs.volatile_, common_memory_attrs.nontemporal, common_memory_attrs.nonull,
+                                                         common_memory_attrs.alignment, common_memory_attrs.dereferenceable_bytes);
+    }
+    else{
+        return std::make_shared<MIR::FloatMaskedStoreInst>(inst_stmt, args[1].first->get_literal(), args[0].first->get_literal(), args[0].second, mask_lit,
+                                                           common_memory_attrs.volatile_, common_memory_attrs.nontemporal, common_memory_attrs.nonull,
+                                                           common_memory_attrs.alignment, common_memory_attrs.dereferenceable_bytes, fast_math_attr.value());
+    }
 }
 MIR::InstPtr analyze_masked_gather_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                 IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
+    if(args.size() < 1 || args.size() > 3){
+        Utils::error(filename, name, "Instruction .masked_gather expects 1 to 3 arguments, but got " + std::to_string(args.size()));
+    }
+    if(dest == nullptr){
+        Utils::error(filename, name, "Instruction .masked_gather expects a destination argument, but got none");
+    }
+    auto ptrs_type_varient = MIR::get_type_variant_from_type(args[0].second);
+    if(!ptrs_type_varient.has_value() || ptrs_type_varient.value() != MIR::TypeVariant::VecPtr){
+        Utils::error(filename, name, "Instruction .masked_gather expects the first argument to be a vector of pointers");
+    }
+    auto type_varient = MIR::get_type_variant_from_type(dest->get_type());
+    if(!type_varient.has_value()){
+        Utils::error(filename, name, "Instruction .masked_gather expects the destination type to be a vector of integers/ptr/float");
+    }
+    if(!MIR::is_vector_typevariant(type_varient.value())){
+        Utils::error(filename, name, "Instruction .masked_gather expects the destination type to be a vector of integers/ptr/float");
+    }
+    auto ptrs_size = std::dynamic_pointer_cast<IR::SIMDTypeExpr>(args[0].second)->get_size();
+    auto dest_size = std::dynamic_pointer_cast<IR::SIMDTypeExpr>(dest->get_type())->get_size();
+    if(ptrs_size != dest_size){
+        Utils::error(filename, name, "Instruction .masked_gather expects the destination and pointer vector to have the same number of elements");
+    }
+    IR::ExprPtr mask_expr = nullptr;
+    IR::ExprPtr passthru_expr = nullptr;
+    if(args.size() >= 2){
+        if(!Utils::is_vector_of_int(args[1].second, 1, dest_size)){
+            Utils::error(filename, name, "Instruction .masked_gather expects the second argument to be of type <i1,N>");
+        }
+        mask_expr = args[1].first;
+    }
+    if(args.size() == 3){
+        if(!Utils::type_eq(args[2].second, dest->get_type())){
+            Utils::error(filename, name, "Instruction .masked_gather expects the third argument to be of the same type as the destination");
+        }
+        passthru_expr = args[2].first;
+    }
+    auto [common_memory_attrs, remaining_attrs] = Utils::extract_common_memory_attrs(filename, attributes);
+    auto [flag_attrs, remaining_attrs2] = Utils::extract_flag_attrs(filename, remaining_attrs, {"zeropassthru"});
+    if(flag_attrs["zeropassthru"]){
+        if(args.size() == 3){
+            Utils::error(filename, name, "Instruction .masked_gather cannot have both 'zeropassthru' attribute and a passthru argument");
+        }
+        if(args.size() < 2){
+            Utils::error(filename, name, "Instruction .masked_gather 'zeropassthru' attribute requires a mask argument");
+        }
+    }
+    else if(args.size() == 2){
+        Utils::error(filename, name, "Instruction .masked_gather requires a passthru argument when a mask is provided, unless the 'zeropassthru' attribute is used");
+    }
+    std::optional<MIR::FastMathAttr> fast_math_attr = std::nullopt;
+    if(type_varient.value() == MIR::TypeVariant::VecFloat){
+        auto val = Utils::extract_fastmath_attrs(filename, remaining_attrs2);
+        remaining_attrs2 = val.second;
+        fast_math_attr = val.first;
+    }
+    if(remaining_attrs2.size() > 0){
+        Utils::error(filename, remaining_attrs2[0]->get_token(), "Unsupported attribute for .masked_gather instruction: " + remaining_attrs2[0]->to_string());
+    }
+    IR::LiteralExprPtr mask_lit = mask_expr ? mask_expr->get_literal() : nullptr;
+    IR::LiteralExprPtr passthru_lit = passthru_expr ? passthru_expr->get_literal() : nullptr;
+
+    if(type_varient.value() == MIR::TypeVariant::VecInt){
+        return std::make_shared<MIR::IntMaskedGatherInst>(inst_stmt, dest, args[0].first->get_literal(), mask_lit, passthru_lit,
+                                                          common_memory_attrs.volatile_, common_memory_attrs.nontemporal, common_memory_attrs.nonull, flag_attrs["zeropassthru"],
+                                                          common_memory_attrs.alignment, common_memory_attrs.dereferenceable_bytes);
+    }
+    else if(type_varient.value() == MIR::TypeVariant::VecPtr){
+        return std::make_shared<MIR::PtrMaskedGatherInst>(inst_stmt, dest, args[0].first->get_literal(), mask_lit, passthru_lit,
+                                                          common_memory_attrs.volatile_, common_memory_attrs.nontemporal, common_memory_attrs.nonull, flag_attrs["zeropassthru"],
+                                                          common_memory_attrs.alignment, common_memory_attrs.dereferenceable_bytes);
+    }
+    else{
+        return std::make_shared<MIR::FloatMaskedGatherInst>(inst_stmt, dest, args[0].first->get_literal(), mask_lit, passthru_lit,
+                                                            common_memory_attrs.volatile_, common_memory_attrs.nontemporal, common_memory_attrs.nonull, flag_attrs["zeropassthru"],
+                                                            common_memory_attrs.alignment, common_memory_attrs.dereferenceable_bytes, fast_math_attr.value());
+    }
 }
 MIR::InstPtr analyze_masked_scatter_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                 IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
+    if(args.size() != 2 && args.size() != 3){
+        Utils::error(filename, name, "Instruction .masked_scatter expects 2 or 3 arguments, but got " + std::to_string(args.size()));
+    }
+    if(dest != nullptr){
+        Utils::error(filename, name, "Instruction .masked_scatter does not expect a destination argument, but got one");
+    }
+    auto ptrs_type_varient = MIR::get_type_variant_from_type(args[0].second);
+    if(!ptrs_type_varient.has_value() || ptrs_type_varient.value() != MIR::TypeVariant::VecPtr){
+        Utils::error(filename, name, "Instruction .masked_scatter expects the first argument to be a vector of pointers");
+    }
+    auto type_varient = MIR::get_type_variant_from_type(args[1].second);
+    if(!type_varient.has_value()){
+        Utils::error(filename, name, "Instruction .masked_scatter expects the second argument to be a vector of integers/ptr/float");
+    }
+    if(!MIR::is_vector_typevariant(type_varient.value())){
+        Utils::error(filename, name, "Instruction .masked_scatter expects the second argument to be a vector of integers/ptr/float");
+    }
+    auto ptrs_size = std::dynamic_pointer_cast<IR::SIMDTypeExpr>(args[0].second)->get_size();
+    auto val_size = std::dynamic_pointer_cast<IR::SIMDTypeExpr>(args[1].second)->get_size();
+    if(ptrs_size != val_size){
+        Utils::error(filename, name, "Instruction .masked_scatter expects the pointer and value vectors to have the same number of elements");
+    }
+    IR::ExprPtr mask_expr = nullptr;
+    if(args.size() == 3){
+        if(!Utils::is_vector_of_int(args[2].second, 1, val_size)){
+            Utils::error(filename, name, "Instruction .masked_scatter expects the third argument to be of type <i1,N>");
+        }
+        mask_expr = args[2].first;
+    }
+    auto [common_memory_attrs, remaining_attrs] = Utils::extract_common_memory_attrs(filename, attributes);
+    std::optional<MIR::FastMathAttr> fast_math_attr = std::nullopt;
+    if(type_varient.value() == MIR::TypeVariant::VecFloat){
+        auto val = Utils::extract_fastmath_attrs(filename, remaining_attrs);
+        remaining_attrs = val.second;
+        fast_math_attr = val.first;
+    }
+    if(remaining_attrs.size() > 0){
+        Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for .masked_scatter instruction: " + remaining_attrs[0]->to_string());
+    }
+    IR::LiteralExprPtr mask_lit = mask_expr ? mask_expr->get_literal() : nullptr;
+
+    if(type_varient.value() == MIR::TypeVariant::VecInt){
+        return std::make_shared<MIR::IntMaskedScatterInst>(inst_stmt, args[0].first->get_literal(), args[1].first->get_literal(), args[1].second, mask_lit,
+                                                           common_memory_attrs.volatile_, common_memory_attrs.nontemporal, common_memory_attrs.nonull,
+                                                           common_memory_attrs.alignment, common_memory_attrs.dereferenceable_bytes);
+    }
+    else if(type_varient.value() == MIR::TypeVariant::VecPtr){
+        return std::make_shared<MIR::PtrMaskedScatterInst>(inst_stmt, args[0].first->get_literal(), args[1].first->get_literal(), args[1].second, mask_lit,
+                                                           common_memory_attrs.volatile_, common_memory_attrs.nontemporal, common_memory_attrs.nonull,
+                                                           common_memory_attrs.alignment, common_memory_attrs.dereferenceable_bytes);
+    }
+    else{
+        return std::make_shared<MIR::FloatMaskedScatterInst>(inst_stmt, args[0].first->get_literal(), args[1].first->get_literal(), args[1].second, mask_lit,
+                                                             common_memory_attrs.volatile_, common_memory_attrs.nontemporal, common_memory_attrs.nonull,
+                                                             common_memory_attrs.alignment, common_memory_attrs.dereferenceable_bytes, fast_math_attr.value());
+    }
 }
 MIR::InstPtr analyze_prefetch_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
@@ -382,6 +639,103 @@ MIR::InstPtr analyze_memcopy_inst(std::string filename, MIR::LocalDestRegisterPt
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                 IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
+    if(args.size() != 3){
+        Utils::error(filename, name, "Instruction .memcopy expects exactly 3 arguments, but got " + std::to_string(args.size()));
+    }
+    if(dest != nullptr){
+        Utils::error(filename, name, "Instruction .memcopy does not expect a destination argument, but got one");
+    }
+    if(args[0].second->get_kind() != IR::TypeExprKind::PtrTypeExpr){
+        Utils::error(filename, name, "Instruction .memcopy expects the first argument to be a pointer type");
+    }
+    if(args[1].second->get_kind() != IR::TypeExprKind::PtrTypeExpr){
+        Utils::error(filename, name, "Instruction .memcopy expects the second argument to be a pointer type");
+    }
+    if(!Utils::is_int(args[2].second, 64)){
+        Utils::error(filename, name, "Instruction .memcopy expects the third argument to be of type i64");
+    }
+    auto [flag_attrs, remaining_attrs] = Utils::extract_flag_attrs(filename, attributes, {"nooverlap","volatile"});
+    auto [idx_attrs, remaining_attrs2] = Utils::extract_attrs_with_num_args<std::uint64_t>(filename, remaining_attrs, {"nontemporal","nonnull","nopoison"});
+    std::pair<bool,bool> nontemporal = {false,false};
+    std::pair<bool,bool> nonnull = {false,false};
+    std::pair<bool,bool> nopoison = {false,false};
+    for(auto idx : idx_attrs["nontemporal"]){
+        if(idx == 0){
+            nontemporal.first = true;//dest
+        } 
+        else if(idx == 1){
+            nontemporal.second = true;//src
+        } 
+        else{
+            Utils::error(filename, name, "Instruction .memcopy attribute 'nontemporal' index must be 0 or 1");
+        }
+    }
+    for(auto idx : idx_attrs["nonnull"]){
+        if(idx == 0){
+            nonnull.first = true;
+        } 
+        else if(idx == 1){
+            nonnull.second = true;
+        } 
+        else{
+            Utils::error(filename, name, "Instruction .memcopy attribute 'nonnull' index must be 0 or 1");
+        }
+    }
+    for(auto idx : idx_attrs["nopoison"]){
+        if(idx == 0){
+            nopoison.first = true;
+        } 
+        else if(idx == 1){
+            nopoison.second = true;
+        } 
+        else{
+            Utils::error(filename, name, "Instruction .memcopy attribute 'nopoison' index must be 0 or 1");
+        }
+    }
+
+    auto [pair_attrs, remaining_attrs3] = Utils::extract_attrs_with_num_args<std::uint64_t>(filename, remaining_attrs2, {"align","dereferenceable"});
+    std::pair<std::size_t,std::size_t> alignment = {0,0};
+    std::pair<std::size_t,std::size_t> dereferenceable_bytes = {0,0};
+    if(pair_attrs["align"].size() % 2 != 0){
+        Utils::error(filename, name, "Attribute 'align' for .memcopy instruction expects pairs of index and alignment value");
+    }
+    for(size_t i = 0; i < pair_attrs["align"].size(); i += 2){
+        std::uint64_t idx = pair_attrs["align"][i];
+        std::uint64_t align_value = pair_attrs["align"][i+1];
+        if(!Utils::is_pow_of_2(align_value)){
+            Utils::error(filename, name, "Attribute 'align' for .memcopy instruction must be a power of 2");
+        }
+        if(idx == 0){
+            alignment.first = align_value;
+        } 
+        else if(idx == 1){
+            alignment.second = align_value;
+        } 
+        else{
+            Utils::error(filename, name, "Instruction .memcopy attribute 'align' index must be 0 or 1");
+        }
+    }
+    if(pair_attrs["dereferenceable"].size() % 2 != 0){
+        Utils::error(filename, name, "Attribute 'dereferenceable' for .memcopy instruction expects pairs of index and byte count");
+    }
+    for(size_t i = 0; i < pair_attrs["dereferenceable"].size(); i += 2){
+        std::uint64_t idx = pair_attrs["dereferenceable"][i];
+        std::uint64_t deref_value = pair_attrs["dereferenceable"][i+1];
+        if(idx == 0){
+            dereferenceable_bytes.first = deref_value;
+        } 
+        else if(idx == 1){
+            dereferenceable_bytes.second = deref_value;
+        } 
+        else{
+            Utils::error(filename, name, "Instruction .memcopy attribute 'dereferenceable' index must be 0 or 1");
+        }
+    }
+    if(remaining_attrs3.size() > 0){
+        Utils::error(filename, remaining_attrs3[0]->get_token(), "Unsupported attribute for .memcopy instruction: " + remaining_attrs3[0]->to_string());
+    }
+    return std::make_shared<MIR::MemcopyInst>(inst_stmt, args[0].first->get_literal(), args[1].first->get_literal(), args[2].first->get_literal(),
+                                              flag_attrs["nooverlap"], flag_attrs["volatile"], nontemporal, nonnull, nopoison, alignment, dereferenceable_bytes);
 }
 MIR::InstPtr analyze_memset_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
@@ -415,7 +769,106 @@ MIR::InstPtr analyze_memcmp_inst(std::string filename, MIR::LocalDestRegisterPtr
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                 IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
-    
+    if(args.size() != 3){
+        Utils::error(filename, name, "Instruction .memcmp expects exactly 3 arguments, but got " + std::to_string(args.size()));
+    }
+    if(dest == nullptr){
+        Utils::error(filename, name, "Instruction .memcmp expects a destination argument, but got none");
+    }
+    if(!Utils::is_int(dest->get_type(), 32)){
+        Utils::error(filename, name, "Instruction .memcmp expects the destination to be of type i32");
+    }
+    if(args[0].second->get_kind() != IR::TypeExprKind::PtrTypeExpr){
+        Utils::error(filename, name, "Instruction .memcmp expects the first argument to be a pointer type");
+    }
+    if(args[1].second->get_kind() != IR::TypeExprKind::PtrTypeExpr){
+        Utils::error(filename, name, "Instruction .memcmp expects the second argument to be a pointer type");
+    }
+    if(!Utils::is_int(args[2].second, 64)){
+        Utils::error(filename, name, "Instruction .memcmp expects the third argument to be of type i64");
+    }
+    auto [flag_attrs, remaining_attrs] = Utils::extract_flag_attrs(filename, attributes, {"volatile"});
+    auto [idx_attrs, remaining_attrs2] = Utils::extract_attrs_with_num_args<std::uint64_t>(filename, remaining_attrs, {"nontemporal","nonnull","nopoison"});
+    std::pair<bool,bool> nontemporal = {false,false};
+    std::pair<bool,bool> nonnull = {false,false};
+    std::pair<bool,bool> nopoison = {false,false};
+    for(auto idx : idx_attrs["nontemporal"]){
+        if(idx == 0){
+            nontemporal.first = true;
+        }
+        else if(idx == 1){
+            nontemporal.second = true;
+        }
+        else{
+            Utils::error(filename, name, "Instruction .memcmp attribute 'nontemporal' index must be 0 or 1");
+        }
+    }
+    for(auto idx : idx_attrs["nonnull"]){
+        if(idx == 0){
+            nonnull.first = true;
+        }
+        else if(idx == 1){
+            nonnull.second = true;
+        }
+        else{
+            Utils::error(filename, name, "Instruction .memcmp attribute 'nonnull' index must be 0 or 1");
+        }
+    }
+    for(auto idx : idx_attrs["nopoison"]){
+        if(idx == 0){
+            nopoison.first = true;
+        }
+        else if(idx == 1){
+            nopoison.second = true;
+        }
+        else{
+            Utils::error(filename, name, "Instruction .memcmp attribute 'nopoison' index must be 0 or 1");
+        }
+    }
+
+    auto [pair_attrs, remaining_attrs3] = Utils::extract_attrs_with_num_args<std::uint64_t>(filename, remaining_attrs2, {"align","dereferenceable"});
+    std::pair<std::size_t,std::size_t> alignment = {0,0};
+    std::pair<std::size_t,std::size_t> dereferenceable_bytes = {0,0};
+    if(pair_attrs["align"].size() % 2 != 0){
+        Utils::error(filename, name, "Attribute 'align' for .memcmp instruction expects pairs of index and alignment value");
+    }
+    for(size_t i = 0; i < pair_attrs["align"].size(); i += 2){
+        std::uint64_t idx = pair_attrs["align"][i];
+        std::uint64_t align_value = pair_attrs["align"][i+1];
+        if(!Utils::is_pow_of_2(align_value)){
+            Utils::error(filename, name, "Attribute 'align' for .memcmp instruction must be a power of 2");
+        }
+        if(idx == 0){
+            alignment.first = align_value;
+        }
+        else if(idx == 1){
+            alignment.second = align_value;
+        }
+        else{
+            Utils::error(filename, name, "Instruction .memcmp attribute 'align' index must be 0 or 1");
+        }
+    }
+    if(pair_attrs["dereferenceable"].size() % 2 != 0){
+        Utils::error(filename, name, "Attribute 'dereferenceable' for .memcmp instruction expects pairs of index and byte count");
+    }
+    for(size_t i = 0; i < pair_attrs["dereferenceable"].size(); i += 2){
+        std::uint64_t idx = pair_attrs["dereferenceable"][i];
+        std::uint64_t deref_value = pair_attrs["dereferenceable"][i+1];
+        if(idx == 0){
+            dereferenceable_bytes.first = deref_value;
+        }
+        else if(idx == 1){
+            dereferenceable_bytes.second = deref_value;
+        }
+        else{
+            Utils::error(filename, name, "Instruction .memcmp attribute 'dereferenceable' index must be 0 or 1");
+        }
+    }
+    if(remaining_attrs3.size() > 0){
+        Utils::error(filename, remaining_attrs3[0]->get_token(), "Unsupported attribute for .memcmp instruction: " + remaining_attrs3[0]->to_string());
+    }
+    return std::make_shared<MIR::MemcmpInst>(inst_stmt, dest, args[0].first->get_literal(), args[1].first->get_literal(), args[2].first->get_literal(),
+                                             flag_attrs["volatile"], nontemporal, nonnull, nopoison, alignment, dereferenceable_bytes);
 }
 MIR::InstPtr analyze_getaddress_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
@@ -646,7 +1099,7 @@ MIR::InstPtr analyze_fence_inst(std::string filename, MIR::LocalDestRegisterPtr 
         }
     }
     else if(ordering != MIR::AtomicOrdering::SEQUENTIALLY_CONSISTENT){
-        Utils::error(filename, name, "Instruction .fence with ordering 'sequentially_consistent' cannot have other attributes");
+        Utils::error(filename, name, "Invalid ordering for .fence");
     }
     return std::make_shared<MIR::FenceInst>(inst_stmt, syncscope, ordering, flag_attrs["store_only"], flag_attrs["load_only"]);
 }
@@ -704,7 +1157,7 @@ MIR::InstPtr analyze_atomic_cmpxchg_inst(std::string filename, MIR::LocalDestReg
     }
     auto [flag_attrs, remaining_attrs] = Utils::extract_flag_attrs(filename,attributes, {"weak","volatile"});
     auto [syncscope, remaining_attrs2] = Utils::extract_syncscope_attr(filename,remaining_attrs);
-    auto [attrs_with_num_args, remaining_attrs3] = Utils::extract_attrs_with_num_args<uint64_t>(filename, attributes, {"align"});
+    auto [attrs_with_num_args, remaining_attrs3] = Utils::extract_attrs_with_num_args<uint64_t>(filename, remaining_attrs2, {"align"});
     if(attrs_with_num_args["align"].size() > 1){
         Utils::error(filename, name, "Attribute 'align' for .atomic_cmpxchg instruction takes at most one argument");
     }

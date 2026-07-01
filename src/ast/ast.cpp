@@ -88,7 +88,7 @@ ExprKind Expr::get_kind() const{
     if(this->literal!=nullptr){
         return ExprKind::LiteralExpr;
     } 
-    else {
+    else{
         return ExprKind::TypeExpr;
     }
 }
@@ -96,7 +96,7 @@ Token Expr::get_token() const{
     if(this->literal!=nullptr){
         return this->literal->get_token();
     } 
-    else {
+    else{
         return this->type->get_token();
     }
 }
@@ -110,7 +110,7 @@ std::string Expr::to_string() const{
     if(this->literal!=nullptr){
         return this->literal->to_string();
     } 
-    else {
+    else{
         return this->type->to_string();
     }
 }
@@ -373,7 +373,7 @@ std::string Function::to_string() const{
 
 
 GlobalItem::GlobalItem(FunctionPtr function){
-    if (function == nullptr){
+    if(function == nullptr){
         throw std::invalid_argument("FunctionPtr cannot be null");
     }
     this->function = function;

@@ -18,7 +18,7 @@ InstType RetInst::get_inst_type() const{
 }
 std::string RetInst::to_string() const{
     std::string res = ".ret" + (ret_value.has_value() ? "(" + ret_value.value().first->to_string() + ":" + ret_value.value().second->to_string() + ")" : "");
-    if (this->fast_math_attr){
+    if(this->fast_math_attr){
         res += " " + this->fast_math_attr.value().to_string();
     }
     if(noreturn){
@@ -97,7 +97,7 @@ InstType JmpInst::get_inst_type() const{
 }
 std::string JmpInst::to_string() const{
     std::string res = ".jmp(" + this->target_block_name;
-    if (this->fast_math_attr){
+    if(this->fast_math_attr){
         res += " " + this->fast_math_attr.value().to_string();
     }
     if(!this->args.empty()){
@@ -157,7 +157,7 @@ std::string ConditionalJmpInst::to_string() const{
     std::string res = ".cond_jmp(i1:" + this->condition->to_string() + ", ";
     res += this->true_label_type->to_string() + ":" + this->true_block_name + ", " + pretty_print_label_args(this->true_label_args) + ", ";
     res += this->false_label_type->to_string() + ":" + this->false_block_name + ", " + pretty_print_label_args(this->false_label_args) + ")";
-    if (this->fast_math_attr){
+    if(this->fast_math_attr){
         res += " " + this->fast_math_attr.value().to_string();
     }
     if(!this->frequency_profile.empty()){
@@ -253,7 +253,7 @@ std::string SwitchInst::to_string() const{
         }
     }
     res+= ")";
-    if (this->fast_math_attr){
+    if(this->fast_math_attr){
         res += " " + this->fast_math_attr.value().to_string();
     }
     if(!this->frequency_profile.empty()){

@@ -119,6 +119,8 @@ enum class InstType:std::int16_t{
     AssumeNotRangeInst,
     ExpectInst,
     ExpectRangeInst,
+    ExpectNotInst,
+    ExpectNotRangeInst,
     NopInst,
     AnnotationInst,
     Endbr64Inst,

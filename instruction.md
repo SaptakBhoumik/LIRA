@@ -687,7 +687,7 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
     - `#[volatile]` - volatile set
     - `#[nontemporal]` - non-temporal stores
     - `#[nonnull]` - asserts `dest` is not null
-    - `#[+]` - asserts the region contains no poison
+    - `#[nopoison]` - asserts the region contains no poison
     - `#[align(i64:N)]` - alignment of `dest`; must be a power of 2; default is 16
     - `#[dereferenceable(i64:N)]` - asserts `dest` is dereferenceable for N bytes
 
@@ -1408,7 +1408,17 @@ For the following if T is float/bfloat/vector of float: `#[fast]`, `#[nnan]`, `#
     - `#[unsigned]` - interval unsigned
     - `#[probability(f64:P)]` - probability the value is in range
 
-There are no expect_not variants, since they are equivalent to the corresponding expect variant with the probability inverted (1 - P).
+ `.expect_not(T:%var, T:compile_time_value)` - Hints that `%var` rarely holds `compile_time_value`. No UB if wrong. Analogous to `__builtin_expect`. `T` can be any type as long as represented as compile time value.
+    - `#[probability(f64:P)]` - probability the value matches (0.0–1.0); default unspecified
+
+- `.expect_not(T:%var, T:v0, T:v1, ...)` - Hints that `%var` is rarely one of the listed values. `T` can be any type as long as represented as compile time value. No UB if wrong.
+    - `#[probability(f64:P)]` - probability the value is in the list
+
+- `.expect_not_range(T:%var, T:compile_time_lo, T:compile_time_hi)` - Hints that `%var` rarely falls in `[lo, hi]`. T is integer or float. No UB if wrong.
+    - `#[unsigned]` - interval unsigned
+    - `#[probability(f64:P)]` - probability the value is in range
+
+There are expect_not variants because sometimes u may not have the probablity value to do (1-P) along with expect varient. So expect_not varient is provided to give the user a way to hint that the value is rarely in a range without having to compute (1-P) and use expect varient. + Makes it more consistent
 
 ### Metadata and Machine Instructions
 

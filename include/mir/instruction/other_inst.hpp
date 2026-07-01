@@ -260,6 +260,47 @@ class ExpectRangeInst:public Inst {
 };
 
 
+class ExpectNotInst:public Inst {
+    std::vector<IR::LiteralExprPtr> assumed_values;
+    IR::TypeExprPtr type;
+    std::optional<double> probability;
+    std::string varname;
+    public:
+    ExpectNotInst(IR::InstructionStmtPtr instruction_stmt, std::string varname, std::vector<IR::LiteralExprPtr> assumed_values, IR::TypeExprPtr type, 
+                  std::optional<double> probability, std::optional<FastMathAttr> fast_math_attr);    
+    
+    std::string get_varname() const;
+    std::vector<IR::LiteralExprPtr> get_assumed_values() const;
+    std::optional<double> get_probability() const;
+    IR::TypeExprPtr get_type() const;
+
+    InstType get_inst_type() const override;
+    std::string to_string() const override;
+};
+
+class ExpectNotRangeInst:public Inst {
+    IR::LiteralExprPtr min_value;
+    IR::LiteralExprPtr max_value;
+    IR::TypeExprPtr type;
+    std::optional<double> probability;
+    bool unsigned_;
+    std::string varname;
+    public:
+    ExpectNotRangeInst(IR::InstructionStmtPtr instruction_stmt, std::string varname, IR::LiteralExprPtr min_value, IR::LiteralExprPtr max_value, 
+                       IR::TypeExprPtr type, std::optional<double> probability, bool unsigned_, std::optional<FastMathAttr> fast_math_attr);  
+
+    std::string get_varname() const;
+    IR::LiteralExprPtr get_min_value() const;
+    IR::LiteralExprPtr get_max_value() const;
+    std::optional<double> get_probability() const;
+    IR::TypeExprPtr get_type() const;
+    bool is_unsigned() const;
+
+    InstType get_inst_type() const override;
+    std::string to_string() const override;
+};
+
+
 // --------------------------Metadata and Machine Instructions-------------------------------
 class NopInst:public Inst {
     std::uint8_t size;

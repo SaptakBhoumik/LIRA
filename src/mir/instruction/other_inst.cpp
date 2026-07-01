@@ -446,6 +446,92 @@ std::string ExpectRangeInst::to_string() const{
 }
 
 
+ExpectNotInst::ExpectNotInst(IR::InstructionStmtPtr instruction_stmt, std::string varname, std::vector<IR::LiteralExprPtr> assumed_values, IR::TypeExprPtr type, 
+                             std::optional<double> probability, std::optional<FastMathAttr> fast_math_attr):
+                             Inst(instruction_stmt, nullptr, fast_math_attr){
+    this->assumed_values = assumed_values;
+    this->type = type;
+    this->varname = varname;
+    this->probability = probability;
+}
+std::string ExpectNotInst::get_varname() const{
+    return this->varname;
+}
+std::vector<IR::LiteralExprPtr> ExpectNotInst::get_assumed_values() const{
+    return this->assumed_values;
+}
+std::optional<double> ExpectNotInst::get_probability() const{
+    return this->probability;
+}
+IR::TypeExprPtr ExpectNotInst::get_type() const{
+    return this->type;
+}
+InstType ExpectNotInst::get_inst_type() const{
+    return InstType::ExpectNotInst;
+}
+std::string ExpectNotInst::to_string() const{
+    std::string res = ".expect_not(" + this->type->to_string() + ":" + this->varname;
+    for(auto& val: this->assumed_values){
+        res += ", " + this->type->to_string() + ":" + val->to_string();
+    }
+    res += ")";
+    if(this->fast_math_attr.has_value()){
+        res += " " + this->fast_math_attr.value().to_string();
+    }
+    if(this->probability.has_value()){
+        res += " #[probability(f64:" + std::to_string(this->probability.value()) + ")]";
+    }
+    return res;
+}
+
+
+ExpectNotRangeInst::ExpectNotRangeInst(IR::InstructionStmtPtr instruction_stmt, std::string varname, IR::LiteralExprPtr min_value, IR::LiteralExprPtr max_value, 
+                                       IR::TypeExprPtr type, std::optional<double> probability, bool unsigned_, std::optional<FastMathAttr> fast_math_attr):
+                                       Inst(instruction_stmt, nullptr, fast_math_attr){
+    this->min_value = min_value;
+    this->max_value = max_value;
+    this->type = type;
+    this->varname = varname;
+    this->probability = probability;
+    this->unsigned_ = unsigned_;
+}
+std::string ExpectNotRangeInst::get_varname() const{
+    return this->varname;
+}
+IR::LiteralExprPtr ExpectNotRangeInst::get_min_value() const{
+    return this->min_value;
+}
+IR::LiteralExprPtr ExpectNotRangeInst::get_max_value() const{
+    return this->max_value;
+}
+std::optional<double> ExpectNotRangeInst::get_probability() const{
+    return this->probability;
+}
+IR::TypeExprPtr ExpectNotRangeInst::get_type() const{
+    return this->type;
+}
+bool ExpectNotRangeInst::is_unsigned() const{
+    return this->unsigned_;
+}
+InstType ExpectNotRangeInst::get_inst_type() const{
+    return InstType::ExpectNotRangeInst;
+}
+std::string ExpectNotRangeInst::to_string() const{
+    std::string res = ".expect_not_range(" + this->type->to_string() + ":" + this->varname + ", " + this->type->to_string() + ":" + this->min_value->to_string() + ", " +
+                      this->type->to_string() + ":" + this->max_value->to_string() + ")";
+    if(this->fast_math_attr.has_value()){
+        res += " " + this->fast_math_attr.value().to_string();
+    }
+    if(this->probability.has_value()){
+        res += " #[probability(f64:" + std::to_string(this->probability.value()) + ")]";
+    }
+    if(this->unsigned_){
+        res += " #[unsigned]";
+    }
+    return res;
+}
+
+
 // --------------------------Metadata and Machine Instructions-------------------------------
 NopInst::NopInst(IR::InstructionStmtPtr instruction_stmt, std::uint8_t size, bool multi_byte):Inst(instruction_stmt, nullptr, std::nullopt){
     this->size = size;

@@ -35,24 +35,12 @@ MIR::InstPtr analyze_ptrmask_inst(std::string filename, Utils::VarSymTablePtr va
 MIR::InstPtr analyze_pause_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
                                 IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_assume_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
-                                 std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
-                                 IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_assume_range_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
-                                       std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
-                                       IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_assume_not_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
-                                     std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
-                                     IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_assume_not_range_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
-                                           std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
-                                           IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_expect_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
-                                 std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
-                                 IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_expect_range_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
-                                       std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
-                                       IR::InstructionStmtPtr inst_stmt);
+MIR::InstPtr analyze_discrete_value_optimizer_hint(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
+                                                   std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
+                                                   IR::InstructionStmtPtr inst_stmt);
+MIR::InstPtr analyze_range_optimizer_hint(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
+                                          std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
+                                          IR::InstructionStmtPtr inst_stmt);
 MIR::InstPtr analyze_nop_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
                               std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
                               IR::InstructionStmtPtr inst_stmt);
@@ -82,12 +70,14 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_other_inst(IR::Token name,IR::Inst
         {".nop", analyze_nop_inst},
         {".annotation", analyze_annotation_inst},
         {".endbr64", analyze_endbr64_inst},
-        {".assume", analyze_assume_inst},
-        {".assume_range", analyze_assume_range_inst},
-        {".assume_not", analyze_assume_not_inst},
-        {".assume_not_range", analyze_assume_not_range_inst},
-        {".expect", analyze_expect_inst},
-        {".expect_range", analyze_expect_range_inst},
+        {".assume", analyze_discrete_value_optimizer_hint},
+        {".assume_range", analyze_range_optimizer_hint},
+        {".assume_not", analyze_discrete_value_optimizer_hint},
+        {".assume_not_range", analyze_range_optimizer_hint},
+        {".expect", analyze_discrete_value_optimizer_hint},
+        {".expect_range", analyze_range_optimizer_hint},
+        {".expect_not", analyze_discrete_value_optimizer_hint},
+        {".expect_not_range", analyze_range_optimizer_hint},
         {".launder", analyze_launder_inst},
         {".strip_invariant_group", analyze_strip_invariant_group_inst},
     };
@@ -331,180 +321,28 @@ MIR::InstPtr analyze_pause_inst(std::string filename, Utils::VarSymTablePtr var_
     }
     return std::make_shared<MIR::PauseInst>(inst_stmt);
 }
-MIR::InstPtr analyze_assume_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
-                                 std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
-                                 IR::InstructionStmtPtr inst_stmt){
+MIR::InstPtr analyze_discrete_value_optimizer_hint(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
+                                                   std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
+                                                   IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     if(args.size() < 2){
-        Utils::error(filename, name, "Instruction .assume takes at least two arguments");
+        Utils::error(filename, name, "Discrete value optimizer hint instruction takes at least two arguments");
     }
     if(dest != nullptr){
-        Utils::error(filename, name, "Instruction .assume has no destination");
+        Utils::error(filename, name, "Discrete value optimizer hint instruction has no destination");
     }
     auto var_name = Utils::get_var_name(args[0].first);
     if(!var_name.has_value()){
-        Utils::error(filename, name, "Instruction .assume takes a variable name as the first argument");
+        Utils::error(filename, name, "Discrete value optimizer hint instruction takes a variable name as the first argument");
     }
     auto type_expr = args[0].second;
     std::vector<IR::LiteralExprPtr> arg_literals;
     for(size_t i = 1; i < args.size(); i++){
         if(!Utils::type_eq(type_expr, args[i].second)){
-            Utils::error(filename, name, "Instruction .assume takes arguments of the same type");
+            Utils::error(filename, name, "Discrete value optimizer hint instruction takes arguments of the same type");
         }
         if(!Utils::is_constexpr(args[i].first)){
-            Utils::error(filename, name, "Instruction .assume takes const expression arguments");
-        }
-        arg_literals.push_back(args[i].first->get_literal());
-    }
-    if(Utils::contains_float(type_expr)){
-        auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
-        if(remaining_attrs.size() > 0){
-            Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for float arithmetic binary instruction: " + remaining_attrs[0]->to_string());
-        }
-        return std::make_shared<MIR::AssumeInst>(inst_stmt, var_name.value(), arg_literals, type_expr, fast_math_attr);
-    }
-    if(attributes.size() > 0){
-        Utils::error(filename, attributes[0]->get_token(), "Unsupported attribute for .assume instruction: " + attributes[0]->to_string());
-    }
-    return std::make_shared<MIR::AssumeInst>(inst_stmt, var_name.value(), arg_literals, type_expr, std::nullopt);
-}
-MIR::InstPtr analyze_assume_range_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
-                                       std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
-                                       IR::InstructionStmtPtr inst_stmt){
-    auto attributes = inst_stmt->get_value()->get_attributes();
-    if(args.size() != 3){
-        Utils::error(filename, name, "Instruction .assume_range takes exactly three arguments");
-    }
-    if(dest != nullptr){
-        Utils::error(filename, name, "Instruction .assume_range has no destination");
-    }
-    auto var_name = Utils::get_var_name(args[0].first);
-    if(!var_name.has_value()){
-        Utils::error(filename, name, "Instruction .assume_range takes a variable name as the first argument");
-    }
-    auto type_expr = args[0].second;
-    for(size_t i = 1; i < args.size(); i++){
-        if(!Utils::type_eq(type_expr, args[i].second)){
-            Utils::error(filename, name, "Instruction .assume_range takes arguments of the same type");
-        }
-        if(!Utils::is_constexpr(args[i].first)){
-            Utils::error(filename, name, "Instruction .assume_range takes const expression arguments");
-        }
-    }
-    if(type_expr->get_kind() != IR::TypeExprKind::IntTypeExpr && type_expr->get_kind() != IR::TypeExprKind::FloatTypeExpr){
-        Utils::error(filename, name, "Instruction .assume_range takes arguments of integer or float type");
-    }
-    if(type_expr->get_kind() == IR::TypeExprKind::FloatTypeExpr){
-        auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
-        if(remaining_attrs.size() > 0){
-            Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for float arithmetic binary instruction: " + remaining_attrs[0]->to_string());
-        }
-        return std::make_shared<MIR::AssumeRangeInst>(inst_stmt, var_name.value(), args[1].first->get_literal(), args[2].first->get_literal(), type_expr, false, fast_math_attr);
-    }
-    auto [flag_attrs,remaining_attrs] = Utils::extract_flag_attrs(filename,attributes, {"unsigned"});
-    if(remaining_attrs.size() > 0){
-        Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for .assume_range instruction: " + remaining_attrs[0]->to_string());
-    }
-    return std::make_shared<MIR::AssumeRangeInst>(inst_stmt, var_name.value(), args[1].first->get_literal(), args[2].first->get_literal(), type_expr, flag_attrs["unsigned"], std::nullopt);
-}
-MIR::InstPtr analyze_assume_not_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
-                                     std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
-                                     IR::InstructionStmtPtr inst_stmt){
-    auto attributes = inst_stmt->get_value()->get_attributes();
-    if(args.size() < 2){
-        Utils::error(filename, name, "Instruction .assume_not takes at least two arguments");
-    }
-    if(dest != nullptr){
-        Utils::error(filename, name, "Instruction .assume_not has no destination");
-    }
-    auto var_name = Utils::get_var_name(args[0].first);
-    if(!var_name.has_value()){
-        Utils::error(filename, name, "Instruction .assume_not takes a variable name as the first argument");
-    }
-    auto type_expr = args[0].second;
-    std::vector<IR::LiteralExprPtr> arg_literals;
-    for(size_t i = 1; i < args.size(); i++){
-        if(!Utils::type_eq(type_expr, args[i].second)){
-            Utils::error(filename, name, "Instruction .assume_not takes arguments of the same type");
-        }
-        if(!Utils::is_constexpr(args[i].first)){
-            Utils::error(filename, name, "Instruction .assume_not takes const expression arguments");
-        }
-        arg_literals.push_back(args[i].first->get_literal());
-    }
-    if(Utils::contains_float(type_expr)){
-        auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
-        if(remaining_attrs.size() > 0){
-            Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for float arithmetic binary instruction: " + remaining_attrs[0]->to_string());
-        }
-        return std::make_shared<MIR::AssumeNotInst>(inst_stmt, var_name.value(), arg_literals, type_expr, fast_math_attr);
-    }
-    if(attributes.size() > 0){
-        Utils::error(filename, attributes[0]->get_token(), "Unsupported attribute for .assume_not instruction: " + attributes[0]->to_string());
-    }
-    return std::make_shared<MIR::AssumeNotInst>(inst_stmt, var_name.value(), arg_literals, type_expr, std::nullopt);
-}
-MIR::InstPtr analyze_assume_not_range_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
-                                           std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
-                                           IR::InstructionStmtPtr inst_stmt){
-    auto attributes = inst_stmt->get_value()->get_attributes();
-    if(args.size() != 3){
-        Utils::error(filename, name, "Instruction .assume_not_range takes exactly three arguments");
-    }
-    if(dest != nullptr){
-        Utils::error(filename, name, "Instruction .assume_not_range has no destination");
-    }
-    auto var_name = Utils::get_var_name(args[0].first);
-    if(!var_name.has_value()){
-        Utils::error(filename, name, "Instruction .assume_not_range takes a variable name as the first argument");
-    }
-    auto type_expr = args[0].second;
-    for(size_t i = 1; i < args.size(); i++){
-        if(!Utils::type_eq(type_expr, args[i].second)){
-            Utils::error(filename, name, "Instruction .assume_not_range takes arguments of the same type");
-        }
-        if(!Utils::is_constexpr(args[i].first)){
-            Utils::error(filename, name, "Instruction .assume_not_range takes const expression arguments");
-        }
-    }
-    if(type_expr->get_kind() != IR::TypeExprKind::IntTypeExpr && type_expr->get_kind() != IR::TypeExprKind::FloatTypeExpr){
-        Utils::error(filename, name, "Instruction .assume_not_range takes arguments of integer or float type");
-    }
-    if(type_expr->get_kind() == IR::TypeExprKind::FloatTypeExpr){
-        auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
-        if(remaining_attrs.size() > 0){
-            Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for float arithmetic binary instruction: " + remaining_attrs[0]->to_string());
-        }
-        return std::make_shared<MIR::AssumeNotRangeInst>(inst_stmt, var_name.value(), args[1].first->get_literal(), args[2].first->get_literal(), type_expr, false, fast_math_attr);
-    }
-    auto [flag_attrs,remaining_attrs] = Utils::extract_flag_attrs(filename,attributes, {"unsigned"});
-    if(remaining_attrs.size() > 0){
-        Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for .assume_not_range instruction: " + remaining_attrs[0]->to_string());
-    }
-    return std::make_shared<MIR::AssumeNotRangeInst>(inst_stmt, var_name.value(), args[1].first->get_literal(), args[2].first->get_literal(), type_expr, flag_attrs["unsigned"], std::nullopt);
-}
-MIR::InstPtr analyze_expect_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
-                                 std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
-                                 IR::InstructionStmtPtr inst_stmt){
-    auto attributes = inst_stmt->get_value()->get_attributes();
-    if(args.size() < 2){
-        Utils::error(filename, name, "Instruction .expect takes at least two arguments");
-    }
-    if(dest != nullptr){
-        Utils::error(filename, name, "Instruction .expect has no destination");
-    }
-    auto var_name = Utils::get_var_name(args[0].first);
-    if(!var_name.has_value()){
-        Utils::error(filename, name, "Instruction .expect takes a variable name as the first argument");
-    }
-    auto type_expr = args[0].second;
-    std::vector<IR::LiteralExprPtr> arg_literals;
-    for(size_t i = 1; i < args.size(); i++){
-        if(!Utils::type_eq(type_expr, args[i].second)){
-            Utils::error(filename, name, "Instruction .expect takes arguments of the same type");
-        }
-        if(!Utils::is_constexpr(args[i].first)){
-            Utils::error(filename, name, "Instruction .expect takes const expression arguments");
+            Utils::error(filename, name, "Discrete value optimizer hint instruction takes const expression arguments");
         }
         arg_literals.push_back(args[i].first->get_literal());
     }
@@ -516,40 +354,62 @@ MIR::InstPtr analyze_expect_inst(std::string filename, Utils::VarSymTablePtr var
     }
     auto [attrs_with_num_args, remaining_attrs] = Utils::extract_attrs_with_num_args<double>(filename, attributes, {"probability"});
     if(attrs_with_num_args["probability"].size() > 1){
-        Utils::error(filename, name, "Attribute 'probability' for .expect instruction takes at most one argument");
+        Utils::error(filename, name, "Attribute 'probability' for discrete value optimizer hint instruction takes at most one argument");
     }
     if(remaining_attrs.size() > 0){
-        Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for .expect instruction: " + remaining_attrs[0]->to_string());
+        Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for discrete value optimizer hint instruction: " + remaining_attrs[0]->to_string());
     }
-    return std::make_shared<MIR::ExpectInst>(inst_stmt, var_name.value(), arg_literals, type_expr, 
-                                             (attrs_with_num_args["probability"].size() == 0 ? std::nullopt : std::make_optional(attrs_with_num_args["probability"][0])), 
-                                             fast_math_attr);
+    if(name.value == ".assume"){
+        if(attrs_with_num_args["probability"].size() > 0){
+            Utils::error(filename, name, "Attribute 'probability' is not supported for .assume instruction");
+        }
+        return std::make_shared<MIR::AssumeInst>(inst_stmt, var_name.value(), arg_literals, type_expr, fast_math_attr);
+    }
+    else if(name.value == ".assume_not"){
+        if(attrs_with_num_args["probability"].size() > 0){
+            Utils::error(filename, name, "Attribute 'probability' is not supported for .assume_not instruction");
+        }
+        return std::make_shared<MIR::AssumeNotInst>(inst_stmt, var_name.value(), arg_literals, type_expr, fast_math_attr);
+    }
+    else if(name.value == ".expect"){
+        return std::make_shared<MIR::ExpectInst>(inst_stmt, var_name.value(), arg_literals, type_expr, 
+                                                 (attrs_with_num_args["probability"].size() == 0 ? std::nullopt : std::make_optional(attrs_with_num_args["probability"][0])), 
+                                                 fast_math_attr);
+    }
+    else if(name.value == ".expect_not"){
+        return std::make_shared<MIR::ExpectNotInst>(inst_stmt, var_name.value(), arg_literals, type_expr, 
+                                                    (attrs_with_num_args["probability"].size() == 0 ? std::nullopt : std::make_optional(attrs_with_num_args["probability"][0])), 
+                                                    fast_math_attr);
+    }
+    else{
+        Utils::error(filename, name, "Unknown discrete value optimizer hint instruction: " + name.value);
+    }
 }
-MIR::InstPtr analyze_expect_range_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
-                                       std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
-                                       IR::InstructionStmtPtr inst_stmt){
+MIR::InstPtr analyze_range_optimizer_hint(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
+                                          std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
+                                          IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     if(args.size() != 3){
-        Utils::error(filename, name, "Instruction .expect_range takes exactly three arguments");
+        Utils::error(filename, name, "Optimizer range hint instruction takes exactly three arguments");
     }
     if(dest != nullptr){
-        Utils::error(filename, name, "Instruction .expect_range has no destination");
+        Utils::error(filename, name, "Optimizer range hint instruction has no destination");
     }
     auto var_name = Utils::get_var_name(args[0].first);
     if(!var_name.has_value()){
-        Utils::error(filename, name, "Instruction .expect_range takes a variable name as the first argument");
+        Utils::error(filename, name, "Optimizer range hint instruction takes a variable name as the first argument");
     }
     auto type_expr = args[0].second;
     for(size_t i = 1; i < args.size(); i++){
         if(!Utils::type_eq(type_expr, args[i].second)){
-            Utils::error(filename, name, "Instruction .expect_range takes arguments of the same type");
+            Utils::error(filename, name, "Optimizer range hint instruction takes arguments of the same type");
         }
         if(!Utils::is_constexpr(args[i].first)){
-            Utils::error(filename, name, "Instruction .expect_range takes const expression arguments");
+            Utils::error(filename, name, "Optimizer range hint instruction takes const expression arguments");
         }
     } 
     if(type_expr->get_kind() != IR::TypeExprKind::IntTypeExpr && type_expr->get_kind() != IR::TypeExprKind::FloatTypeExpr){
-        Utils::error(filename, name, "Instruction .expect_range takes arguments of integer or float type");
+        Utils::error(filename, name, "Optimizer range hint instruction takes arguments of integer or float type");
     }
     std::optional<MIR::FastMathAttr> fast_math_attr = std::nullopt;
     if(type_expr->get_kind() == IR::TypeExprKind::FloatTypeExpr){
@@ -560,17 +420,45 @@ MIR::InstPtr analyze_expect_range_inst(std::string filename, Utils::VarSymTableP
     auto [attrs_with_num_args, _remaining_attrs] = Utils::extract_attrs_with_num_args<double>(filename, attributes, {"probability"});
     auto [flag_attrs, remaining_attrs] = Utils::extract_flag_attrs(filename, _remaining_attrs, {"unsigned"});
     if(fast_math_attr.has_value() && flag_attrs["unsigned"]){
-        Utils::error(filename, name, "Instruction .expect_range cannot have both 'unsigned' and 'fast-math' attributes");
+        Utils::error(filename, name, "Optimizer range hint instruction cannot have both 'unsigned' and 'fast-math' attributes");
     }
+    //TODO:Check if high > low. Will implement later because the size can also be an i128,i256 and so on
     if(attrs_with_num_args["probability"].size() > 1){
-        Utils::error(filename, name, "Attribute 'probability' for .expect_range instruction takes at most one argument");
+        Utils::error(filename, name, "Attribute 'probability' for optimizer range hint instruction takes at most one argument");
+    }
+    if(attrs_with_num_args["probability"].size() == 1){
+        if(attrs_with_num_args["probability"][0] < 0 || attrs_with_num_args["probability"][0] > 1){
+            Utils::error(filename, name, "Attribute 'probability' for optimizer range hint instruction takes a value in the range [0, 1]");
+        }
     }
     if(remaining_attrs.size() > 0){
-        Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for .expect_range instruction: " + remaining_attrs[0]->to_string());
+        Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for optimizer range hint instruction: " + remaining_attrs[0]->to_string());
     }
-    return std::make_shared<MIR::ExpectRangeInst>(inst_stmt, var_name.value(), args[1].first->get_literal(), args[2].first->get_literal(), type_expr, 
-                                                  (attrs_with_num_args["probability"].size() == 0 ? std::nullopt : std::make_optional(attrs_with_num_args["probability"][0])), 
-                                                  flag_attrs["unsigned"], fast_math_attr);
+    if(name.value == ".assume_range"){
+        if(attrs_with_num_args["probability"].size() > 0){
+            Utils::error(filename, name, "Attribute 'probability' is not supported for .assume_range instruction");
+        }
+        return std::make_shared<MIR::AssumeRangeInst>(inst_stmt, var_name.value(), args[1].first->get_literal(), args[2].first->get_literal(), type_expr, flag_attrs["unsigned"], fast_math_attr);
+    }
+    else if(name.value == ".assume_not_range"){
+        if(attrs_with_num_args["probability"].size() > 0){
+            Utils::error(filename, name, "Attribute 'probability' is not supported for .assume_not_range instruction");
+        }
+        return std::make_shared<MIR::AssumeNotRangeInst>(inst_stmt, var_name.value(), args[1].first->get_literal(), args[2].first->get_literal(), type_expr, flag_attrs["unsigned"], fast_math_attr);
+    }
+    else if(name.value == ".expect_range"){
+        return std::make_shared<MIR::ExpectRangeInst>(inst_stmt, var_name.value(), args[1].first->get_literal(), args[2].first->get_literal(), type_expr, 
+                                                      (attrs_with_num_args["probability"].size() == 0 ? std::nullopt : std::make_optional(attrs_with_num_args["probability"][0])), 
+                                                      flag_attrs["unsigned"], fast_math_attr);
+    }
+    else if(name.value == ".expect_not_range"){
+        return std::make_shared<MIR::ExpectNotRangeInst>(inst_stmt, var_name.value(), args[1].first->get_literal(), args[2].first->get_literal(), type_expr, 
+                                                         (attrs_with_num_args["probability"].size() == 0 ? std::nullopt : std::make_optional(attrs_with_num_args["probability"][0])), 
+                                                         flag_attrs["unsigned"], fast_math_attr);
+    }
+    else{
+        Utils::error(filename, name, "Unknown optimizer range hint instruction: " + name.value);
+    }
 }
 MIR::InstPtr analyze_nop_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
                               std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,

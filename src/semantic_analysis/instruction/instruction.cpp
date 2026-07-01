@@ -84,8 +84,9 @@ bool is_call_inst(std::string inst_name){
 bool is_other_inst(std::string inst_name) {
     return inst_name == ".select" || inst_name == ".freeze" || inst_name == ".va_start" || inst_name == ".va_end" || inst_name == ".va_copy" || 
            inst_name == ".va_arg" || inst_name == ".ptrmask" || inst_name == ".pause" || inst_name == ".assume" || inst_name == ".assume_range" || 
-           inst_name == ".assume_not" || inst_name == ".assume_not_range" || inst_name == ".expect" || inst_name == ".expect_range" || inst_name == ".nop" || 
-           inst_name == ".annotation" || inst_name == ".endbr64" || inst_name == ".launder" || inst_name == ".strip_invariant_group";
+           inst_name == ".assume_not" || inst_name == ".assume_not_range" || inst_name == ".expect" || inst_name == ".expect_range" || 
+           inst_name == ".expect_not" || inst_name == ".expect_not_range" || inst_name == ".nop" ||  inst_name == ".annotation" || inst_name == ".endbr64" || 
+           inst_name == ".launder" || inst_name == ".strip_invariant_group";
 }
 bool is_global_inst(std::string inst_name){
     return inst_name == ".global" || inst_name == ".assign_type";

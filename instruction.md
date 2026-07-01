@@ -541,6 +541,7 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
 - `let T:%local_var = .local(T:initial_value)` - Defines and initializes a local variable. Value can be anything. Present for parser simplicity; does little in MIR. T can be any type. 
 
     If T is float/vec of float:
+    - `#[align(i64:N)]` - alignment of the variable in bytes; must be a power of 2; default is 16
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 - `let ptr:%local_var = .alloca(i64:%size)` - Allocates `size` bytes on the stack. Returns a pointer to the allocation.
@@ -741,8 +742,8 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
     - `#[syncscope("singlethreaded")]` - synchronizes only with atomic ops in the same thread; default is global
     - `#[store_only]` - emit `SFENCE` (store fence only); valid orderings: `release`, `seq_cst`. Required after sequences of non-temporal stores to enforce visibility ordering. Mutually exclusive with `#[load_only]`.
     - `#[load_only]` - emit `LFENCE` (load fence only); valid orderings: `acquire`, `seq_cst`. Mutually exclusive with `#[store_only]`. Without either attribute, `.fence` maps to `MFENCE` (full fence).
-
-- `let {T,i1}:%output_var = .atomic_cmpxchg(ptr:%ptr, T:%expected, T:%desired, str:success_ordering, str:failure_ordering)` - Atomically compares `*ptr` with `expected`. If equal, stores `desired` and returns `{original, true}`; otherwise leaves memory unchanged and returns `{original, false}`. `success_ordering` must be one of: `monotonic`, `acquire`, `release`, `acq_rel`, `seq_cst`. `failure_ordering` must be one of: `monotonic`, `acquire`, `seq_cst` (not `release` or `acq_rel`).
+    
+- `let {T,i1}:%output_var = .atomic_cmpxchg(ptr:%ptr, T:%expected, T:%desired, str:success_ordering, str:failure_ordering)` - Atomically compares `*ptr` with `expected`. If equal, stores `desired` and returns `{original, true}`; otherwise leaves memory unchanged and returns `{original, false}`. `success_ordering` must be one of: `monotonic`, `acquire`, `release`, `acq_rel`, `seq_cst`. `failure_ordering` must be one of: `monotonic`, `acquire`, `seq_cst` (not `release` or `acq_rel`), and must not be stronger than `success_ordering` (ranking: `monotonic` < `acquire`/`release` < `acq_rel` < `seq_cst`).
 
     - `#[volatile]` - volatile operation
     - `#[weak]` - weak CAS; permitted to spuriously fail even when `*ptr == expected`
@@ -751,7 +752,7 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
 
     If T is float/vec of float:
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
-
+    
 ### Cache Control Instructions
 
 - `.clflush(ptr:%addr)` - Evicts the cache line containing `addr` from all levels of the CPU cache hierarchy, forcing the next access to reload from main memory. Corresponds to `CLFLUSH`. Has no effect if the address is not cached. Does not wait for the flush to complete; use `.fence` with `seq_cst` afterward if ordering is required. No output.
@@ -774,7 +775,7 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
 
 - `.invariant.end(ptr:%scope, ptr:%ptr, i64:%size)` - Ends the invariant scope established by `.invariant.start`. `%scope` must be the handle returned by the paired start. No additional attributes.
 
----
+--- 
 
 ## Binary Arithmetic Fetch Modify Instructions
 

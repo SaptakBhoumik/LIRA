@@ -40,12 +40,12 @@ MIR::InstPtr analyze_int_to_ptr_inst(std::string filename, MIR::LocalDestRegiste
 MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_conv_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt){
     //NOTE:Dont use a common templated function for all. The attributes can change in future. It is more code but more maintainable imo+The error messages can be more specific
     const std::unordered_map<std::string, DispatchFuncType> dispatch_map = {
-        {".trunc",        analyze_trunc_inst},
-        {".ext",          analyze_ext_inst},
+        {".trunc", analyze_trunc_inst},
+        {".ext", analyze_ext_inst},
         {".float_to_int", analyze_float_to_int_inst},
         {".int_to_float", analyze_int_to_float_inst},
-        {".ptr_to_int",   analyze_ptr_to_int_inst},
-        {".int_to_ptr",   analyze_int_to_ptr_inst},
+        {".ptr_to_int", analyze_ptr_to_int_inst},
+        {".int_to_ptr", analyze_int_to_ptr_inst},
     };
     auto args = inst_stmt->get_value()->get_operands();
     if(args.size() != 1){
@@ -68,7 +68,7 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_conv_inst(IR::Token name,IR::Instr
             Utils::error(this->filename, name, "Bitcast instruction requires the source and destination types to have the same size. Destination type: " + dest->get_type()->to_string() + " has size " + std::to_string(Utils::get_type_size(dest->get_type())) + " bits. Source type: " + args[0].second->to_string() + " has size " + std::to_string(Utils::get_type_size(args[0].second)) + " bits.");
         }
         auto attributes = inst_stmt->get_value()->get_attributes();
-        if(MIR::is_float_typevariant(dest_type_variant.value()) || MIR::is_float_typevariant(arg_type_variant.value())){
+        if(Utils::contains_float(dest->get_type()) || Utils::contains_float(args[0].second)){
             auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
             if(remaining_attrs.size() > 0){
                 Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for float bitcast instruction: " + remaining_attrs[0]->to_string());

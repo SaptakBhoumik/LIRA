@@ -3,9 +3,10 @@
 namespace LIRA {
 namespace MIR {
 //--------------------------------- Uncategorized Memory Instructions ---------------------------------
-LocalInst::LocalInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value,
+LocalInst::LocalInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, std::size_t alignment,
                      std::optional<FastMathAttr> fast_math_attr):Inst(instruction_stmt,destination,fast_math_attr){
     this->value = value;
+    this->alignment = alignment;
 }
 IR::LiteralExprPtr LocalInst::get_value() const{
     return this->value;
@@ -13,11 +14,16 @@ IR::LiteralExprPtr LocalInst::get_value() const{
 IR::TypeExprPtr LocalInst::get_type() const{
     return this->destination->get_type();
 }
+std::size_t LocalInst::get_alignment() const{
+    return this->alignment;
+}
 InstType LocalInst::get_inst_type() const{
     return InstType::LocalInst;
 }
 std::string LocalInst::to_string() const{
-    return "let " + this->destination->to_string() + " = .local(" + this->value->to_string() + ")" + (this->fast_math_attr.has_value() ? " " + this->fast_math_attr.value().to_string() : "");
+    return "let " + this->destination->to_string() + " = .local(" + this->value->to_string() + ")" 
+                  + (this->alignment != 0 ? " #[align(" + std::to_string(this->alignment) + ")]" : "")
+                  + (this->fast_math_attr.has_value() ? " " + this->fast_math_attr.value().to_string() : "");
 }
 
 

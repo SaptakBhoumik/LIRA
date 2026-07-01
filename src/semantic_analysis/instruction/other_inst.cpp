@@ -10,7 +10,7 @@ namespace SemanticAnalyzer {
 using DispatchFuncType = std::function<MIR::InstPtr(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
                                                     std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                                     IR::InstructionStmtPtr inst_stmt)>;
-
+ 
 MIR::InstPtr analyze_select_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
                                  std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
                                  IR::InstructionStmtPtr inst_stmt);
@@ -147,41 +147,12 @@ MIR::InstPtr analyze_select_inst(std::string filename, Utils::VarSymTablePtr var
             }
         }
     }
-    if(dest->get_type()->get_kind() == IR::TypeExprKind::StrTypeExpr || args[1].second->get_kind() == IR::TypeExprKind::StrTypeExpr || args[2].second->get_kind() == IR::TypeExprKind::StrTypeExpr){
-        auto [arg1_reduced_type, arg1_str_value] = Utils::reduce_str_value_and_type(var_symtable, args[1].second, args[1].first);
-        auto [arg2_reduced_type, arg2_str_value] = Utils::reduce_str_value_and_type(var_symtable, args[2].second, args[2].first);
-        if(arg1_reduced_type == nullptr && arg2_reduced_type == nullptr){
-            Utils::error(filename, name, "Unable to resolve the string type for either the second or third argument of instruction .select.");
-        }
-        if(arg1_reduced_type == nullptr){
-            dest->change_type(arg2_reduced_type);
-            args[1].second = arg2_reduced_type;
-        }
-        else if(arg2_reduced_type == nullptr){
-            dest->change_type(arg1_reduced_type);
-            args[2].second = arg1_reduced_type;
-        }
-        else{
-            if(!Utils::type_eq(arg1_reduced_type, arg2_reduced_type)){
-                Utils::error(filename, name, "Unable to resolve the string type for either the second or third argument of instruction .select.");
-            }
-            dest->change_type(arg1_reduced_type);
-            args[1].second = arg1_reduced_type;
-            args[2].second = arg1_reduced_type;
-        }
-    }
-    auto type_varient = MIR::get_type_variant_from_type(dest->get_type());
     std::optional<MIR::FastMathAttr> fast_math_attr = std::nullopt;
-    if(type_varient.has_value()){
-        if(MIR::is_float_typevariant(type_varient.value())){
-            auto temp = Utils::extract_fastmath_attrs(filename,attributes);
-            fast_math_attr = temp.first;
-            if(temp.second.size() > 0){
-                Utils::error(filename, temp.second[0]->get_token(), "Unsupported attribute for float arithmetic binary instruction: " + temp.second[0]->to_string());
-            }
-        }
-        else if(attributes.size() > 0){
-            Utils::error(filename, attributes[0]->get_token(), "Unsupported attribute for select instruction: " + attributes[0]->to_string());
+    if(Utils::contains_float(dest->get_type())){
+        auto temp = Utils::extract_fastmath_attrs(filename,attributes);
+        fast_math_attr = temp.first;
+        if(temp.second.size() > 0){
+            Utils::error(filename, temp.second[0]->get_token(), "Unsupported attribute for float arithmetic binary instruction: " + temp.second[0]->to_string());
         }
     }
     else if(attributes.size() > 0){
@@ -207,23 +178,12 @@ MIR::InstPtr analyze_freeze_inst(std::string filename, Utils::VarSymTablePtr var
     if(!Utils::type_eq(args[0].second, dest->get_type())){
         Utils::error(filename, name, "Instruction .freeze takes an argument of the same type as the destination");
     }
-    if(dest->get_type()->get_kind() == IR::TypeExprKind::StrTypeExpr || args[0].second->get_kind() == IR::TypeExprKind::StrTypeExpr){
-        auto [reduced_type, str_value] = Utils::reduce_str_value_and_type(var_symtable, args[0].second, args[0].first);
-        if(reduced_type == nullptr){
-            Utils::error(filename, name, "Unable to resolve the string type for the argument of instruction .freeze.");
+    if(Utils::contains_float(dest->get_type())){
+        auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
+        if(remaining_attrs.size() > 0){
+            Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for float arithmetic binary instruction: " + remaining_attrs[0]->to_string());
         }
-        dest->change_type(reduced_type);
-        args[0].second = reduced_type;
-    }
-    auto type_varient = MIR::get_type_variant_from_type(dest->get_type());
-    if(type_varient.has_value()){
-        if(MIR::is_float_typevariant(type_varient.value())){
-            auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
-            if(remaining_attrs.size() > 0){
-                Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for float arithmetic binary instruction: " + remaining_attrs[0]->to_string());
-            }
-            return std::make_shared<MIR::FreezeInst>(inst_stmt, dest, args[0].first->get_literal(), fast_math_attr);
-        }
+        return std::make_shared<MIR::FreezeInst>(inst_stmt, dest, args[0].first->get_literal(), fast_math_attr);
     }
     if(attributes.size() > 0){
         Utils::error(filename, attributes[0]->get_token(), "Unsupported attribute for freeze instruction: " + attributes[0]->to_string());
@@ -300,18 +260,12 @@ MIR::InstPtr analyze_va_arg_inst(std::string filename, Utils::VarSymTablePtr var
     if(args[0].second->get_kind() != IR::TypeExprKind::PtrTypeExpr){
         Utils::error(filename, name, "Instruction .va_arg takes a pointer type argument");
     }
-    if(dest->get_type()->get_kind() == IR::TypeExprKind::StrTypeExpr){
-        Utils::error(filename, name, "Instruction .va_arg cannot have a destination of type str. If you want string use [i8,N]. String is not an actual type and is more of a convinience type so that you dont have to write [i8,N] every time you want a string. It is not a real type and is not supported in instruction where the size of string is not always known at compile time.");
-    }
-    auto type_varient = MIR::get_type_variant_from_type(dest->get_type());
-    if(type_varient.has_value()){
-        if(MIR::is_float_typevariant(type_varient.value())){
-            auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
-            if(remaining_attrs.size() > 0){
-                Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for float arithmetic binary instruction: " + remaining_attrs[0]->to_string());
-            }
-            return std::make_shared<MIR::VaargInst>(inst_stmt, dest, args[0].first->get_literal(), fast_math_attr);
+    if(Utils::contains_float(dest->get_type())){
+        auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
+        if(remaining_attrs.size() > 0){
+            Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for float arithmetic binary instruction: " + remaining_attrs[0]->to_string());
         }
+        return std::make_shared<MIR::VaargInst>(inst_stmt, dest, args[0].first->get_literal(), fast_math_attr);
     }
     if(attributes.size() > 0){
         Utils::error(filename, attributes[0]->get_token(), "Unsupported attribute for va_arg instruction: " + attributes[0]->to_string());
@@ -392,22 +346,8 @@ MIR::InstPtr analyze_assume_inst(std::string filename, Utils::VarSymTablePtr var
         Utils::error(filename, name, "Instruction .assume takes a variable name as the first argument");
     }
     auto type_expr = args[0].second;
-    if(type_expr->get_kind() == IR::TypeExprKind::StrTypeExpr){
-        auto [reduced_type, str_value] = Utils::reduce_str_value_and_type(var_symtable, type_expr, args[0].first);
-        if(reduced_type == nullptr){
-            Utils::error(filename, name, "Unable to resolve the string type for the first argument of instruction .assume.");
-        }
-        type_expr = reduced_type;
-    }
     std::vector<IR::LiteralExprPtr> arg_literals;
     for(size_t i = 1; i < args.size(); i++){
-        if(args[i].second->get_kind() == IR::TypeExprKind::StrTypeExpr){
-            auto [reduced_type, str_value] = Utils::reduce_str_value_and_type(var_symtable, args[i].second, args[i].first);
-            if(reduced_type == nullptr){
-                Utils::error(filename, name, "Unable to resolve the string type for the argument of instruction .assume.");
-            }
-            args[i].second = reduced_type;
-        }
         if(!Utils::type_eq(type_expr, args[i].second)){
             Utils::error(filename, name, "Instruction .assume takes arguments of the same type");
         }
@@ -416,15 +356,12 @@ MIR::InstPtr analyze_assume_inst(std::string filename, Utils::VarSymTablePtr var
         }
         arg_literals.push_back(args[i].first->get_literal());
     }
-    auto type_varient = MIR::get_type_variant_from_type(type_expr);
-    if(type_varient.has_value()){
-        if(MIR::is_float_typevariant(type_varient.value())){
-            auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
-            if(remaining_attrs.size() > 0){
-                Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for float arithmetic binary instruction: " + remaining_attrs[0]->to_string());
-            }
-            return std::make_shared<MIR::AssumeInst>(inst_stmt, var_name.value(), arg_literals, type_expr, fast_math_attr);
+    if(Utils::contains_float(type_expr)){
+        auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
+        if(remaining_attrs.size() > 0){
+            Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for float arithmetic binary instruction: " + remaining_attrs[0]->to_string());
         }
+        return std::make_shared<MIR::AssumeInst>(inst_stmt, var_name.value(), arg_literals, type_expr, fast_math_attr);
     }
     if(attributes.size() > 0){
         Utils::error(filename, attributes[0]->get_token(), "Unsupported attribute for .assume instruction: " + attributes[0]->to_string());
@@ -485,22 +422,8 @@ MIR::InstPtr analyze_assume_not_inst(std::string filename, Utils::VarSymTablePtr
         Utils::error(filename, name, "Instruction .assume_not takes a variable name as the first argument");
     }
     auto type_expr = args[0].second;
-    if(type_expr->get_kind() == IR::TypeExprKind::StrTypeExpr){
-        auto [reduced_type, str_value] = Utils::reduce_str_value_and_type(var_symtable, type_expr, args[0].first);
-        if(reduced_type == nullptr){
-            Utils::error(filename, name, "Unable to resolve the string type for the first argument of instruction .assume_not.");
-        }
-        type_expr = reduced_type;
-    }
     std::vector<IR::LiteralExprPtr> arg_literals;
     for(size_t i = 1; i < args.size(); i++){
-        if(args[i].second->get_kind() == IR::TypeExprKind::StrTypeExpr){
-            auto [reduced_type, str_value] = Utils::reduce_str_value_and_type(var_symtable, args[i].second, args[i].first);
-            if(reduced_type == nullptr){
-                Utils::error(filename, name, "Unable to resolve the string type for the argument of instruction .assume_not.");
-            }
-            args[i].second = reduced_type;
-        }
         if(!Utils::type_eq(type_expr, args[i].second)){
             Utils::error(filename, name, "Instruction .assume_not takes arguments of the same type");
         }
@@ -509,15 +432,12 @@ MIR::InstPtr analyze_assume_not_inst(std::string filename, Utils::VarSymTablePtr
         }
         arg_literals.push_back(args[i].first->get_literal());
     }
-    auto type_varient = MIR::get_type_variant_from_type(type_expr);
-    if(type_varient.has_value()){
-        if(MIR::is_float_typevariant(type_varient.value())){
-            auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
-            if(remaining_attrs.size() > 0){
-                Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for float arithmetic binary instruction: " + remaining_attrs[0]->to_string());
-            }
-            return std::make_shared<MIR::AssumeNotInst>(inst_stmt, var_name.value(), arg_literals, type_expr, fast_math_attr);
+    if(Utils::contains_float(type_expr)){
+        auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
+        if(remaining_attrs.size() > 0){
+            Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for float arithmetic binary instruction: " + remaining_attrs[0]->to_string());
         }
+        return std::make_shared<MIR::AssumeNotInst>(inst_stmt, var_name.value(), arg_literals, type_expr, fast_math_attr);
     }
     if(attributes.size() > 0){
         Utils::error(filename, attributes[0]->get_token(), "Unsupported attribute for .assume_not instruction: " + attributes[0]->to_string());
@@ -578,22 +498,8 @@ MIR::InstPtr analyze_expect_inst(std::string filename, Utils::VarSymTablePtr var
         Utils::error(filename, name, "Instruction .expect takes a variable name as the first argument");
     }
     auto type_expr = args[0].second;
-    if(type_expr->get_kind() == IR::TypeExprKind::StrTypeExpr){
-        auto [reduced_type, str_value] = Utils::reduce_str_value_and_type(var_symtable, type_expr, args[0].first);
-        if(reduced_type == nullptr){
-            Utils::error(filename, name, "Unable to resolve the string type for the first argument of instruction .expect.");
-        }
-        type_expr = reduced_type;
-    }
     std::vector<IR::LiteralExprPtr> arg_literals;
     for(size_t i = 1; i < args.size(); i++){
-        if(args[i].second->get_kind() == IR::TypeExprKind::StrTypeExpr){
-            auto [reduced_type, str_value] = Utils::reduce_str_value_and_type(var_symtable, args[i].second, args[i].first);
-            if(reduced_type == nullptr){
-                Utils::error(filename, name, "Unable to resolve the string type for the argument of instruction .expect.");
-            }
-            args[i].second = reduced_type;
-        }
         if(!Utils::type_eq(type_expr, args[i].second)){
             Utils::error(filename, name, "Instruction .expect takes arguments of the same type");
         }
@@ -603,15 +509,15 @@ MIR::InstPtr analyze_expect_inst(std::string filename, Utils::VarSymTablePtr var
         arg_literals.push_back(args[i].first->get_literal());
     }
     std::optional<MIR::FastMathAttr> fast_math_attr = std::nullopt;
-    auto type_varient = MIR::get_type_variant_from_type(type_expr);
-    if(type_varient.has_value()){
-        if(MIR::is_float_typevariant(type_varient.value())){
-            auto val = Utils::extract_fastmath_attrs(filename,attributes);
-            attributes = val.second;
-            fast_math_attr = val.first;
-        }
+    if(Utils::contains_float(type_expr)){
+        auto val = Utils::extract_fastmath_attrs(filename,attributes);
+        attributes = val.second;
+        fast_math_attr = val.first;
     }
     auto [attrs_with_num_args, remaining_attrs] = Utils::extract_attrs_with_num_args<double>(filename, attributes, {"probability"});
+    if(attrs_with_num_args["probability"].size() > 1){
+        Utils::error(filename, name, "Attribute 'probability' for .expect instruction takes at most one argument");
+    }
     if(remaining_attrs.size() > 0){
         Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for .expect instruction: " + remaining_attrs[0]->to_string());
     }
@@ -641,7 +547,7 @@ MIR::InstPtr analyze_expect_range_inst(std::string filename, Utils::VarSymTableP
         if(!Utils::is_constexpr(args[i].first)){
             Utils::error(filename, name, "Instruction .expect_range takes const expression arguments");
         }
-    }
+    } 
     if(type_expr->get_kind() != IR::TypeExprKind::IntTypeExpr && type_expr->get_kind() != IR::TypeExprKind::FloatTypeExpr){
         Utils::error(filename, name, "Instruction .expect_range takes arguments of integer or float type");
     }
@@ -653,6 +559,12 @@ MIR::InstPtr analyze_expect_range_inst(std::string filename, Utils::VarSymTableP
     }
     auto [attrs_with_num_args, _remaining_attrs] = Utils::extract_attrs_with_num_args<double>(filename, attributes, {"probability"});
     auto [flag_attrs, remaining_attrs] = Utils::extract_flag_attrs(filename, _remaining_attrs, {"unsigned"});
+    if(fast_math_attr.has_value() && flag_attrs["unsigned"]){
+        Utils::error(filename, name, "Instruction .expect_range cannot have both 'unsigned' and 'fast-math' attributes");
+    }
+    if(attrs_with_num_args["probability"].size() > 1){
+        Utils::error(filename, name, "Attribute 'probability' for .expect_range instruction takes at most one argument");
+    }
     if(remaining_attrs.size() > 0){
         Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for .expect_range instruction: " + remaining_attrs[0]->to_string());
     }
@@ -700,14 +612,14 @@ MIR::InstPtr analyze_annotation_inst(std::string filename, Utils::VarSymTablePtr
     if(attributes.size() != 0){
         Utils::error(filename, name, "Instruction .annotation takes no attributes");
     }
-    auto str = Utils::reduce_str_value_and_type(var_symtable, args[0].second, args[0].first);
-    if(str.first == nullptr){
-        Utils::error(filename, name, "Instruction .annotation takes a string literal argument");
+    if(!Utils::is_18_array(args[0].second)){
+        Utils::error(filename, name, "Instruction .annotation takes an array of 18 elements");
     }
-    if(!str.second.has_value()){
+    auto str = Utils::reduce_str_value(args[0].first);
+    if(!str.has_value()){
         Utils::error(filename, name, "Instruction .annotation takes a const expression string literal argument");
     }
-    return std::make_shared<MIR::AnnotationInst>(inst_stmt, str.second.value());
+    return std::make_shared<MIR::AnnotationInst>(inst_stmt, str.value());
 }
 MIR::InstPtr analyze_endbr64_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
                                   std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,

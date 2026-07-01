@@ -123,30 +123,6 @@ std::string VoidTypeExpr::to_string() const{
 }
 
 
-StrTypeExpr::StrTypeExpr(Token tok, std::vector<AttributePtr> attributes){
-    this->tok = tok;
-    this->attributes = attributes;
-}
-TypeExprKind StrTypeExpr::get_kind() const{
-    return TypeExprKind::StrTypeExpr;
-}
-Token StrTypeExpr::get_token() const{
-    return this->tok;
-}
-std::vector<AttributePtr> StrTypeExpr::get_attributes() const{
-    return this->attributes;
-}
-std::string StrTypeExpr::to_string() const{
-    std::string res = "str";
-    for(const auto& attr: this->attributes){
-        res += " "+attr->to_string();
-    }
-    if(!this->attributes.empty()){
-        res = "("+res+")";
-    }
-    return res;
-}
-
 PtrTypeExpr::PtrTypeExpr(Token tok, std::vector<AttributePtr> attributes){
     this->tok = tok;
     this->attributes = attributes;

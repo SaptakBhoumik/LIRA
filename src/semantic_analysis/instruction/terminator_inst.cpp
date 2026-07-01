@@ -78,23 +78,13 @@ MIR::InstPtr analyze_ret_inst(std::string filename, IR::TypeExprPtr curr_func_re
         }
     }
     else{
-        if(args[0].second->get_kind() == IR::TypeExprKind::StrTypeExpr){
-            auto [reduced_type, str_value] = Utils::reduce_str_value_and_type(var_symtable, args[0].second, args[0].first);
-            if(reduced_type == nullptr){
-                Utils::error(filename, name, "Unable to resolve the string type for the argument of instruction .ret.");
-            }
-            args[0].second = reduced_type;
-        }
         if(!Utils::type_eq(curr_func_ret_type, args[0].second)){
             Utils::error(filename, name, "Instruction .ret takes an argument of the same type as the current function return type");
         }
-        auto type_varient = MIR::get_type_variant_from_type(args[0].second);
-        if(type_varient.has_value()){
-            if(MIR::is_float_typevariant(type_varient.value())){
-                auto val = Utils::extract_fastmath_attrs(filename,attributes);
-                remaining_attrs = val.second;
-                fast_math_attr = val.first;
-            }
+        if(Utils::contains_float(args[0].second)){
+            auto val = Utils::extract_fastmath_attrs(filename,attributes);
+            remaining_attrs = val.second;
+            fast_math_attr = val.first;
         }
         ret_value = std::make_pair(args[0].second, args[0].first->get_literal());
     }
@@ -152,21 +142,11 @@ std::pair<std::vector<std::pair<IR::TypeExprPtr,IR::LiteralExprPtr>>, bool> get_
     for(size_t i = 0; i < label_type_expr_param.size(); i++){
         auto param_type = label_type_expr_param[i];
         auto arg_type = arg_types_struct_fields[i];
-        if(arg_type->get_kind() == IR::TypeExprKind::StrTypeExpr){
-            auto [reduced_type, str_value] = Utils::reduce_str_value_and_type(var_symtable, arg_type, _args);
-            if(reduced_type == nullptr){
-                Utils::error(filename, arg_types->get_token(), "Unable to resolve the string type for the label argument type.");
-            }
-            arg_type = reduced_type;
-        }
         if(!Utils::type_eq(param_type, arg_type)){
             Utils::error(filename, arg_type->get_token(), "Label argument type does not match the label type parameter");
         }
-        auto type_varient = MIR::get_type_variant_from_type(param_type);
-        if(type_varient.has_value()){
-            if(MIR::is_float_typevariant(type_varient.value())){
-                contains_float_type = true;
-            }
+        if(Utils::contains_float(param_type)){
+            contains_float_type = true;
         }
         label_args.push_back(std::make_pair(param_type, args_struct_fields[i]));
     }

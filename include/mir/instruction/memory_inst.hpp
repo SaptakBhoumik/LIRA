@@ -7,12 +7,14 @@ namespace MIR {
 //--------------------------------- Uncategorized Memory Instructions ---------------------------------
 class LocalInst:public Inst {
     IR::LiteralExprPtr value;
+    std::size_t alignment;
     public:
-    LocalInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value,
+    LocalInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, std::size_t alignment,
               std::optional<FastMathAttr> fast_math_attr);
 
     IR::LiteralExprPtr get_value() const;
     IR::TypeExprPtr get_type() const;
+    std::size_t get_alignment() const;
 
     InstType get_inst_type() const override;
     std::string to_string() const override;

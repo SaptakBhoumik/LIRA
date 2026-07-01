@@ -25,7 +25,6 @@ class LocalDestRegister{
     public:
     LocalDestRegister(std::string dest_register_name, IR::TypeExprPtr type,bool artificial, bool synthetic, bool nonnull, bool nopoison, bool nnan, bool ninf, 
                       bool noalias, std::string original_name, std::string scope, std::size_t dereferenceable_bytes, std::size_t alignment);
-    void change_type(IR::TypeExprPtr new_type);//SHould be used only in rare cases like when the type is set to str but now we know the length of the string and we want to change the type to [i8,N] where N is the length of the string.  
 
     std::string get_dest_register_name() const;
     IR::TypeExprPtr get_type() const;

@@ -238,6 +238,7 @@ enum class SyncScope:std::uint64_t{
 std::string to_string(SyncScope syncscope);
 
 enum class AtomicOrdering:std::uint64_t{
+    // ACQUIRE and RELEASE have same strength but enum says ACQUIRE<RELEASE because C++ needs distinct type. Keep in mind when comparing 
     UNORDERED = 1 << 0,
     MONOTONIC = 1 << 1,
     ACQUIRE = 1 << 2,

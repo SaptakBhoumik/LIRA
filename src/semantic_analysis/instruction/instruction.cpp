@@ -52,8 +52,12 @@ bool is_numerical_classify_inst(std::string inst_name){
            inst_name == ".iszero" || inst_name == ".isnegative" || inst_name == ".ispositive";
 }
 bool is_mem_inst(std::string inst_name){
-    return inst_name == ".local" || inst_name == ".alloca" || inst_name == ".load" || inst_name == ".store" || inst_name == ".getaddress" || inst_name == ".ptroffset" || 
-           inst_name == ".extractelement" || inst_name == ".insertelement" || inst_name == ".fence" || inst_name == ".cmpxchg";
+    return inst_name == ".local" || inst_name == ".alloca" || inst_name == ".load" || inst_name == ".store" || inst_name == ".broadcast_load" || 
+           inst_name == ".masked_load" || inst_name == ".masked_store" || inst_name == ".masked_gather" || inst_name == ".masked_scatter" || 
+           inst_name == ".prefetch" || inst_name == ".memcopy" || inst_name == ".memset" || inst_name == ".memcmp" || inst_name == ".getaddress" || 
+           inst_name == ".ptroffset" || inst_name == ".stacksave" || inst_name == ".stackrestore" || inst_name == ".extractelement" || 
+           inst_name == ".insertelement" || inst_name == ".fence" || inst_name == ".atomic_cmpxchg" || inst_name == ".clflush" || inst_name == ".clwb" || 
+           inst_name == ".cldemote" || inst_name == ".lifetime.start" || inst_name == ".lifetime.end" || inst_name == ".invariant.start" || inst_name == ".invariant.end";
 }
 bool is_arithmetic_fetch_bin_inst(std::string inst_name){
     return inst_name == ".fetch_xchg" || inst_name == ".fetch_add" || inst_name == ".fetch_sub" || inst_name == ".fetch_absdiff" || inst_name == ".fetch_mul" || inst_name == ".fetch_div" || inst_name == ".fetch_rem" ||  

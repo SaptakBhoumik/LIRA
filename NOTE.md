@@ -30,3 +30,5 @@ let typed: fn(i32, i32) -> i32 = add    ;  not allowed as a variable type
 - In a lot of places in the MIR instruction class implementation, I have not taking in the operand type as a seperate argument. This is because the operand type can be obtained from the destination register's type. This is a design choice to avoid redundancy and potential inconsistencies. The destination register's type serves as the authoritative source for the operand type, ensuring that all operands are consistent with the expected type of the instruction. This also simplifies the instruction constructors and reduces the chances of errors where the operand type might not match the destination register's type.
 
 - A function must do -> void in the declaration if it does not return anything.
+
+- The doc and reference uses ``str`` as a type. It is not a type. We just use it as a placeholder to indicate that the type is a string. In the IR u need to use [i8,N] for a string of length N

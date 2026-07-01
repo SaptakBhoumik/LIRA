@@ -1436,7 +1436,7 @@ There are expect_not variants because sometimes u may not have the probablity va
 - `let ptr:%out = .strip_invariant_group(ptr:%ptr)` - Strips the invariant-group annotation from a pointer, allowing the optimizer to see stores through the returned pointer as potentially observable by loads from the original pointer. Corresponds to LLVM `llvm.strip.invariant.group`. No attributes.
 
 ---
-
+ 
 ## Hardware-Specific Instructions
 
 ### Processor Identification
@@ -1445,7 +1445,7 @@ There are expect_not variants because sometimes u may not have the probablity va
 
 ### Timestamp Counter Instructions
 
-- `let i64:%out = .rdtsc()` - Returns the current value of the processor's time-stamp counter. Corresponds to `RDTSC`. Not ordered with respect to surrounding instructions by default; pair with a serializing instruction (`lfence; rdtsc` idiom) for a fully serialized timestamp. No attributes. `#[unsigned]` permitted but has no effect.
+- `let i64:%out = .rdtsc()` - Returns the current value of the processor's time-stamp counter. Corresponds to `RDTSC`. Not ordered with respect to surrounding instructions by default; pair with a serializing instruction (`lfence; rdtsc` idiom) for a fully serialized timestamp. No attributes.
 
 - `let {i64, i32}:%out = .rdtscp()` - Returns `{timestamp: i64, cpuid_aux: i32}`. `cpuid_aux` is the value of `IA32_TSC_AUX` MSR (typically a core identifier). Corresponds to `RDTSCP`. Partially serializing: waits for prior instructions to execute before reading the counter, but does not prevent subsequent instructions from starting. No attributes.
 
@@ -1467,21 +1467,20 @@ and serves as the overload discriminator - omitting or mismatching it is a compi
 
 - `.set_fpenv(T:%env)` - Writes `%env` to the floating-point control register. The type annotation on `%env` is mandatory and selects the overload. `%env` must be a value obtained from `.get_fpenv` (possibly modified via field accessors); writing arbitrary bit patterns with reserved bits set incorrectly is undefined behavior.
     - `T=i32` (default) - writes `MXCSR`.
-    - `T=i16` - writes `FCW` via `FLDCW`. `#[x87]` is not required and is ignored if provided
-      since `T` already selects the overload.
+    - `T=i16` - writes `FCW` via `FLDCW`. `#[x87]` is required when T = `i16`.
     - `#[volatile]` - prevents the optimizer from eliminating, reordering across other FP ops,
       or merging redundant calls. Applies to both overloads.
 
-- `let i32:%out = .fpenv_get_field(T:%env, str:field)` - Extracts a named field from an opaque env token. The type annotation on `%env` is mandatory and selects the overload. `field` must be a compile-time string literal. No attributes.
+- `let i32:%out = .fpenv_get_field(T:%env, str:field)` - Extracts a named field from an opaque env token. The type annotation on `%env` is mandatory and selects the overload. `field` must be a compile-time string literal.
     - `T=i32` (default) - SSE overload. Valid fields: `"round"` (0=nearest-even, 1=neg-inf,
       2=pos-inf, 3=zero), `"ftz"`, `"daz"`, `"except_mask"` (6-bit packed: bits 0–5 invalid,
       denorm, divzero, overflow, underflow, inexact; 1=masked), `"except_status"` (same 6-bit
       order for sticky flags).
     - `T=i16` - x87 overload. Valid fields: `"round"` (same 4-value encoding), `"precision"`
       (0=single, 2=double, 3=extended; 1=UB), `"except_mask"` (same 6-bit layout). Passing
-      `"ftz"`, `"daz"`, or `"except_status"` is a compile error.
+      `"ftz"`, `"daz"`, or `"except_status"` is a compile error. requires `#[x87]` when T = i16
 
-- `let T:%out = .fpenv_set_field(T:%env, str:field, i32:%value)` - Returns a copy of `%env` with the named field replaced by `%value`. Return type matches `T`. The type annotation on `%env` is mandatory and selects the overload. Same field restrictions as `.fpenv_get_field` apply. Does not modify processor state; pass the result to `.set_fpenv` to take effect. No attributes.
+- `let T:%out = .fpenv_set_field(T:%env, str:field, i32:%value)` - Returns a copy of `%env` with the named field replaced by `%value`. Return type matches `T`. The type annotation on `%env` is mandatory and selects the overload. Same field restrictions as `.fpenv_get_field` apply. Does not modify processor state; pass the result to `.set_fpenv` to take effect. 
     - `T=i32` (default) - SSE overload. For `"except_status"`, setting a bit clears the
       corresponding sticky flag (write-1-to-clear semantics).
     - `T=i16` - x87 overload. `"except_status"`, `"ftz"`, and `"daz"` are compile errors; x87
@@ -1492,9 +1491,9 @@ and serves as the overload discriminator - omitting or mismatching it is a compi
     - `T=i32` (default) - reads `MXCSR` bits 0–5 as a 6-bit value in the same layout as
       `"except_status"`. Equivalent to `.fpenv_get_field(i32:.get_fpenv(), "except_status")`.
     - `T=i16` - requires `#[x87]`; reads `FSW` via `FNSTSW`. Note: `FSW` contains more than
-      exception bits (condition codes, stack top pointer, etc.).
+      exception bits (condition codes, stack top pointer, etc.). requires `#[x87]` when T = i16
 
-- `.clear_fpstatus()` - Clears all sticky exception flags. `#[volatile]` implicit. No inputs/outputs.
+- `.clear_fpstatus()` - Clears all sticky exception flags. It is implecitely volatile. No inputs/outputs.
     - default - reads-modifies-writes `MXCSR`. Equivalent to
       `.set_fpenv(i32:.fpenv_set_field(i32:.get_fpenv(), "except_status", 0))`.
     - `#[x87]` - issues `FNCLEX` to clear `FSW`.
@@ -1547,6 +1546,6 @@ On hardware with CET-SS disabled, every instruction in this section executes as 
 
 - `.setssbsy()` - Sets the "busy" bit on the current shadow-stack's supervisor token. No output. No attributes.
 
-- `.wrss(T:%value, ptr:%addr)` - Writes `%value` directly into shadow-stack memory at `%addr`. `T` must be `i32` or `i64`. Requires user-mode WRSS enable; faults otherwise. `#[volatile]` implicitly. No additional attributes.
+- `.wrss(T:%value, ptr:%addr)` - Writes `%value` directly into shadow-stack memory at `%addr`. `T` must be `i32` or `i64`. Requires user-mode WRSS enable; faults otherwise. It is volatile implicitly. No additional attributes.
 
 ---

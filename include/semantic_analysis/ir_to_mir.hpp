@@ -16,12 +16,14 @@ bool type_ge(std::string filename, IR::TypeExprPtr t1, IR::TypeExprPtr t2);//Che
                                                                            //If vector then we expect the same number of elements(Error otherwise) and expects the base type to have same TypeVariant(Else error)
                                                                            //If same number of element we compare size of basetype
 bool is_int(IR::TypeExprPtr type, std::size_t bits);//Check if the type is an integer type of the given bit width. Expects reduced type. Returns false if type is not int type
+bool is_vector_of_int(IR::TypeExprPtr type, std::size_t bits, std::size_t size);//Check if the type is an vector of int of the given bit width and size. Expects reduced type. Returns false if type is not vector of int type
 bool is_float(IR::TypeExprPtr type, std::size_t bits, bool is_brain_float);//Check if the type is an float type of the given bit width. Expects reduced type. Returns false if type is not float type
 bool type_compatible(VarSymTablePtr var_symtable, IR::TypeExprPtr type, IR::ExprPtr literal);//Check if a reduced type is compatible with a literal. This is used to check if a literal can be assigned to a variable of a certain type.
 bool is_constexpr(IR::ExprPtr expr);//Check if an expression is a constant expression
 std::optional<std::string> reduce_str_value(IR::ExprPtr literal);//If the literal is a constant expresstion then we return the reduced string value as the second element of the pair
                                                                  //In case of raw string or regular string literal, return the valid string. Like we currently store string as stuff
                                                                  //like "Hello\nWorld" but we want the string with \n replaced with an actual new line
+std::optional<MIR::FPEnvField> get_fpenv_field(IR::ExprPtr literal, bool is_x87);//Get the FP environment field from an expression. Returns nullopt if the expression is not a valid FP environment field or if it not a constexpr str
 bool is_18_array(IR::TypeExprPtr type);//Check if the type is an array of i8. Expects reduced type. Returns false if type is not an array of i8
 std::optional<std::string> get_var_name(IR::ExprPtr expr);//Get the variable name from an expression. Returns nullopt if the expression is not a variable
 template<typename T>
@@ -94,6 +96,7 @@ class IRToMIRSemanticAnalyzer {
     MIR::InstPtr analyze_unary_fetch_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
     MIR::InstPtr analyze_call_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
     MIR::InstPtr analyze_other_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
+    MIR::InstPtr analyze_hardware_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
 
     //Destination argument
     MIR::LocalDestRegisterPtr process_local_dest_arg(IR::InstructionStmtPtr inst_stmt);//Reduce type,aReturn nullptr if no destination argument

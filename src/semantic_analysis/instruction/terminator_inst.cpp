@@ -7,26 +7,26 @@
 #include <memory>
 namespace LIRA {
 namespace SemanticAnalyzer {
-using DispatchFuncType = std::function<MIR::InstPtr(std::string filename, IR::TypeExprPtr curr_func_ret_type, Utils::VarSymTablePtr var_symtable, IR::Token name,
+using DispatchFuncType = std::function<MIR::InstPtr(std::string filename, IR::TypeExprPtr curr_func_ret_type, IR::Token name,
                                                     std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                                     IR::InstructionStmtPtr inst_stmt)>;
 
-MIR::InstPtr analyze_ret_inst(std::string filename, IR::TypeExprPtr curr_func_ret_type, Utils::VarSymTablePtr var_symtable, IR::Token name,
+MIR::InstPtr analyze_ret_inst(std::string filename, IR::TypeExprPtr curr_func_ret_type, IR::Token name,
                               std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
                               IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_unreachable_inst(std::string filename, IR::TypeExprPtr curr_func_ret_type, Utils::VarSymTablePtr var_symtable, IR::Token name,
+MIR::InstPtr analyze_unreachable_inst(std::string filename, IR::TypeExprPtr curr_func_ret_type, IR::Token name,
                                       std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
                                       IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_trap_inst(std::string filename, IR::TypeExprPtr curr_func_ret_type, Utils::VarSymTablePtr var_symtable, IR::Token name,
+MIR::InstPtr analyze_trap_inst(std::string filename, IR::TypeExprPtr curr_func_ret_type, IR::Token name,
                                std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
                                IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_br_inst(std::string filename, IR::TypeExprPtr curr_func_ret_type, Utils::VarSymTablePtr var_symtable, IR::Token name,
+MIR::InstPtr analyze_br_inst(std::string filename, IR::TypeExprPtr curr_func_ret_type, IR::Token name,
                              std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
                              IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_switch_inst(std::string filename, IR::TypeExprPtr curr_func_ret_type, Utils::VarSymTablePtr var_symtable, IR::Token name,
+MIR::InstPtr analyze_switch_inst(std::string filename, IR::TypeExprPtr curr_func_ret_type, IR::Token name,
                                  std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
                                  IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_indirectbr_inst(std::string filename, IR::TypeExprPtr curr_func_ret_type, Utils::VarSymTablePtr var_symtable, IR::Token name,
+MIR::InstPtr analyze_indirectbr_inst(std::string filename, IR::TypeExprPtr curr_func_ret_type, IR::Token name,
                                      std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
                                      IR::InstructionStmtPtr inst_stmt);
 
@@ -53,7 +53,7 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_terminator_inst(IR::Token name,IR:
 
     auto it = dispatch_map.find(name.value);
     if(it != dispatch_map.end()){
-        return it->second(this->filename, this->curr_func_ret_type,this->var_symtable,name,args,inst_stmt);
+        return it->second(this->filename, this->curr_func_ret_type, name, args, inst_stmt);
     }
     else{
         std::cerr << "Unknown terminator instruction: " << name.value << std::endl;
@@ -62,7 +62,7 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_terminator_inst(IR::Token name,IR:
     }
 }
 
-MIR::InstPtr analyze_ret_inst(std::string filename, IR::TypeExprPtr curr_func_ret_type, Utils::VarSymTablePtr var_symtable, IR::Token name,
+MIR::InstPtr analyze_ret_inst(std::string filename, IR::TypeExprPtr curr_func_ret_type, IR::Token name,
                               std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
                               IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
@@ -93,7 +93,7 @@ MIR::InstPtr analyze_ret_inst(std::string filename, IR::TypeExprPtr curr_func_re
     }
     return std::make_shared<MIR::RetInst>(inst_stmt, ret_value, flag_attrs["noreturn"], fast_math_attr);
 }
-MIR::InstPtr analyze_unreachable_inst(std::string filename, IR::TypeExprPtr curr_func_ret_type, Utils::VarSymTablePtr var_symtable, IR::Token name,
+MIR::InstPtr analyze_unreachable_inst(std::string filename, IR::TypeExprPtr curr_func_ret_type, IR::Token name,
                                       std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
                                       IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
@@ -105,7 +105,7 @@ MIR::InstPtr analyze_unreachable_inst(std::string filename, IR::TypeExprPtr curr
     }
     return std::make_shared<MIR::UnreachableInst>(inst_stmt);
 }
-MIR::InstPtr analyze_trap_inst(std::string filename, IR::TypeExprPtr curr_func_ret_type, Utils::VarSymTablePtr var_symtable, IR::Token name,
+MIR::InstPtr analyze_trap_inst(std::string filename, IR::TypeExprPtr curr_func_ret_type, IR::Token name,
                                std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
                                IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
@@ -119,8 +119,7 @@ MIR::InstPtr analyze_trap_inst(std::string filename, IR::TypeExprPtr curr_func_r
     return std::make_shared<MIR::TrapInst>(inst_stmt, flag_attrs["breakpoint"]);
 }
 
-std::pair<std::vector<std::pair<IR::TypeExprPtr,IR::LiteralExprPtr>>, bool> get_label_args(std::string filename, Utils::VarSymTablePtr var_symtable, 
-                                                                                           IR::TypeExprPtr label_type, IR::TypeExprPtr arg_types, IR::ExprPtr _args){
+std::pair<std::vector<std::pair<IR::TypeExprPtr,IR::LiteralExprPtr>>, bool> get_label_args(std::string filename, IR::TypeExprPtr label_type, IR::TypeExprPtr arg_types, IR::ExprPtr _args){
     std::vector<std::pair<IR::TypeExprPtr,IR::LiteralExprPtr>> label_args;
     auto args = _args->get_literal();
     if(label_type->get_kind() != IR::TypeExprKind::LabelTypeExpr){
@@ -152,7 +151,7 @@ std::pair<std::vector<std::pair<IR::TypeExprPtr,IR::LiteralExprPtr>>, bool> get_
     }
     return std::make_pair(label_args, contains_float_type);
 }
-MIR::InstPtr analyze_br_inst(std::string filename, IR::TypeExprPtr curr_func_ret_type, Utils::VarSymTablePtr var_symtable, IR::Token name,
+MIR::InstPtr analyze_br_inst(std::string filename, IR::TypeExprPtr curr_func_ret_type, IR::Token name,
                              std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
                              IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
@@ -162,7 +161,7 @@ MIR::InstPtr analyze_br_inst(std::string filename, IR::TypeExprPtr curr_func_ret
         if(!block_name.has_value()){
             Utils::error(filename, name, "Instruction .br takes a block name as the first argument");
         }
-        auto block_arg = get_label_args(filename, var_symtable, args[0].second, args[1].second, args[1].first);
+        auto block_arg = get_label_args(filename, args[0].second, args[1].second, args[1].first);
         if(block_arg.second){
             auto val = Utils::extract_fastmath_attrs(filename,attributes);
             attributes = val.second;
@@ -185,8 +184,8 @@ MIR::InstPtr analyze_br_inst(std::string filename, IR::TypeExprPtr curr_func_ret
         if(!false_block_name.has_value()){
             Utils::error(filename, name, "Instruction .br takes a block name as the fourth argument");
         }
-        auto true_block_arg = get_label_args(filename, var_symtable, args[1].second, args[2].second, args[2].first);
-        auto false_block_arg = get_label_args(filename, var_symtable, args[3].second, args[4].second, args[4].first);
+        auto true_block_arg = get_label_args(filename, args[1].second, args[2].second, args[2].first);
+        auto false_block_arg = get_label_args(filename, args[3].second, args[4].second, args[4].first);
         if(true_block_arg.second || false_block_arg.second){
             auto val = Utils::extract_fastmath_attrs(filename,attributes);
             attributes = val.second;
@@ -211,7 +210,7 @@ MIR::InstPtr analyze_br_inst(std::string filename, IR::TypeExprPtr curr_func_ret
         Utils::error(filename, name, "Instruction .br takes either 2 or 5 arguments");
     }
 }
-MIR::InstPtr analyze_switch_inst(std::string filename, IR::TypeExprPtr curr_func_ret_type, Utils::VarSymTablePtr var_symtable, IR::Token name,
+MIR::InstPtr analyze_switch_inst(std::string filename, IR::TypeExprPtr curr_func_ret_type, IR::Token name,
                                  std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
                                  IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
@@ -227,7 +226,7 @@ MIR::InstPtr analyze_switch_inst(std::string filename, IR::TypeExprPtr curr_func
     if(!default_block_name.has_value()){
         Utils::error(filename, name, "Instruction .switch takes a block name as the second argument");
     }
-    auto default_block_arg = get_label_args(filename, var_symtable, args[1].second, args[2].second, args[2].first);
+    auto default_block_arg = get_label_args(filename, args[1].second, args[2].second, args[2].first);
     std::vector<std::string> case_blocks;
     std::vector<std::vector<std::pair<IR::TypeExprPtr,IR::LiteralExprPtr>>> case_label_args; 
     std::vector<IR::LiteralExprPtr> case_values;
@@ -240,7 +239,7 @@ MIR::InstPtr analyze_switch_inst(std::string filename, IR::TypeExprPtr curr_func
         if(!case_block_name.has_value()){
             Utils::error(filename, args[i+1].first->get_token(), "Instruction .switch takes a block name as the second argument of each case");
         }
-        auto case_block_arg = get_label_args(filename, var_symtable, args[i+1].second, args[i+2].second, args[i+2].first);
+        auto case_block_arg = get_label_args(filename, args[i+1].second, args[i+2].second, args[i+2].first);
         if(case_block_arg.second){
             has_float_type = true;
         }
@@ -270,7 +269,7 @@ MIR::InstPtr analyze_switch_inst(std::string filename, IR::TypeExprPtr curr_func
                                              attrs_with_num_args["freq"], flag_attrs["unpredictable"], fast_math_attr);
     
 }
-MIR::InstPtr analyze_indirectbr_inst(std::string filename, IR::TypeExprPtr curr_func_ret_type, Utils::VarSymTablePtr var_symtable, IR::Token name,
+MIR::InstPtr analyze_indirectbr_inst(std::string filename, IR::TypeExprPtr curr_func_ret_type, IR::Token name,
                                      std::vector<std::pair<IR::ExprPtr, IR::TypeExprPtr>> args,
                                      IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();

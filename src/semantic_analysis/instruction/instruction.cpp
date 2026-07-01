@@ -88,6 +88,14 @@ bool is_other_inst(std::string inst_name) {
            inst_name == ".expect_not" || inst_name == ".expect_not_range" || inst_name == ".nop" ||  inst_name == ".annotation" || inst_name == ".endbr64" || 
            inst_name == ".launder" || inst_name == ".strip_invariant_group";
 }
+bool is_hardware_inst(std::string inst_name) {
+    return inst_name == ".cpuid" || inst_name == ".rdtsc" || inst_name == ".rdtscp" || inst_name == ".rdrand" || inst_name == ".rdseed" || inst_name == ".get_fpenv" ||
+           inst_name == ".set_fpenv" || inst_name == ".fpenv_get_field" || inst_name == ".fpenv_set_field" || inst_name == ".get_fpstatus" || inst_name == ".clear_fpstatus" ||
+           inst_name == ".aesenc" || inst_name == ".aesenclast" || inst_name == ".aesdec" || inst_name == ".aesdeclast" || inst_name == ".aesimc" || inst_name == ".aeskeygenassist" ||
+           inst_name == ".clmul" || inst_name == ".sha1rnds4" || inst_name == ".sha1nexte" || inst_name == ".sha1msg1" || inst_name == ".sha1msg2" || inst_name == ".sha256rnds2" ||
+           inst_name == ".sha256msg1" || inst_name == ".sha256msg2" || inst_name == ".crc32" || inst_name == ".syscall" || inst_name == ".rdssp" || inst_name == ".incssp" ||
+           inst_name == ".saveprevssp" || inst_name == ".rstorssp" || inst_name == ".setssbsy" || inst_name == ".wrss";
+}
 bool is_global_inst(std::string inst_name){
     return inst_name == ".global" || inst_name == ".assign_type";
 }
@@ -150,6 +158,9 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_instruction(IR::InstructionStmtPtr
     }
     else if(is_other_inst(inst_name.value)){
         inst = analyze_other_inst(inst_name,inst_stmt);
+    }
+    else if(is_hardware_inst(inst_name.value)){
+        inst = analyze_hardware_inst(inst_name,inst_stmt);
     }
     else if(is_global_inst(inst_name.value)){
         Utils::error(this->filename,inst_stmt->get_value()->get_token(),"Instruction " + inst_name.value + " is a global instruction and cannot be used within a label");

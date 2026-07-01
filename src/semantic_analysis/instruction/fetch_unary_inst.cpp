@@ -98,9 +98,6 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_unary_fetch_inst(IR::Token name,IR
     IR::TypeExprPtr type = dest->get_type();//Already reduced type by process_local_dest_arg
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [common_fetch_attrs,remaining_attrs] = Utils::extract_common_fetch_attrs(this->filename,attributes);
-    if(Utils::get_type_size(type) > 128 && common_fetch_attrs.atomic_ordering.has_value()){
-        Utils::error(this->filename, name, "Atomic unary fetch instruction destination type size must be less than or equal to 128 bits. Found: " + std::to_string(Utils::get_type_size(type)) + " bits");
-    }
     {
         args[0].second = Utils::get_reduced_type(this->type_symtable,args[0].second);
         if(args[0].second->get_kind() != IR::TypeExprKind::PtrTypeExpr){

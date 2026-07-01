@@ -274,5 +274,13 @@ enum class FPEnvField:uint8_t {
     ExceptStatus,
 };
 std::string to_string(FPEnvField field);
+
+struct CommonMemoryInstAttrs{
+    std::size_t alignment = 0;
+    std::size_t dereferenceable_bytes = 0;
+    bool volatile_ = false;
+    bool nontemporal = false;
+    bool nonull = false;
+};
 }
 }

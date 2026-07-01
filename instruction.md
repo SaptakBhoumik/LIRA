@@ -555,7 +555,6 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
     - `#[nontemporal]` - non-temporal (cache-bypassing) load
     - `#[nonnull]` - asserts the pointer is not null
     - `#[nopoison]` - asserts the loaded value is not poison
-    - `#[nsb]` - asserts the loaded integer's sign bit is 0 (tighter range for optimizer)
     - `#[align(i64:N)]` - alignment of the pointer; must be a power of 2; required if atomic; default is 16
     - `#[dereferenceable(i64:N)]` - asserts the pointer is dereferenceable for N bytes
     - `#[atomic(str:ordering)]` - atomic load; ordering must be one of: `acquire`, `monotonic`, `unordered`, `seq_cst`
@@ -688,7 +687,7 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
     - `#[volatile]` - volatile set
     - `#[nontemporal]` - non-temporal stores
     - `#[nonnull]` - asserts `dest` is not null
-    - `#[nopoison]` - asserts the region contains no poison
+    - `#[+]` - asserts the region contains no poison
     - `#[align(i64:N)]` - alignment of `dest`; must be a power of 2; default is 16
     - `#[dereferenceable(i64:N)]` - asserts `dest` is dereferenceable for N bytes
 
@@ -779,7 +778,7 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
 
 ## Binary Arithmetic Fetch Modify Instructions
 
-Read-modify-write instructions that read a value from memory, apply a binary operation with a given operand, write the result back, and return the original value. Can optionally be made atomic with `#[atomic](Note:If atomic then max size is limited to 128 bytes)
+Read-modify-write instructions that read a value from memory, apply a binary operation with a given operand, write the result back, and return the original value. Can optionally be made atomic with `#[atomic](Note:If atomic then we use mutex lock is size above hardware limit)
 
 **Attributes shared by all fetch instructions:**
 - `#[align(i64:N)]` - alignment of the pointer; must be a power of 2; default is 16
@@ -886,7 +885,7 @@ Read-modify-write instructions that read a value from memory, apply a binary ope
 
 ## Binary Bitwise Fetch Modify Instructions
 
-Read-modify-write instructions that read a value from memory, apply a binary operation with a given operand, write the result back, and return the original value. Can optionally be made atomic with `#[atomic](Note:If atomic then max size is limited to 128 bytes)
+Read-modify-write instructions that read a value from memory, apply a binary operation with a given operand, write the result back, and return the original value. Can optionally be made atomic with `#[atomic](Note:If atomic then we use mutex lock is size above hardware limit)
 
 **Attributes shared by all fetch instructions:**
 - `#[align(i64:N)]` - alignment of the pointer; must be a power of 2; default is 16
@@ -932,7 +931,7 @@ Read-modify-write instructions that read a value from memory, apply a binary ope
 
 ## Unary Fetch Modify Instructions
 
-Read-modify-write instructions that apply a unary operation to the value at a memory location and return the original value. Can optionally be made atomic with `#[atomic]`(Note:If atomic then max size is limited to 128 bytes)
+Read-modify-write instructions that apply a unary operation to the value at a memory location and return the original value. Can optionally be made atomic with `#[atomic]`(Note:If atomic then we use mutex lock is size above hardware limit)
 
 **Attributes shared by all unary fetch instructions:** same as Binary Fetch - `#[align(i64:N)]` (default is 16), `#[volatile]`, `#[atomic(str:ordering)]`, `#[syncscope("singlethreaded")]`.
 

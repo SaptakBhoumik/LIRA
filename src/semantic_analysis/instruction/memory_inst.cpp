@@ -222,16 +222,106 @@ MIR::InstPtr analyze_load_inst(std::string filename, Utils::VarSymTablePtr var_s
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                 IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
+    if(args.size() != 1){
+        Utils::error(filename, name, "Instruction .load expects exactly 1 argument, but got " + std::to_string(args.size()));
+    }
+    if(dest == nullptr){
+        Utils::error(filename, name, "Instruction .load expects a destination argument, but got none");
+    }
+    if(args[0].second->get_kind() != IR::TypeExprKind::PtrTypeExpr){
+        Utils::error(filename, name, "Instruction .load expects the argument to be a pointer type");
+    }
+    auto [common_memory_attrs, remaining_attrs] = Utils::extract_common_memory_attrs(filename, attributes);
+    auto [atomic_info, remaining_attrs2] = Utils::extract_atomic_info_attr(filename, remaining_attrs);
+    auto [flag_attrs, remaining_attrs3] = Utils::extract_flag_attrs(filename, remaining_attrs2, 
+                                                   {"invariant.load","nopoison"});
+    std::optional<MIR::FastMathAttr> fast_math_attr = std::nullopt;
+    if(Utils::contains_float(dest->get_type())){
+        auto val = Utils::extract_fastmath_attrs(filename,remaining_attrs3);
+        remaining_attrs3 = val.second;
+        fast_math_attr = val.first;
+    }
+    if(remaining_attrs3.size() > 0){
+        Utils::error(filename, remaining_attrs3[0]->get_token(), "Unsupported attribute for .load instruction: " + remaining_attrs3[0]->to_string());
+    }
+    return std::make_shared<MIR::LoadInst>(inst_stmt, dest, args[0].first->get_literal(), common_memory_attrs.volatile_, flag_attrs["invariant.load"], 
+                                           common_memory_attrs.nontemporal, common_memory_attrs.nonull, flag_attrs["nopoison"], 
+                                           common_memory_attrs.alignment, common_memory_attrs.dereferenceable_bytes, fast_math_attr, atomic_info);
+                                            
+                                            
 }
 MIR::InstPtr analyze_store_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                 IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
+    if(args.size() != 2){
+        Utils::error(filename, name, "Instruction .store expects exactly 2 arguments, but got " + std::to_string(args.size()));
+    }
+    if(dest != nullptr){
+        Utils::error(filename, name, "Instruction .store does not expect a destination argument, but got one");
+    }
+    if(args[0].second->get_kind() != IR::TypeExprKind::PtrTypeExpr){
+        Utils::error(filename, name, "Instruction .store expects the first argument to be a pointer type");
+    }
+    auto [common_memory_attrs, remaining_attrs] = Utils::extract_common_memory_attrs(filename, attributes);
+    auto [atomic_info, remaining_attrs2] = Utils::extract_atomic_info_attr(filename, remaining_attrs);
+    auto [flag_attrs, remaining_attrs3] = Utils::extract_flag_attrs(filename, remaining_attrs2, {"nopoison"});
+    std::optional<MIR::FastMathAttr> fast_math_attr = std::nullopt;
+    if(Utils::contains_float(dest->get_type())){
+        auto val = Utils::extract_fastmath_attrs(filename,remaining_attrs3);
+        remaining_attrs3 = val.second;
+        fast_math_attr = val.first;
+    }
+    if(remaining_attrs3.size() > 0){
+        Utils::error(filename, remaining_attrs3[0]->get_token(), "Unsupported attribute for .store instruction: " + remaining_attrs3[0]->to_string());
+    }
+    return std::make_shared<MIR::StoreInst>(inst_stmt, args[0].first->get_literal(), args[1].first->get_literal(), args[1].second,
+                                           common_memory_attrs.volatile_, common_memory_attrs.nontemporal, common_memory_attrs.nonull, flag_attrs["nopoison"], 
+                                           common_memory_attrs.alignment, common_memory_attrs.dereferenceable_bytes, fast_math_attr, atomic_info);
 }
 MIR::InstPtr analyze_broadcast_load_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                 IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
+    if(args.size() != 1){
+        Utils::error(filename, name, "Instruction .broadcast_load expects exactly 1 argument, but got " + std::to_string(args.size()));
+    }
+    if(dest == nullptr){
+        Utils::error(filename, name, "Instruction .broadcast_load expects a destination argument, but got none");
+    }
+    if(args[0].second->get_kind() != IR::TypeExprKind::PtrTypeExpr){
+        Utils::error(filename, name, "Instruction .broadcast_load expects the argument to be a pointer type");
+    }
+    auto [common_memory_attrs, remaining_attrs] = Utils::extract_common_memory_attrs(filename, attributes);
+    auto type_varient = MIR::get_type_variant_from_type(dest->get_type());
+    if(!type_varient.has_value()){
+        Utils::error(filename, name, "Instruction .broadcast_load expects the destination type to be a vector of integers/ptr/float");
+    }
+    if(type_varient.value() != MIR::TypeVariant::VecInt){
+        if(remaining_attrs.size() > 0){
+            Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for .broadcast_load instruction: " + remaining_attrs[0]->to_string());
+        }
+        return std::make_shared<MIR::IntBroadcastLoadInst>(inst_stmt, dest, args[0].first->get_literal(), common_memory_attrs.volatile_, common_memory_attrs.nontemporal, 
+                                                           common_memory_attrs.nonull, common_memory_attrs.alignment, common_memory_attrs.dereferenceable_bytes);
+    }
+    else if(type_varient.value() == MIR::TypeVariant::VecPtr){
+        if(remaining_attrs.size() > 0){
+            Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for .broadcast_load instruction: " + remaining_attrs[0]->to_string());
+        }
+        return std::make_shared<MIR::PtrBroadcastLoadInst>(inst_stmt, dest, args[0].first->get_literal(), common_memory_attrs.volatile_, common_memory_attrs.nontemporal, 
+                                                           common_memory_attrs.nonull, common_memory_attrs.alignment, common_memory_attrs.dereferenceable_bytes);
+    }
+    else if(type_varient.value() == MIR::TypeVariant::VecFloat){
+        auto [fast_math_attr, remaining_attrs2] = Utils::extract_fastmath_attrs(filename, remaining_attrs);
+        if(remaining_attrs2.size() > 0){
+            Utils::error(filename, remaining_attrs2[0]->get_token(), "Unsupported attribute for .broadcast_load instruction: " + remaining_attrs2[0]->to_string());
+        }
+        return std::make_shared<MIR::FloatBroadcastLoadInst>(inst_stmt, dest, args[0].first->get_literal(), common_memory_attrs.volatile_, common_memory_attrs.nontemporal, 
+                                                             common_memory_attrs.nonull, common_memory_attrs.alignment, common_memory_attrs.dereferenceable_bytes, fast_math_attr);
+    }
+    else{
+        Utils::error(filename, name, "Instruction .broadcast_load expects the destination type to be a vector of integers/ptr/float");
+    }
 }
 MIR::InstPtr analyze_masked_load_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
@@ -297,6 +387,29 @@ MIR::InstPtr analyze_memset_inst(std::string filename, Utils::VarSymTablePtr var
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                 IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
+    if(args.size() != 3){
+        Utils::error(filename, name, "Instruction .memset expects exactly 3 arguments, but got " + std::to_string(args.size()));
+    }
+    if(dest != nullptr){
+        Utils::error(filename, name, "Instruction .memset does not expect a destination argument, but got one");
+    }
+    if(args[0].second->get_kind() != IR::TypeExprKind::PtrTypeExpr){
+        Utils::error(filename, name, "Instruction .memset expects the first argument to be a pointer type");
+    }
+    if(!Utils::is_int(args[1].second, 8)){
+        Utils::error(filename, name, "Instruction .memset expects the second argument to be of type i8");
+    }
+    if(!Utils::is_int(args[2].second, 64)){
+        Utils::error(filename, name, "Instruction .memset expects the third argument to be of type i64");
+    }
+    auto [common_memory_attrs, remaining_attrs] = Utils::extract_common_memory_attrs(filename, attributes);
+    auto [flag_attrs, remaining_attrs2] = Utils::extract_flag_attrs(filename, remaining_attrs, {"nopoison"});
+    if(remaining_attrs2.size() > 0){
+        Utils::error(filename, remaining_attrs2[0]->get_token(), "Unsupported attribute for .memset instruction: " + remaining_attrs2[0]->to_string());
+    }
+    return std::make_shared<MIR::MemsetInst>(inst_stmt, args[0].first->get_literal(), args[1].first->get_literal(), args[2].first->get_literal(), 
+                                             common_memory_attrs.volatile_, common_memory_attrs.nontemporal, common_memory_attrs.nonull, flag_attrs["nopoison"], 
+                                             common_memory_attrs.alignment, common_memory_attrs.dereferenceable_bytes);    
 }
 MIR::InstPtr analyze_memcmp_inst(std::string filename, Utils::VarSymTablePtr var_symtable, MIR::LocalDestRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
@@ -560,9 +673,6 @@ MIR::InstPtr analyze_atomic_cmpxchg_inst(std::string filename, Utils::VarSymTabl
     IR::TypeExprPtr type = fields[0];
     if(!Utils::type_eq(type, args[1].second) || !Utils::type_eq(type, args[2].second)){
         Utils::error(filename, name, "Instruction .atomic_cmpxchg requires the second and third arguments to be of the same type as the first field of the destination struct type");
-    }
-    if(Utils::get_type_size(type) > 128){
-        Utils::error(filename, name, "Instruction .atomic_cmpxchg requires the first field of the destination struct type to be at most 128 bits");
     }
     if(!Utils::is_int(fields[1], 1)){
         Utils::error(filename, name, "Instruction .atomic_cmpxchg requires the second field of the destination struct type to be of type i1");

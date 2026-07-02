@@ -81,6 +81,18 @@ bool is_terminator_inst(std::string inst_name){
 bool is_call_inst(std::string inst_name){
     return inst_name == ".call";
 }
+bool is_simd_inst(std::string inst_name){
+    return inst_name == ".shufflevector" || inst_name == ".ternlog" || inst_name == ".splat" || inst_name == ".step_vector" || inst_name == ".insert_subvector" ||
+           inst_name == ".extract_subvector" || inst_name == ".active_lane_mask" || inst_name == ".addsub" || inst_name == ".reduce_add" || inst_name == ".reduce_mul" ||
+           inst_name == ".reduce_avg" || inst_name == ".reduce_min" || inst_name == ".reduce_max" || inst_name == ".reduce_and" || inst_name == ".reduce_or" ||
+           inst_name == ".reduce_xor" || inst_name == ".reduce_xnor" || inst_name == ".hadd" || inst_name == ".hsub" || inst_name == ".habsdiff" || inst_name == ".haddsub" ||
+           inst_name == ".hmul" || inst_name == ".havg" || inst_name == ".hmin" || inst_name == ".hmax" || inst_name == ".hand" || inst_name == ".hor" || 
+           inst_name == ".hxor" || inst_name == ".hnand" || inst_name == ".hnor" || inst_name == ".hxnor" || inst_name == ".dot" || inst_name == ".sad" ||
+           inst_name == ".pack_sat" || inst_name == ".unpack_lo" || inst_name == ".unpack_hi" || inst_name == ".compress" || inst_name == ".expand" ||
+           inst_name == ".interleave2" || inst_name == ".interleave3" || inst_name == ".interleave4" || inst_name == ".deinterleave2" || inst_name == ".deinterleave3" ||
+           inst_name == ".deinterleave4" || inst_name == ".mask_to_int" || inst_name == ".int_to_mask";
+}
+
 bool is_other_inst(std::string inst_name){
     return inst_name == ".select" || inst_name == ".freeze" || inst_name == ".va_start" || inst_name == ".va_end" || inst_name == ".va_copy" || 
            inst_name == ".va_arg" || inst_name == ".ptrmask" || inst_name == ".pause" || inst_name == ".assume" || inst_name == ".assume_range" || 
@@ -155,6 +167,9 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_instruction(IR::InstructionStmtPtr
     }
     else if(is_call_inst(inst_name.value)){
         inst = analyze_call_inst(inst_name,inst_stmt);
+    }
+    else if(is_simd_inst(inst_name.value)){
+        inst = analyze_simd_inst(inst_name,inst_stmt);
     }
     else if(is_other_inst(inst_name.value)){
         inst = analyze_other_inst(inst_name,inst_stmt);

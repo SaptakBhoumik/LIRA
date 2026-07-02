@@ -1343,9 +1343,9 @@ The following are defined only on integer
 
 ### Lane Mask Conversion Instructions
 
-- `let iM:%out = .mask_to_int(<i1,N>:%mask)` - Packs the N single-bit lanes of `mask` into the low N bits of a scalar integer of type `iM`. Lane `i` maps to bit `i` of the result; the remaining `M - N` high bits are zeroed. Mirrors `VMOVMSKPS`/`VPMOVMSKB`/`KMOVD` semantics. `M` must satisfy `M >= N`. No attributes.
+- `let iM:%out = .mask_to_int(<i1,N>:%mask)` - Packs the N single-bit lanes of `mask` into the low N bits of a scalar integer of type `iM`. Lane `i` maps to bit `i` of the result; If M>=N then the high bits are zeroed. If M < N then the high bits are truncated.No attributes.
 
-- `let <i1,N>:%out = .int_to_mask(iM:%bits)` - Inverse of `.mask_to_int`. Unpacks the low N bits of `bits` into an N-lane `i1` vector. Bit `i` of `bits` becomes lane `i` of the output. High bits beyond N are ignored. Mirrors `KMOVD`/`VPMOVM2B` semantics. `M` must satisfy `M >= N`. No attributes.
+- `let <i1,N>:%out = .int_to_mask(iM:%bits)` - Inverse of `.mask_to_int`. Unpacks the low N bits of `bits` into an N-lane `i1` vector. Bit `i` of `bits` becomes lane `i` of the output. If M < N then the high lanes of the output are zeroed. If M > N then the high bits of `bits` are ignored. No attributes.
 ---
 
 ## Other Instructions

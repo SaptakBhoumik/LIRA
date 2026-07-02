@@ -531,11 +531,45 @@ MIR::InstPtr analyze_mask_to_int_inst(std::string filename, MIR::LocalDestRegist
                                       std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                       IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
+    if(args.size() != 1){
+        Utils::error(filename, name, "Instruction mask_to_int expects 1 argument, but got " + std::to_string(args.size()));
+    }
+    if(dest->get_type()->get_kind() != IR::TypeExprKind::IntTypeExpr){
+        Utils::error(filename, name, "Instruction mask_to_int expects the destination argument to be of integer type, but got " + dest->get_type()->to_string());
+    }
+    if(args[0].second->get_kind() != IR::TypeExprKind::SIMDTypeExpr){
+        Utils::error(filename, name, "Instruction mask_to_int expects the first argument to be of simd type, but got " + args[0].second->to_string());
+    }
+    auto arg0_simd_type = std::dynamic_pointer_cast<IR::SIMDTypeExpr>(args[0].second);
+    if(!Utils::is_int(arg0_simd_type->get_basetype(), 1)){
+        Utils::error(filename, name, "Instruction mask_to_int expects the first argument simd type to have base type of i1, but got " + arg0_simd_type->get_basetype()->to_string());
+    }
+    if(attributes.size() != 0){
+        Utils::error(filename, name, "Instruction mask_to_int takes no attributes");
+    }
+    return std::make_shared<MIR::MaskToIntInst>(inst_stmt, dest, args[0].first->get_literal(), args[0].second);
 }
 MIR::InstPtr analyze_int_to_mask_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
                                       std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                       IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
+    if(args.size() != 1){
+        Utils::error(filename, name, "Instruction int_to_mask expects 1 argument, but got " + std::to_string(args.size()));
+    }
+    if(dest->get_type()->get_kind() != IR::TypeExprKind::SIMDTypeExpr){
+        Utils::error(filename, name, "Instruction int_to_mask expects the destination argument to be of simd type, but got " + dest->get_type()->to_string());
+    }
+    auto dest_simd_type = std::dynamic_pointer_cast<IR::SIMDTypeExpr>(dest->get_type());
+    if(!Utils::is_int(dest_simd_type->get_basetype(), 1)){
+        Utils::error(filename, name, "Instruction int_to_mask expects the destination simd type to have base type of i1, but got " + dest_simd_type->get_basetype()->to_string());
+    }
+    if(args[0].second->get_kind() != IR::TypeExprKind::IntTypeExpr){
+        Utils::error(filename, name, "Instruction int_to_mask expects the first argument to be of integer type, but got " + args[0].second->to_string());
+    }
+    if(attributes.size() != 0){
+        Utils::error(filename, name, "Instruction int_to_mask takes no attributes");
+    }
+    return std::make_shared<MIR::IntToMaskInst>(inst_stmt, dest, args[0].first->get_literal(), args[0].second);
 }
 }
 }

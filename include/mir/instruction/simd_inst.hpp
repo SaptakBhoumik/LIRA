@@ -911,15 +911,17 @@ class DotInst:public Inst {
     protected:
     IR::LiteralExprPtr lhs;
     IR::LiteralExprPtr rhs;
+    IR::LiteralExprPtr acc;//May be nullptr if not provided
     IR::TypeExprPtr input_vector_type;//Type of lhs and rhs. Must be same type
 
     virtual std::string to_string_helper(const std::string op_name) const final;
     public:
-    DotInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr input_vector_type,
-            std::optional<FastMathAttr> fast_math_attr);
+    DotInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::LiteralExprPtr acc,
+            IR::TypeExprPtr input_vector_type, std::optional<FastMathAttr> fast_math_attr);
     
     virtual IR::LiteralExprPtr get_lhs() const final;
     virtual IR::LiteralExprPtr get_rhs() const final;
+    virtual IR::LiteralExprPtr get_acc() const final;
     virtual IR::TypeExprPtr get_input_basetype() const final;//From input_vector_type
     virtual std::size_t get_vector_size() const final;//From input_vector_type
     virtual IR::TypeExprPtr get_output_type() const final;// From destination
@@ -935,8 +937,8 @@ class IntDotInst:public DotInst {
     bool unsigned_;
     bool saturating;
     public:
-    IntDotInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr input_vector_type,
-               bool nuw, bool nsw, bool unsigned_, bool saturating);
+    IntDotInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::LiteralExprPtr acc, 
+               IR::TypeExprPtr input_vector_type, bool nuw, bool nsw, bool unsigned_, bool saturating);
 
     bool is_nuw() const;
     bool is_nsw() const;
@@ -954,8 +956,8 @@ class IntDotInst:public DotInst {
 
 class FloatDotInst:public DotInst {
     public:
-    FloatDotInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr input_vector_type,
-                 FastMathAttr fast_math_attr);
+    FloatDotInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::LiteralExprPtr acc, 
+                 IR::TypeExprPtr input_vector_type, FastMathAttr fast_math_attr);
 
     std::shared_ptr<IR::FloatTypeExpr> get_casted_input_basetype() const;
     std::size_t get_input_basetype_bitwidth() const;
@@ -973,15 +975,17 @@ class SADInst:public Inst {
     protected:
     IR::LiteralExprPtr lhs;
     IR::LiteralExprPtr rhs;
+    IR::LiteralExprPtr acc;//May be nullptr if not provided
     IR::TypeExprPtr input_vector_type;//Type of lhs and rhs. Must be same type
 
     virtual std::string to_string_helper(const std::string op_name) const final;
     public:
-    SADInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr input_vector_type,
-            std::optional<FastMathAttr> fast_math_attr);
+    SADInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::LiteralExprPtr acc, 
+            IR::TypeExprPtr input_vector_type, std::optional<FastMathAttr> fast_math_attr);
     
     virtual IR::LiteralExprPtr get_lhs() const final;
     virtual IR::LiteralExprPtr get_rhs() const final;
+    virtual IR::LiteralExprPtr get_acc() const final;
     virtual IR::TypeExprPtr get_input_basetype() const final;//From input_vector_type
     virtual std::size_t get_vector_size() const final;//From input_vector_type
     virtual IR::TypeExprPtr get_output_type() const final;// From destination
@@ -997,8 +1001,8 @@ class IntSADInst:public SADInst {
     bool unsigned_;
     bool saturating;
     public:
-    IntSADInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr input_vector_type,
-               bool nuw, bool nsw, bool unsigned_, bool saturating);
+    IntSADInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::LiteralExprPtr acc,
+               IR::TypeExprPtr input_vector_type, bool nuw, bool nsw, bool unsigned_, bool saturating);
 
     bool is_nuw() const;
     bool is_nsw() const;
@@ -1016,8 +1020,8 @@ class IntSADInst:public SADInst {
 
 class FloatSADInst:public SADInst {
     public:
-    FloatSADInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr input_vector_type,
-                  FastMathAttr fast_math_attr);
+    FloatSADInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::LiteralExprPtr acc,
+                 IR::TypeExprPtr input_vector_type, FastMathAttr fast_math_attr);
 
     std::shared_ptr<IR::FloatTypeExpr> get_casted_input_basetype() const;
     std::size_t get_input_basetype_bitwidth() const;

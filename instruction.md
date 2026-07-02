@@ -86,7 +86,7 @@
     - `#[unsigned]` - treat `a` and `b` as unsigned; default is signed
     - `#[floor]` - round toward negative infinity (`(a + b) >> 1`) instead of the default ceiling
     - `#[nsw]` - poison if the intermediate sum `a + b` overflows before the shift
-    - `#[nuw]` - poison on unsigned intermediate overflow; only valid with `#[unsigned]`
+    - `#[nuw]` - poison on unsigned intermediate overflow;
 
     **If `T0` is float/bfloat:** Computes `(a + b) * 0.5` exactly.
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
@@ -199,7 +199,7 @@ Widening instructions compute `a OP b` at the full precision of the *output* typ
     **If `T1`/`T2` base type is integer:**
     - `#[unsigned]` - zero-extend inputs; default is sign-extend
     - `#[nsw]` - poison on signed overflow of the *widened* result (rarely needed since widening usually prevents overflow)
-    - `#[nuw]` - poison on unsigned overflow of the widened result; only valid with `#[unsigned]`
+    - `#[nuw]` - poison on unsigned overflow of the widened result;
 
     **If `T1`/`T2` base type is float/bfloat:** `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
@@ -876,7 +876,7 @@ Read-modify-write instructions that read a value from memory, apply a binary ope
     - `#[unsigned]` - treat `a` and `b` as unsigned; default is signed
     - `#[floor]` - round toward negative infinity (`(a + b) >> 1`) instead of the default ceiling
     - `#[nsw]` - poison if the intermediate sum `a + b` overflows before the shift
-    - `#[nuw]` - poison on unsigned intermediate overflow; only valid with `#[unsigned]`
+    - `#[nuw]` - poison on unsigned intermediate overflow;
 
     **If `T` is float/bfloat:** Computes `(a + b) * 0.5` exactly.
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
@@ -1120,8 +1120,8 @@ A terminator must be the final instruction of every block. Falling through to th
 - `let <T,N>:%out = .insert_subvector(<T,N>:%vec, <T,M>:%sub, i64:%index)` - Inserts a shorter vector into a lane-aligned position within a longer vector, returning the updated longer vector. The other lanes are unchanged. 
 
     - `<T,N>:%vec` - the destination vector; T can be any integer, float, ptr, or bfloat; N is the total lane count
-    - `<T,M>:%sub` - the subvector to insert; same element type T; M < N; M must divide N
-    - `i64:%index` - the starting lane index in `vec` where insertion begins; must be a compile-time/run-time integer; must satisfy `index + M <= N`; If at compiletime multiple of M then we can optimize it better
+    - `<T,M>:%sub` - the subvector to insert; same element type T; M<=N
+    - `i64:%index` - the starting lane index in `vec` where insertion begins; must be a compile-time/run-time integer; must satisfy `index + M <= N`; If at compiletime multiple of M then we can optimize it better but not necessary
 
     Output type: `<T,N>` - same type as `vec`
 
@@ -1131,9 +1131,9 @@ A terminator must be the final instruction of every block. Falling through to th
 - `let <T,M>:%out = .extract_subvector(<T,N>:%vec, i64:%index)` - Extracts a contiguous slice of lanes from a vector into a shorter vector. 
 
     - `<T,N>:%vec` - the source vector; T can be any integer, float, ptr, or bfloat
-    - `i64:%index` - the starting lane index; must be a compile-time/run-time integer; must satisfy `index + M <= N`. If at compiletime multiple of M then we can optimize it better
+    - `i64:%index` - the starting lane index; must be a compile-time/run-time integer; must satisfy `index + M <= N`; If at compiletime multiple of M then we can optimize it better but not necessary
 
-    Output type: `<T,M>` - the element type is the same T; M is determined by the declared output type; M < N; M must divide N
+    Output type: `<T,M>` - the element type is the same T; M is determined by the declared output type; M <= N; M must divide N
 
     If T is float:
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
@@ -1152,7 +1152,7 @@ A terminator must be the final instruction of every block. Falling through to th
 
     **If `T0` is integer:**
     - `#[nsw]` - poison on signed overflow in any lane
-    - `#[nuw]` - poison on unsigned overflow; only valid with `#[unsigned]`
+    - `#[nuw]` - poison on unsigned overflow;
     - `#[unsigned]` - treat lanes as unsigned
     - `#[saturating]` - clamp instead of wrap
 
@@ -1240,7 +1240,7 @@ Ops where adjacent lanes have distinct roles dividend/divisor for .hdiv, value/s
     **If `T0` is integer:**
     - `#[unsigned]` - treat lane values as unsigned for overflow semantics
     - `#[nsw]` - poison on signed overflow
-    - `#[nuw]` - poison on unsigned overflow; only valid with `#[unsigned]`
+    - `#[nuw]` - poison on unsigned overflow;
     - `#[saturating]` - clamp instead of wrap; pair with `#[unsigned]` for unsigned saturation
 
     **If `T0` is float/bfloat:** `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
@@ -1249,7 +1249,7 @@ Ops where adjacent lanes have distinct roles dividend/divisor for .hdiv, value/s
 
 - `let <T0,N>:%out = .habsdiff(<T0,N>:%a, <T0,N>:%b)` - Pairwise absolute differences of adjacent lanes. Same type and attribute rules as `.hadd`.
 
-- `let <T0,N>:%out = .haddsub(<T0,N>:%a, <T0,N>:%b)` - Pairwise-combines adjacent lanes, consuming two `N`-lane input vectors and producing one `N`-lane output vector. The lower `N/2` output lanes are pairwise alternating differences and sums from `a`; the upper `N/2` output lanes are pairwise alternating differences and sums from `b`. Within each pair, the even-indexed output lane is the difference (`a[2i] - a[2i+1]`) and the odd-indexed output lane is the sum (`a[2i] + a[2i+1]`). No direct mirror instruction; equivalent to interleaving `HSUBPS` and `HADDPS` results. `N` must be even. `T0` must be float or bfloat.
+- `let <T0,N>:%out = .haddsub(<T0,N>:%a, <T0,N>:%b)` - Pairwise-combines adjacent lanes, consuming two `N`-lane input vectors and producing one `N`-lane output vector. The lower `N/2` output lanes are pairwise alternating differences and sums from `a`; the upper `N/2` output lanes are pairwise alternating differences and sums from `b`. Within each pair, the even-indexed output lane is the difference (`a[2i] - a[2i+1]`) and the odd-indexed output lane is the sum (`a[2i] + a[2i+1]`). No direct mirror instruction; equivalent to interleaving `HSUBPS` and `HADDPS` results. `N` must be even. `T0` must be float or bfloat or int.
 
 - `let <T0,N>:%out = .hmul(<T0,N>:%a, <T0,N>:%b)` - Pairwise-multiplies adjacent lanes. Same type and attribute rules as `.hadd`.
 
@@ -1281,10 +1281,12 @@ Ops where adjacent lanes have distinct roles dividend/divisor for .hdiv, value/s
     **If `T1` is integer:** The per-lane multiply is widening (products computed at `bitwidth(T2)` internally before accumulation). `T2` must be an integer type with `bitwidth(T2) >= bitwidth(T1)`. When `%acc` is provided it must be of type `T2`.
     - `#[unsigned]` - treat lane values as unsigned; default is signed
     - `#[nsw]` - poison if the accumulated sum overflows `T2`
-    - `#[nuw]` - poison on unsigned overflow; only valid with `#[unsigned]`
+    - `#[nuw]` - poison on unsigned overflow;
     - `#[saturating]` - clamp the accumulator to the `T2` range instead of wrapping
 
     **If `T1` is float/bfloat:** `T2` must be float/bfloat with `bitwidth(T2) >= bitwidth(T1)`. When `%acc` is provided it must be of type `T2`. Float attributes: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+
+- `let T2:%out = .dot(<T1,N>:%a, <T1,N>:%b, T2:%acc)` :- Same as above, but adds the scalar `%acc` to the result.
 
 ### Absolute Difference Instructions
 
@@ -1292,16 +1294,19 @@ Ops where adjacent lanes have distinct roles dividend/divisor for .hdiv, value/s
 
     **If `T1` is integer:** Lane-wise differences are computed without overflow (widened to `2xbitwidth(T1)` internally before summing). `T2` must be an integer type with sufficient width for the full sum.
     - `#[unsigned]` - treat lane values as unsigned before differencing
-    - `#[nsw]` / `#[nuw]` - poison on signed/unsigned overflow of the accumulated sum
+    - `#[nsw]` - poison if the accumulated sum overflows `T2`
+    - `#[nuw]` - poison on unsigned overflow;
     - `#[saturating]` - clamp the accumulator to the `T2` range instead of wrapping
 
     **If `T1` is float/bfloat:** Each `|a[i] - b[i]|` is computed as a float absolute difference and then accumulated into `T2`. `T2` must be float/bfloat with `bitwidth(T2) >= bitwidth(T1)`. Float attributes: `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
+
+- `let T2:%out = .sad(<T1,N>:%a, <T1,N>:%b, T2:%acc)` - Same as above, but adds the scalar `%acc` to the result.
 
 ### Pack / Unpack Instructions
 
 The following are defined only on integer
 
-- `let <T2,N2>:%out = .pack_sat(<T1,N>:%a, <T1,N>:%b)` - Narrows both input vectors and concatenates them into one output vector. `bitwidth(T2) < bitwidth(T1)`; `N2 = 2*N`. Each element is clamped to the *signed* range of `T2` before truncation, even if the inputs are unsigned. Mirrors `PACKSSWB`, `PACKSSDW`.
+- `let <T2,N2>:%out = .pack_sat(<T1,N>:%a, <T1,N>:%b)` - Narrows both input vectors and concatenates them into one output vector. `bitwidth(T2) <= bitwidth(T1)`; `N2 = 2*N`. Each element is clamped to the *signed* range of `T2` before truncation, even if the inputs are unsigned. Mirrors `PACKSSWB`, `PACKSSDW`.
     - `#[unsigned]` - clamp to the *unsigned* range of `T2` instead (e.g., `[0, 255]` for `i8`); mirrors `PACKUSWB`, `PACKUSDW`
 
 - `let <T2,N2>:%out = .unpack_lo(<T1,N>:%a, <T1,N>:%b)` - Interleaves the *lower half* lanes of `a` and `b` into a single output vector. `N2 = N`; each output element is widened from `T1` to `T2` (`bitwidth(T2) >= bitwidth(T1)`). Output order: `a[0], b[0], a[1], b[1], ..., a[N/2-1], b[N/2-1]`. Mirrors `PUNPCKLBW` / `PUNPCKLWD` / `PUNPCKLDQ`.
@@ -1319,7 +1324,7 @@ The following are defined only on integer
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 - `let <T,N>:%out = .expand(<T,N>:%src, <i1,N>:%mask [,<T,N>:%passthru])` - Inverse of `.compress`. Reads elements from the consecutive low lanes of `src` and scatters them into the active (mask=true) lanes of the output. Inactive lanes take their value from `passthru`. Mirrors `VPEXPANDPS`/`VPEXPANDQ`/`VPEXPANDB`.
-    - `#[zeropassthru]` - inactive lanes are zeroed; avoids materialising a zero `passthru` vector. If passthru is not provided and this attribute is not set then you get poisoned inactive lanes
+    - `#[zeropassthru]` - inactive lanes are zeroed; avoids materialising a zero `passthru` vector. If passthru is not provided and this attribute is not set then you get poisoned inactive lanes. If both this passthru and this attribute are set then its a compile error.
 
     If T is float:
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.

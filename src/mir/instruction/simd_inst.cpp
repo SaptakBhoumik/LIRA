@@ -1,4 +1,5 @@
 #include "mir/instruction/simd_inst.hpp"
+#include "ast/ast.hpp"
 #include "mir/instruction/_instruction.hpp"
 #include <memory>
 #include <string>
@@ -1313,15 +1314,21 @@ std::string IntHorizontalXnorInst::to_string() const{
 
 
 //--------------------------------- Dot Product Instructions ---------------------------------
-DotInst::DotInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr input_vector_type,
-                 std::optional<FastMathAttr> fast_math_attr):Inst(instruction_stmt,destination,fast_math_attr){
+DotInst::DotInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::LiteralExprPtr acc,
+                 IR::TypeExprPtr input_vector_type, std::optional<FastMathAttr> fast_math_attr):Inst(instruction_stmt,destination,fast_math_attr){
     this->lhs = lhs;
     this->rhs = rhs;
+    this->acc = acc;
     this->input_vector_type = input_vector_type;
 }
 std::string DotInst::to_string_helper(const std::string op_name) const{
     std::string vec_type = this->input_vector_type->to_string() + ":";
-    std::string str = "let " + this->destination->to_string() + " = ." + op_name + "(" + vec_type + this->lhs->to_string() + ", " + this->rhs->to_string() + ")";
+    std::string str = "let " + this->destination->to_string() + " = ." + op_name + "(" + vec_type + this->lhs->to_string() + ", " + vec_type + this->rhs->to_string();
+    if(this->acc != nullptr){
+        auto acc_type = std::dynamic_pointer_cast<IR::SIMDTypeExpr>(this->destination->get_type())->get_basetype()->to_string() + ":";
+        str += ", "  + acc_type + this->acc->to_string();
+    }
+    str += ")";
     if(this->fast_math_attr.has_value()){
         str += " " + this->fast_math_attr.value().to_string();
     }
@@ -1332,6 +1339,9 @@ IR::LiteralExprPtr DotInst::get_lhs() const{
 }
 IR::LiteralExprPtr DotInst::get_rhs() const{
     return this->rhs;
+}
+IR::LiteralExprPtr DotInst::get_acc() const{
+    return this->acc;
 }
 IR::TypeExprPtr DotInst::get_input_basetype() const{
     auto simd_type = std::dynamic_pointer_cast<IR::SIMDTypeExpr>(this->input_vector_type);
@@ -1350,9 +1360,9 @@ InstType DotInst::get_inst_type() const{
 }
 
 
-IntDotInst::IntDotInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr input_vector_type,
-                        bool nuw, bool nsw, bool unsigned_,  bool saturating)
-                        :DotInst(instruction_stmt,destination,lhs,rhs,input_vector_type,std::nullopt){
+IntDotInst::IntDotInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::LiteralExprPtr acc, 
+                       IR::TypeExprPtr input_vector_type, bool nuw, bool nsw, bool unsigned_,  bool saturating)
+                       :DotInst(instruction_stmt,destination,lhs,rhs,acc,input_vector_type,std::nullopt){
     this->nuw = nuw;
     this->nsw = nsw;
     this->unsigned_ = unsigned_;
@@ -1403,9 +1413,9 @@ std::string IntDotInst::to_string() const{
 }
 
 
-FloatDotInst::FloatDotInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr input_vector_type,
-                            FastMathAttr fast_math_attr)
-                            :DotInst(instruction_stmt,destination,lhs,rhs,input_vector_type,fast_math_attr){}
+FloatDotInst::FloatDotInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::LiteralExprPtr acc, 
+                           IR::TypeExprPtr input_vector_type, FastMathAttr fast_math_attr)
+                            :DotInst(instruction_stmt,destination,lhs,rhs,acc,input_vector_type,fast_math_attr){}
 std::shared_ptr<IR::FloatTypeExpr> FloatDotInst::get_casted_input_basetype() const{
     return std::dynamic_pointer_cast<IR::FloatTypeExpr>(this->get_input_basetype());
 }
@@ -1433,15 +1443,21 @@ std::string FloatDotInst::to_string() const{
 
 
 //--------------------------------- Absolute Difference Instructions ---------------------------------
-SADInst::SADInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr input_vector_type,
-                 std::optional<FastMathAttr> fast_math_attr):Inst(instruction_stmt,destination,fast_math_attr){
+SADInst::SADInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::LiteralExprPtr acc,
+                 IR::TypeExprPtr input_vector_type, std::optional<FastMathAttr> fast_math_attr):Inst(instruction_stmt,destination,fast_math_attr){
     this->lhs = lhs;
     this->rhs = rhs;
+    this->acc = acc;
     this->input_vector_type = input_vector_type;
 }
 std::string SADInst::to_string_helper(const std::string op_name) const{
     std::string vec_type = this->input_vector_type->to_string() + ":";
-    std::string str = "let " + this->destination->to_string() + " = ." + op_name + "(" + vec_type + this->lhs->to_string() + ", " + this->rhs->to_string() + ")";
+    std::string str = "let " + this->destination->to_string() + " = ." + op_name + "(" + vec_type + this->lhs->to_string() + ", " + this->rhs->to_string();
+    if(this->acc != nullptr){
+        auto acc_type = std::dynamic_pointer_cast<IR::SIMDTypeExpr>(this->destination->get_type())->get_basetype()->to_string() + ":";
+        str += ", "  + acc_type + this->acc->to_string();
+    }
+    str += ")";
     if(this->fast_math_attr.has_value()){
         str += " " + this->fast_math_attr.value().to_string();
     }
@@ -1470,9 +1486,9 @@ InstType SADInst::get_inst_type() const{
 }
 
 
-IntSADInst::IntSADInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr input_vector_type,
-                       bool nuw, bool nsw, bool unsigned_,  bool saturating)
-                       :SADInst(instruction_stmt,destination,lhs,rhs,input_vector_type,std::nullopt){
+IntSADInst::IntSADInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::LiteralExprPtr acc,
+                       IR::TypeExprPtr input_vector_type, bool nuw, bool nsw, bool unsigned_,  bool saturating)
+                       :SADInst(instruction_stmt,destination,lhs,rhs,acc,input_vector_type,std::nullopt){
     this->nuw = nuw;
     this->nsw = nsw;
     this->unsigned_ = unsigned_;
@@ -1524,9 +1540,9 @@ std::string IntSADInst::to_string() const{
 }
 
 
-FloatSADInst::FloatSADInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr input_vector_type,
-                            FastMathAttr fast_math_attr)
-                            :SADInst(instruction_stmt,destination,lhs,rhs,input_vector_type,fast_math_attr){}
+FloatSADInst::FloatSADInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::LiteralExprPtr acc,
+                           IR::TypeExprPtr input_vector_type, FastMathAttr fast_math_attr)
+                           :SADInst(instruction_stmt,destination,lhs,rhs,acc,input_vector_type,fast_math_attr){}
 std::shared_ptr<IR::FloatTypeExpr> FloatSADInst::get_casted_input_basetype() const{
     return std::dynamic_pointer_cast<IR::FloatTypeExpr>(this->get_input_basetype());
 }

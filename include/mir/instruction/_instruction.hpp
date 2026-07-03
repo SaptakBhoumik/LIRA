@@ -3,7 +3,7 @@
 #include <cstddef>
 #include <string>
 #include <sys/cdefs.h>
-#include "mir/destregister.hpp"
+#include "mir/register.hpp"
 namespace LIRA {
 namespace MIR{
 enum class InstType:std::int16_t{

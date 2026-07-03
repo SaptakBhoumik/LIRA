@@ -49,13 +49,13 @@ class LocalDestRegister{
 
 using LocalDestRegisterPtr = std::shared_ptr<LocalDestRegister>;
 
-class LabelParamtRegister{};
+class LabelParamRegister{};
 
-using LabelParamtRegisterPtr = std::shared_ptr<LabelParamtRegister>;
+using LabelParamRegisterPtr = std::shared_ptr<LabelParamRegister>;
 
-class FuncParamtRegister{};
+class FuncParamRegister{};
 
-using FuncParamtRegisterPtr = std::shared_ptr<FuncParamtRegister>;
+using FuncParamRegisterPtr = std::shared_ptr<FuncParamRegister>;
 
 class GlobalDestRegister{
     //TODO: This class should also store the innitial value if given + sometimes the inntial value may be ptr to another global variable. Do it in future

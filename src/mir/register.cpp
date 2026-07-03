@@ -1,4 +1,4 @@
-#include "mir/destregister.hpp"
+#include "mir/register.hpp"
 
 namespace LIRA {
 namespace MIR{
@@ -20,6 +20,10 @@ LocalDestRegister::LocalDestRegister(std::string dest_register_name, IR::TypeExp
     this->scope = scope;
     this->dereferenceable_bytes = dereferenceable_bytes;
     this->alignment = alignment;    
+}
+
+void LocalDestRegister::set_alignment(std::size_t alignment){
+    this->alignment = alignment;
 }
 
 std::string LocalDestRegister::get_dest_register_name() const{

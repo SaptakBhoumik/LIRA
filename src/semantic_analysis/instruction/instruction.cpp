@@ -111,7 +111,11 @@ bool is_global_inst(std::string inst_name){
     return inst_name == ".global" || inst_name == ".assign_type";
 }
 MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_instruction(IR::InstructionStmtPtr inst_stmt){
-    IR::Token inst_name = inst_stmt->get_value()->get_token();
+    auto instruction = inst_stmt->get_value();
+    if(!instruction.has_value()){
+        Utils::error(this->filename,inst_stmt->get_token(),"Instruction statement has no instruction value", "Assign to .local(T:poison) if you want to create a undef value variable");
+    }
+    IR::Token inst_name = instruction.value().get_token();
     MIR::InstPtr inst = nullptr;
     if(is_arithmetic_bin_inst(inst_name.value)){
         inst = analyze_arithmetic_bin_inst(inst_name,inst_stmt);

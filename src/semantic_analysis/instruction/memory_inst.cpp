@@ -179,6 +179,17 @@ MIR::InstPtr analyze_local_inst(std::string filename, MIR::LocalDestRegisterPtr 
     else{
         attrs_with_num_args["align"].push_back(0);
     }
+    if(dest->get_alignment() != attrs_with_num_args["align"][0]){
+        if(dest->get_alignment() == 0){
+            dest->set_alignment(attrs_with_num_args["align"][0]);
+        }
+        else if(attrs_with_num_args["align"][0] == 0){
+            attrs_with_num_args["align"][0] = dest->get_alignment();
+        }
+        else{
+            Utils::error(filename, name, "Attribute 'align' for .local instruction does not match the alignment of the destination register");
+        }
+    }
     if(remaining_attrs.size() > 0){
         Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for .local instruction: " + remaining_attrs[0]->to_string());
     }
@@ -212,6 +223,17 @@ MIR::InstPtr analyze_alloca_inst(std::string filename, MIR::LocalDestRegisterPtr
     }
     else{
         attrs_with_num_args["align"].push_back(0);
+    }
+    if(dest->get_alignment() != attrs_with_num_args["align"][0]){
+        if(dest->get_alignment() == 0){
+            dest->set_alignment(attrs_with_num_args["align"][0]);
+        }
+        else if(attrs_with_num_args["align"][0] == 0){
+            attrs_with_num_args["align"][0] = dest->get_alignment();
+        }
+        else{
+            Utils::error(filename, name, "Attribute 'align' for .alloca instruction does not match the alignment of the destination register");
+        }
     }
     if(remaining_attrs.size() > 0){
         Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for .alloca instruction: " + remaining_attrs[0]->to_string());

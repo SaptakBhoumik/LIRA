@@ -535,18 +535,18 @@ All instructions in this section: T must be of the form `T0` or `<T0,M>` where T
 
 - `let ptr:$global_var = .global(T:value)` - Defines a global variable. Output must be a pointer type; `$global_var` holds the address. Value must be a constant expression (not a variable). Not part of MIR; stored in the module's global section.
 
-    - `#[align(i64:N)]` - alignment of the global in bytes; must be a power of 2; default is 16
+    - `#[align(i64:N)]` - alignment of the global in bytes; must be a power of 2; 
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination if T is float/vec of float
 
 - `let T:%local_var = .local(T:initial_value)` - Defines and initializes a local variable. Value can be anything. Present for parser simplicity; does little in MIR. T can be any type. 
 
     If T is float/vec of float:
-    - `#[align(i64:N)]` - alignment of the variable in bytes; must be a power of 2; default is 16
+    - `#[align(i64:N)]` - Local is equivalent to alloca + store. The align tells the alignemnt of allocation
     - `#[fast]`, `#[nnan]`, `#[ninf]`, `#[nsz]`, `#[arcp]`, `#[contract]`, `#[afn]`, `#[reassoc]`, or any combination.
 
 - `let ptr:%local_var = .alloca(i64:%size)` - Allocates `size` bytes on the stack. Returns a pointer to the allocation.
 
-    - `#[align(i64:N)]` - alignment of the allocation in bytes; must be a power of 2; default is 16
+    - `#[align(i64:N)]` - alignment of the allocation in bytes; must be a power of 2;
 
 - `let T:%output_var = .load(ptr:%ptr)` - Loads a value of type T from memory.
 

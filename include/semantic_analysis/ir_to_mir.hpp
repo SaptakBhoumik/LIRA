@@ -1,7 +1,7 @@
 #pragma once
 #include "ast/ast.hpp"
 #include "lexer/token.hpp"
-#include "mir/destregister.hpp"
+#include "mir/register.hpp"
 #include "mir/instruction.hpp"
 #include "mir/instruction/_instruction.hpp"
 #include "symtable/symtable.hpp"
@@ -102,6 +102,7 @@ class IRToMIRSemanticAnalyzer {
                                                                                        //Throws error if the type is ``type`` because typedef is allowed only at global scope
                                                                                        //Does not to symbol table because the destination variable cant be used as an operand in the same instruction. 
                                                                                        //So we add it to the symbol table in analyze_instruction after analyzing the instruction
+                                                                                       //It also checks if the attributes of destination are valid for the type of destination
     void add_dest_to_symtable(MIR::LocalDestRegisterPtr dest);//Does nothing if dest is nullptr. Adds destination to symbol table if not nullptr. 
                                                               //Used in the MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_instruction(IR::InstructionStmtPtr inst_stmt) method at the end after analyzing the instruction. 
     public:

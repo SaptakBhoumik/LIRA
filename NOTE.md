@@ -32,3 +32,5 @@ let typed: fn(i32, i32) -> i32 = add    ;  not allowed as a variable type
 - A function must do -> void in the declaration if it does not return anything.
 
 - The doc and reference uses ``str`` as a type. It is not a type. We just use it as a placeholder to indicate that the type is a string. In the IR u need to use [i8,N] for a string of length N
+
+- alloca, local and global align  attribute makes the alignment true. Everywhere else, align merely claims the alignment is true. Alignment attached to a pointer destination variable promises the alignment to be true when returned by the instuction. For alloca, local and global, IRToMIRSemanticAnalyzer must check if the alignment from the attribute attached to the destination register and also from the instruction's align attribute(Checking done at the instruction verifier function). If both are present, they must match. If only one is present, it is used as the alignment. If neither is present, the default alignment of 0 is used. 

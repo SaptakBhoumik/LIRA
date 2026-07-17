@@ -7,74 +7,74 @@
 #include <memory>
 namespace LIRA {
 namespace SemanticAnalyzer {
-using DispatchFuncType = std::function<MIR::InstPtr(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+using DispatchFuncType = std::function<MIR::InstPtr(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                                     std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt)>;
                                                 
-MIR::InstPtr analyze_cpuid_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_cpuid_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_rdtsc_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_rdtsc_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_rdtscp_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_rdtscp_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_rdrand_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_rdrand_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_rdseed_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_rdseed_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_get_fpenv_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_get_fpenv_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_set_fpenv_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_set_fpenv_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_fpenv_get_field_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_fpenv_get_field_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_fpenv_set_field_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_fpenv_set_field_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_get_fpstatus_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_get_fpstatus_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_clear_fpstatus_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_clear_fpstatus_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_aesenc_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_aesenc_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_aesenclast_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_aesenclast_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_aesdec_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_aesdec_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_aesdeclast_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_aesdeclast_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_aesimc_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_aesimc_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_aeskeygenassist_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_aeskeygenassist_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_clmul_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_clmul_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_sha1rnds4_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_sha1rnds4_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_sha1nexte_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_sha1nexte_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_sha1msg1_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_sha1msg1_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_sha1msg2_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_sha1msg2_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_sha256rnds2_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_sha256rnds2_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_sha256msg1_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_sha256msg1_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_sha256msg2_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_sha256msg2_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_crc32_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_crc32_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_syscall_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_syscall_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_rdssp_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_rdssp_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_incssp_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_incssp_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_saveprevssp_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_saveprevssp_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_rstorssp_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_rstorssp_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_setssbsy_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_setssbsy_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_wrss_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_wrss_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt);
 
 MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_hardware_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt){
@@ -133,7 +133,7 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_hardware_inst(IR::Token name,IR::I
     }
 }
 
-MIR::InstPtr analyze_cpuid_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_cpuid_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     if(args.size() != 2){
@@ -166,7 +166,7 @@ MIR::InstPtr analyze_cpuid_inst(std::string filename, MIR::LocalDestRegisterPtr 
     }
     return std::make_shared<MIR::CpuIdInst>(inst_stmt, dest, args[0].first->get_literal(), args[1].first->get_literal());
 }
-MIR::InstPtr analyze_rdtsc_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_rdtsc_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     if(args.size() != 0){
@@ -183,7 +183,7 @@ MIR::InstPtr analyze_rdtsc_inst(std::string filename, MIR::LocalDestRegisterPtr 
     }
     return std::make_shared<MIR::RdTscInst>(inst_stmt, dest);
 }
-MIR::InstPtr analyze_rdtscp_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_rdtscp_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     if(args.size() != 0){
@@ -212,7 +212,7 @@ MIR::InstPtr analyze_rdtscp_inst(std::string filename, MIR::LocalDestRegisterPtr
     }
     return std::make_shared<MIR::RdTscpInst>(inst_stmt, dest);
 }
-MIR::InstPtr analyze_rdrand_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_rdrand_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     if(args.size() != 0){
@@ -242,7 +242,7 @@ MIR::InstPtr analyze_rdrand_inst(std::string filename, MIR::LocalDestRegisterPtr
     }
     return std::make_shared<MIR::RdrandInst>(inst_stmt, dest);
 }
-MIR::InstPtr analyze_rdseed_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_rdseed_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     if(args.size() != 0){
@@ -272,7 +272,7 @@ MIR::InstPtr analyze_rdseed_inst(std::string filename, MIR::LocalDestRegisterPtr
     }
     return std::make_shared<MIR::RdseedInst>(inst_stmt, dest);
 }
-MIR::InstPtr analyze_get_fpenv_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_get_fpenv_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     if(args.size() != 0){
@@ -297,7 +297,7 @@ MIR::InstPtr analyze_get_fpenv_inst(std::string filename, MIR::LocalDestRegister
     }
     return std::make_shared<MIR::GetFpEnvInst>(inst_stmt, dest, flag_attrs["x87"]);
 }
-MIR::InstPtr analyze_set_fpenv_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_set_fpenv_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     if(args.size() != 1){
@@ -322,7 +322,7 @@ MIR::InstPtr analyze_set_fpenv_inst(std::string filename, MIR::LocalDestRegister
     }
     return std::make_shared<MIR::SetFpEnvInst>(inst_stmt, args[0].first->get_literal(), flag_attrs["volatile"], flag_attrs["x87"]);
 }
-MIR::InstPtr analyze_fpenv_get_field_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_fpenv_get_field_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     if(args.size() != 2){
@@ -354,7 +354,7 @@ MIR::InstPtr analyze_fpenv_get_field_inst(std::string filename, MIR::LocalDestRe
     }
     return std::make_shared<MIR::FpenvGetFieldInst>(inst_stmt, dest, args[0].first->get_literal(), field.value(), flag_attrs["x87"]);
 }
-MIR::InstPtr analyze_fpenv_set_field_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_fpenv_set_field_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     if(args.size() != 3){
@@ -389,7 +389,7 @@ MIR::InstPtr analyze_fpenv_set_field_inst(std::string filename, MIR::LocalDestRe
     }
     return std::make_shared<MIR::FpenvSetFieldInst>(inst_stmt, dest, args[0].first->get_literal(), field.value(), args[2].first->get_literal(), flag_attrs["x87"]);
 }
-MIR::InstPtr analyze_get_fpstatus_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_get_fpstatus_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     if(args.size() != 0){
@@ -414,7 +414,7 @@ MIR::InstPtr analyze_get_fpstatus_inst(std::string filename, MIR::LocalDestRegis
     }
     return std::make_shared<MIR::GetFpStatusInst>(inst_stmt, dest, flag_attrs["x87"]);
 }
-MIR::InstPtr analyze_clear_fpstatus_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_clear_fpstatus_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     if(args.size() != 0){
@@ -429,7 +429,7 @@ MIR::InstPtr analyze_clear_fpstatus_inst(std::string filename, MIR::LocalDestReg
     }
     return std::make_shared<MIR::ClearFpStatusInst>(inst_stmt, flag_attrs["x87"]);
 }
-MIR::InstPtr analyze_aesenc_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_aesenc_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     if(args.size() != 2){
@@ -451,7 +451,7 @@ MIR::InstPtr analyze_aesenc_inst(std::string filename, MIR::LocalDestRegisterPtr
     }
     return std::make_shared<MIR::AesEncInst>(inst_stmt, dest, args[0].first->get_literal(), args[1].first->get_literal());
 }
-MIR::InstPtr analyze_aesenclast_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_aesenclast_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     if(args.size() != 2){
@@ -473,7 +473,7 @@ MIR::InstPtr analyze_aesenclast_inst(std::string filename, MIR::LocalDestRegiste
     }
     return std::make_shared<MIR::AesEncLastInst>(inst_stmt, dest, args[0].first->get_literal(), args[1].first->get_literal());
 }
-MIR::InstPtr analyze_aesdec_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_aesdec_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     if(args.size() != 2){
@@ -495,7 +495,7 @@ MIR::InstPtr analyze_aesdec_inst(std::string filename, MIR::LocalDestRegisterPtr
     }
     return std::make_shared<MIR::AesDecInst>(inst_stmt, dest, args[0].first->get_literal(), args[1].first->get_literal());
 }
-MIR::InstPtr analyze_aesdeclast_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_aesdeclast_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     if(args.size() != 2){
@@ -517,7 +517,7 @@ MIR::InstPtr analyze_aesdeclast_inst(std::string filename, MIR::LocalDestRegiste
     }
     return std::make_shared<MIR::AesDecLastInst>(inst_stmt, dest, args[0].first->get_literal(), args[1].first->get_literal());
 }
-MIR::InstPtr analyze_aesimc_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_aesimc_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     if(args.size() != 1){
@@ -537,7 +537,7 @@ MIR::InstPtr analyze_aesimc_inst(std::string filename, MIR::LocalDestRegisterPtr
     }
     return std::make_shared<MIR::AesImcInst>(inst_stmt, dest, args[0].first->get_literal());
 }
-MIR::InstPtr analyze_aeskeygenassist_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_aeskeygenassist_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     if(args.size() != 2){
@@ -560,7 +560,7 @@ MIR::InstPtr analyze_aeskeygenassist_inst(std::string filename, MIR::LocalDestRe
     }
     return std::make_shared<MIR::AesKeyGenAssistInst>(inst_stmt, dest, args[0].first->get_literal(), args[1].first->get_literal());
 }
-MIR::InstPtr analyze_clmul_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_clmul_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     if(args.size() != 2){
@@ -583,7 +583,7 @@ MIR::InstPtr analyze_clmul_inst(std::string filename, MIR::LocalDestRegisterPtr 
     }
     return std::make_shared<MIR::ClmulInst>(inst_stmt, dest, args[0].first->get_literal(), args[1].first->get_literal());
 }
-MIR::InstPtr analyze_sha1rnds4_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_sha1rnds4_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     if(args.size() != 3){
@@ -615,7 +615,7 @@ MIR::InstPtr analyze_sha1rnds4_inst(std::string filename, MIR::LocalDestRegister
     }
     return std::make_shared<MIR::Sha1Rnds4Inst>(inst_stmt, dest, args[0].first->get_literal(), args[1].first->get_literal(), args[2].first->get_literal());
 }
-MIR::InstPtr analyze_sha1nexte_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_sha1nexte_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     if(args.size() != 2){
@@ -637,7 +637,7 @@ MIR::InstPtr analyze_sha1nexte_inst(std::string filename, MIR::LocalDestRegister
     }
     return std::make_shared<MIR::Sha1NextEInst>(inst_stmt, dest, args[0].first->get_literal(), args[1].first->get_literal());
 }
-MIR::InstPtr analyze_sha1msg1_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_sha1msg1_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     if(args.size() != 2){
@@ -659,7 +659,7 @@ MIR::InstPtr analyze_sha1msg1_inst(std::string filename, MIR::LocalDestRegisterP
     }
     return std::make_shared<MIR::Sha1Msg1Inst>(inst_stmt, dest, args[0].first->get_literal(), args[1].first->get_literal());
 }
-MIR::InstPtr analyze_sha1msg2_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_sha1msg2_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     if(args.size() != 2){
@@ -681,7 +681,7 @@ MIR::InstPtr analyze_sha1msg2_inst(std::string filename, MIR::LocalDestRegisterP
     }
     return std::make_shared<MIR::Sha1Msg2Inst>(inst_stmt, dest, args[0].first->get_literal(), args[1].first->get_literal());
 }
-MIR::InstPtr analyze_sha256rnds2_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_sha256rnds2_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     if(args.size() != 3){
@@ -703,7 +703,7 @@ MIR::InstPtr analyze_sha256rnds2_inst(std::string filename, MIR::LocalDestRegist
     }
     return std::make_shared<MIR::Sha256Rnds2Inst>(inst_stmt, dest, args[0].first->get_literal(), args[1].first->get_literal(), args[2].first->get_literal());
 }
-MIR::InstPtr analyze_sha256msg1_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_sha256msg1_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     if(args.size() != 2){
@@ -725,7 +725,7 @@ MIR::InstPtr analyze_sha256msg1_inst(std::string filename, MIR::LocalDestRegiste
     }
     return std::make_shared<MIR::Sha256Msg1Inst>(inst_stmt, dest, args[0].first->get_literal(), args[1].first->get_literal());
 }
-MIR::InstPtr analyze_sha256msg2_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_sha256msg2_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     if(args.size() != 2){
@@ -747,7 +747,7 @@ MIR::InstPtr analyze_sha256msg2_inst(std::string filename, MIR::LocalDestRegiste
     }
     return std::make_shared<MIR::Sha256Msg2Inst>(inst_stmt, dest, args[0].first->get_literal(), args[1].first->get_literal());
 }
-MIR::InstPtr analyze_crc32_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_crc32_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     if(args.size() != 2){
@@ -777,7 +777,7 @@ MIR::InstPtr analyze_crc32_inst(std::string filename, MIR::LocalDestRegisterPtr 
     }
     return std::make_shared<MIR::Crc32Inst>(inst_stmt, dest, args[0].first->get_literal(), args[1].first->get_literal(), args[0].second, args[1].second);
 }
-MIR::InstPtr analyze_syscall_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_syscall_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     if(args.size() > 7){
@@ -812,7 +812,7 @@ MIR::InstPtr analyze_syscall_inst(std::string filename, MIR::LocalDestRegisterPt
     }
     return std::make_shared<MIR::SyscallInst>(inst_stmt, dest, args[0].first->get_literal(), arg_literals, flag_attrs["noreturn"], flag_attrs["nosideeffect"], flag_attrs["pure"]);
 }
-MIR::InstPtr analyze_rdssp_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_rdssp_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     if(args.size() != 0){
@@ -829,7 +829,7 @@ MIR::InstPtr analyze_rdssp_inst(std::string filename, MIR::LocalDestRegisterPtr 
     }
     return std::make_shared<MIR::RdsspInst>(inst_stmt, dest);
 }
-MIR::InstPtr analyze_incssp_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_incssp_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     if(args.size() != 1){
@@ -852,7 +852,7 @@ MIR::InstPtr analyze_incssp_inst(std::string filename, MIR::LocalDestRegisterPtr
     }
     return std::make_shared<MIR::IncsspInst>(inst_stmt, args[0].first->get_literal());
 }
-MIR::InstPtr analyze_saveprevssp_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_saveprevssp_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     if(args.size() != 0){
@@ -866,7 +866,7 @@ MIR::InstPtr analyze_saveprevssp_inst(std::string filename, MIR::LocalDestRegist
     }
     return std::make_shared<MIR::SavePrevSspInst>(inst_stmt);
 }
-MIR::InstPtr analyze_rstorssp_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_rstorssp_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     if(args.size() != 1){
@@ -883,7 +883,7 @@ MIR::InstPtr analyze_rstorssp_inst(std::string filename, MIR::LocalDestRegisterP
     }
     return std::make_shared<MIR::RstorSspInst>(inst_stmt, args[0].first->get_literal());
 }
-MIR::InstPtr analyze_setssbsy_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_setssbsy_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     if(args.size() != 0){
@@ -897,7 +897,7 @@ MIR::InstPtr analyze_setssbsy_inst(std::string filename, MIR::LocalDestRegisterP
     }
     return std::make_shared<MIR::SetssbsyInst>(inst_stmt);
 }
-MIR::InstPtr analyze_wrss_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_wrss_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     if(args.size() != 2){

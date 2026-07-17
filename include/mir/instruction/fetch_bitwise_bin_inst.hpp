@@ -33,7 +33,7 @@ class FetchBitwiseBinInst:public Inst {
         FETCH_PEXT = 1 << 17,
         FETCH_PDEP = 1 << 18
     };
-    FetchBitwiseBinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+    FetchBitwiseBinInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                         CommonFetchInstAttrs common_fetch_inst_attrs, bool nuw, bool nsw, bool exact, bool disjoint);
 
     virtual TypeVariant get_type_variant() const = 0;
@@ -55,7 +55,7 @@ class FetchBitwiseBinInst:public Inst {
 // --------------------------- Integer read modify operations ---------------------------
 class IntFetchBitwiseBinInst:public FetchBitwiseBinInst {
     public:
-    IntFetchBitwiseBinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+    IntFetchBitwiseBinInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                             CommonFetchInstAttrs common_fetch_inst_attrs, bool nuw, bool nsw, bool exact, bool disjoint);
 
     virtual std::shared_ptr<IR::IntTypeExpr> get_casted_type() const final;//Returns the type casted to IntTypeExpr. Just a helper function to make life easier
@@ -66,7 +66,7 @@ class IntFetchBitwiseBinInst:public FetchBitwiseBinInst {
 
 class IntFetchAndInst:public IntFetchBitwiseBinInst {
     public:
-    IntFetchAndInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+    IntFetchAndInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     CommonFetchInstAttrs common_fetch_inst_attrs);
 
     OpType get_op_type() const override;
@@ -75,7 +75,7 @@ class IntFetchAndInst:public IntFetchBitwiseBinInst {
 
 class IntFetchNandInst:public IntFetchBitwiseBinInst {
     public:
-    IntFetchNandInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+    IntFetchNandInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     CommonFetchInstAttrs common_fetch_inst_attrs);
 
     OpType get_op_type() const override;
@@ -84,7 +84,7 @@ class IntFetchNandInst:public IntFetchBitwiseBinInst {
 
 class IntFetchOrInst:public IntFetchBitwiseBinInst {
     public:
-    IntFetchOrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+    IntFetchOrInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     CommonFetchInstAttrs common_fetch_inst_attrs, bool disjoint);
 
     OpType get_op_type() const override;
@@ -93,7 +93,7 @@ class IntFetchOrInst:public IntFetchBitwiseBinInst {
 
 class IntFetchNorInst:public IntFetchBitwiseBinInst {
     public:
-    IntFetchNorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+    IntFetchNorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     CommonFetchInstAttrs common_fetch_inst_attrs, bool disjoint);
 
     OpType get_op_type() const override;
@@ -102,7 +102,7 @@ class IntFetchNorInst:public IntFetchBitwiseBinInst {
 
 class IntFetchXorInst:public IntFetchBitwiseBinInst {
     public:
-    IntFetchXorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+    IntFetchXorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     CommonFetchInstAttrs common_fetch_inst_attrs);
 
     OpType get_op_type() const override;
@@ -111,7 +111,7 @@ class IntFetchXorInst:public IntFetchBitwiseBinInst {
 
 class IntFetchXnorInst:public IntFetchBitwiseBinInst {
     public:
-    IntFetchXnorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+    IntFetchXnorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     CommonFetchInstAttrs common_fetch_inst_attrs);
 
     OpType get_op_type() const override;
@@ -120,7 +120,7 @@ class IntFetchXnorInst:public IntFetchBitwiseBinInst {
 
 class IntFetchShlInst:public IntFetchBitwiseBinInst {
     public:
-    IntFetchShlInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+    IntFetchShlInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     CommonFetchInstAttrs common_fetch_inst_attrs, bool nuw, bool nsw);
 
     OpType get_op_type() const override;
@@ -129,7 +129,7 @@ class IntFetchShlInst:public IntFetchBitwiseBinInst {
 
 class IntFetchLshrInst:public IntFetchBitwiseBinInst {
     public:
-    IntFetchLshrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+    IntFetchLshrInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     CommonFetchInstAttrs common_fetch_inst_attrs, bool exact);
 
     OpType get_op_type() const override;
@@ -138,7 +138,7 @@ class IntFetchLshrInst:public IntFetchBitwiseBinInst {
 
 class IntFetchAshrInst:public IntFetchBitwiseBinInst {
     public:
-    IntFetchAshrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+    IntFetchAshrInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     CommonFetchInstAttrs common_fetch_inst_attrs, bool exact);
 
     OpType get_op_type() const override;
@@ -147,7 +147,7 @@ class IntFetchAshrInst:public IntFetchBitwiseBinInst {
 
 class IntFetchRotlInst:public IntFetchBitwiseBinInst {
     public:
-    IntFetchRotlInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+    IntFetchRotlInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     CommonFetchInstAttrs common_fetch_inst_attrs);
 
     OpType get_op_type() const override;
@@ -156,7 +156,7 @@ class IntFetchRotlInst:public IntFetchBitwiseBinInst {
 
 class IntFetchRotrInst:public IntFetchBitwiseBinInst {
     public:
-    IntFetchRotrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+    IntFetchRotrInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     CommonFetchInstAttrs common_fetch_inst_attrs);
 
     OpType get_op_type() const override;
@@ -165,7 +165,7 @@ class IntFetchRotrInst:public IntFetchBitwiseBinInst {
 
 class IntFetchPextInst:public IntFetchBitwiseBinInst {
     public:
-    IntFetchPextInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+    IntFetchPextInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     CommonFetchInstAttrs common_fetch_inst_attrs);
 
     OpType get_op_type() const override;
@@ -174,7 +174,7 @@ class IntFetchPextInst:public IntFetchBitwiseBinInst {
 
 class IntFetchPdepInst:public IntFetchBitwiseBinInst {
     public:
-    IntFetchPdepInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+    IntFetchPdepInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     CommonFetchInstAttrs common_fetch_inst_attrs);
 
     OpType get_op_type() const override;

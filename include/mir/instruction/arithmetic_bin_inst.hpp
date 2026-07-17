@@ -21,7 +21,7 @@ class ArithmeticBinaryInst:public Inst {
         MAX = 1 << 14,
         AVG = 1 << 15,
     };
-    ArithmeticBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    ArithmeticBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                          std::optional<FastMathAttr> fast_math_attr);
 
     virtual TypeVariant get_operand_type_variant() const = 0;
@@ -45,7 +45,7 @@ class IntArithmeticBinaryInst:public ArithmeticBinaryInst {
 
     virtual std::string to_string_helper(const std::string op_name) const final;
     public:
-    IntArithmeticBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    IntArithmeticBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                             bool nuw, bool nsw, bool unsigned_, bool saturating, bool floor, bool exact);
 
     virtual bool is_nuw() const final;
@@ -63,7 +63,7 @@ class IntArithmeticBinaryInst:public ArithmeticBinaryInst {
 
 class IntAddInst:public IntArithmeticBinaryInst {
     public:
-    IntAddInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    IntAddInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                 bool nuw, bool nsw, bool unsigned_, bool saturating);
     
     OpType get_op_type() const override;
@@ -73,7 +73,7 @@ class IntAddInst:public IntArithmeticBinaryInst {
 
 class IntSubInst:public IntArithmeticBinaryInst {
     public:
-    IntSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    IntSubInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                 bool nuw, bool nsw, bool unsigned_, bool saturating);
 
     OpType get_op_type() const override;
@@ -83,7 +83,7 @@ class IntSubInst:public IntArithmeticBinaryInst {
 
 class IntAbsDiffInst:public IntArithmeticBinaryInst {
     public:
-    IntAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    IntAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                     bool nuw, bool nsw, bool unsigned_, bool saturating);
 
     OpType get_op_type() const override;
@@ -93,7 +93,7 @@ class IntAbsDiffInst:public IntArithmeticBinaryInst {
 
 class IntMulInst:public IntArithmeticBinaryInst {
     public:
-    IntMulInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    IntMulInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                 bool nuw, bool nsw, bool unsigned_, bool saturating);
 
     OpType get_op_type() const override;
@@ -102,7 +102,7 @@ class IntMulInst:public IntArithmeticBinaryInst {
 
 class IntDivInst:public IntArithmeticBinaryInst {
     public:
-    IntDivInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    IntDivInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                 bool unsigned_, bool exact);
 
     OpType get_op_type() const override;
@@ -111,7 +111,7 @@ class IntDivInst:public IntArithmeticBinaryInst {
 
 class IntRemInst:public IntArithmeticBinaryInst {
     public:
-    IntRemInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    IntRemInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                 bool unsigned_);
 
     OpType get_op_type() const override;
@@ -120,7 +120,7 @@ class IntRemInst:public IntArithmeticBinaryInst {
 
 class IntCopySignInst:public IntArithmeticBinaryInst {
     public:
-    IntCopySignInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, bool nsw);
+    IntCopySignInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, bool nsw);
 
     OpType get_op_type() const override;
     std::string to_string() const override;
@@ -128,7 +128,7 @@ class IntCopySignInst:public IntArithmeticBinaryInst {
 
 class IntMinInst:public IntArithmeticBinaryInst {
     public:
-    IntMinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    IntMinInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                 bool unsigned_);
 
     OpType get_op_type() const override;
@@ -137,7 +137,7 @@ class IntMinInst:public IntArithmeticBinaryInst {
 
 class IntMaxInst:public IntArithmeticBinaryInst {
     public:
-    IntMaxInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    IntMaxInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                 bool unsigned_);
 
     OpType get_op_type() const override;
@@ -146,7 +146,7 @@ class IntMaxInst:public IntArithmeticBinaryInst {
 
 class IntAvgInst:public IntArithmeticBinaryInst {
     public:
-    IntAvgInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    IntAvgInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                 bool nuw, bool nsw ,bool unsigned_, bool floor);
 
     OpType get_op_type() const override;
@@ -168,7 +168,7 @@ class VecIntArithmeticBinaryInst:public ArithmeticBinaryInst {
 
     virtual std::string to_string_helper(const std::string op_name) const final;
     public:
-    VecIntArithmeticBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    VecIntArithmeticBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                 bool nuw, bool nsw, bool unsigned_, bool saturating, bool floor, bool exact);
 
     virtual bool is_nuw() const final;
@@ -188,7 +188,7 @@ class VecIntArithmeticBinaryInst:public ArithmeticBinaryInst {
 
 class VecIntAddInst:public VecIntArithmeticBinaryInst {
     public:
-    VecIntAddInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    VecIntAddInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                 bool nuw, bool nsw, bool unsigned_, bool saturating);
     
     OpType get_op_type() const override;
@@ -198,7 +198,7 @@ class VecIntAddInst:public VecIntArithmeticBinaryInst {
 
 class VecIntSubInst:public VecIntArithmeticBinaryInst {
     public:
-    VecIntSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    VecIntSubInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                 bool nuw, bool nsw, bool unsigned_, bool saturating);
 
     OpType get_op_type() const override;
@@ -208,7 +208,7 @@ class VecIntSubInst:public VecIntArithmeticBinaryInst {
 
 class VecIntAbsDiffInst:public VecIntArithmeticBinaryInst {
     public:
-    VecIntAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    VecIntAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                       bool nuw, bool nsw, bool unsigned_, bool saturating);
 
     OpType get_op_type() const override;
@@ -218,7 +218,7 @@ class VecIntAbsDiffInst:public VecIntArithmeticBinaryInst {
 
 class VecIntMulInst:public VecIntArithmeticBinaryInst {
     public:
-    VecIntMulInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    VecIntMulInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                 bool nuw, bool nsw, bool unsigned_, bool saturating);
 
     OpType get_op_type() const override;
@@ -227,7 +227,7 @@ class VecIntMulInst:public VecIntArithmeticBinaryInst {
 
 class VecIntDivInst:public VecIntArithmeticBinaryInst {
     public:
-    VecIntDivInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    VecIntDivInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                 bool unsigned_, bool exact);
 
     OpType get_op_type() const override;
@@ -236,7 +236,7 @@ class VecIntDivInst:public VecIntArithmeticBinaryInst {
 
 class VecIntRemInst:public VecIntArithmeticBinaryInst {
     public:
-    VecIntRemInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    VecIntRemInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                 bool unsigned_);
 
     OpType get_op_type() const override;
@@ -245,7 +245,7 @@ class VecIntRemInst:public VecIntArithmeticBinaryInst {
 
 class VecIntCopySignInst:public VecIntArithmeticBinaryInst {
     public:
-    VecIntCopySignInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, bool nsw);
+    VecIntCopySignInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, bool nsw);
 
     OpType get_op_type() const override;
     std::string to_string() const override;
@@ -253,7 +253,7 @@ class VecIntCopySignInst:public VecIntArithmeticBinaryInst {
 
 class VecIntMinInst:public VecIntArithmeticBinaryInst {
     public:
-    VecIntMinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    VecIntMinInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                     bool unsigned_);
 
     OpType get_op_type() const override;
@@ -262,7 +262,7 @@ class VecIntMinInst:public VecIntArithmeticBinaryInst {
 
 class VecIntMaxInst:public VecIntArithmeticBinaryInst {
     public:
-    VecIntMaxInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    VecIntMaxInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                 bool unsigned_);
 
     OpType get_op_type() const override;
@@ -271,7 +271,7 @@ class VecIntMaxInst:public VecIntArithmeticBinaryInst {
 
 class VecIntAvgInst:public VecIntArithmeticBinaryInst {
     public:
-    VecIntAvgInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    VecIntAvgInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                 bool nuw, bool nsw ,bool unsigned_, bool floor);
 
     OpType get_op_type() const override;
@@ -287,7 +287,7 @@ class FloatArithmeticBinaryInst:public ArithmeticBinaryInst {
 
     virtual std::string to_string_helper(const std::string op_name) const final;
     public:
-    FloatArithmeticBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    FloatArithmeticBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                 FastMathAttr fast_math_attr,bool ieee754_2019, bool unordered);
 
     virtual bool is_ieee754_2019() const final;
@@ -302,7 +302,7 @@ class FloatArithmeticBinaryInst:public ArithmeticBinaryInst {
 
 class FloatAddInst:public FloatArithmeticBinaryInst {
     public:
-    FloatAddInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    FloatAddInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                 FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override;
@@ -311,7 +311,7 @@ class FloatAddInst:public FloatArithmeticBinaryInst {
 
 class FloatSubInst:public FloatArithmeticBinaryInst {
     public:
-    FloatSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    FloatSubInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                 FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override;
@@ -321,7 +321,7 @@ class FloatSubInst:public FloatArithmeticBinaryInst {
 
 class FloatAbsDiffInst:public FloatArithmeticBinaryInst {
     public:
-    FloatAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    FloatAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                     FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override;
@@ -331,7 +331,7 @@ class FloatAbsDiffInst:public FloatArithmeticBinaryInst {
 
 class FloatMulInst:public FloatArithmeticBinaryInst {
     public:
-    FloatMulInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    FloatMulInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                 FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override;
@@ -340,7 +340,7 @@ class FloatMulInst:public FloatArithmeticBinaryInst {
 
 class FloatDivInst:public FloatArithmeticBinaryInst {
     public:
-    FloatDivInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    FloatDivInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                 FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override;
@@ -349,7 +349,7 @@ class FloatDivInst:public FloatArithmeticBinaryInst {
 
 class FloatRemInst:public FloatArithmeticBinaryInst {
     public:
-    FloatRemInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    FloatRemInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                 FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override;
@@ -358,7 +358,7 @@ class FloatRemInst:public FloatArithmeticBinaryInst {
 
 class FloatCopySignInst:public FloatArithmeticBinaryInst {
     public:
-    FloatCopySignInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    FloatCopySignInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                 FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override;
@@ -367,7 +367,7 @@ class FloatCopySignInst:public FloatArithmeticBinaryInst {
 
 class FloatMinInst:public FloatArithmeticBinaryInst {
     public:
-    FloatMinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    FloatMinInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                 FastMathAttr fast_math_attr, bool ieee754_2019, bool unordered);
 
     OpType get_op_type() const override;
@@ -376,7 +376,7 @@ class FloatMinInst:public FloatArithmeticBinaryInst {
 
 class FloatMaxInst:public FloatArithmeticBinaryInst {
     public:
-    FloatMaxInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    FloatMaxInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                 FastMathAttr fast_math_attr, bool ieee754_2019, bool unordered);
 
     OpType get_op_type() const override;
@@ -385,7 +385,7 @@ class FloatMaxInst:public FloatArithmeticBinaryInst {
 
 class FloatAvgInst:public FloatArithmeticBinaryInst {
     public:
-    FloatAvgInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    FloatAvgInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                 FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override;
@@ -401,7 +401,7 @@ class VecFloatArithmeticBinaryInst:public ArithmeticBinaryInst {
 
     virtual std::string to_string_helper(const std::string op_name) const final;
     public:
-    VecFloatArithmeticBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    VecFloatArithmeticBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                 FastMathAttr fast_math_attr,bool ieee754_2019, bool unordered);
 
     virtual bool is_ieee754_2019() const final;
@@ -416,7 +416,7 @@ class VecFloatArithmeticBinaryInst:public ArithmeticBinaryInst {
 
 class VecFloatAddInst:public VecFloatArithmeticBinaryInst {
     public:
-    VecFloatAddInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    VecFloatAddInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                 FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override;
@@ -425,7 +425,7 @@ class VecFloatAddInst:public VecFloatArithmeticBinaryInst {
 
 class VecFloatSubInst:public VecFloatArithmeticBinaryInst {
     public:
-    VecFloatSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    VecFloatSubInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                 FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override;
@@ -435,7 +435,7 @@ class VecFloatSubInst:public VecFloatArithmeticBinaryInst {
 
 class VecFloatAbsDiffInst:public VecFloatArithmeticBinaryInst {
     public:
-    VecFloatAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    VecFloatAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                     FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override;
@@ -445,7 +445,7 @@ class VecFloatAbsDiffInst:public VecFloatArithmeticBinaryInst {
 
 class VecFloatMulInst:public VecFloatArithmeticBinaryInst {
     public:
-    VecFloatMulInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    VecFloatMulInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                 FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override;
@@ -454,7 +454,7 @@ class VecFloatMulInst:public VecFloatArithmeticBinaryInst {
 
 class VecFloatDivInst:public VecFloatArithmeticBinaryInst {
     public:
-    VecFloatDivInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    VecFloatDivInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                 FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override;
@@ -463,7 +463,7 @@ class VecFloatDivInst:public VecFloatArithmeticBinaryInst {
 
 class VecFloatRemInst:public VecFloatArithmeticBinaryInst {
     public:
-    VecFloatRemInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    VecFloatRemInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                 FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override;
@@ -472,7 +472,7 @@ class VecFloatRemInst:public VecFloatArithmeticBinaryInst {
 
 class VecFloatCopySignInst:public VecFloatArithmeticBinaryInst {
     public:
-    VecFloatCopySignInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    VecFloatCopySignInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                 FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override;
@@ -481,7 +481,7 @@ class VecFloatCopySignInst:public VecFloatArithmeticBinaryInst {
 
 class VecFloatMinInst:public VecFloatArithmeticBinaryInst {
     public:
-    VecFloatMinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    VecFloatMinInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                 FastMathAttr fast_math_attr, bool ieee754_2019, bool unordered);
 
     OpType get_op_type() const override;
@@ -490,7 +490,7 @@ class VecFloatMinInst:public VecFloatArithmeticBinaryInst {
 
 class VecFloatMaxInst:public VecFloatArithmeticBinaryInst {
     public:
-    VecFloatMaxInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    VecFloatMaxInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                 FastMathAttr fast_math_attr, bool ieee754_2019, bool unordered);
 
     OpType get_op_type() const override;
@@ -499,7 +499,7 @@ class VecFloatMaxInst:public VecFloatArithmeticBinaryInst {
 
 class VecFloatAvgInst:public VecFloatArithmeticBinaryInst {
     public:
-    VecFloatAvgInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    VecFloatAvgInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                 FastMathAttr fast_math_attr);
 
     OpType get_op_type() const override;

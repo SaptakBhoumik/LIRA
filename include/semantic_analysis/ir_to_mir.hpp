@@ -98,12 +98,12 @@ class IRToMIRSemanticAnalyzer {
     MIR::InstPtr analyze_hardware_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt);
 
     //Destination argument
-    MIR::LocalDestRegisterPtr process_local_dest_arg(IR::InstructionStmtPtr inst_stmt);//Reduce type,aReturn nullptr if no destination argument
+    MIR::LocalRegisterPtr process_local_dest_arg(IR::InstructionStmtPtr inst_stmt);//Reduce type,aReturn nullptr if no destination argument
                                                                                        //Throws error if the type is ``type`` because typedef is allowed only at global scope
                                                                                        //Does not to symbol table because the destination variable cant be used as an operand in the same instruction. 
                                                                                        //So we add it to the symbol table in analyze_instruction after analyzing the instruction
                                                                                        //It also checks if the attributes of destination are valid for the type of destination
-    void add_dest_to_symtable(MIR::LocalDestRegisterPtr dest);//Does nothing if dest is nullptr. Adds destination to symbol table if not nullptr. 
+    void add_dest_to_symtable(MIR::LocalRegisterPtr dest);//Does nothing if dest is nullptr. Adds destination to symbol table if not nullptr. 
                                                               //Used in the MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_instruction(IR::InstructionStmtPtr inst_stmt) method at the end after analyzing the instruction. 
     public:
     IRToMIRSemanticAnalyzer(IR::ProgramPtr program);

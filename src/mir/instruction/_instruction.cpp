@@ -39,12 +39,12 @@ std::string FastMathAttr::to_string() const{
     }
     return result;
 }
-Inst::Inst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, std::optional<FastMathAttr> fast_math_attr){
+Inst::Inst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, std::optional<FastMathAttr> fast_math_attr){
     this->instruction_stmt = instruction_stmt;
     this->destination = destination;
     this->fast_math_attr = fast_math_attr;
 }
-LocalDestRegisterPtr Inst::get_destination() const{
+LocalRegisterPtr Inst::get_destination() const{
     return this->destination;
 }
 std::optional<FastMathAttr> Inst::get_fast_math_attr() const{

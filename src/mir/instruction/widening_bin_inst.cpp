@@ -2,7 +2,7 @@
 
 namespace LIRA {
 namespace MIR {
-WideningBinaryInst::WideningBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+WideningBinaryInst::WideningBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                        IR::TypeExprPtr input_type, std::optional<FastMathAttr> fast_math_attr):Inst(instruction_stmt, destination, fast_math_attr){
     this->lhs = lhs;
     this->rhs = rhs;
@@ -26,7 +26,7 @@ InstType WideningBinaryInst::get_inst_type() const{
 
 
 // ---------------------------- Integer Widening Binary operations ---------------------------
-IntWideningBinaryInst::IntWideningBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+IntWideningBinaryInst::IntWideningBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                              IR::TypeExprPtr input_type, bool nuw, bool nsw, bool unsigned_)
                                              :WideningBinaryInst(instruction_stmt, destination, lhs, rhs, input_type, std::nullopt){
     this->nuw = nuw;
@@ -72,7 +72,7 @@ TypeVariant IntWideningBinaryInst::get_type_variant() const{
 }
 
 
-IntWideningAddInst::IntWideningAddInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+IntWideningAddInst::IntWideningAddInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                             IR::TypeExprPtr input_type, bool nuw, bool nsw, bool unsigned_)
                             :IntWideningBinaryInst(instruction_stmt, destination, lhs, rhs, input_type, nuw, nsw, unsigned_){}
 WideningBinaryInst::OpType IntWideningAddInst::get_op_type() const{
@@ -83,7 +83,7 @@ std::string IntWideningAddInst::to_string() const{
 }
 
 
-IntWideningSubInst::IntWideningSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+IntWideningSubInst::IntWideningSubInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                             IR::TypeExprPtr input_type, bool nuw, bool nsw, bool unsigned_)
                             :IntWideningBinaryInst(instruction_stmt, destination, lhs, rhs, input_type, nuw, nsw, unsigned_){}
 
@@ -95,7 +95,7 @@ std::string IntWideningSubInst::to_string() const{
 }
 
 
-IntWideningAbsDiffInst::IntWideningAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+IntWideningAbsDiffInst::IntWideningAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                             IR::TypeExprPtr input_type, bool nuw, bool nsw, bool unsigned_)
                             :IntWideningBinaryInst(instruction_stmt, destination, lhs, rhs, input_type, nuw, nsw, unsigned_){}
 WideningBinaryInst::OpType IntWideningAbsDiffInst::get_op_type() const{
@@ -105,7 +105,7 @@ std::string IntWideningAbsDiffInst::to_string() const{
     return this->to_string_helper("int_widening_absdiff");
 }
 
-IntWideningMulInst::IntWideningMulInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+IntWideningMulInst::IntWideningMulInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                             IR::TypeExprPtr input_type, bool nuw, bool nsw, bool unsigned_)
                             :IntWideningBinaryInst(instruction_stmt, destination, lhs, rhs, input_type, nuw, nsw, unsigned_){}
 WideningBinaryInst::OpType IntWideningMulInst::get_op_type() const{
@@ -117,7 +117,7 @@ std::string IntWideningMulInst::to_string() const{
 
 
 // ---------------------------- Integer Widening Binary operations ---------------------------
-VecIntWideningBinaryInst::VecIntWideningBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+VecIntWideningBinaryInst::VecIntWideningBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                              IR::TypeExprPtr input_type, bool nuw, bool nsw, bool unsigned_)
                                              :WideningBinaryInst(instruction_stmt, destination, lhs, rhs, input_type, std::nullopt){
     this->nuw = nuw;
@@ -170,7 +170,7 @@ TypeVariant VecIntWideningBinaryInst::get_type_variant() const{
 }
 
 
-VecIntWideningAddInst::VecIntWideningAddInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+VecIntWideningAddInst::VecIntWideningAddInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                             IR::TypeExprPtr input_type, bool nuw, bool nsw, bool unsigned_)
                             :VecIntWideningBinaryInst(instruction_stmt, destination, lhs, rhs, input_type, nuw, nsw, unsigned_){}
 WideningBinaryInst::OpType VecIntWideningAddInst::get_op_type() const{
@@ -181,7 +181,7 @@ std::string VecIntWideningAddInst::to_string() const{
 }
 
 
-VecIntWideningSubInst::VecIntWideningSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+VecIntWideningSubInst::VecIntWideningSubInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                             IR::TypeExprPtr input_type, bool nuw, bool nsw, bool unsigned_)
                             :VecIntWideningBinaryInst(instruction_stmt, destination, lhs, rhs, input_type, nuw, nsw, unsigned_){}
 WideningBinaryInst::OpType VecIntWideningSubInst::get_op_type() const{
@@ -192,7 +192,7 @@ std::string VecIntWideningSubInst::to_string() const{
 }
 
 
-VecIntWideningAbsDiffInst::VecIntWideningAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+VecIntWideningAbsDiffInst::VecIntWideningAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                             IR::TypeExprPtr input_type, bool nuw, bool nsw, bool unsigned_)
                             :VecIntWideningBinaryInst(instruction_stmt, destination, lhs, rhs, input_type, nuw, nsw, unsigned_){}
 WideningBinaryInst::OpType VecIntWideningAbsDiffInst::get_op_type() const{
@@ -203,7 +203,7 @@ std::string VecIntWideningAbsDiffInst::to_string() const{
 }
 
 
-VecIntWideningMulInst::VecIntWideningMulInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+VecIntWideningMulInst::VecIntWideningMulInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                             IR::TypeExprPtr input_type, bool nuw, bool nsw, bool unsigned_)
                             :VecIntWideningBinaryInst(instruction_stmt, destination, lhs, rhs, input_type, nuw, nsw, unsigned_){}
 WideningBinaryInst::OpType VecIntWideningMulInst::get_op_type() const{
@@ -215,7 +215,7 @@ std::string VecIntWideningMulInst::to_string() const{
 
 
 // ---------------------------- Float Widening Binary operations ---------------------------
-FloatWideningBinaryInst::FloatWideningBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs,
+FloatWideningBinaryInst::FloatWideningBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs,
                                                  IR::LiteralExprPtr rhs, IR::TypeExprPtr input_type, FastMathAttr fast_math_attr)
                                                  :WideningBinaryInst(instruction_stmt, destination, lhs, rhs, input_type, fast_math_attr){}
 std::string FloatWideningBinaryInst::to_string_helper(const std::string op_name) const{
@@ -248,7 +248,7 @@ TypeVariant FloatWideningBinaryInst::get_type_variant() const{
 }   
 
 
-FloatWideningAddInst::FloatWideningAddInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+FloatWideningAddInst::FloatWideningAddInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                             IR::TypeExprPtr input_type, FastMathAttr fast_math_attr)
                             :FloatWideningBinaryInst(instruction_stmt, destination, lhs, rhs, input_type, fast_math_attr){}
 WideningBinaryInst::OpType FloatWideningAddInst::get_op_type() const{
@@ -259,7 +259,7 @@ std::string FloatWideningAddInst::to_string() const{
 }
 
 
-FloatWideningSubInst::FloatWideningSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+FloatWideningSubInst::FloatWideningSubInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                             IR::TypeExprPtr input_type, FastMathAttr fast_math_attr)
                             :FloatWideningBinaryInst(instruction_stmt, destination, lhs, rhs, input_type, fast_math_attr){}
 WideningBinaryInst::OpType FloatWideningSubInst::get_op_type() const{
@@ -270,7 +270,7 @@ std::string FloatWideningSubInst::to_string() const{
 }
 
 
-FloatWideningAbsDiffInst::FloatWideningAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+FloatWideningAbsDiffInst::FloatWideningAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                             IR::TypeExprPtr input_type, FastMathAttr fast_math_attr)
                             :FloatWideningBinaryInst(instruction_stmt, destination, lhs, rhs, input_type, fast_math_attr){}
 WideningBinaryInst::OpType FloatWideningAbsDiffInst::get_op_type() const{
@@ -281,7 +281,7 @@ std::string FloatWideningAbsDiffInst::to_string() const{
 }
 
 
-FloatWideningMulInst::FloatWideningMulInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+FloatWideningMulInst::FloatWideningMulInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                             IR::TypeExprPtr input_type, FastMathAttr fast_math_attr)
                             :FloatWideningBinaryInst(instruction_stmt, destination, lhs, rhs, input_type, fast_math_attr){}
 WideningBinaryInst::OpType FloatWideningMulInst::get_op_type() const{
@@ -293,7 +293,7 @@ std::string FloatWideningMulInst::to_string() const{
 
 
 // ---------------------------- Vector Float Widening Binary operations ---------------------------
-VecFloatWideningBinaryInst::VecFloatWideningBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs,
+VecFloatWideningBinaryInst::VecFloatWideningBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs,
                                                  IR::LiteralExprPtr rhs, IR::TypeExprPtr input_type, FastMathAttr fast_math_attr)
                                                  :WideningBinaryInst(instruction_stmt, destination, lhs, rhs, input_type, fast_math_attr){}
 std::string VecFloatWideningBinaryInst::to_string_helper(const std::string op_name) const{
@@ -320,7 +320,7 @@ TypeVariant VecFloatWideningBinaryInst::get_type_variant() const{
 }   
 
 
-VecFloatWideningAddInst::VecFloatWideningAddInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+VecFloatWideningAddInst::VecFloatWideningAddInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                             IR::TypeExprPtr input_type, FastMathAttr fast_math_attr)
                             :VecFloatWideningBinaryInst(instruction_stmt, destination, lhs, rhs, input_type, fast_math_attr){}
 WideningBinaryInst::OpType VecFloatWideningAddInst::get_op_type() const{
@@ -331,7 +331,7 @@ std::string VecFloatWideningAddInst::to_string() const{
 }
 
 
-VecFloatWideningSubInst::VecFloatWideningSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+VecFloatWideningSubInst::VecFloatWideningSubInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                             IR::TypeExprPtr input_type, FastMathAttr fast_math_attr)
                             :VecFloatWideningBinaryInst(instruction_stmt, destination, lhs, rhs, input_type, fast_math_attr){}
 WideningBinaryInst::OpType VecFloatWideningSubInst::get_op_type() const{
@@ -342,7 +342,7 @@ std::string VecFloatWideningSubInst::to_string() const{
 }
 
 
-VecFloatWideningAbsDiffInst::VecFloatWideningAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+VecFloatWideningAbsDiffInst::VecFloatWideningAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                             IR::TypeExprPtr input_type, FastMathAttr fast_math_attr)
                             :VecFloatWideningBinaryInst(instruction_stmt, destination, lhs, rhs, input_type, fast_math_attr){}
 WideningBinaryInst::OpType VecFloatWideningAbsDiffInst::get_op_type() const{
@@ -353,7 +353,7 @@ std::string VecFloatWideningAbsDiffInst::to_string() const{
 }
 
 
-VecFloatWideningMulInst::VecFloatWideningMulInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+VecFloatWideningMulInst::VecFloatWideningMulInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                             IR::TypeExprPtr input_type, FastMathAttr fast_math_attr)
                             :VecFloatWideningBinaryInst(instruction_stmt, destination, lhs, rhs, input_type, fast_math_attr){}
 WideningBinaryInst::OpType VecFloatWideningMulInst::get_op_type() const{

@@ -9,7 +9,7 @@ class LocalInst:public Inst {
     IR::LiteralExprPtr value;
     std::size_t alignment;
     public:
-    LocalInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, std::size_t alignment,
+    LocalInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, std::size_t alignment,
               std::optional<FastMathAttr> fast_math_attr);
 
     IR::LiteralExprPtr get_value() const;
@@ -25,7 +25,7 @@ class AllocaInst:public Inst {
     IR::LiteralExprPtr size;//The size variable 
     std::size_t alignment;
     public:
-    AllocaInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,IR::LiteralExprPtr size, std::size_t alignment);
+    AllocaInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination,IR::LiteralExprPtr size, std::size_t alignment);
 
     IR::LiteralExprPtr get_size() const;
     std::size_t get_alignment() const;
@@ -47,7 +47,7 @@ class LoadInst:public Inst {
     std::size_t dereferenceable_bytes; //If 0 means the value is not set
     std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info;
     public:
-    LoadInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, 
+    LoadInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, 
              bool volatile_, bool invariant_load, bool nontemporal, bool nonull, bool nopoison, 
              std::size_t alignment, std::size_t dereferenceable_bytes, std::optional<FastMathAttr> fast_math_attr, std::optional<std::pair<AtomicOrdering,SyncScope>> atomic_info);
 
@@ -113,7 +113,7 @@ class BroadcastLoadInst:public Inst {
 
     virtual std::string to_string_helper(const std::string op_name) const final;
     public:
-    BroadcastLoadInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr src, 
+    BroadcastLoadInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr src, 
                       bool volatile_, bool nontemporal, bool nonull, std::size_t alignment, 
                       std::size_t dereferenceable_bytes, std::optional<FastMathAttr> fast_math_attr);
 
@@ -134,7 +134,7 @@ class BroadcastLoadInst:public Inst {
 
 class IntBroadcastLoadInst:public BroadcastLoadInst {
     public:
-    IntBroadcastLoadInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr src, 
+    IntBroadcastLoadInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr src, 
                          bool volatile_, bool nontemporal, bool nonull, std::size_t alignment, 
                          std::size_t dereferenceable_bytes);
     
@@ -147,7 +147,7 @@ class IntBroadcastLoadInst:public BroadcastLoadInst {
 
 class PtrBroadcastLoadInst:public BroadcastLoadInst {
     public:
-    PtrBroadcastLoadInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr src, 
+    PtrBroadcastLoadInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr src, 
                          bool volatile_, bool nontemporal, bool nonull, std::size_t alignment, 
                          std::size_t dereferenceable_bytes);
     
@@ -159,7 +159,7 @@ class PtrBroadcastLoadInst:public BroadcastLoadInst {
 
 class FloatBroadcastLoadInst:public BroadcastLoadInst {
     public:
-    FloatBroadcastLoadInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr src, 
+    FloatBroadcastLoadInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr src, 
                            bool volatile_, bool nontemporal, bool nonull, std::size_t alignment, 
                            std::size_t dereferenceable_bytes, FastMathAttr fast_math_attr);
     
@@ -186,7 +186,7 @@ class MaskedLoadInst:public Inst {
 
     virtual std::string to_string_helper(std::string opname) const;
     public:
-    MaskedLoadInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr mask, 
+    MaskedLoadInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr mask, 
                     IR::LiteralExprPtr passthru, bool volatile_, bool nontemporal, bool nonull, bool zeropassthru, std::size_t alignment, 
                     std::size_t dereferenceable_bytes, std::optional<FastMathAttr> fast_math_attr);
 
@@ -210,7 +210,7 @@ class MaskedLoadInst:public Inst {
 
 class IntMaskedLoadInst:public MaskedLoadInst {
     public:
-    IntMaskedLoadInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr mask, 
+    IntMaskedLoadInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr mask, 
                     IR::LiteralExprPtr passthru, bool volatile_, bool nontemporal, bool nonull, bool zeropassthru, std::size_t alignment, 
                     std::size_t dereferenceable_bytes);
     
@@ -223,7 +223,7 @@ class IntMaskedLoadInst:public MaskedLoadInst {
 
 class PtrMaskedLoadInst:public MaskedLoadInst {
     public:
-    PtrMaskedLoadInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr mask, 
+    PtrMaskedLoadInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr mask, 
                     IR::LiteralExprPtr passthru, bool volatile_, bool nontemporal, bool nonull, bool zeropassthru, std::size_t alignment, 
                     std::size_t dereferenceable_bytes);
     
@@ -235,7 +235,7 @@ class PtrMaskedLoadInst:public MaskedLoadInst {
 
 class FloatMaskedLoadInst:public MaskedLoadInst {
     public:
-    FloatMaskedLoadInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr mask, 
+    FloatMaskedLoadInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr mask, 
                     IR::LiteralExprPtr passthru, bool volatile_, bool nontemporal, bool nonull, bool zeropassthru, std::size_t alignment, 
                     std::size_t dereferenceable_bytes, FastMathAttr fast_math_attr);
     
@@ -337,7 +337,7 @@ class MaskedGatherInst:public Inst {
 
     virtual std::string to_string_helper(std::string opname) const;
     public:
-    MaskedGatherInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vec_of_ptrs, IR::LiteralExprPtr mask, 
+    MaskedGatherInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vec_of_ptrs, IR::LiteralExprPtr mask, 
                      IR::LiteralExprPtr passthru, bool volatile_, bool nontemporal, bool nonull, bool zeropassthru, std::size_t alignment, 
                      std::size_t dereferenceable_bytes, std::optional<FastMathAttr> fast_math_attr);
 
@@ -361,7 +361,7 @@ class MaskedGatherInst:public Inst {
 
 class IntMaskedGatherInst:public MaskedGatherInst {
     public:
-    IntMaskedGatherInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vec_of_ptrs, IR::LiteralExprPtr mask, 
+    IntMaskedGatherInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vec_of_ptrs, IR::LiteralExprPtr mask, 
                         IR::LiteralExprPtr passthru, bool volatile_, bool nontemporal, bool nonull, bool zeropassthru, std::size_t alignment, 
                         std::size_t dereferenceable_bytes);
     
@@ -374,7 +374,7 @@ class IntMaskedGatherInst:public MaskedGatherInst {
 
 class PtrMaskedGatherInst:public MaskedGatherInst {
     public:
-    PtrMaskedGatherInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vec_of_ptrs, IR::LiteralExprPtr mask, 
+    PtrMaskedGatherInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vec_of_ptrs, IR::LiteralExprPtr mask, 
                         IR::LiteralExprPtr passthru, bool volatile_, bool nontemporal, bool nonull, bool zeropassthru, std::size_t alignment, 
                         std::size_t dereferenceable_bytes);
     
@@ -386,7 +386,7 @@ class PtrMaskedGatherInst:public MaskedGatherInst {
 
 class FloatMaskedGatherInst:public MaskedGatherInst {
     public:
-    FloatMaskedGatherInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vec_of_ptrs, IR::LiteralExprPtr mask, 
+    FloatMaskedGatherInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vec_of_ptrs, IR::LiteralExprPtr mask, 
                           IR::LiteralExprPtr passthru, bool volatile_, bool nontemporal, bool nonull, bool zeropassthru, std::size_t alignment, 
                           std::size_t dereferenceable_bytes, FastMathAttr fast_math_attr);
     
@@ -568,7 +568,7 @@ class MemcmpInst:public Inst {
     std::pair<size_t, size_t> alignment;//{alignment of ptr1, alignment of ptr2}
     std::pair<size_t, size_t> dereferenceable_bytes;//{dereferenceable bytes of ptr1, dereferenceable bytes of ptr2}
     public:
-    MemcmpInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr ptr1, IR::LiteralExprPtr ptr2, IR::LiteralExprPtr size, 
+    MemcmpInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr ptr1, IR::LiteralExprPtr ptr2, IR::LiteralExprPtr size, 
                bool volatile_, std::pair<bool,bool> nontemporal, std::pair<bool,bool> nonnull, std::pair<bool,bool> nopoison, 
                std::pair<size_t, size_t> alignment, std::pair<size_t, size_t> dereferenceable_bytes);   
     
@@ -597,7 +597,7 @@ class GetAddressInst:public Inst {
     bool nuw;
     bool inbounds;
     public:
-    GetAddressInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
+    GetAddressInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                     IR::LiteralExprPtr offset, bool unsigned_, bool nsw, bool nuw, bool inbounds, std::optional<FastMathAttr> fast_math_attr);
 
     IR::LiteralExprPtr get_value() const;
@@ -622,7 +622,7 @@ class PtrOffsetInst:public Inst {
     bool nuw;
     bool inbounds;
     public:
-    PtrOffsetInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, 
+    PtrOffsetInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, 
                     IR::LiteralExprPtr offset, bool unsigned_, bool nsw, bool nuw, bool inbounds);
 
     IR::LiteralExprPtr get_pointer() const;
@@ -643,7 +643,7 @@ class PtrOffsetInst:public Inst {
 
 class StackSaveInst:public Inst {
     public:
-    StackSaveInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination);
+    StackSaveInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination);
 
     InstType get_inst_type() const override;
     std::string to_string() const override;
@@ -671,7 +671,7 @@ class ExtractElementInst:public Inst {
 
     bool inbounds = false;//Whether it has the inbounds attribute or not
     public:
-    ExtractElementInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::LiteralExprPtr index, 
+    ExtractElementInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::LiteralExprPtr index, 
                         IR::TypeExprPtr value_type,bool inbounds, std::optional<FastMathAttr> fast_math_attr);
 
     IR::LiteralExprPtr get_value() const;
@@ -693,7 +693,7 @@ class InsertElementInst:public Inst {
     IR::LiteralExprPtr index;
     bool inbounds = false;//Whether it has the inbounds attribute or not
     public:
-    InsertElementInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::LiteralExprPtr element, 
+    InsertElementInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::LiteralExprPtr element, 
                         IR::LiteralExprPtr index, IR::TypeExprPtr value_type, IR::TypeExprPtr element_type, bool inbounds, std::optional<FastMathAttr> fast_math_attr);
 
     IR::LiteralExprPtr get_value() const;
@@ -739,7 +739,7 @@ class CmpXchgInst: public Inst {
     std::size_t alignment;
     SyncScope sync_scope;
     public:
-    CmpXchgInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr expected, 
+    CmpXchgInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr expected, 
                 IR::LiteralExprPtr desired, AtomicOrdering success_ordering, AtomicOrdering failure_ordering, 
                 bool volatile_, bool weak, std::size_t alignment, SyncScope sync_scope, std::optional<FastMathAttr> fast_math_attr);
 
@@ -826,7 +826,7 @@ class InvariantStartInst:public Inst {
     IR::LiteralExprPtr pointer;//The pointer to start the invariant scope of. Must be of type ptr
     std::size_t size;//The size in bytes of the object. Must be of integer type
     public:
-    InvariantStartInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, std::size_t size);
+    InvariantStartInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, std::size_t size);
 
     IR::LiteralExprPtr get_pointer() const;
     std::size_t get_size() const;

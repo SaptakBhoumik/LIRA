@@ -7,7 +7,7 @@
 namespace LIRA {
 namespace MIR {
 //--------------------------------- Uncategorized SIMD Instructions ---------------------------------
-ShuffleVectorInst::ShuffleVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector1, IR::LiteralExprPtr vector2, IR::LiteralExprPtr mask, 
+ShuffleVectorInst::ShuffleVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector1, IR::LiteralExprPtr vector2, IR::LiteralExprPtr mask, 
                                    std::size_t vec1_elm_count, std::size_t vec2_elm_count, std::optional<FastMathAttr> fast_math_attr)
                                    :Inst(instruction_stmt,destination,fast_math_attr){
     this->vector1 = vector1;
@@ -56,7 +56,7 @@ InstType ShuffleVectorInst::get_inst_type() const{
 }
 
 
-IntShuffleVectorInst::IntShuffleVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector1, IR::LiteralExprPtr vector2, IR::LiteralExprPtr mask, 
+IntShuffleVectorInst::IntShuffleVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector1, IR::LiteralExprPtr vector2, IR::LiteralExprPtr mask, 
                                          std::size_t vec1_elm_count, std::size_t vec2_elm_count)
                                          :ShuffleVectorInst(instruction_stmt,destination,vector1,vector2,mask,vec1_elm_count,vec2_elm_count,std::nullopt){}
 std::shared_ptr<IR::IntTypeExpr> IntShuffleVectorInst::get_casted_basetype() const{
@@ -73,7 +73,7 @@ std::string IntShuffleVectorInst::to_string() const{
 }
 
 
-PtrShuffleVectorInst::PtrShuffleVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector1, IR::LiteralExprPtr vector2, IR::LiteralExprPtr mask, 
+PtrShuffleVectorInst::PtrShuffleVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector1, IR::LiteralExprPtr vector2, IR::LiteralExprPtr mask, 
                                          std::size_t vec1_elm_count, std::size_t vec2_elm_count)
                                          :ShuffleVectorInst(instruction_stmt,destination,vector1,vector2,mask,vec1_elm_count,vec2_elm_count,std::nullopt){}
 std::size_t PtrShuffleVectorInst::get_basetype_bitwidth() const{
@@ -87,7 +87,7 @@ std::string PtrShuffleVectorInst::to_string() const{
 }
 
 
-FloatShuffleVectorInst::FloatShuffleVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector1, IR::LiteralExprPtr vector2, IR::LiteralExprPtr mask, 
+FloatShuffleVectorInst::FloatShuffleVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector1, IR::LiteralExprPtr vector2, IR::LiteralExprPtr mask, 
                                              std::size_t vec1_elm_count, std::size_t vec2_elm_count, FastMathAttr fast_math_attr)
                                              :ShuffleVectorInst(instruction_stmt,destination,vector1,vector2,mask,vec1_elm_count,vec2_elm_count,fast_math_attr){}
 std::shared_ptr<IR::FloatTypeExpr> FloatShuffleVectorInst::get_casted_basetype() const{
@@ -107,7 +107,7 @@ std::string FloatShuffleVectorInst::to_string() const{
 }
 
 
-TernLogInst::TernLogInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr a, IR::LiteralExprPtr b, IR::LiteralExprPtr c, 
+TernLogInst::TernLogInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr a, IR::LiteralExprPtr b, IR::LiteralExprPtr c, 
                          IR::LiteralExprPtr imm):Inst(instruction_stmt, destination, std::nullopt){
     this->a = a;
     this->b = b;
@@ -143,7 +143,7 @@ std::string TernLogInst::to_string() const{
 }
 
 
-SplatInst::SplatInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, std::optional<FastMathAttr> fast_math_attr)
+SplatInst::SplatInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, std::optional<FastMathAttr> fast_math_attr)
                      :Inst(instruction_stmt,destination,fast_math_attr){
     this->value = value;
 }
@@ -169,7 +169,7 @@ InstType SplatInst::get_inst_type() const{
     return InstType::SplatInst;
 }
 
-IntSplatInst::IntSplatInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value)
+IntSplatInst::IntSplatInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value)
                      :SplatInst(instruction_stmt,destination,value,std::nullopt){}
 std::shared_ptr<IR::IntTypeExpr> IntSplatInst::get_casted_element_type() const{
     return std::dynamic_pointer_cast<IR::IntTypeExpr>(this->get_element_type());
@@ -185,7 +185,7 @@ std::string IntSplatInst::to_string() const{
 }
 
 
-PtrSplatInst::PtrSplatInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value)
+PtrSplatInst::PtrSplatInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value)
                      :SplatInst(instruction_stmt,destination,value,std::nullopt){}
 std::size_t PtrSplatInst::get_element_bitwidth() const{
     return 64;
@@ -198,7 +198,7 @@ std::string PtrSplatInst::to_string() const{
 }
 
 
-FloatSplatInst::FloatSplatInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
+FloatSplatInst::FloatSplatInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
                      :SplatInst(instruction_stmt,destination,value,fast_math_attr){}
 std::shared_ptr<IR::FloatTypeExpr> FloatSplatInst::get_casted_element_type() const{
     return std::dynamic_pointer_cast<IR::FloatTypeExpr>(this->get_element_type());
@@ -217,7 +217,7 @@ std::string FloatSplatInst::to_string() const{
 }
 
 
-StepVectorInst::StepVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr start, IR::LiteralExprPtr step, 
+StepVectorInst::StepVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr start, IR::LiteralExprPtr step, 
                                std::optional<FastMathAttr> fast_math_attr)
                                :Inst(instruction_stmt,destination,fast_math_attr){
     this->start = start;
@@ -250,7 +250,7 @@ InstType StepVectorInst::get_inst_type() const{
 }
 
 
-IntStepVectorInst::IntStepVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr start, IR::LiteralExprPtr step)
+IntStepVectorInst::IntStepVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr start, IR::LiteralExprPtr step)
                          :StepVectorInst(instruction_stmt,destination,start,step,std::nullopt){}
 std::shared_ptr<IR::IntTypeExpr> IntStepVectorInst::get_casted_element_type() const{
     return std::dynamic_pointer_cast<IR::IntTypeExpr>(this->get_element_type());
@@ -266,7 +266,7 @@ std::string IntStepVectorInst::to_string() const{
 }
 
 
-FloatStepVectorInst::FloatStepVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr start, IR::LiteralExprPtr step, 
+FloatStepVectorInst::FloatStepVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr start, IR::LiteralExprPtr step, 
                              FastMathAttr fast_math_attr)
                              :StepVectorInst(instruction_stmt,destination,start,step,fast_math_attr){}
 std::shared_ptr<IR::FloatTypeExpr> FloatStepVectorInst::get_casted_element_type() const{
@@ -286,7 +286,7 @@ std::string FloatStepVectorInst::to_string() const{
 }
 
 
-InsertSubVectorInst::InsertSubVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+InsertSubVectorInst::InsertSubVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                                          IR::LiteralExprPtr subvector, IR::LiteralExprPtr index, std::size_t subvector_size, std::optional<FastMathAttr> fast_math_attr)
                                          :Inst(instruction_stmt,destination,fast_math_attr){
     this->vector = vector;
@@ -330,7 +330,7 @@ InstType InsertSubVectorInst::get_inst_type() const{
 }
 
 
-IntInsertSubVectorInst::IntInsertSubVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+IntInsertSubVectorInst::IntInsertSubVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                                          IR::LiteralExprPtr subvector, IR::LiteralExprPtr index, std::size_t subvector_size)
                                          :InsertSubVectorInst(instruction_stmt,destination,vector,subvector,index,subvector_size,std::nullopt){}
 std::shared_ptr<IR::IntTypeExpr> IntInsertSubVectorInst::get_casted_element_type() const{
@@ -347,7 +347,7 @@ std::string IntInsertSubVectorInst::to_string() const{
 }
 
 
-PtrInsertSubVectorInst::PtrInsertSubVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+PtrInsertSubVectorInst::PtrInsertSubVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                                          IR::LiteralExprPtr subvector, IR::LiteralExprPtr index, std::size_t subvector_size)
                                          :InsertSubVectorInst(instruction_stmt,destination,vector,subvector,index,subvector_size,std::nullopt){}
 std::size_t PtrInsertSubVectorInst::get_element_bitwidth() const{
@@ -360,7 +360,7 @@ std::string PtrInsertSubVectorInst::to_string() const{
     return this->to_string_helper("ptr_insert_subvector");
 }
 
-FloatInsertSubVectorInst::FloatInsertSubVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+FloatInsertSubVectorInst::FloatInsertSubVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                                          IR::LiteralExprPtr subvector, IR::LiteralExprPtr index, std::size_t subvector_size, FastMathAttr fast_math_attr)
                                          :InsertSubVectorInst(instruction_stmt,destination,vector,subvector,index,subvector_size,fast_math_attr){}
 std::shared_ptr<IR::FloatTypeExpr> FloatInsertSubVectorInst::get_casted_element_type() const{
@@ -380,7 +380,7 @@ std::string FloatInsertSubVectorInst::to_string() const{
 }
 
 
-ExtractSubVectorInst::ExtractSubVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+ExtractSubVectorInst::ExtractSubVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                                          IR::LiteralExprPtr index, std::size_t vector_size, std::optional<FastMathAttr> fast_math_attr)
                                          :Inst(instruction_stmt,destination,fast_math_attr){
     this->vector = vector;
@@ -418,7 +418,7 @@ InstType ExtractSubVectorInst::get_inst_type() const{
 }
 
 
-IntExtractSubVectorInst::IntExtractSubVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+IntExtractSubVectorInst::IntExtractSubVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                                          IR::LiteralExprPtr index, std::size_t vector_size)
                                          :ExtractSubVectorInst(instruction_stmt,destination,vector,index,vector_size,std::nullopt){}
 std::shared_ptr<IR::IntTypeExpr> IntExtractSubVectorInst::get_casted_element_type() const{
@@ -435,7 +435,7 @@ std::string IntExtractSubVectorInst::to_string() const{
 }
 
 
-PtrExtractSubVectorInst::PtrExtractSubVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+PtrExtractSubVectorInst::PtrExtractSubVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                                          IR::LiteralExprPtr index, std::size_t vector_size)
                                          :ExtractSubVectorInst(instruction_stmt,destination,vector,index,vector_size,std::nullopt){}
 std::size_t PtrExtractSubVectorInst::get_element_bitwidth() const{
@@ -449,7 +449,7 @@ std::string PtrExtractSubVectorInst::to_string() const{
 }
 
 
-FloatExtractSubVectorInst::FloatExtractSubVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+FloatExtractSubVectorInst::FloatExtractSubVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                                          IR::LiteralExprPtr index, std::size_t vector_size, FastMathAttr fast_math_attr)
                                          :ExtractSubVectorInst(instruction_stmt,destination,vector,index,vector_size,fast_math_attr){}
 std::shared_ptr<IR::FloatTypeExpr> FloatExtractSubVectorInst::get_casted_element_type() const{
@@ -469,7 +469,7 @@ std::string FloatExtractSubVectorInst::to_string() const{
 }
 
 
-ActiveLaneMaskInst::ActiveLaneMaskInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr base, IR::LiteralExprPtr count, 
+ActiveLaneMaskInst::ActiveLaneMaskInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr base, IR::LiteralExprPtr count, 
                                         IR::TypeExprPtr type, bool unsigned_):Inst(instruction_stmt,destination,std::nullopt){
     this->base = base;
     this->count = count;
@@ -509,7 +509,7 @@ std::string ActiveLaneMaskInst::to_string() const{
 }
 
 
-AddSubInst::AddSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+AddSubInst::AddSubInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                        std::optional<FastMathAttr> fast_math_attr):Inst(instruction_stmt,destination,fast_math_attr){
     this->lhs = lhs;
     this->rhs = rhs;  
@@ -532,7 +532,7 @@ InstType AddSubInst::get_inst_type() const{
 }
 
 
-IntAddSubInst::IntAddSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+IntAddSubInst::IntAddSubInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                              bool nuw, bool nsw, bool unsigned_, bool saturating):AddSubInst(instruction_stmt,destination,lhs,rhs,std::nullopt){}
 std::shared_ptr<IR::IntTypeExpr> IntAddSubInst::get_casted_element_type() const{
     return std::dynamic_pointer_cast<IR::IntTypeExpr>(this->get_element_type());
@@ -573,7 +573,7 @@ std::string IntAddSubInst::to_string() const{
 }
 
 
-FloatAddSubInst::FloatAddSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+FloatAddSubInst::FloatAddSubInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                  FastMathAttr fast_math_attr):AddSubInst(instruction_stmt,destination,lhs,rhs,std::nullopt){}
 std::shared_ptr<IR::FloatTypeExpr> FloatAddSubInst::get_casted_element_type() const{
     return std::dynamic_pointer_cast<IR::FloatTypeExpr>(this->get_element_type());
@@ -597,7 +597,7 @@ std::string FloatAddSubInst::to_string() const{
 
 
 //----------------------- Reduce Arithmetic SIMD Instructions -----------------------
-ReduceArithmeticSIMDInst::ReduceArithmeticSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+ReduceArithmeticSIMDInst::ReduceArithmeticSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                                                     IR::LiteralExprPtr mask, std::size_t vector_size, std::optional<FastMathAttr> fast_math_attr):
                                                     Inst(instruction_stmt,destination,fast_math_attr){
     this->vector = vector;
@@ -622,7 +622,7 @@ InstType ReduceArithmeticSIMDInst::get_inst_type() const{
 
 
 //--------------------------------- Int Reduce Arithmetic SIMD Instructions ---------------------------------
-IntReduceArithmeticSIMDInst::IntReduceArithmeticSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+IntReduceArithmeticSIMDInst::IntReduceArithmeticSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                                                         IR::LiteralExprPtr mask, std::size_t vector_size, bool nuw, bool nsw, bool unsigned_, bool saturating, bool floor)
                                                         :ReduceArithmeticSIMDInst(instruction_stmt,destination,vector,mask,vector_size,std::nullopt){
     this->nuw = nuw;
@@ -682,7 +682,7 @@ TypeVariant IntReduceArithmeticSIMDInst::get_element_type_variant() const{
 }
 
 
-IntReduceAddInst::IntReduceAddInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+IntReduceAddInst::IntReduceAddInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                                    IR::LiteralExprPtr mask, std::size_t vector_size, bool nuw, bool nsw, bool unsigned_, bool saturating)
                                    :IntReduceArithmeticSIMDInst(instruction_stmt,destination,vector,mask,vector_size,nuw,nsw,unsigned_,saturating,false){}
 ReduceArithmeticSIMDInst::OpType IntReduceAddInst::get_op_type() const{
@@ -693,7 +693,7 @@ std::string IntReduceAddInst::to_string() const{
 }
 
 
-IntReduceMulInst::IntReduceMulInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+IntReduceMulInst::IntReduceMulInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                                    IR::LiteralExprPtr mask, std::size_t vector_size, bool nuw, bool nsw, bool unsigned_, bool saturating)
                                    :IntReduceArithmeticSIMDInst(instruction_stmt,destination,vector,mask,vector_size,nuw,nsw,unsigned_,saturating,false){}
 ReduceArithmeticSIMDInst::OpType IntReduceMulInst::get_op_type() const{
@@ -704,7 +704,7 @@ std::string IntReduceMulInst::to_string() const{
 }
 
 
-IntReduceAvgInst::IntReduceAvgInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+IntReduceAvgInst::IntReduceAvgInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                                     IR::LiteralExprPtr mask, std::size_t vector_size, bool nuw, bool nsw, bool unsigned_, bool floor)
                                    :IntReduceArithmeticSIMDInst(instruction_stmt,destination,vector,mask,vector_size,nuw,nsw,unsigned_,false,floor){}
 ReduceArithmeticSIMDInst::OpType IntReduceAvgInst::get_op_type() const{
@@ -715,7 +715,7 @@ std::string IntReduceAvgInst::to_string() const{
 }
 
 
-IntReduceMinInst::IntReduceMinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+IntReduceMinInst::IntReduceMinInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                                    IR::LiteralExprPtr mask, std::size_t vector_size, bool unsigned_)
                                    :IntReduceArithmeticSIMDInst(instruction_stmt,destination,vector,mask,vector_size,false,false,unsigned_,false,false){}
 ReduceArithmeticSIMDInst::OpType IntReduceMinInst::get_op_type() const{
@@ -727,7 +727,7 @@ std::string IntReduceMinInst::to_string() const{
 
 
 //--------------------------------- Float Reduce Arithmetic SIMD Instructions ---------------------------------
-FloatReduceArithmeticSIMDInst::FloatReduceArithmeticSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+FloatReduceArithmeticSIMDInst::FloatReduceArithmeticSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                                                              IR::LiteralExprPtr mask, std::size_t vector_size, FastMathAttr fast_math_attr, bool ieee754_2019, bool unordered)
                                                              :ReduceArithmeticSIMDInst(instruction_stmt,destination,vector,mask,vector_size,fast_math_attr){
     this->ieee754_2019 = ieee754_2019;
@@ -771,7 +771,7 @@ TypeVariant FloatReduceArithmeticSIMDInst::get_element_type_variant() const{
     return TypeVariant::Float;
 }
 
-FloatReduceAddInst::FloatReduceAddInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+FloatReduceAddInst::FloatReduceAddInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                                          IR::LiteralExprPtr mask, std::size_t vector_size, FastMathAttr fast_math_attr)
                                          :FloatReduceArithmeticSIMDInst(instruction_stmt,destination,vector,mask,vector_size,fast_math_attr,false,false){}
 ReduceArithmeticSIMDInst::OpType FloatReduceAddInst::get_op_type() const{
@@ -782,7 +782,7 @@ std::string FloatReduceAddInst::to_string() const{
 }
 
 
-FloatReduceMulInst::FloatReduceMulInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+FloatReduceMulInst::FloatReduceMulInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                                          IR::LiteralExprPtr mask, std::size_t vector_size, FastMathAttr fast_math_attr)
                                          :FloatReduceArithmeticSIMDInst(instruction_stmt,destination,vector,mask,vector_size,fast_math_attr,false,false){}
 ReduceArithmeticSIMDInst::OpType FloatReduceMulInst::get_op_type() const{
@@ -793,7 +793,7 @@ std::string FloatReduceMulInst::to_string() const{
 }
 
 
-FloatReduceAvgInst::FloatReduceAvgInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+FloatReduceAvgInst::FloatReduceAvgInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                                          IR::LiteralExprPtr mask, std::size_t vector_size, FastMathAttr fast_math_attr)
                                          :FloatReduceArithmeticSIMDInst(instruction_stmt,destination,vector,mask,vector_size,fast_math_attr,false,false){}
 ReduceArithmeticSIMDInst::OpType FloatReduceAvgInst::get_op_type() const{
@@ -804,7 +804,7 @@ std::string FloatReduceAvgInst::to_string() const{
 }
 
 
-FloatReduceMinInst::FloatReduceMinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+FloatReduceMinInst::FloatReduceMinInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                                          IR::LiteralExprPtr mask, std::size_t vector_size, FastMathAttr fast_math_attr, bool ieee754_2019, bool unordered)
                                          :FloatReduceArithmeticSIMDInst(instruction_stmt,destination,vector,mask,vector_size,fast_math_attr,ieee754_2019,unordered){}
 ReduceArithmeticSIMDInst::OpType FloatReduceMinInst::get_op_type() const{
@@ -815,7 +815,7 @@ std::string FloatReduceMinInst::to_string() const{
 }
 
 
-FloatReduceMaxInst::FloatReduceMaxInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+FloatReduceMaxInst::FloatReduceMaxInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                                          IR::LiteralExprPtr mask, std::size_t vector_size, FastMathAttr fast_math_attr, bool ieee754_2019, bool unordered)
                                          :FloatReduceArithmeticSIMDInst(instruction_stmt,destination,vector,mask,vector_size,fast_math_attr,ieee754_2019,unordered){}
 ReduceArithmeticSIMDInst::OpType FloatReduceMaxInst::get_op_type() const{
@@ -827,7 +827,7 @@ std::string FloatReduceMaxInst::to_string() const{
 
 
 //--------------------------------- Int Reduce Bitwise SIMD Instructions ---------------------------------
-IntReduceBitwiseSIMDInst::IntReduceBitwiseSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+IntReduceBitwiseSIMDInst::IntReduceBitwiseSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                                                    IR::LiteralExprPtr mask, std::size_t vector_size, bool disjoint)
                                                    :Inst(instruction_stmt,destination,std::nullopt){
     this->vector = vector;
@@ -872,7 +872,7 @@ InstType IntReduceBitwiseSIMDInst::get_inst_type() const{
 }
 
 
-IntReduceAndInst::IntReduceAndInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+IntReduceAndInst::IntReduceAndInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                                     IR::LiteralExprPtr mask, std::size_t vector_size)
                                     :IntReduceBitwiseSIMDInst(instruction_stmt,destination,vector,mask,vector_size,false){}
 IntReduceBitwiseSIMDInst::OpType IntReduceAndInst::get_op_type() const{
@@ -883,7 +883,7 @@ std::string IntReduceAndInst::to_string() const{
 }
 
 
-IntReduceOrInst::IntReduceOrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+IntReduceOrInst::IntReduceOrInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                                     IR::LiteralExprPtr mask, std::size_t vector_size, bool disjoint)
                                     :IntReduceBitwiseSIMDInst(instruction_stmt,destination,vector,mask,vector_size,disjoint){}
 IntReduceBitwiseSIMDInst::OpType IntReduceOrInst::get_op_type() const{
@@ -894,7 +894,7 @@ std::string IntReduceOrInst::to_string() const{
 }
 
 
-IntReduceXorInst::IntReduceXorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+IntReduceXorInst::IntReduceXorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                                     IR::LiteralExprPtr mask, std::size_t vector_size)
                                     :IntReduceBitwiseSIMDInst(instruction_stmt,destination,vector,mask,vector_size,false){}
 IntReduceBitwiseSIMDInst::OpType IntReduceXorInst::get_op_type() const{
@@ -905,7 +905,7 @@ std::string IntReduceXorInst::to_string() const{
 }
 
 
-IntReduceXnorInst::IntReduceXnorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+IntReduceXnorInst::IntReduceXnorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                                     IR::LiteralExprPtr mask, std::size_t vector_size)
                                     :IntReduceBitwiseSIMDInst(instruction_stmt,destination,vector,mask,vector_size,false){}
 IntReduceBitwiseSIMDInst::OpType IntReduceXnorInst::get_op_type() const{
@@ -917,7 +917,7 @@ std::string IntReduceXnorInst::to_string() const{
 
 
 //---------------- Horizontal Arithmetic SIMD Instructions ----------------
-HArithmeticSIMDInst::HArithmeticSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+HArithmeticSIMDInst::HArithmeticSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                        std::optional<FastMathAttr> fast_math_attr)
                        :Inst(instruction_stmt, destination, fast_math_attr){
     this->lhs = lhs;
@@ -943,7 +943,7 @@ InstType HArithmeticSIMDInst::get_inst_type() const{
 
 
 //---------------- Int Horizontal Arithmetic SIMD Instructions ----------------
-IntHArithmeticSIMDInst::IntHArithmeticSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+IntHArithmeticSIMDInst::IntHArithmeticSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                                bool nuw, bool nsw, bool unsigned_, bool saturating, bool floor)
                                                :HArithmeticSIMDInst(instruction_stmt, destination, lhs, rhs, std::nullopt){
     this->nuw = nuw;
@@ -997,7 +997,7 @@ TypeVariant IntHArithmeticSIMDInst::get_element_type_variant() const{
 }
 
 
-IntHorizontalAddInst::IntHorizontalAddInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+IntHorizontalAddInst::IntHorizontalAddInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                            bool nuw, bool nsw, bool unsigned_, bool saturating)
                                            :IntHArithmeticSIMDInst(instruction_stmt,destination,lhs,rhs,nuw,nsw,unsigned_,saturating,false){}
 IntHArithmeticSIMDInst::OpType IntHorizontalAddInst::get_op_type() const{
@@ -1008,7 +1008,7 @@ std::string IntHorizontalAddInst::to_string() const{
 }
 
 
-IntHorizontalSubInst::IntHorizontalSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+IntHorizontalSubInst::IntHorizontalSubInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                            bool nuw, bool nsw, bool unsigned_, bool saturating)
                                            :IntHArithmeticSIMDInst(instruction_stmt,destination,lhs,rhs,nuw,nsw,unsigned_,saturating,false){}
 IntHArithmeticSIMDInst::OpType IntHorizontalSubInst::get_op_type() const{
@@ -1019,7 +1019,7 @@ std::string IntHorizontalSubInst::to_string() const{
 }
 
 
-IntHorizontalAbsDiffInst::IntHorizontalAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+IntHorizontalAbsDiffInst::IntHorizontalAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                                     bool nuw, bool nsw, bool unsigned_, bool saturating)
                                                     :IntHArithmeticSIMDInst(instruction_stmt,destination,lhs,rhs,nuw,nsw,unsigned_,saturating,false){}
 IntHArithmeticSIMDInst::OpType IntHorizontalAbsDiffInst::get_op_type() const{
@@ -1030,7 +1030,7 @@ std::string IntHorizontalAbsDiffInst::to_string() const{
 }
 
 
-IntHorizontalAddSubInst::IntHorizontalAddSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+IntHorizontalAddSubInst::IntHorizontalAddSubInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                                bool nuw, bool nsw, bool unsigned_, bool saturating)
                                                :IntHArithmeticSIMDInst(instruction_stmt,destination,lhs,rhs,nuw,nsw,unsigned_,saturating,false){}
 IntHArithmeticSIMDInst::OpType IntHorizontalAddSubInst::get_op_type() const{
@@ -1041,7 +1041,7 @@ std::string IntHorizontalAddSubInst::to_string() const{
 }
 
 
-IntHorizontalMulInst::IntHorizontalMulInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+IntHorizontalMulInst::IntHorizontalMulInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                             bool nuw, bool nsw, bool unsigned_, bool saturating)
                                             :IntHArithmeticSIMDInst(instruction_stmt,destination,lhs,rhs,nuw,nsw,unsigned_,saturating,false){}
 IntHArithmeticSIMDInst::OpType IntHorizontalMulInst::get_op_type() const{
@@ -1052,7 +1052,7 @@ std::string IntHorizontalMulInst::to_string() const{
 }
 
 
-IntHorizontalAvgInst::IntHorizontalAvgInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+IntHorizontalAvgInst::IntHorizontalAvgInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                             bool nuw, bool nsw, bool unsigned_, bool floor)
                                             :IntHArithmeticSIMDInst(instruction_stmt,destination,lhs,rhs,nuw,nsw,unsigned_,false,floor){}
 IntHArithmeticSIMDInst::OpType IntHorizontalAvgInst::get_op_type() const{
@@ -1063,7 +1063,7 @@ std::string IntHorizontalAvgInst::to_string() const{
 }
 
 
-IntHorizontalMinInst::IntHorizontalMinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+IntHorizontalMinInst::IntHorizontalMinInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                             bool unsigned_)
                                             :IntHArithmeticSIMDInst(instruction_stmt,destination,lhs,rhs,false,false,unsigned_,false,false){}
 IntHArithmeticSIMDInst::OpType IntHorizontalMinInst::get_op_type() const{
@@ -1074,7 +1074,7 @@ std::string IntHorizontalMinInst::to_string() const{
 }
 
 
-IntHorizontalMaxInst::IntHorizontalMaxInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+IntHorizontalMaxInst::IntHorizontalMaxInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                             bool unsigned_)
                                             :IntHArithmeticSIMDInst(instruction_stmt,destination,lhs,rhs,false,false,unsigned_,false,false){}
 IntHArithmeticSIMDInst::OpType IntHorizontalMaxInst::get_op_type() const{
@@ -1086,7 +1086,7 @@ std::string IntHorizontalMaxInst::to_string() const{
 
 
 //---------------- Float Horizontal Arithmetic SIMD Instructions ----------------
-FloatHArithmeticSIMDInst::FloatHArithmeticSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+FloatHArithmeticSIMDInst::FloatHArithmeticSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                                      FastMathAttr fast_math_attr, bool ieee754_2019, bool unordered)
                                                      :HArithmeticSIMDInst(instruction_stmt,destination,lhs,rhs,fast_math_attr){
     this->ieee754_2019 = ieee754_2019;
@@ -1125,7 +1125,7 @@ TypeVariant FloatHArithmeticSIMDInst::get_element_type_variant() const{
 }
 
 
-FloatHorizontalAddInst::FloatHorizontalAddInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+FloatHorizontalAddInst::FloatHorizontalAddInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                                FastMathAttr fast_math_attr)
                                                :FloatHArithmeticSIMDInst(instruction_stmt,destination,lhs,rhs,fast_math_attr,false,false){}
 HArithmeticSIMDInst::OpType FloatHorizontalAddInst::get_op_type() const{
@@ -1136,7 +1136,7 @@ std::string FloatHorizontalAddInst::to_string() const{
 }
 
 
-FloatHorizontalSubInst::FloatHorizontalSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+FloatHorizontalSubInst::FloatHorizontalSubInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                                FastMathAttr fast_math_attr)
                                                :FloatHArithmeticSIMDInst(instruction_stmt,destination,lhs,rhs,fast_math_attr,false,false){}
 HArithmeticSIMDInst::OpType FloatHorizontalSubInst::get_op_type() const{
@@ -1147,7 +1147,7 @@ std::string FloatHorizontalSubInst::to_string() const{
 }
 
 
-FloatHorizontalAbsDiffInst::FloatHorizontalAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+FloatHorizontalAbsDiffInst::FloatHorizontalAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                                     FastMathAttr fast_math_attr)
                                                     :FloatHArithmeticSIMDInst(instruction_stmt,destination,lhs,rhs,fast_math_attr,false,false){}
 HArithmeticSIMDInst::OpType FloatHorizontalAbsDiffInst::get_op_type() const{
@@ -1158,7 +1158,7 @@ std::string FloatHorizontalAbsDiffInst::to_string() const{
 }
 
 
-FloatHorizontalAddSubInst::FloatHorizontalAddSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+FloatHorizontalAddSubInst::FloatHorizontalAddSubInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                                      FastMathAttr fast_math_attr)
                                                      :FloatHArithmeticSIMDInst(instruction_stmt,destination,lhs,rhs,fast_math_attr,false,false){}
 HArithmeticSIMDInst::OpType FloatHorizontalAddSubInst::get_op_type() const{
@@ -1169,7 +1169,7 @@ std::string FloatHorizontalAddSubInst::to_string() const{
 }
 
 
-FloatHorizontalMulInst::FloatHorizontalMulInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+FloatHorizontalMulInst::FloatHorizontalMulInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                                FastMathAttr fast_math_attr)
                                                :FloatHArithmeticSIMDInst(instruction_stmt,destination,lhs,rhs,fast_math_attr,false,false){}
 HArithmeticSIMDInst::OpType FloatHorizontalMulInst::get_op_type() const{
@@ -1180,7 +1180,7 @@ std::string FloatHorizontalMulInst::to_string() const{
 }
 
 
-FloatHorizontalAvgInst::FloatHorizontalAvgInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+FloatHorizontalAvgInst::FloatHorizontalAvgInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                                FastMathAttr fast_math_attr)
                                                :FloatHArithmeticSIMDInst(instruction_stmt,destination,lhs,rhs,fast_math_attr,false,false){}
 HArithmeticSIMDInst::OpType FloatHorizontalAvgInst::get_op_type() const{
@@ -1191,7 +1191,7 @@ std::string FloatHorizontalAvgInst::to_string() const{
 }
 
 
-FloatHorizontalMinInst::FloatHorizontalMinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+FloatHorizontalMinInst::FloatHorizontalMinInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                                FastMathAttr fast_math_attr, bool ieee754_2019, bool unordered)
                                                :FloatHArithmeticSIMDInst(instruction_stmt,destination,lhs,rhs,fast_math_attr,ieee754_2019,unordered){}
 HArithmeticSIMDInst::OpType FloatHorizontalMinInst::get_op_type() const{
@@ -1202,7 +1202,7 @@ std::string FloatHorizontalMinInst::to_string() const{
 }
 
 
-FloatHorizontalMaxInst::FloatHorizontalMaxInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+FloatHorizontalMaxInst::FloatHorizontalMaxInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                                FastMathAttr fast_math_attr, bool ieee754_2019, bool unordered)
                                                :FloatHArithmeticSIMDInst(instruction_stmt,destination,lhs,rhs,fast_math_attr,ieee754_2019,unordered){}
 HArithmeticSIMDInst::OpType FloatHorizontalMaxInst::get_op_type() const{
@@ -1214,7 +1214,7 @@ std::string FloatHorizontalMaxInst::to_string() const{
 
 
 //---------------- Int Horizontal Bitwise SIMD Instructions ----------------
-IntHBitwiseSIMDInst::IntHBitwiseSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+IntHBitwiseSIMDInst::IntHBitwiseSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                          bool disjoint)
                                          :Inst(instruction_stmt,destination,std::nullopt){
     this->lhs = lhs;
@@ -1253,7 +1253,7 @@ InstType IntHBitwiseSIMDInst::get_inst_type() const{
 }
 
 
-IntHorizontalAndInst::IntHorizontalAndInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs)
+IntHorizontalAndInst::IntHorizontalAndInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs)
                                            :IntHBitwiseSIMDInst(instruction_stmt,destination,lhs,rhs,false){}
 IntHBitwiseSIMDInst::OpType IntHorizontalAndInst::get_op_type() const{
     return OpType::HAND;
@@ -1263,7 +1263,7 @@ std::string IntHorizontalAndInst::to_string() const{
 }
 
 
-IntHorizontalNandInst::IntHorizontalNandInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs)
+IntHorizontalNandInst::IntHorizontalNandInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs)
                                             :IntHBitwiseSIMDInst(instruction_stmt,destination,lhs,rhs,false){}
 IntHBitwiseSIMDInst::OpType IntHorizontalNandInst::get_op_type() const{
     return OpType::HNAND;
@@ -1273,7 +1273,7 @@ std::string IntHorizontalNandInst::to_string() const{
 }
 
 
-IntHorizontalOrInst::IntHorizontalOrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, bool disjoint)
+IntHorizontalOrInst::IntHorizontalOrInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, bool disjoint)
                                           :IntHBitwiseSIMDInst(instruction_stmt,destination,lhs,rhs,disjoint){}
 IntHBitwiseSIMDInst::OpType IntHorizontalOrInst::get_op_type() const{
     return OpType::HOR;
@@ -1283,7 +1283,7 @@ std::string IntHorizontalOrInst::to_string() const{
 }
 
 
-IntHorizontalNorInst::IntHorizontalNorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, bool disjoint)
+IntHorizontalNorInst::IntHorizontalNorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, bool disjoint)
                                            :IntHBitwiseSIMDInst(instruction_stmt,destination,lhs,rhs,disjoint){}
 IntHBitwiseSIMDInst::OpType IntHorizontalNorInst::get_op_type() const{
     return OpType::HNOR;
@@ -1293,7 +1293,7 @@ std::string IntHorizontalNorInst::to_string() const{
 }
 
 
-IntHorizontalXorInst::IntHorizontalXorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs)
+IntHorizontalXorInst::IntHorizontalXorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs)
                                             :IntHBitwiseSIMDInst(instruction_stmt,destination,lhs,rhs,false){}
 IntHBitwiseSIMDInst::OpType IntHorizontalXorInst::get_op_type() const{
     return OpType::HXOR;
@@ -1303,7 +1303,7 @@ std::string IntHorizontalXorInst::to_string() const{
 }
 
 
-IntHorizontalXnorInst::IntHorizontalXnorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs)
+IntHorizontalXnorInst::IntHorizontalXnorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs)
                                              :IntHBitwiseSIMDInst(instruction_stmt,destination,lhs,rhs,false){}
 IntHBitwiseSIMDInst::OpType IntHorizontalXnorInst::get_op_type() const{
     return OpType::HXNOR;
@@ -1314,7 +1314,7 @@ std::string IntHorizontalXnorInst::to_string() const{
 
 
 //--------------------------------- Dot Product Instructions ---------------------------------
-DotInst::DotInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::LiteralExprPtr acc,
+DotInst::DotInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::LiteralExprPtr acc,
                  IR::TypeExprPtr input_vector_type, std::optional<FastMathAttr> fast_math_attr):Inst(instruction_stmt,destination,fast_math_attr){
     this->lhs = lhs;
     this->rhs = rhs;
@@ -1360,7 +1360,7 @@ InstType DotInst::get_inst_type() const{
 }
 
 
-IntDotInst::IntDotInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::LiteralExprPtr acc, 
+IntDotInst::IntDotInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::LiteralExprPtr acc, 
                        IR::TypeExprPtr input_vector_type, bool nuw, bool nsw, bool unsigned_,  bool saturating)
                        :DotInst(instruction_stmt,destination,lhs,rhs,acc,input_vector_type,std::nullopt){
     this->nuw = nuw;
@@ -1413,7 +1413,7 @@ std::string IntDotInst::to_string() const{
 }
 
 
-FloatDotInst::FloatDotInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::LiteralExprPtr acc, 
+FloatDotInst::FloatDotInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::LiteralExprPtr acc, 
                            IR::TypeExprPtr input_vector_type, FastMathAttr fast_math_attr)
                             :DotInst(instruction_stmt,destination,lhs,rhs,acc,input_vector_type,fast_math_attr){}
 std::shared_ptr<IR::FloatTypeExpr> FloatDotInst::get_casted_input_basetype() const{
@@ -1443,7 +1443,7 @@ std::string FloatDotInst::to_string() const{
 
 
 //--------------------------------- Absolute Difference Instructions ---------------------------------
-SADInst::SADInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::LiteralExprPtr acc,
+SADInst::SADInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::LiteralExprPtr acc,
                  IR::TypeExprPtr input_vector_type, std::optional<FastMathAttr> fast_math_attr):Inst(instruction_stmt,destination,fast_math_attr){
     this->lhs = lhs;
     this->rhs = rhs;
@@ -1486,7 +1486,7 @@ InstType SADInst::get_inst_type() const{
 }
 
 
-IntSADInst::IntSADInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::LiteralExprPtr acc,
+IntSADInst::IntSADInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::LiteralExprPtr acc,
                        IR::TypeExprPtr input_vector_type, bool nuw, bool nsw, bool unsigned_,  bool saturating)
                        :SADInst(instruction_stmt,destination,lhs,rhs,acc,input_vector_type,std::nullopt){
     this->nuw = nuw;
@@ -1540,7 +1540,7 @@ std::string IntSADInst::to_string() const{
 }
 
 
-FloatSADInst::FloatSADInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::LiteralExprPtr acc,
+FloatSADInst::FloatSADInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::LiteralExprPtr acc,
                            IR::TypeExprPtr input_vector_type, FastMathAttr fast_math_attr)
                            :SADInst(instruction_stmt,destination,lhs,rhs,acc,input_vector_type,fast_math_attr){}
 std::shared_ptr<IR::FloatTypeExpr> FloatSADInst::get_casted_input_basetype() const{
@@ -1570,7 +1570,7 @@ std::string FloatSADInst::to_string() const{
 
 
 //--------------------------------- Pack / Unpack Instructions ---------------------------------
-PackSatInst::PackSatInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+PackSatInst::PackSatInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                          IR::TypeExprPtr input_vector_type, bool unsigned_):Inst(instruction_stmt,destination,std::nullopt){
     this->lhs = lhs;
     this->rhs = rhs;
@@ -1620,7 +1620,7 @@ std::string PackSatInst::to_string() const{
 }
 
 
-UnpackLoInst::UnpackLoInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+UnpackLoInst::UnpackLoInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                            IR::TypeExprPtr input_vector_type, bool unsigned_):Inst(instruction_stmt,destination,std::nullopt){
     this->lhs = lhs;
     this->rhs = rhs;
@@ -1670,7 +1670,7 @@ std::string UnpackLoInst::to_string() const{
 }
 
 
-UnpackHiInst::UnpackHiInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+UnpackHiInst::UnpackHiInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                            IR::TypeExprPtr input_vector_type, bool unsigned_):Inst(instruction_stmt,destination,std::nullopt){
     this->lhs = lhs;
     this->rhs = rhs;
@@ -1721,7 +1721,7 @@ std::string UnpackHiInst::to_string() const{
 
 
 //--------------------------------- Vector Layout Instructions ---------------------------------
-CompressInst::CompressInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask,
+CompressInst::CompressInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask,
                            bool poison_inactive, std::optional<FastMathAttr> fast_math_attr):Inst(instruction_stmt,destination,fast_math_attr){
     this->src = src;
     this->mask = mask;
@@ -1761,7 +1761,7 @@ InstType CompressInst::get_inst_type() const{
 }
 
 
-IntCompressInst::IntCompressInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask,
+IntCompressInst::IntCompressInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask,
                                  bool poison_inactive)
                                  :CompressInst(instruction_stmt,destination,src,mask,poison_inactive,std::nullopt){}
 std::shared_ptr<IR::IntTypeExpr> IntCompressInst::get_casted_element_type() const{
@@ -1778,7 +1778,7 @@ std::string IntCompressInst::to_string() const{
 }
 
 
-PtrCompressInst::PtrCompressInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask,
+PtrCompressInst::PtrCompressInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask,
                                  bool poison_inactive)
                                  :CompressInst(instruction_stmt,destination,src,mask,poison_inactive,std::nullopt){}
 std::size_t PtrCompressInst::get_element_bitwidth() const{
@@ -1792,7 +1792,7 @@ std::string PtrCompressInst::to_string() const{
 }
 
 
-FloatCompressInst::FloatCompressInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask,
+FloatCompressInst::FloatCompressInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask,
                                      bool poison_inactive, FastMathAttr fast_math_attr)
                                      :CompressInst(instruction_stmt,destination,src,mask,poison_inactive,fast_math_attr){}
 std::shared_ptr<IR::FloatTypeExpr> FloatCompressInst::get_casted_element_type() const{
@@ -1812,7 +1812,7 @@ std::string FloatCompressInst::to_string() const{
 }
 
 
-ExpandInst::ExpandInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask, IR::LiteralExprPtr passthru,
+ExpandInst::ExpandInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask, IR::LiteralExprPtr passthru,
                        bool zeropassthru, std::optional<FastMathAttr> fast_math_attr):Inst(instruction_stmt,destination,fast_math_attr){
     this->src = src;
     this->mask = mask;
@@ -1860,7 +1860,7 @@ InstType ExpandInst::get_inst_type() const{
 }
 
 
-IntExpandInst::IntExpandInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask, IR::LiteralExprPtr passthru,
+IntExpandInst::IntExpandInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask, IR::LiteralExprPtr passthru,
                              bool zeropassthru)
                              :ExpandInst(instruction_stmt,destination,src,mask,passthru,zeropassthru,std::nullopt){}
 std::shared_ptr<IR::IntTypeExpr> IntExpandInst::get_casted_element_type() const{
@@ -1877,7 +1877,7 @@ std::string IntExpandInst::to_string() const{
 }
 
 
-PtrExpandInst::PtrExpandInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask, IR::LiteralExprPtr passthru,
+PtrExpandInst::PtrExpandInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask, IR::LiteralExprPtr passthru,
                              bool zeropassthru)
                              :ExpandInst(instruction_stmt,destination,src,mask,passthru,zeropassthru,std::nullopt){}
 std::size_t PtrExpandInst::get_element_bitwidth() const{
@@ -1891,7 +1891,7 @@ std::string PtrExpandInst::to_string() const{
 }
 
 
-FloatExpandInst::FloatExpandInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask, IR::LiteralExprPtr passthru,
+FloatExpandInst::FloatExpandInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask, IR::LiteralExprPtr passthru,
                                  bool zeropassthru, FastMathAttr fast_math_attr)
                                  :ExpandInst(instruction_stmt,destination,src,mask,passthru,zeropassthru,fast_math_attr){}
 std::shared_ptr<IR::FloatTypeExpr> FloatExpandInst::get_casted_element_type() const{
@@ -1911,7 +1911,7 @@ std::string FloatExpandInst::to_string() const{
 }
 
 
-InterleaveInst::InterleaveInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, std::vector<IR::LiteralExprPtr> args, 
+InterleaveInst::InterleaveInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, std::vector<IR::LiteralExprPtr> args, 
                                std::optional<FastMathAttr> fast_math_attr):Inst(instruction_stmt,destination,fast_math_attr){
     this->args = args;
 }
@@ -1952,7 +1952,7 @@ InstType InterleaveInst::get_inst_type() const{
 }
 
 
-IntInterleaveInst::IntInterleaveInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, std::vector<IR::LiteralExprPtr> args)
+IntInterleaveInst::IntInterleaveInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, std::vector<IR::LiteralExprPtr> args)
                                    :InterleaveInst(instruction_stmt,destination,args,std::nullopt){}
 std::shared_ptr<IR::IntTypeExpr> IntInterleaveInst::get_casted_element_type() const{
     return std::dynamic_pointer_cast<IR::IntTypeExpr>(this->get_element_type());
@@ -1968,7 +1968,7 @@ std::string IntInterleaveInst::to_string() const{
 }
 
 
-PtrInterleaveInst::PtrInterleaveInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, std::vector<IR::LiteralExprPtr> args)
+PtrInterleaveInst::PtrInterleaveInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, std::vector<IR::LiteralExprPtr> args)
                                    :InterleaveInst(instruction_stmt,destination,args,std::nullopt){}
 std::size_t PtrInterleaveInst::get_element_bitwidth() const{
     return 64;
@@ -1981,7 +1981,7 @@ std::string PtrInterleaveInst::to_string() const{
 }
 
 
-FloatInterleaveInst::FloatInterleaveInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, std::vector<IR::LiteralExprPtr> args, FastMathAttr fast_math_attr)
+FloatInterleaveInst::FloatInterleaveInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, std::vector<IR::LiteralExprPtr> args, FastMathAttr fast_math_attr)
                                          :InterleaveInst(instruction_stmt,destination,args,fast_math_attr){}
 std::shared_ptr<IR::FloatTypeExpr> FloatInterleaveInst::get_casted_element_type() const{
     return std::dynamic_pointer_cast<IR::FloatTypeExpr>(this->get_element_type());
@@ -2000,7 +2000,7 @@ std::string FloatInterleaveInst::to_string() const{
 }
 
 
-DeinterleaveInst::DeinterleaveInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg, IR::TypeExprPtr arg_type, IR::LiteralExprPtr channel,
+DeinterleaveInst::DeinterleaveInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg, IR::TypeExprPtr arg_type, IR::LiteralExprPtr channel,
                                    std::optional<FastMathAttr> fast_math_attr):Inst(instruction_stmt,destination,fast_math_attr){
     this->arg = arg;
     this->arg_type = arg_type;
@@ -2040,7 +2040,7 @@ InstType DeinterleaveInst::get_inst_type() const{
 }
 
 
-IntDeinterleaveInst::IntDeinterleaveInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg, IR::TypeExprPtr arg_type, IR::LiteralExprPtr channel)
+IntDeinterleaveInst::IntDeinterleaveInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg, IR::TypeExprPtr arg_type, IR::LiteralExprPtr channel)
                                          :DeinterleaveInst(instruction_stmt,destination,arg,arg_type,channel,std::nullopt){}
 std::shared_ptr<IR::IntTypeExpr> IntDeinterleaveInst::get_casted_element_type() const{
     return std::dynamic_pointer_cast<IR::IntTypeExpr>(this->get_element_type());
@@ -2056,7 +2056,7 @@ std::string IntDeinterleaveInst::to_string() const{
 }
 
 
-PtrDeinterleaveInst::PtrDeinterleaveInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg, IR::TypeExprPtr arg_type, IR::LiteralExprPtr channel)
+PtrDeinterleaveInst::PtrDeinterleaveInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg, IR::TypeExprPtr arg_type, IR::LiteralExprPtr channel)
                                          :DeinterleaveInst(instruction_stmt,destination,arg,arg_type,channel,std::nullopt){}
 std::size_t PtrDeinterleaveInst::get_element_bitwidth() const{
     return 64;
@@ -2069,7 +2069,7 @@ std::string PtrDeinterleaveInst::to_string() const{
 }
 
 
-FloatDeinterleaveInst::FloatDeinterleaveInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg, IR::TypeExprPtr arg_type, IR::LiteralExprPtr channel, FastMathAttr fast_math_attr)
+FloatDeinterleaveInst::FloatDeinterleaveInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg, IR::TypeExprPtr arg_type, IR::LiteralExprPtr channel, FastMathAttr fast_math_attr)
                                              :DeinterleaveInst(instruction_stmt,destination,arg,arg_type,channel,fast_math_attr){}
 std::shared_ptr<IR::FloatTypeExpr> FloatDeinterleaveInst::get_casted_element_type() const{
     return std::dynamic_pointer_cast<IR::FloatTypeExpr>(this->get_element_type());
@@ -2089,7 +2089,7 @@ std::string FloatDeinterleaveInst::to_string() const{
 
 
 //--------------------------------- Lane Mask Conversion Instructions --------------------------------
-MaskToIntInst::MaskToIntInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr mask, IR::TypeExprPtr mask_type)
+MaskToIntInst::MaskToIntInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr mask, IR::TypeExprPtr mask_type)
                              :Inst(instruction_stmt,destination,std::nullopt){
     this->mask = mask;
     this->mask_type = mask_type;
@@ -2113,7 +2113,7 @@ std::string MaskToIntInst::to_string() const{
 }
 
 
-IntToMaskInst::IntToMaskInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr input, IR::TypeExprPtr input_type)
+IntToMaskInst::IntToMaskInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr input, IR::TypeExprPtr input_type)
                              :Inst(instruction_stmt,destination,std::nullopt){
     this->input = input;
     this->input_type = input_type;

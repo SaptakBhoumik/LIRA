@@ -6,33 +6,33 @@
 #include <memory>
 namespace LIRA {
 namespace SemanticAnalyzer {
-using DispatchFuncType = std::function<MIR::InstPtr(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr arg,
+using DispatchFuncType = std::function<MIR::InstPtr(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr arg,
                                                     std::pair<IR::TypeExprPtr, IR::TypeExprPtr> type_exprs, std::pair<MIR::TypeVariant, MIR::TypeVariant> type_variants, 
                                                     //For vector instructions ``base_types`` is the base type of vector. For scalar it is same as ``type_exprs``
                                                     std::pair<IR::TypeExprPtr, IR::TypeExprPtr> base_types,
                                                     IR::InstructionStmtPtr inst_stmt)>;
 
-MIR::InstPtr analyze_trunc_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr arg,
+MIR::InstPtr analyze_trunc_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr arg,
                                 std::pair<IR::TypeExprPtr, IR::TypeExprPtr> type_exprs, std::pair<MIR::TypeVariant, MIR::TypeVariant> type_variants,
                                 std::pair<IR::TypeExprPtr, IR::TypeExprPtr> base_types,
                                 IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_ext_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr arg,
+MIR::InstPtr analyze_ext_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr arg,
                               std::pair<IR::TypeExprPtr, IR::TypeExprPtr> type_exprs, std::pair<MIR::TypeVariant, MIR::TypeVariant> type_variants,
                               std::pair<IR::TypeExprPtr, IR::TypeExprPtr> base_types,
                               IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_float_to_int_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr arg,
+MIR::InstPtr analyze_float_to_int_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr arg,
                                        std::pair<IR::TypeExprPtr, IR::TypeExprPtr> type_exprs, std::pair<MIR::TypeVariant, MIR::TypeVariant> type_variants,
                                        std::pair<IR::TypeExprPtr, IR::TypeExprPtr> base_types,
                                        IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_int_to_float_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr arg,
+MIR::InstPtr analyze_int_to_float_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr arg,
                                        std::pair<IR::TypeExprPtr, IR::TypeExprPtr> type_exprs, std::pair<MIR::TypeVariant, MIR::TypeVariant> type_variants,
                                        std::pair<IR::TypeExprPtr, IR::TypeExprPtr> base_types,
                                        IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_ptr_to_int_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr arg,
+MIR::InstPtr analyze_ptr_to_int_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr arg,
                                      std::pair<IR::TypeExprPtr, IR::TypeExprPtr> type_exprs, std::pair<MIR::TypeVariant, MIR::TypeVariant> type_variants,
                                      std::pair<IR::TypeExprPtr, IR::TypeExprPtr> base_types,
                                      IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_int_to_ptr_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr arg,
+MIR::InstPtr analyze_int_to_ptr_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr arg,
                                      std::pair<IR::TypeExprPtr, IR::TypeExprPtr> type_exprs, std::pair<MIR::TypeVariant, MIR::TypeVariant> type_variants,
                                      std::pair<IR::TypeExprPtr, IR::TypeExprPtr> base_types,
                                      IR::InstructionStmtPtr inst_stmt);
@@ -115,7 +115,7 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_conv_inst(IR::Token name,IR::Instr
     }
 }
 
-MIR::InstPtr analyze_trunc_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr arg,
+MIR::InstPtr analyze_trunc_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr arg,
                                 std::pair<IR::TypeExprPtr, IR::TypeExprPtr> type_exprs, std::pair<MIR::TypeVariant, MIR::TypeVariant> type_variants,
                                 std::pair<IR::TypeExprPtr, IR::TypeExprPtr> base_types,
                                 IR::InstructionStmtPtr inst_stmt){
@@ -154,7 +154,7 @@ MIR::InstPtr analyze_trunc_inst(std::string filename, MIR::LocalDestRegisterPtr 
     }
 }
 
-MIR::InstPtr analyze_ext_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr arg,
+MIR::InstPtr analyze_ext_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr arg,
                               std::pair<IR::TypeExprPtr, IR::TypeExprPtr> type_exprs, std::pair<MIR::TypeVariant, MIR::TypeVariant> type_variants,
                               std::pair<IR::TypeExprPtr, IR::TypeExprPtr> base_types,
                               IR::InstructionStmtPtr inst_stmt){
@@ -196,7 +196,7 @@ MIR::InstPtr analyze_ext_inst(std::string filename, MIR::LocalDestRegisterPtr de
     }
 }
 
-MIR::InstPtr analyze_float_to_int_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr arg,
+MIR::InstPtr analyze_float_to_int_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr arg,
                                        std::pair<IR::TypeExprPtr, IR::TypeExprPtr> type_exprs, std::pair<MIR::TypeVariant, MIR::TypeVariant> type_variants,
                                        std::pair<IR::TypeExprPtr, IR::TypeExprPtr> base_types,
                                        IR::InstructionStmtPtr inst_stmt){
@@ -222,7 +222,7 @@ MIR::InstPtr analyze_float_to_int_inst(std::string filename, MIR::LocalDestRegis
     }
 }
 
-MIR::InstPtr analyze_int_to_float_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr arg,
+MIR::InstPtr analyze_int_to_float_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr arg,
                                        std::pair<IR::TypeExprPtr, IR::TypeExprPtr> type_exprs, std::pair<MIR::TypeVariant, MIR::TypeVariant> type_variants,
                                        std::pair<IR::TypeExprPtr, IR::TypeExprPtr> base_types,
                                        IR::InstructionStmtPtr inst_stmt){
@@ -248,7 +248,7 @@ MIR::InstPtr analyze_int_to_float_inst(std::string filename, MIR::LocalDestRegis
     }
 }
 
-MIR::InstPtr analyze_ptr_to_int_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr arg,
+MIR::InstPtr analyze_ptr_to_int_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr arg,
                                      std::pair<IR::TypeExprPtr, IR::TypeExprPtr> type_exprs, std::pair<MIR::TypeVariant, MIR::TypeVariant> type_variants,
                                      std::pair<IR::TypeExprPtr, IR::TypeExprPtr> base_types,
                                      IR::InstructionStmtPtr inst_stmt){
@@ -273,7 +273,7 @@ MIR::InstPtr analyze_ptr_to_int_inst(std::string filename, MIR::LocalDestRegiste
     }
 }
 
-MIR::InstPtr analyze_int_to_ptr_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr arg,
+MIR::InstPtr analyze_int_to_ptr_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr arg,
                                      std::pair<IR::TypeExprPtr, IR::TypeExprPtr> type_exprs, std::pair<MIR::TypeVariant, MIR::TypeVariant> type_variants,
                                      std::pair<IR::TypeExprPtr, IR::TypeExprPtr> base_types,
                                      IR::InstructionStmtPtr inst_stmt){

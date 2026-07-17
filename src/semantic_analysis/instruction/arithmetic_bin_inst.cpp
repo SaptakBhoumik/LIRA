@@ -4,28 +4,28 @@
 #include <functional>
 namespace LIRA {
 namespace SemanticAnalyzer {
-using DispatchFuncType = std::function<MIR::InstPtr(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+using DispatchFuncType = std::function<MIR::InstPtr(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                                     MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt)>;
  
-MIR::InstPtr analyze_add_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_add_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                   MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_sub_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_sub_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                   MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_absdiff_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_absdiff_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                       MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_mul_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_mul_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                   MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_div_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_div_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                   MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_rem_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_rem_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                   MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_copysign_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_copysign_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                        MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_min_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_min_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                   MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_max_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_max_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                   MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_avg_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_avg_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                   MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
 
 
@@ -81,7 +81,7 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_arithmetic_bin_inst(IR::Token name
     }
 }
 
-MIR::InstPtr analyze_add_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_add_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                     MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     if(MIR::is_float_typevariant(type_variant)){
@@ -109,7 +109,7 @@ MIR::InstPtr analyze_add_bin_inst(std::string filename, MIR::LocalDestRegisterPt
         }
     }
 }
-MIR::InstPtr analyze_sub_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+MIR::InstPtr analyze_sub_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                     MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     if(MIR::is_float_typevariant(type_variant)){
@@ -137,7 +137,7 @@ MIR::InstPtr analyze_sub_bin_inst(std::string filename, MIR::LocalDestRegisterPt
         }
     }
 }
-MIR::InstPtr analyze_absdiff_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+MIR::InstPtr analyze_absdiff_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                      MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     if(MIR::is_float_typevariant(type_variant)){
@@ -165,7 +165,7 @@ MIR::InstPtr analyze_absdiff_bin_inst(std::string filename, MIR::LocalDestRegist
         }
     }
 }
-MIR::InstPtr analyze_mul_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_mul_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                     MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     if(MIR::is_float_typevariant(type_variant)){
@@ -193,7 +193,7 @@ MIR::InstPtr analyze_mul_bin_inst(std::string filename, MIR::LocalDestRegisterPt
         }
     }
 }
-MIR::InstPtr analyze_div_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_div_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                     MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     if(MIR::is_float_typevariant(type_variant)){
@@ -221,7 +221,7 @@ MIR::InstPtr analyze_div_bin_inst(std::string filename, MIR::LocalDestRegisterPt
         }
     }
 }
-MIR::InstPtr analyze_rem_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_rem_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                     MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     if(MIR::is_float_typevariant(type_variant)){
@@ -249,7 +249,7 @@ MIR::InstPtr analyze_rem_bin_inst(std::string filename, MIR::LocalDestRegisterPt
         }
     }
 }
-MIR::InstPtr analyze_copysign_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_copysign_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                         MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     if(MIR::is_float_typevariant(type_variant)){
@@ -278,7 +278,7 @@ MIR::InstPtr analyze_copysign_bin_inst(std::string filename, MIR::LocalDestRegis
         }
     }
 }
-MIR::InstPtr analyze_min_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+MIR::InstPtr analyze_min_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                     MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     if(MIR::is_float_typevariant(type_variant)){
@@ -307,7 +307,7 @@ MIR::InstPtr analyze_min_bin_inst(std::string filename, MIR::LocalDestRegisterPt
         }
     }
 }
-MIR::InstPtr analyze_max_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_max_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                     MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     if(MIR::is_float_typevariant(type_variant)){
@@ -336,7 +336,7 @@ MIR::InstPtr analyze_max_bin_inst(std::string filename, MIR::LocalDestRegisterPt
         }
     }
 }
-MIR::InstPtr analyze_avg_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_avg_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                     MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     if(MIR::is_float_typevariant(type_variant)){

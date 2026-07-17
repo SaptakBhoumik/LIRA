@@ -3,7 +3,7 @@
 
 namespace LIRA {
 namespace MIR {
-FetchBitwiseBinInst::FetchBitwiseBinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+FetchBitwiseBinInst::FetchBitwiseBinInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                            CommonFetchInstAttrs common_fetch_inst_attrs,
                            bool nuw, bool nsw, bool exact, bool disjoint)
                            :Inst(instruction_stmt, destination, std::nullopt){
@@ -65,7 +65,7 @@ InstType FetchBitwiseBinInst::get_inst_type() const{
 
 
 // --------------------------- Integer read modify operations ---------------------------
-IntFetchBitwiseBinInst::IntFetchBitwiseBinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+IntFetchBitwiseBinInst::IntFetchBitwiseBinInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                            CommonFetchInstAttrs common_fetch_inst_attrs, bool nuw, bool nsw, bool exact, bool disjoint)
                            :FetchBitwiseBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, nuw, nsw, exact, disjoint){}
 std::shared_ptr<IR::IntTypeExpr> IntFetchBitwiseBinInst::get_casted_type() const{
@@ -79,7 +79,7 @@ TypeVariant IntFetchBitwiseBinInst::get_type_variant() const{
 }
 
 
-IntFetchAndInst::IntFetchAndInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+IntFetchAndInst::IntFetchAndInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     CommonFetchInstAttrs common_fetch_inst_attrs)
                     :IntFetchBitwiseBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, false, false, false, false){}
 FetchBitwiseBinInst::OpType IntFetchAndInst::get_op_type() const{
@@ -90,7 +90,7 @@ std::string IntFetchAndInst::to_string() const{
 }
 
 
-IntFetchNandInst::IntFetchNandInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+IntFetchNandInst::IntFetchNandInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     CommonFetchInstAttrs common_fetch_inst_attrs)
                     :IntFetchBitwiseBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, false, false, false, false){}
 FetchBitwiseBinInst::OpType IntFetchNandInst::get_op_type() const{
@@ -101,7 +101,7 @@ std::string IntFetchNandInst::to_string() const{
 }
 
 
-IntFetchOrInst::IntFetchOrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+IntFetchOrInst::IntFetchOrInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     CommonFetchInstAttrs common_fetch_inst_attrs, bool disjoint)
                     :IntFetchBitwiseBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, false, false, false, disjoint){}
 FetchBitwiseBinInst::OpType IntFetchOrInst::get_op_type() const{
@@ -112,7 +112,7 @@ std::string IntFetchOrInst::to_string() const{
 }
 
 
-IntFetchNorInst::IntFetchNorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+IntFetchNorInst::IntFetchNorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     CommonFetchInstAttrs common_fetch_inst_attrs, bool disjoint)
                     :IntFetchBitwiseBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, false, false, false, disjoint){}
 FetchBitwiseBinInst::OpType IntFetchNorInst::get_op_type() const{
@@ -123,7 +123,7 @@ std::string IntFetchNorInst::to_string() const{
 }
 
 
-IntFetchXorInst::IntFetchXorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+IntFetchXorInst::IntFetchXorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     CommonFetchInstAttrs common_fetch_inst_attrs)
                     :IntFetchBitwiseBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, false, false, false, false){}
 FetchBitwiseBinInst::OpType IntFetchXorInst::get_op_type() const{
@@ -134,7 +134,7 @@ std::string IntFetchXorInst::to_string() const{
 }
 
 
-IntFetchXnorInst::IntFetchXnorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+IntFetchXnorInst::IntFetchXnorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     CommonFetchInstAttrs common_fetch_inst_attrs)
                     :IntFetchBitwiseBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, false, false, false, false){}
 FetchBitwiseBinInst::OpType IntFetchXnorInst::get_op_type() const{
@@ -145,7 +145,7 @@ std::string IntFetchXnorInst::to_string() const{
 }
 
 
-IntFetchShlInst::IntFetchShlInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+IntFetchShlInst::IntFetchShlInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     CommonFetchInstAttrs common_fetch_inst_attrs, bool nuw, bool nsw)
                     :IntFetchBitwiseBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, nuw, nsw, false, false){}
 FetchBitwiseBinInst::OpType IntFetchShlInst::get_op_type() const{
@@ -155,7 +155,7 @@ std::string IntFetchShlInst::to_string() const{
     return this->to_string_helper("int_fetch_shl");
 }
 
-IntFetchLshrInst::IntFetchLshrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+IntFetchLshrInst::IntFetchLshrInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     CommonFetchInstAttrs common_fetch_inst_attrs, bool exact)
                     :IntFetchBitwiseBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, false, false, exact, false){}
 FetchBitwiseBinInst::OpType IntFetchLshrInst::get_op_type() const{
@@ -166,7 +166,7 @@ std::string IntFetchLshrInst::to_string() const{
 }
 
 
-IntFetchAshrInst::IntFetchAshrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+IntFetchAshrInst::IntFetchAshrInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     CommonFetchInstAttrs common_fetch_inst_attrs, bool exact)
                     :IntFetchBitwiseBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, false, false, exact, false){}
 FetchBitwiseBinInst::OpType IntFetchAshrInst::get_op_type() const{
@@ -177,7 +177,7 @@ std::string IntFetchAshrInst::to_string() const{
 }
 
 
-IntFetchRotlInst::IntFetchRotlInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+IntFetchRotlInst::IntFetchRotlInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     CommonFetchInstAttrs common_fetch_inst_attrs)
                     :IntFetchBitwiseBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, false, false, false, false){}
 FetchBitwiseBinInst::OpType IntFetchRotlInst::get_op_type() const{
@@ -188,7 +188,7 @@ std::string IntFetchRotlInst::to_string() const{
 }
 
 
-IntFetchRotrInst::IntFetchRotrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+IntFetchRotrInst::IntFetchRotrInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     CommonFetchInstAttrs common_fetch_inst_attrs)
                     :IntFetchBitwiseBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, false, false, false, false){}
 FetchBitwiseBinInst::OpType IntFetchRotrInst::get_op_type() const{
@@ -199,7 +199,7 @@ std::string IntFetchRotrInst::to_string() const{
 }
 
 
-IntFetchPextInst::IntFetchPextInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+IntFetchPextInst::IntFetchPextInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     CommonFetchInstAttrs common_fetch_inst_attrs)
                     :IntFetchBitwiseBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, false, false, false, false){}
 FetchBitwiseBinInst::OpType IntFetchPextInst::get_op_type() const{
@@ -210,7 +210,7 @@ std::string IntFetchPextInst::to_string() const{
 }
 
 
-IntFetchPdepInst::IntFetchPdepInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+IntFetchPdepInst::IntFetchPdepInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     CommonFetchInstAttrs common_fetch_inst_attrs)
                     :IntFetchBitwiseBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, false, false, false, false){}
 FetchBitwiseBinInst::OpType IntFetchPdepInst::get_op_type() const{

@@ -28,7 +28,7 @@ class ConvInst:public Inst {
         INT_TO_PTR = 1 << 11,
         BITCAST = 1 << 12
     };
-    ConvInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type,
+    ConvInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type,
              bool nuw, bool nsw, bool nsb, bool unsigned_, bool saturating, std::optional<FastMathAttr> fast_math_attr);
 
     virtual std::optional<TypeVariant> get_in_type_variant() const final;//Can be calculated easily from ``in_type``. Just a helper function
@@ -51,7 +51,7 @@ class ConvInst:public Inst {
 // --------------------------- Scalar conversion operations ---------------------------
 class ScalarConvInst:public ConvInst{
     public:
-    ScalarConvInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
+    ScalarConvInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
                    bool nuw, bool nsw, bool nsb, bool unsigned_, bool saturating, std::optional<FastMathAttr> fast_math_attr);
 
     virtual std::size_t get_in_type_bitwidth() const = 0;
@@ -60,7 +60,7 @@ class ScalarConvInst:public ConvInst{
 
 class IntTruncInst:public ScalarConvInst{
     public:
-    IntTruncInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
+    IntTruncInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
                  bool nuw, bool nsw, bool unsigned_, bool saturating);
 
     //I can implement casted integer type helper here but I doubt it will be useful because we can get the width from get_in_type_bitwidth and get_out_type_bitwidth anyways
@@ -76,7 +76,7 @@ class IntTruncInst:public ScalarConvInst{
 
 class FloatTruncInst:public ScalarConvInst{
     public:
-    FloatTruncInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, FastMathAttr fast_math_attr);
+    FloatTruncInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, FastMathAttr fast_math_attr);
 
     //I can implement casted integer type helper here but I doubt it will be useful because we can get the width from get_in_type_bitwidth and get_out_type_bitwidth anyways
     //But I am implementing it just for consistency 
@@ -93,7 +93,7 @@ class FloatTruncInst:public ScalarConvInst{
 
 class IntExtInst:public ScalarConvInst{
     public:
-    IntExtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type,
+    IntExtInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type,
                 bool nsb, bool unsigned_);
 
     std::shared_ptr<IR::IntTypeExpr> get_casted_in_type() const;
@@ -107,7 +107,7 @@ class IntExtInst:public ScalarConvInst{
 
 class FloatExtInst:public ScalarConvInst{
     public:
-    FloatExtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, FastMathAttr fast_math_attr);
+    FloatExtInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, FastMathAttr fast_math_attr);
 
     std::shared_ptr<IR::FloatTypeExpr> get_casted_in_type() const;
     std::shared_ptr<IR::FloatTypeExpr> get_casted_out_type() const; 
@@ -122,7 +122,7 @@ class FloatExtInst:public ScalarConvInst{
 
 class FloatToIntInst:public ScalarConvInst{
     public:
-    FloatToIntInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
+    FloatToIntInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
                    bool nsb, bool unsigned_, bool saturating, FastMathAttr fast_math_attr);
 
     std::shared_ptr<IR::FloatTypeExpr> get_casted_in_type() const;
@@ -137,7 +137,7 @@ class FloatToIntInst:public ScalarConvInst{
 
 class IntToFloatInst:public ScalarConvInst{
     public:
-    IntToFloatInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
+    IntToFloatInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
                    bool nsb, bool unsigned_, FastMathAttr fast_math_attr);
 
     std::shared_ptr<IR::IntTypeExpr> get_casted_in_type() const;
@@ -153,7 +153,7 @@ class IntToFloatInst:public ScalarConvInst{
 class PtrToIntInst:public ScalarConvInst{
     public:
     //We already know the in type(ptr) and out type(i64). No need to store again
-    PtrToIntInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value);
+    PtrToIntInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value);
 
     std::shared_ptr<IR::IntTypeExpr> get_casted_out_type() const;
     std::size_t get_in_type_bitwidth() const override;
@@ -166,7 +166,7 @@ class PtrToIntInst:public ScalarConvInst{
 class IntToPtrInst:public ScalarConvInst{
     public:
     //We already know the in type(i64) and out type(ptr). No need to store again
-    IntToPtrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type);
+    IntToPtrInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type);
 
     std::shared_ptr<IR::IntTypeExpr> get_casted_in_type() const;
     std::size_t get_in_type_bitwidth() const override;
@@ -179,7 +179,7 @@ class IntToPtrInst:public ScalarConvInst{
 class BitcastInst:public ScalarConvInst{
     public:
     //We already know the in type and out type have same bit width. No need to store again
-    BitcastInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, std::optional<FastMathAttr> fast_math_attr);
+    BitcastInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, std::optional<FastMathAttr> fast_math_attr);
 
     std::size_t get_in_type_bitwidth() const override;//Returns 0 as of now but in future must return the actual size. TODO:Implement the size of method for typeexpr
     std::size_t get_out_type_bitwidth() const override;//Returns 0 as of now but in future must return the actual size. TODO:Implement the size of method for typeexpr
@@ -193,7 +193,7 @@ class BitcastInst:public ScalarConvInst{
 // --------------------------- Vector conversion operations ---------------------------
 class VecConvInst:public ConvInst{
     public:
-    VecConvInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
+    VecConvInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
                 bool nuw, bool nsw, bool nsb, bool unsigned_, bool saturating, std::optional<FastMathAttr> fast_math_attr);
 
     virtual std::shared_ptr<IR::SIMDTypeExpr> get_casted_in_type() const final;//Returns the in type casted to SIMDTypeExpr.
@@ -205,7 +205,7 @@ class VecConvInst:public ConvInst{
 
 class VecIntTruncInst:public VecConvInst{
     public:
-    VecIntTruncInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
+    VecIntTruncInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
                     bool nuw, bool nsw, bool unsigned_, bool saturating);
 
     std::shared_ptr<IR::IntTypeExpr> get_casted_in_basetype() const;
@@ -219,7 +219,7 @@ class VecIntTruncInst:public VecConvInst{
 
 class VecFloatTruncInst:public VecConvInst{
     public:
-    VecFloatTruncInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, FastMathAttr fast_math_attr);
+    VecFloatTruncInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, FastMathAttr fast_math_attr);
     
     std::shared_ptr<IR::FloatTypeExpr> get_casted_in_basetype() const;
     std::shared_ptr<IR::FloatTypeExpr> get_casted_out_basetype() const;
@@ -234,7 +234,7 @@ class VecFloatTruncInst:public VecConvInst{
 
 class VecIntExtInst:public VecConvInst{
     public:
-    VecIntExtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
+    VecIntExtInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
                   bool nsb, bool unsigned_);
 
     std::shared_ptr<IR::IntTypeExpr> get_casted_in_basetype() const;
@@ -248,7 +248,7 @@ class VecIntExtInst:public VecConvInst{
 
 class VecFloatExtInst:public VecConvInst{
     public:
-    VecFloatExtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, FastMathAttr fast_math_attr);
+    VecFloatExtInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, FastMathAttr fast_math_attr);
 
     std::shared_ptr<IR::FloatTypeExpr> get_casted_in_basetype() const;
     std::shared_ptr<IR::FloatTypeExpr> get_casted_out_basetype() const;
@@ -263,7 +263,7 @@ class VecFloatExtInst:public VecConvInst{
 
 class VecFloatToIntInst:public VecConvInst{
     public:
-    VecFloatToIntInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
+    VecFloatToIntInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
                       bool nsb, bool unsigned_, bool saturating, FastMathAttr fast_math_attr);
     
     std::shared_ptr<IR::FloatTypeExpr> get_casted_in_basetype() const;
@@ -278,7 +278,7 @@ class VecFloatToIntInst:public VecConvInst{
 
 class VecIntToFloatInst:public VecConvInst{
     public:
-    VecIntToFloatInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
+    VecIntToFloatInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
                       bool nsb, bool unsigned_, FastMathAttr fast_math_attr);
     
     std::shared_ptr<IR::IntTypeExpr> get_casted_in_basetype() const;
@@ -295,7 +295,7 @@ class VecPtrToIntInst:public VecConvInst{
     public:
     //We already know the in type(<i64,N>) and out type(<ptr,N>). But we need to know N. That is why we take the type here
     //Why not just the number? No partiqular reason. It works. Thought it will make the code cleaner(It doesnt. It is the same either way)
-    VecPtrToIntInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type);
+    VecPtrToIntInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type);
     
     std::shared_ptr<IR::IntTypeExpr> get_casted_out_basetype() const;
     std::size_t get_in_basetype_bitwidth() const override;
@@ -307,7 +307,7 @@ class VecPtrToIntInst:public VecConvInst{
 
 class VecIntToPtrInst:public VecConvInst{
     public:
-    VecIntToPtrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type);
+    VecIntToPtrInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type);
 
     std::shared_ptr<IR::IntTypeExpr> get_casted_in_basetype() const;
     std::size_t get_in_basetype_bitwidth() const override;

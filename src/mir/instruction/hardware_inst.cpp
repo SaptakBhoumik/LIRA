@@ -6,7 +6,7 @@
 namespace LIRA {
 namespace MIR {
 //---------------------------------Processor Identification Instructions ---------------------------------
-CpuIdInst::CpuIdInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr leaf, IR::LiteralExprPtr subleaf):
+CpuIdInst::CpuIdInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr leaf, IR::LiteralExprPtr subleaf):
                      Inst(instruction_stmt, destination, std::nullopt){
     this->leaf = leaf;
     this->subleaf = subleaf;
@@ -27,7 +27,7 @@ std::string CpuIdInst::to_string() const{
 
 
 //---------------------------------Timestamp Counter Instructions---------------------------------
-RdTscInst::RdTscInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination):
+RdTscInst::RdTscInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination):
                      Inst(instruction_stmt, destination, std::nullopt){}
 InstType RdTscInst::get_inst_type() const{
     return InstType::RdTscInst;
@@ -37,7 +37,7 @@ std::string RdTscInst::to_string() const{
 }
 
 
-RdTscpInst::RdTscpInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination):
+RdTscpInst::RdTscpInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination):
                      Inst(instruction_stmt, destination, std::nullopt){}
 InstType RdTscpInst::get_inst_type() const{
     return InstType::RdTscpInst;
@@ -48,7 +48,7 @@ std::string RdTscpInst::to_string() const{
 
 
 //---------------------------------Hardware Random Number Instructions---------------------------------
-RdrandInst::RdrandInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination):
+RdrandInst::RdrandInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination):
                      Inst(instruction_stmt, destination, std::nullopt){}
 InstType RdrandInst::get_inst_type() const{
     return InstType::RdrandInst;
@@ -58,7 +58,7 @@ std::string RdrandInst::to_string() const{
 }
 
 
-RdseedInst::RdseedInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination):
+RdseedInst::RdseedInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination):
                      Inst(instruction_stmt, destination, std::nullopt){}
 InstType RdseedInst::get_inst_type() const{
     return InstType::RdseedInst;
@@ -69,7 +69,7 @@ std::string RdseedInst::to_string() const{
 
 
 //---------------------------------Floating-Point Environment---------------------------------
-GetFpEnvInst::GetFpEnvInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, bool x87):
+GetFpEnvInst::GetFpEnvInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, bool x87):
                      Inst(instruction_stmt, destination, std::nullopt){
     this->x87 = x87;
 }
@@ -108,7 +108,7 @@ std::string SetFpEnvInst::to_string() const{
 }
 
 
-FpenvGetFieldInst::FpenvGetFieldInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr env, FPEnvField field, bool x87):
+FpenvGetFieldInst::FpenvGetFieldInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr env, FPEnvField field, bool x87):
                      Inst(instruction_stmt, destination, std::nullopt){
     this->env = env;
     this->field = field;
@@ -132,7 +132,7 @@ std::string FpenvGetFieldInst::to_string() const{
 }
 
 
-FpenvSetFieldInst::FpenvSetFieldInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr env, FPEnvField field, 
+FpenvSetFieldInst::FpenvSetFieldInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr env, FPEnvField field, 
                       IR::LiteralExprPtr value, bool x87):
                      Inst(instruction_stmt, destination, std::nullopt){
     this->env = env;
@@ -161,7 +161,7 @@ std::string FpenvSetFieldInst::to_string() const{
 }
 
 
-GetFpStatusInst::GetFpStatusInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, bool x87):
+GetFpStatusInst::GetFpStatusInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, bool x87):
                      Inst(instruction_stmt, destination, std::nullopt){
     this->x87 = x87;
 }
@@ -191,7 +191,7 @@ std::string ClearFpStatusInst::to_string() const{
 }
 //---------------------------------Crypto Extensions---------------------------------
 // ---- AES (all operate on <i8,16> blocks) ----
-AesEncInst::AesEncInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+AesEncInst::AesEncInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination,
                        IR::LiteralExprPtr state, IR::LiteralExprPtr roundkey):Inst(instruction_stmt, destination, std::nullopt){
     this->state = state;
     this->roundkey = roundkey;
@@ -210,7 +210,7 @@ std::string AesEncInst::to_string() const{
 }
 
 
-AesEncLastInst::AesEncLastInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+AesEncLastInst::AesEncLastInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination,
                            IR::LiteralExprPtr state, IR::LiteralExprPtr roundkey):Inst(instruction_stmt, destination, std::nullopt){
     this->state = state;
     this->roundkey = roundkey;
@@ -229,7 +229,7 @@ std::string AesEncLastInst::to_string() const{
 }
 
 
-AesDecInst::AesDecInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+AesDecInst::AesDecInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination,
                        IR::LiteralExprPtr state, IR::LiteralExprPtr roundkey):Inst(instruction_stmt, destination, std::nullopt){
     this->state = state;
     this->roundkey = roundkey;
@@ -248,7 +248,7 @@ std::string AesDecInst::to_string() const{
 }
 
 
-AesDecLastInst::AesDecLastInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+AesDecLastInst::AesDecLastInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination,
                            IR::LiteralExprPtr state, IR::LiteralExprPtr roundkey):Inst(instruction_stmt, destination, std::nullopt){
     this->state = state;
     this->roundkey = roundkey;
@@ -267,7 +267,7 @@ std::string AesDecLastInst::to_string() const{
 }
 
 
-AesImcInst::AesImcInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+AesImcInst::AesImcInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination,
                        IR::LiteralExprPtr roundkey):Inst(instruction_stmt, destination, std::nullopt){
     this->roundkey = roundkey;
 }
@@ -282,7 +282,7 @@ std::string AesImcInst::to_string() const{
 }
 
 
-AesKeyGenAssistInst::AesKeyGenAssistInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+AesKeyGenAssistInst::AesKeyGenAssistInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination,
                                          IR::LiteralExprPtr a, IR::LiteralExprPtr rcon):Inst(instruction_stmt, destination, std::nullopt){
     this->a = a;
     this->rcon = rcon;
@@ -302,7 +302,7 @@ std::string AesKeyGenAssistInst::to_string() const{
 
 
 // ---- Carry-less Multiply ----
-ClmulInst::ClmulInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+ClmulInst::ClmulInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination,
                  IR::LiteralExprPtr a, IR::LiteralExprPtr b):
                      Inst(instruction_stmt, destination, std::nullopt){
     this->a = a;
@@ -323,7 +323,7 @@ std::string ClmulInst::to_string() const{
 
 
 // ---- SHA (all operate on <i32,4> state) ----
-Sha1Rnds4Inst::Sha1Rnds4Inst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+Sha1Rnds4Inst::Sha1Rnds4Inst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination,
                              IR::LiteralExprPtr abcd, IR::LiteralExprPtr msg, IR::LiteralExprPtr func):Inst(instruction_stmt,destination,std::nullopt){
     this->abcd = abcd;
     this->msg = msg;
@@ -346,7 +346,7 @@ std::string Sha1Rnds4Inst::to_string() const{
 }
 
 
-Sha1NextEInst::Sha1NextEInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+Sha1NextEInst::Sha1NextEInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination,
                              IR::LiteralExprPtr abcd, IR::LiteralExprPtr e):Inst(instruction_stmt,destination,std::nullopt){
     this->abcd = abcd;
     this->e = e;
@@ -365,7 +365,7 @@ std::string Sha1NextEInst::to_string() const{
 }
 
 
-Sha1Msg1Inst::Sha1Msg1Inst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+Sha1Msg1Inst::Sha1Msg1Inst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination,
                            IR::LiteralExprPtr a, IR::LiteralExprPtr b):Inst(instruction_stmt,destination,std::nullopt){
     this->a = a;
     this->b = b;
@@ -384,7 +384,7 @@ std::string Sha1Msg1Inst::to_string() const{
 }
 
 
-Sha1Msg2Inst::Sha1Msg2Inst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+Sha1Msg2Inst::Sha1Msg2Inst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination,
                            IR::LiteralExprPtr a, IR::LiteralExprPtr b):Inst(instruction_stmt,destination,std::nullopt){
     this->a = a;
     this->b = b;
@@ -403,7 +403,7 @@ std::string Sha1Msg2Inst::to_string() const{
 }
 
 
-Sha256Rnds2Inst::Sha256Rnds2Inst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+Sha256Rnds2Inst::Sha256Rnds2Inst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination,
                                  IR::LiteralExprPtr abef, IR::LiteralExprPtr cdgh, IR::LiteralExprPtr wk):Inst(instruction_stmt,destination,std::nullopt){
     this->abef = abef;
     this->cdgh = cdgh;
@@ -426,7 +426,7 @@ std::string Sha256Rnds2Inst::to_string() const{
 }
 
 
-Sha256Msg1Inst::Sha256Msg1Inst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+Sha256Msg1Inst::Sha256Msg1Inst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination,
                              IR::LiteralExprPtr a, IR::LiteralExprPtr b):Inst(instruction_stmt,destination,std::nullopt){
     this->a = a;
     this->b = b;
@@ -445,7 +445,7 @@ std::string Sha256Msg1Inst::to_string() const{
 }
 
 
-Sha256Msg2Inst::Sha256Msg2Inst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+Sha256Msg2Inst::Sha256Msg2Inst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination,
                              IR::LiteralExprPtr a, IR::LiteralExprPtr b):Inst(instruction_stmt,destination,std::nullopt){
     this->a = a;
     this->b = b;
@@ -465,7 +465,7 @@ std::string Sha256Msg2Inst::to_string() const{
 
 
 // ---- CRC32 ----
-Crc32Inst::Crc32Inst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+Crc32Inst::Crc32Inst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination,
                      IR::LiteralExprPtr acc, IR::LiteralExprPtr data, IR::TypeExprPtr acc_type, IR::TypeExprPtr data_type):
                      Inst(instruction_stmt, destination, std::nullopt){
     this->acc = acc;
@@ -501,7 +501,7 @@ std::string Crc32Inst::to_string() const{
 
 
 //---------------------------------System Call---------------------------------
-SyscallInst::SyscallInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+SyscallInst::SyscallInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination,
                          IR::LiteralExprPtr nr, std::vector<IR::LiteralExprPtr> args,
                          bool noreturn_, bool nosideeffect, bool pure):Inst(instruction_stmt, destination, std::nullopt){
     this->nr = nr;
@@ -548,7 +548,7 @@ std::string SyscallInst::to_string() const{
 
 
 //---------------------------------CET Shadow Stack---------------------------------
-RdsspInst::RdsspInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination):
+RdsspInst::RdsspInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination):
                      Inst(instruction_stmt, destination, std::nullopt){}
 InstType RdsspInst::get_inst_type() const{
     return InstType::RdsspInst;

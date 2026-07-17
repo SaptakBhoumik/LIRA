@@ -4,15 +4,15 @@
 #include <functional>
 namespace LIRA {
 namespace SemanticAnalyzer {
-using DispatchFuncType = std::function<MIR::InstPtr(std::string, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+using DispatchFuncType = std::function<MIR::InstPtr(std::string, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                                     IR::LiteralExprPtr optional_arg3, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt)>;
-MIR::InstPtr analyze_divmod_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_divmod_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                  IR::LiteralExprPtr optional_arg3, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_widening_divmod_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_widening_divmod_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                          IR::LiteralExprPtr optional_arg3, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_mulhi_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_mulhi_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                 IR::LiteralExprPtr optional_arg3, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_mulfix_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_mulfix_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                  IR::LiteralExprPtr optional_arg3, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
 
 MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_other_arithmetic_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt){
@@ -93,7 +93,7 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_other_arithmetic_inst(IR::Token na
     }
 }
 
-MIR::InstPtr analyze_divmod_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_divmod_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                  IR::LiteralExprPtr optional_arg3, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     if(MIR::is_float_typevariant(type_variant)){
@@ -121,7 +121,7 @@ MIR::InstPtr analyze_divmod_inst(std::string filename, MIR::LocalDestRegisterPtr
         }
     }
 }
-MIR::InstPtr analyze_widening_divmod_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_widening_divmod_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                          IR::LiteralExprPtr optional_arg3, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [flag_attrs,remaining_attrs] = Utils::extract_flag_attrs(filename,attributes, { "unsigned", "exact"});
@@ -135,7 +135,7 @@ MIR::InstPtr analyze_widening_divmod_inst(std::string filename, MIR::LocalDestRe
         return std::make_shared<MIR::VecIntWideningDivmodInst>(inst_stmt,dest,lhs,rhs,optional_arg3,flag_attrs["unsigned"],flag_attrs["exact"]);
     }
 }
-MIR::InstPtr analyze_mulhi_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_mulhi_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                 IR::LiteralExprPtr optional_arg3, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [flag_attrs,remaining_attrs] = Utils::extract_flag_attrs(filename,attributes, { "unsigned"});
@@ -149,7 +149,7 @@ MIR::InstPtr analyze_mulhi_inst(std::string filename, MIR::LocalDestRegisterPtr 
         return std::make_shared<MIR::VecIntMulHiInst>(inst_stmt,dest,lhs,rhs,flag_attrs["unsigned"]);
     }
 }
-MIR::InstPtr analyze_mulfix_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_mulfix_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                  IR::LiteralExprPtr optional_arg3, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [flag_attrs,remaining_attrs] = Utils::extract_flag_attrs(filename,attributes,{ "nuw","nsw", "unsigned", "saturating", "round" });

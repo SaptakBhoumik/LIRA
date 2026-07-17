@@ -3,7 +3,7 @@
 namespace LIRA {
 namespace MIR {
 // --------------------------Unclassified other instructions-------------------------------
-ScalarSelectInst::ScalarSelectInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr condition, 
+ScalarSelectInst::ScalarSelectInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr condition, 
                                     IR::LiteralExprPtr true_value, IR::LiteralExprPtr false_value, std::optional<FastMathAttr> fast_math_attr):
                                     Inst(instruction_stmt, destination, fast_math_attr){
     this->condition = condition;
@@ -36,7 +36,7 @@ std::string ScalarSelectInst::to_string() const{
 }
 
 
-LanewiseSelectInst::LanewiseSelectInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr condition, 
+LanewiseSelectInst::LanewiseSelectInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr condition, 
                                    IR::LiteralExprPtr true_value, IR::LiteralExprPtr false_value, std::optional<FastMathAttr> fast_math_attr):
                                    Inst(instruction_stmt, destination, fast_math_attr){
     this->condition = condition;
@@ -75,7 +75,7 @@ std::string LanewiseSelectInst::to_string() const{
 }
 
 
-FreezeInst::FreezeInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, std::optional<FastMathAttr> fast_math_attr):
+FreezeInst::FreezeInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, std::optional<FastMathAttr> fast_math_attr):
                 Inst(instruction_stmt, destination, fast_math_attr){
     this->value = value;
 }
@@ -146,7 +146,7 @@ std::string VacopyInst::to_string() const{
 }
 
 
-VaargInst::VaargInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, std::optional<FastMathAttr> fast_math_attr):
+VaargInst::VaargInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, std::optional<FastMathAttr> fast_math_attr):
                      Inst(instruction_stmt, destination, fast_math_attr){
     this->pointer = pointer;
 }
@@ -164,7 +164,7 @@ std::string VaargInst::to_string() const{
 }
 
 
-PtrMaskInst::PtrMaskInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr mask):
+PtrMaskInst::PtrMaskInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr mask):
                      Inst(instruction_stmt, destination, std::nullopt){
     this->pointer = pointer;
     this->mask = mask;
@@ -180,7 +180,7 @@ InstType PtrMaskInst::get_inst_type() const{
 }
 
 
-IntPtrMaskInst::IntPtrMaskInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr mask)
+IntPtrMaskInst::IntPtrMaskInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr mask)
                                :PtrMaskInst(instruction_stmt, destination, pointer, mask){}
 TypeVariant IntPtrMaskInst::get_dest_type_var() const{
     return TypeVariant::Ptr;
@@ -190,7 +190,7 @@ std::string IntPtrMaskInst::to_string() const{
 }
 
 
-VecIntPtrMaskInst::VecIntPtrMaskInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr mask)
+VecIntPtrMaskInst::VecIntPtrMaskInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr mask)
                                :PtrMaskInst(instruction_stmt, destination, pointer, mask){}
 TypeVariant VecIntPtrMaskInst::get_dest_type_var() const{
     return TypeVariant::Ptr;
@@ -579,7 +579,7 @@ std::string Endbr64Inst::to_string() const{
 
 
 // --------------------------Pointer Provenance Instructions-------------------------------
-LaunderInst::LaunderInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr ptr):Inst(instruction_stmt, destination, std::nullopt){
+LaunderInst::LaunderInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr ptr):Inst(instruction_stmt, destination, std::nullopt){
     this->ptr = ptr;
 }
 IR::LiteralExprPtr LaunderInst::get_ptr() const{
@@ -593,7 +593,7 @@ std::string LaunderInst::to_string() const{
 }
 
 
-StripInvariantGroupInst::StripInvariantGroupInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr ptr):Inst(instruction_stmt, destination, std::nullopt){
+StripInvariantGroupInst::StripInvariantGroupInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr ptr):Inst(instruction_stmt, destination, std::nullopt){
     this->ptr = ptr;
 }
 IR::LiteralExprPtr StripInvariantGroupInst::get_ptr() const{

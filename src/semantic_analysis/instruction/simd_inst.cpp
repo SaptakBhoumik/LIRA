@@ -7,76 +7,76 @@
 #include <memory>
 namespace LIRA {
 namespace SemanticAnalyzer {
-using DispatchFuncType = std::function<MIR::InstPtr(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+using DispatchFuncType = std::function<MIR::InstPtr(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                                     std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args, IR::InstructionStmtPtr inst_stmt)>;
 
-MIR::InstPtr analyze_shufflevector_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_shufflevector_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                         std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                         IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_ternlog_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_ternlog_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                   std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                   IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_splat_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_splat_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                 IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_step_vector_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_step_vector_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                       std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                       IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_insert_subvector_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_insert_subvector_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                            std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                            IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_extract_subvector_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_extract_subvector_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                             std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                             IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_active_lane_mask_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_active_lane_mask_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                            std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                            IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_addsub_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_addsub_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                  std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                  IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_reduce_arithmetic_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_reduce_arithmetic_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                                 IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_reduce_bitwise_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_reduce_bitwise_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                              std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                              IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_horizontal_arithmetic_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_horizontal_arithmetic_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                                     std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                                     IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_horizontal_bitwise_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_horizontal_bitwise_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                                  std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                                  IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_dot_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_dot_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                               std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                               IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_sad_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_sad_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                               std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                               IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_pack_sat_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_pack_sat_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                    std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                    IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_unpack_lo_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_unpack_lo_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                     std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                     IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_unpack_hi_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_unpack_hi_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                     std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                     IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_compress_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_compress_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                    std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                    IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_expand_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_expand_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                  std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                  IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_interleave_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_interleave_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                      std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                      IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_deinterleave_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_deinterleave_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                        std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                        IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_mask_to_int_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_mask_to_int_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                       std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                       IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_int_to_mask_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_int_to_mask_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                       std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                       IR::InstructionStmtPtr inst_stmt);
 
@@ -152,7 +152,7 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_simd_inst(IR::Token name,IR::Instr
     }
 }
 
-MIR::InstPtr analyze_shufflevector_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_shufflevector_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                         std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                         IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
@@ -209,7 +209,7 @@ MIR::InstPtr analyze_shufflevector_inst(std::string filename, MIR::LocalDestRegi
     }
 
 }
-MIR::InstPtr analyze_ternlog_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_ternlog_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                   std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                   IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
@@ -236,7 +236,7 @@ MIR::InstPtr analyze_ternlog_inst(std::string filename, MIR::LocalDestRegisterPt
     }
     return std::make_shared<MIR::TernLogInst>(inst_stmt, dest, args[0].first->get_literal(), args[1].first->get_literal(), args[2].first->get_literal(), args[3].first->get_literal());
 }
-MIR::InstPtr analyze_splat_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_splat_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                 IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
@@ -273,7 +273,7 @@ MIR::InstPtr analyze_splat_inst(std::string filename, MIR::LocalDestRegisterPtr 
         Utils::error(filename, name, "Instruction splat expects the destination simd type to have base type of integer, float, or pointer, but got " + dest_simd_type->get_basetype()->to_string());
     }
 }
-MIR::InstPtr analyze_step_vector_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_step_vector_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                       std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                       IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
@@ -307,7 +307,7 @@ MIR::InstPtr analyze_step_vector_inst(std::string filename, MIR::LocalDestRegist
         Utils::error(filename, name, "Instruction step_vector expects the destination simd type to have base type of integer or float, but got " + dest_simd_type->get_basetype()->to_string());
     }
 }
-MIR::InstPtr analyze_insert_subvector_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_insert_subvector_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                            std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                            IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
@@ -358,7 +358,7 @@ MIR::InstPtr analyze_insert_subvector_inst(std::string filename, MIR::LocalDestR
     }
 
 }
-MIR::InstPtr analyze_extract_subvector_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_extract_subvector_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                             std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                             IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
@@ -405,7 +405,7 @@ MIR::InstPtr analyze_extract_subvector_inst(std::string filename, MIR::LocalDest
         Utils::error(filename, name, "Instruction extract_subvector expects the destination simd type to have base type of integer, float, or pointer, but got " + dest_simd_type->get_basetype()->to_string());
     }
 }
-MIR::InstPtr analyze_active_lane_mask_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_active_lane_mask_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                            std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                            IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
@@ -431,7 +431,7 @@ MIR::InstPtr analyze_active_lane_mask_inst(std::string filename, MIR::LocalDestR
     }
     return std::make_shared<MIR::ActiveLaneMaskInst>(inst_stmt, dest, args[0].first->get_literal(), args[1].first->get_literal(), args[0].second, flag_attrs["unsigned"]);
 }
-MIR::InstPtr analyze_addsub_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_addsub_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                  std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                  IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
@@ -465,7 +465,7 @@ MIR::InstPtr analyze_addsub_inst(std::string filename, MIR::LocalDestRegisterPtr
         Utils::error(filename, name, "Instruction addsub expects the destination simd type to have base type of integer, or float, but got " + dest->get_type()->to_string());
     }
 }
-MIR::InstPtr analyze_reduce_arithmetic_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_reduce_arithmetic_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                                 std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                                 IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
@@ -563,7 +563,7 @@ MIR::InstPtr analyze_reduce_arithmetic_bin_inst(std::string filename, MIR::Local
         Utils::error(filename, name, "Instruction " + name.value + " expects the destination type to be integer or float, but got " + dest->get_type()->to_string());
     }
 }
-MIR::InstPtr analyze_reduce_bitwise_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_reduce_bitwise_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                              std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                              IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
@@ -616,7 +616,7 @@ MIR::InstPtr analyze_reduce_bitwise_bin_inst(std::string filename, MIR::LocalDes
         Utils::error(filename, name, "Unknown reduce bitwise instruction: " + name.value);
     }
 }
-MIR::InstPtr analyze_horizontal_arithmetic_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_horizontal_arithmetic_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                                     std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                                     IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
@@ -727,7 +727,7 @@ MIR::InstPtr analyze_horizontal_arithmetic_bin_inst(std::string filename, MIR::L
         Utils::error(filename, name, "Instruction " + name.value + " expects the destination simd type to have base type of integer or float, but got " + dest->get_type()->to_string());
     }
 }
-MIR::InstPtr analyze_horizontal_bitwise_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_horizontal_bitwise_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                                  std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                                  IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
@@ -788,7 +788,7 @@ MIR::InstPtr analyze_horizontal_bitwise_bin_inst(std::string filename, MIR::Loca
         Utils::error(filename, name, "Unknown horizontal bitwise instruction: " + name.value);
     }
 }
-MIR::InstPtr analyze_dot_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_dot_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                               std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                               IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
@@ -842,7 +842,7 @@ MIR::InstPtr analyze_dot_inst(std::string filename, MIR::LocalDestRegisterPtr de
         Utils::error(filename, name, "Instruction dot expects the input vector base type to be integer or float, but got " + arg0_simd_type->get_basetype()->to_string());
     }
 }
-MIR::InstPtr analyze_sad_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_sad_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                               std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                               IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
@@ -893,7 +893,7 @@ MIR::InstPtr analyze_sad_inst(std::string filename, MIR::LocalDestRegisterPtr de
         Utils::error(filename, name, "Instruction sad expects the input vector base type to be integer or float, but got " + arg0_simd_type->get_basetype()->to_string());
     }
 }
-MIR::InstPtr analyze_pack_sat_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_pack_sat_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                    std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                    IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
@@ -926,7 +926,7 @@ MIR::InstPtr analyze_pack_sat_inst(std::string filename, MIR::LocalDestRegisterP
     }
     return std::make_shared<MIR::PackSatInst>(inst_stmt, dest, args[0].first->get_literal(), args[1].first->get_literal(), args[0].second, flag_attrs["unsigned"]);
 }
-MIR::InstPtr analyze_unpack_lo_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_unpack_lo_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                     std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                     IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
@@ -959,7 +959,7 @@ MIR::InstPtr analyze_unpack_lo_inst(std::string filename, MIR::LocalDestRegister
     }
     return std::make_shared<MIR::UnpackLoInst>(inst_stmt, dest, args[0].first->get_literal(), args[1].first->get_literal(), args[0].second, flag_attrs["unsigned"]);
 }
-MIR::InstPtr analyze_unpack_hi_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_unpack_hi_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                     std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                     IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
@@ -992,7 +992,7 @@ MIR::InstPtr analyze_unpack_hi_inst(std::string filename, MIR::LocalDestRegister
     }
     return std::make_shared<MIR::UnpackHiInst>(inst_stmt, dest, args[0].first->get_literal(), args[1].first->get_literal(), args[0].second, flag_attrs["unsigned"]);
 }
-MIR::InstPtr analyze_compress_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_compress_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                    std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                    IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
@@ -1035,7 +1035,7 @@ MIR::InstPtr analyze_compress_inst(std::string filename, MIR::LocalDestRegisterP
         Utils::error(filename, name, "Instruction compress expects the destination simd type to have base type of integer, float, or pointer, but got " + dest_simd_type->get_basetype()->to_string());
     }
 }
-MIR::InstPtr analyze_expand_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_expand_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                  std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                  IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
@@ -1094,7 +1094,7 @@ MIR::InstPtr analyze_expand_inst(std::string filename, MIR::LocalDestRegisterPtr
         Utils::error(filename, name, "Instruction expand expects the destination simd type to have base type of integer, float, or pointer, but got " + dest_simd_type->get_basetype()->to_string());
     }
 }
-MIR::InstPtr analyze_interleave_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_interleave_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                      std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                      IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
@@ -1158,7 +1158,7 @@ MIR::InstPtr analyze_interleave_inst(std::string filename, MIR::LocalDestRegiste
         Utils::error(filename, name, "Instruction " + name.value + " expects the destination simd type to have base type of integer, float, or pointer, but got " + dest_simd_type->get_basetype()->to_string());
     }
 }
-MIR::InstPtr analyze_deinterleave_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_deinterleave_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                        std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                        IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
@@ -1218,7 +1218,7 @@ MIR::InstPtr analyze_deinterleave_inst(std::string filename, MIR::LocalDestRegis
         Utils::error(filename, name, "Instruction " + name.value + " expects the destination simd type to have base type of integer, float, or pointer, but got " + dest_simd_type->get_basetype()->to_string());
     }
 }
-MIR::InstPtr analyze_mask_to_int_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_mask_to_int_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                       std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                       IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
@@ -1240,7 +1240,7 @@ MIR::InstPtr analyze_mask_to_int_inst(std::string filename, MIR::LocalDestRegist
     }
     return std::make_shared<MIR::MaskToIntInst>(inst_stmt, dest, args[0].first->get_literal(), args[0].second);
 }
-MIR::InstPtr analyze_int_to_mask_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::Token name,
+MIR::InstPtr analyze_int_to_mask_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::Token name,
                                       std::vector<std::pair<IR::ExprPtr,IR::TypeExprPtr>> args,
                                       IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();

@@ -5,30 +5,30 @@
 #include <functional>
 namespace LIRA {
 namespace SemanticAnalyzer {
-using DispatchFuncType = std::function<MIR::InstPtr(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
+using DispatchFuncType = std::function<MIR::InstPtr(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
                                                     MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> attributes, IR::InstructionStmtPtr inst_stmt)>;
  
-MIR::InstPtr analyze_fetch_xchg_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_xchg_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
                                          MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> attributes, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_fetch_add_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_add_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
                                         MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> attributes, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_fetch_sub_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_sub_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
                                         MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> attributes, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_fetch_absdiff_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_absdiff_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
                                             MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> attributes, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_fetch_mul_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_mul_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
                                         MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> attributes, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_fetch_div_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_div_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
                                         MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> attributes, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_fetch_rem_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_rem_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
                                         MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> attributes, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_fetch_copysign_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_copysign_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
                                              MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> attributes, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_fetch_min_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_min_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
                                         MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> attributes, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_fetch_max_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_max_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
                                         MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> attributes, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_fetch_avg_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_avg_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
                                         MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> attributes, IR::InstructionStmtPtr inst_stmt);
 
 
@@ -99,7 +99,7 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_arithmetic_fetch_bin_inst(IR::Toke
     }
 }
 
-MIR::InstPtr analyze_fetch_xchg_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_xchg_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
                                          MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> attributes, IR::InstructionStmtPtr inst_stmt){
     if(type_variant == MIR::TypeVariant::Float){
         auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
@@ -115,7 +115,7 @@ MIR::InstPtr analyze_fetch_xchg_bin_inst(std::string filename, MIR::LocalDestReg
         return std::make_shared<MIR::IntFetchXchgInst>(inst_stmt,dest,lhs,rhs,common_fetch_attrs);
     }
 }
-MIR::InstPtr analyze_fetch_add_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_add_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
                                         MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> attributes, IR::InstructionStmtPtr inst_stmt){
     if(type_variant == MIR::TypeVariant::Float){
         auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
@@ -132,7 +132,7 @@ MIR::InstPtr analyze_fetch_add_bin_inst(std::string filename, MIR::LocalDestRegi
         return std::make_shared<MIR::IntFetchAddInst>(inst_stmt,dest,lhs,rhs,common_fetch_attrs,flag_attrs["nuw"],flag_attrs["nsw"],flag_attrs["unsigned"],flag_attrs["saturating"]);
     }
 }
-MIR::InstPtr analyze_fetch_sub_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_sub_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
                                         MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> attributes, IR::InstructionStmtPtr inst_stmt){
     if(type_variant == MIR::TypeVariant::Float){
         auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
@@ -149,7 +149,7 @@ MIR::InstPtr analyze_fetch_sub_bin_inst(std::string filename, MIR::LocalDestRegi
         return std::make_shared<MIR::IntFetchSubInst>(inst_stmt,dest,lhs,rhs,common_fetch_attrs,flag_attrs["nuw"],flag_attrs["nsw"],flag_attrs["unsigned"],flag_attrs["saturating"]);
     }
 }
-MIR::InstPtr analyze_fetch_absdiff_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_absdiff_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
                                             MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> attributes, IR::InstructionStmtPtr inst_stmt){
     if(type_variant == MIR::TypeVariant::Float){
         auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
@@ -166,7 +166,7 @@ MIR::InstPtr analyze_fetch_absdiff_bin_inst(std::string filename, MIR::LocalDest
         return std::make_shared<MIR::IntFetchAbsDiffInst>(inst_stmt,dest,lhs,rhs,common_fetch_attrs,flag_attrs["nuw"],flag_attrs["nsw"],flag_attrs["unsigned"],flag_attrs["saturating"]);
     }
 }
-MIR::InstPtr analyze_fetch_mul_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_mul_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
                                         MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> attributes, IR::InstructionStmtPtr inst_stmt){
     if(type_variant == MIR::TypeVariant::Float){
         auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
@@ -183,7 +183,7 @@ MIR::InstPtr analyze_fetch_mul_bin_inst(std::string filename, MIR::LocalDestRegi
         return std::make_shared<MIR::IntFetchMulInst>(inst_stmt,dest,lhs,rhs,common_fetch_attrs,flag_attrs["nuw"],flag_attrs["nsw"],flag_attrs["unsigned"],flag_attrs["saturating"]);
     }
 }
-MIR::InstPtr analyze_fetch_div_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_div_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
                                         MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> attributes, IR::InstructionStmtPtr inst_stmt){
     if(type_variant == MIR::TypeVariant::Float){
         auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
@@ -200,7 +200,7 @@ MIR::InstPtr analyze_fetch_div_bin_inst(std::string filename, MIR::LocalDestRegi
         return std::make_shared<MIR::IntFetchDivInst>(inst_stmt,dest,lhs,rhs,common_fetch_attrs,flag_attrs["exact"],flag_attrs["unsigned"]);
     }
 }
-MIR::InstPtr analyze_fetch_rem_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_rem_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
                                         MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> attributes, IR::InstructionStmtPtr inst_stmt){
     if(type_variant == MIR::TypeVariant::Float){
         auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
@@ -218,7 +218,7 @@ MIR::InstPtr analyze_fetch_rem_bin_inst(std::string filename, MIR::LocalDestRegi
         
     }
 }
-MIR::InstPtr analyze_fetch_copysign_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_copysign_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
                                              MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> attributes, IR::InstructionStmtPtr inst_stmt){
     if(type_variant == MIR::TypeVariant::Float){
         auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
@@ -236,7 +236,7 @@ MIR::InstPtr analyze_fetch_copysign_bin_inst(std::string filename, MIR::LocalDes
         return std::make_shared<MIR::IntFetchCopySignInst>(inst_stmt,dest,lhs,rhs,common_fetch_attrs,flag_attrs["nsw"]);
     }
 }
-MIR::InstPtr analyze_fetch_min_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_min_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
                                         MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> attributes, IR::InstructionStmtPtr inst_stmt){
     if(type_variant == MIR::TypeVariant::Float){
         auto [fast_math_attr,_remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
@@ -254,7 +254,7 @@ MIR::InstPtr analyze_fetch_min_bin_inst(std::string filename, MIR::LocalDestRegi
         return std::make_shared<MIR::IntFetchMinInst>(inst_stmt,dest,lhs,rhs,common_fetch_attrs,flag_attrs["unsigned"]);
     }
 }
-MIR::InstPtr analyze_fetch_max_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_max_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
                                         MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> attributes, IR::InstructionStmtPtr inst_stmt){
     if(type_variant == MIR::TypeVariant::Float){
         auto [fast_math_attr,_remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
@@ -272,7 +272,7 @@ MIR::InstPtr analyze_fetch_max_bin_inst(std::string filename, MIR::LocalDestRegi
         return std::make_shared<MIR::IntFetchMaxInst>(inst_stmt,dest,lhs,rhs,common_fetch_attrs,flag_attrs["unsigned"]);
     }
 }
-MIR::InstPtr analyze_fetch_avg_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_avg_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, MIR::TypeVariant type_variant, 
                                         MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> attributes, IR::InstructionStmtPtr inst_stmt){
     if(type_variant == MIR::TypeVariant::Float){
         auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);

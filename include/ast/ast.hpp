@@ -531,7 +531,7 @@ class Scope {
     std::optional<Utils::triplet<Token,Token,Token>> get_callsite_loc() const;
     Token get_token() const;
     std::string to_string() const;
-};
+}; 
 
 using ScopePtr = std::shared_ptr<Scope>;
 // class 

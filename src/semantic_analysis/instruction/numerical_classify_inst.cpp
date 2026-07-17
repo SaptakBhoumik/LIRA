@@ -7,24 +7,24 @@
 #include <unordered_set>
 namespace LIRA {
 namespace SemanticAnalyzer {
-using DispatchFuncType = std::function<MIR::InstPtr(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, IR::TypeExprPtr value_type, 
+using DispatchFuncType = std::function<MIR::InstPtr(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, IR::TypeExprPtr value_type, 
                                                     MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt)>;
 
-MIR::InstPtr analyze_isnan_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
+MIR::InstPtr analyze_isnan_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                                 MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_isinf_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
+MIR::InstPtr analyze_isinf_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                                 MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_isfinite_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
+MIR::InstPtr analyze_isfinite_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                                    MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_isnormal_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
+MIR::InstPtr analyze_isnormal_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                                    MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_issubnormal_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
+MIR::InstPtr analyze_issubnormal_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                                       MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_iszero_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
+MIR::InstPtr analyze_iszero_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                                  MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_isnegative_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
+MIR::InstPtr analyze_isnegative_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                                      MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_ispositive_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
+MIR::InstPtr analyze_ispositive_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                                      MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
 
 MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_numerical_classify_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt){
@@ -102,7 +102,7 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_numerical_classify_inst(IR::Token 
     }
 }
 
-MIR::InstPtr analyze_isnan_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_isnan_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                                 IR::TypeExprPtr value_type, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
@@ -116,7 +116,7 @@ MIR::InstPtr analyze_isnan_inst(std::string filename, MIR::LocalDestRegisterPtr 
         return std::make_shared<MIR::VecFloatIsNanInst>(inst_stmt,dest,value,value_type,fast_math_attr);
     }
 }
-MIR::InstPtr analyze_isinf_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_isinf_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                                 IR::TypeExprPtr value_type, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
@@ -130,7 +130,7 @@ MIR::InstPtr analyze_isinf_inst(std::string filename, MIR::LocalDestRegisterPtr 
         return std::make_shared<MIR::VecFloatIsInfInst>(inst_stmt,dest,value,value_type,fast_math_attr);
     }
 }
-MIR::InstPtr analyze_isfinite_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_isfinite_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                                    IR::TypeExprPtr value_type, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
@@ -144,7 +144,7 @@ MIR::InstPtr analyze_isfinite_inst(std::string filename, MIR::LocalDestRegisterP
         return std::make_shared<MIR::VecFloatIsFiniteInst>(inst_stmt,dest,value,value_type,fast_math_attr);
     }
 }
-MIR::InstPtr analyze_isnormal_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_isnormal_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                                    IR::TypeExprPtr value_type, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
@@ -158,7 +158,7 @@ MIR::InstPtr analyze_isnormal_inst(std::string filename, MIR::LocalDestRegisterP
         return std::make_shared<MIR::VecFloatIsNormalInst>(inst_stmt,dest,value,value_type,fast_math_attr);
     }
 }
-MIR::InstPtr analyze_issubnormal_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_issubnormal_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                                       IR::TypeExprPtr value_type, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
@@ -172,7 +172,7 @@ MIR::InstPtr analyze_issubnormal_inst(std::string filename, MIR::LocalDestRegist
         return std::make_shared<MIR::VecFloatIsSubnormalInst>(inst_stmt,dest,value,value_type,fast_math_attr);
     }
 }
-MIR::InstPtr analyze_iszero_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_iszero_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                                  IR::TypeExprPtr value_type, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
@@ -186,7 +186,7 @@ MIR::InstPtr analyze_iszero_inst(std::string filename, MIR::LocalDestRegisterPtr
         return std::make_shared<MIR::VecFloatIsZeroInst>(inst_stmt,dest,value,value_type,fast_math_attr);
     }
 }
-MIR::InstPtr analyze_isnegative_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_isnegative_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                                      IR::TypeExprPtr value_type, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
@@ -200,7 +200,7 @@ MIR::InstPtr analyze_isnegative_inst(std::string filename, MIR::LocalDestRegiste
         return std::make_shared<MIR::VecFloatIsNegativeInst>(inst_stmt,dest,value,value_type,fast_math_attr);
     }
 }
-MIR::InstPtr analyze_ispositive_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_ispositive_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                                      IR::TypeExprPtr value_type, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);

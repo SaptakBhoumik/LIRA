@@ -7,52 +7,52 @@
 #include <unordered_set>
 namespace LIRA {
 namespace SemanticAnalyzer {
-using DispatchFuncType = std::function<MIR::InstPtr(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+using DispatchFuncType = std::function<MIR::InstPtr(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                                     MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt)>;
 
-MIR::InstPtr analyze_fetch_neg_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_neg_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                     MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_fetch_not_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_not_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                     MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_fetch_abs_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_abs_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                     MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_fetch_ceil_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_ceil_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                      MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_fetch_floor_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_floor_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                       MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_fetch_integral_part_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_integral_part_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                               MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_fetch_fractional_part_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_fractional_part_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                                 MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_fetch_roundnearest_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_roundnearest_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                              MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_fetch_roundeven_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_roundeven_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                           MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_fetch_sqrt_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_sqrt_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                      MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_fetch_reciprocal_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_reciprocal_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                            MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_fetch_rsqrt_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_rsqrt_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                       MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_fetch_popcount_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_popcount_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                          MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_fetch_clz_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_clz_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                     MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_fetch_ctz_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_ctz_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                     MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_fetch_parity_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_parity_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                        MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_fetch_bswap_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_bswap_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                       MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_fetch_bitreverse_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_bitreverse_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                            MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_fetch_clrsb_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_clrsb_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                       MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_fetch_blsi_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_blsi_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                      MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_fetch_blsr_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_blsr_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                      MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_fetch_blsmask_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_blsmask_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                         MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt);
 
 MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_unary_fetch_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt){
@@ -135,7 +135,7 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_unary_fetch_inst(IR::Token name,IR
         exit(1);
     }
 }
-MIR::InstPtr analyze_fetch_neg_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_neg_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                     MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt){
     if(type_variant == MIR::TypeVariant::Float){
         auto [fast_math_attr,_remaining_attrs] = Utils::extract_fastmath_attrs(filename,remaining_attrs);
@@ -152,14 +152,14 @@ MIR::InstPtr analyze_fetch_neg_inst(std::string filename, MIR::LocalDestRegister
         return std::make_shared<MIR::IntFetchNegInst>(inst_stmt,dest,value,common_fetch_attrs,flag_attrs["nsw"]);
     }
 }
-MIR::InstPtr analyze_fetch_not_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_not_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                     MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt){
     if(remaining_attrs.size() > 0){
         Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for int unary fetch instruction: " + remaining_attrs[0]->to_string());
     }
     return std::make_shared<MIR::IntFetchNotInst>(inst_stmt,dest,value,common_fetch_attrs);
 }
-MIR::InstPtr analyze_fetch_abs_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_abs_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                     MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt){
     if(type_variant == MIR::TypeVariant::Float){
         auto [fast_math_attr,_remaining_attrs] = Utils::extract_fastmath_attrs(filename,remaining_attrs);
@@ -176,7 +176,7 @@ MIR::InstPtr analyze_fetch_abs_inst(std::string filename, MIR::LocalDestRegister
         return std::make_shared<MIR::IntFetchAbsInst>(inst_stmt,dest,value,common_fetch_attrs,flag_attrs["nsw"]);
     }
 }
-MIR::InstPtr analyze_fetch_ceil_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_ceil_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                      MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt){
     auto [fast_math_attr,_remaining_attrs] = Utils::extract_fastmath_attrs(filename,remaining_attrs);
     if(_remaining_attrs.size() > 0){
@@ -184,7 +184,7 @@ MIR::InstPtr analyze_fetch_ceil_inst(std::string filename, MIR::LocalDestRegiste
     }
     return std::make_shared<MIR::FloatFetchCeilInst>(inst_stmt,dest,value,common_fetch_attrs,fast_math_attr);
 }
-MIR::InstPtr analyze_fetch_floor_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_floor_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                       MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt){
     auto [fast_math_attr,_remaining_attrs] = Utils::extract_fastmath_attrs(filename,remaining_attrs);
     if(_remaining_attrs.size() > 0){
@@ -192,7 +192,7 @@ MIR::InstPtr analyze_fetch_floor_inst(std::string filename, MIR::LocalDestRegist
     }
     return std::make_shared<MIR::FloatFetchFloorInst>(inst_stmt,dest,value,common_fetch_attrs,fast_math_attr);
 }
-MIR::InstPtr analyze_fetch_integral_part_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_integral_part_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                               MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt){
     auto [fast_math_attr,_remaining_attrs] = Utils::extract_fastmath_attrs(filename,remaining_attrs);
     if(_remaining_attrs.size() > 0){
@@ -200,7 +200,7 @@ MIR::InstPtr analyze_fetch_integral_part_inst(std::string filename, MIR::LocalDe
     }
     return std::make_shared<MIR::FloatFetchIntegralPartInst>(inst_stmt,dest,value,common_fetch_attrs,fast_math_attr);
 }
-MIR::InstPtr analyze_fetch_fractional_part_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_fractional_part_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                                 MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt){
     auto [fast_math_attr,_remaining_attrs] = Utils::extract_fastmath_attrs(filename,remaining_attrs);
     if(_remaining_attrs.size() > 0){
@@ -208,7 +208,7 @@ MIR::InstPtr analyze_fetch_fractional_part_inst(std::string filename, MIR::Local
     }
     return std::make_shared<MIR::FloatFetchFractionalPartInst>(inst_stmt,dest,value,common_fetch_attrs,fast_math_attr);
 }
-MIR::InstPtr analyze_fetch_roundnearest_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_roundnearest_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                              MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt){
     auto [fast_math_attr,_remaining_attrs] = Utils::extract_fastmath_attrs(filename,remaining_attrs);
     if(_remaining_attrs.size() > 0){
@@ -216,7 +216,7 @@ MIR::InstPtr analyze_fetch_roundnearest_inst(std::string filename, MIR::LocalDes
     }
     return std::make_shared<MIR::FloatFetchRoundNearestInst>(inst_stmt,dest,value,common_fetch_attrs,fast_math_attr);
 }
-MIR::InstPtr analyze_fetch_roundeven_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_roundeven_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                           MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt){
     auto [fast_math_attr,_remaining_attrs] = Utils::extract_fastmath_attrs(filename,remaining_attrs);
     if(_remaining_attrs.size() > 0){
@@ -224,7 +224,7 @@ MIR::InstPtr analyze_fetch_roundeven_inst(std::string filename, MIR::LocalDestRe
     }
     return std::make_shared<MIR::FloatFetchRoundEvenInst>(inst_stmt,dest,value,common_fetch_attrs,fast_math_attr);
 }
-MIR::InstPtr analyze_fetch_sqrt_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_sqrt_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                      MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt){
     auto [fast_math_attr,_remaining_attrs] = Utils::extract_fastmath_attrs(filename,remaining_attrs);
     if(_remaining_attrs.size() > 0){
@@ -232,7 +232,7 @@ MIR::InstPtr analyze_fetch_sqrt_inst(std::string filename, MIR::LocalDestRegiste
     }
     return std::make_shared<MIR::FloatFetchSqrtInst>(inst_stmt,dest,value,common_fetch_attrs,fast_math_attr);
 }
-MIR::InstPtr analyze_fetch_reciprocal_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_reciprocal_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                            MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt){
     auto [fast_math_attr,__remaining_attrs] = Utils::extract_fastmath_attrs(filename,remaining_attrs);
     auto [flag_attrs,_remaining_attrs] = Utils::extract_flag_attrs(filename,__remaining_attrs, {"approx"});
@@ -241,7 +241,7 @@ MIR::InstPtr analyze_fetch_reciprocal_inst(std::string filename, MIR::LocalDestR
     }
     return std::make_shared<MIR::FloatFetchReciprocalInst>(inst_stmt,dest,value,common_fetch_attrs,fast_math_attr,flag_attrs["approx"]);
 }
-MIR::InstPtr analyze_fetch_rsqrt_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_rsqrt_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                       MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt){
     auto [fast_math_attr,__remaining_attrs] = Utils::extract_fastmath_attrs(filename,remaining_attrs);
     auto [flag_attrs,_remaining_attrs] = Utils::extract_flag_attrs(filename,__remaining_attrs, {"approx"});
@@ -250,14 +250,14 @@ MIR::InstPtr analyze_fetch_rsqrt_inst(std::string filename, MIR::LocalDestRegist
     }
     return std::make_shared<MIR::FloatFetchRsqrtInst>(inst_stmt,dest,value,common_fetch_attrs,fast_math_attr,flag_attrs["approx"]);
 }
-MIR::InstPtr analyze_fetch_popcount_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_popcount_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                          MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt){
     if(remaining_attrs.size() > 0){
         Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for int unary fetch instruction: " + remaining_attrs[0]->to_string());
     }
     return std::make_shared<MIR::IntFetchPopcountInst>(inst_stmt,dest,value,common_fetch_attrs);
 }
-MIR::InstPtr analyze_fetch_clz_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_clz_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                     MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt){
     auto [flag_attrs,_remaining_attrs] = Utils::extract_flag_attrs(filename,remaining_attrs, {"zero_poison"});
     if(_remaining_attrs.size() > 0){
@@ -265,7 +265,7 @@ MIR::InstPtr analyze_fetch_clz_inst(std::string filename, MIR::LocalDestRegister
     }
     return std::make_shared<MIR::IntFetchCLZInst>(inst_stmt,dest,value,common_fetch_attrs,flag_attrs["zero_poison"]);
 }
-MIR::InstPtr analyze_fetch_ctz_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_ctz_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                     MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt){
     auto [flag_attrs,_remaining_attrs] = Utils::extract_flag_attrs(filename,remaining_attrs, {"zero_poison"});
     if(_remaining_attrs.size() > 0){
@@ -273,14 +273,14 @@ MIR::InstPtr analyze_fetch_ctz_inst(std::string filename, MIR::LocalDestRegister
     }
     return std::make_shared<MIR::IntFetchCTZInst>(inst_stmt,dest,value,common_fetch_attrs,flag_attrs["zero_poison"]);
 }
-MIR::InstPtr analyze_fetch_parity_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_parity_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                        MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt){
     if(remaining_attrs.size() > 0){
         Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for int unary fetch instruction: " + remaining_attrs[0]->to_string());
     }
     return std::make_shared<MIR::IntFetchParityInst>(inst_stmt,dest,value,common_fetch_attrs);
 }
-MIR::InstPtr analyze_fetch_bswap_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_bswap_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                       MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt){
     auto type = dest->get_type();
     if(Utils::get_type_size(type) % 8 != 0){
@@ -301,35 +301,35 @@ MIR::InstPtr analyze_fetch_bswap_inst(std::string filename, MIR::LocalDestRegist
         return std::make_shared<MIR::IntFetchBswapInst>(inst_stmt,dest,value,common_fetch_attrs);
     }
 }
-MIR::InstPtr analyze_fetch_bitreverse_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_bitreverse_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                            MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt){
     if(remaining_attrs.size() > 0){
         Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for int unary fetch instruction: " + remaining_attrs[0]->to_string());
     }
     return std::make_shared<MIR::IntFetchBitreverseInst>(inst_stmt,dest,value,common_fetch_attrs);
 }
-MIR::InstPtr analyze_fetch_clrsb_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_clrsb_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                       MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt){
     if(remaining_attrs.size() > 0){
         Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for int unary fetch instruction: " + remaining_attrs[0]->to_string());
     }
     return std::make_shared<MIR::IntFetchCLRSBInst>(inst_stmt,dest,value,common_fetch_attrs);
 }
-MIR::InstPtr analyze_fetch_blsi_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_blsi_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                      MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt){
     if(remaining_attrs.size() > 0){
         Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for int unary fetch instruction: " + remaining_attrs[0]->to_string());
     }
     return std::make_shared<MIR::IntFetchBLSIInst>(inst_stmt,dest,value,common_fetch_attrs);
 }
-MIR::InstPtr analyze_fetch_blsr_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_blsr_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                      MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt){
     if(remaining_attrs.size() > 0){
         Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for int unary fetch instruction: " + remaining_attrs[0]->to_string());
     }
     return std::make_shared<MIR::IntFetchBLSRInst>(inst_stmt,dest,value,common_fetch_attrs);
 }
-MIR::InstPtr analyze_fetch_blsmask_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
+MIR::InstPtr analyze_fetch_blsmask_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, MIR::TypeVariant type_variant, 
                                         MIR::CommonFetchInstAttrs common_fetch_attrs, std::vector<IR::AttributePtr> remaining_attrs, IR::InstructionStmtPtr inst_stmt){
     if(remaining_attrs.size() > 0){
         Utils::error(filename, remaining_attrs[0]->get_token(), "Unsupported attribute for int unary fetch instruction: " + remaining_attrs[0]->to_string());

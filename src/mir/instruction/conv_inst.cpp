@@ -2,7 +2,7 @@
 
 namespace LIRA {
 namespace MIR {
-ConvInst::ConvInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type,
+ConvInst::ConvInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type,
                    bool nuw, bool nsw, bool nsb, bool unsigned_, bool saturating, std::optional<FastMathAttr> fast_math_attr):
                    Inst(instruction_stmt, destination, fast_math_attr){
     this->value = value;
@@ -70,12 +70,12 @@ InstType ConvInst::get_inst_type() const{
 }
 
 // --------------------------- Scalar conversion operations ---------------------------
-ScalarConvInst::ScalarConvInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
+ScalarConvInst::ScalarConvInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
                                 bool nuw, bool nsw, bool nsb, bool unsigned_, bool saturating, std::optional<FastMathAttr> fast_math_attr)
                                 :ConvInst(instruction_stmt, destination, value, in_type, nuw, nsw, nsb, unsigned_, saturating, fast_math_attr){}
 
         
-IntTruncInst::IntTruncInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
+IntTruncInst::IntTruncInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
                            bool nuw, bool nsw, bool unsigned_, bool saturating)
                            :ScalarConvInst(instruction_stmt, destination, value, in_type, nuw, nsw, false, unsigned_, saturating, std::nullopt){}
 std::shared_ptr<IR::IntTypeExpr> IntTruncInst::get_casted_in_type() const{
@@ -98,7 +98,7 @@ std::string IntTruncInst::to_string() const{
 }
 
 
-FloatTruncInst::FloatTruncInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type,
+FloatTruncInst::FloatTruncInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type,
                                FastMathAttr fast_math_attr)
                                :ScalarConvInst(instruction_stmt, destination, value, in_type, false, false, false, false, false, fast_math_attr){}
 std::shared_ptr<IR::FloatTypeExpr> FloatTruncInst::get_casted_in_type() const{
@@ -129,7 +129,7 @@ std::string FloatTruncInst::to_string() const{
 }
 
 
-IntExtInst::IntExtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type,
+IntExtInst::IntExtInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type,
                        bool nsb, bool unsigned_):
                        ScalarConvInst(instruction_stmt, destination, value, in_type, false, false, nsb, unsigned_, false, std::nullopt){}
 std::shared_ptr<IR::IntTypeExpr> IntExtInst::get_casted_in_type() const{
@@ -152,7 +152,7 @@ std::string IntExtInst::to_string() const{
 }
 
 
-FloatExtInst::FloatExtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, FastMathAttr fast_math_attr)
+FloatExtInst::FloatExtInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, FastMathAttr fast_math_attr)
                             :ScalarConvInst(instruction_stmt, destination, value, in_type, false, false, false, false, false, fast_math_attr){}
 std::shared_ptr<IR::FloatTypeExpr> FloatExtInst::get_casted_in_type() const{
     return std::dynamic_pointer_cast<IR::FloatTypeExpr>(this->in_type);
@@ -182,7 +182,7 @@ std::string FloatExtInst::to_string() const{
 }
 
 
-FloatToIntInst::FloatToIntInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
+FloatToIntInst::FloatToIntInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
                                bool nsb, bool unsigned_, bool saturating, FastMathAttr fast_math_attr)
                                :ScalarConvInst(instruction_stmt, destination, value, in_type, false, false, nsb, unsigned_, saturating, fast_math_attr){}
 std::shared_ptr<IR::FloatTypeExpr> FloatToIntInst::get_casted_in_type() const{
@@ -209,7 +209,7 @@ std::string FloatToIntInst::to_string() const{
 }
 
 
-IntToFloatInst::IntToFloatInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
+IntToFloatInst::IntToFloatInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
                                bool nsb, bool unsigned_, FastMathAttr fast_math_attr)
                                :ScalarConvInst(instruction_stmt, destination, value, in_type, false, false, nsb, unsigned_, false, fast_math_attr){}
 std::shared_ptr<IR::IntTypeExpr> IntToFloatInst::get_casted_in_type() const{
@@ -236,7 +236,7 @@ std::string IntToFloatInst::to_string() const{
 }
 
 
-PtrToIntInst::PtrToIntInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value)
+PtrToIntInst::PtrToIntInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value)
                     :ScalarConvInst(instruction_stmt, destination, value, std::make_shared<IR::PtrTypeExpr>(IR::Token{},std::vector<IR::AttributePtr>{}), false, false, false, false, false, std::nullopt){}
 std::shared_ptr<IR::IntTypeExpr> PtrToIntInst::get_casted_out_type() const{
     return std::dynamic_pointer_cast<IR::IntTypeExpr>(this->destination->get_type());
@@ -255,7 +255,7 @@ std::string PtrToIntInst::to_string() const{
 }
 
 
-IntToPtrInst::IntToPtrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type)
+IntToPtrInst::IntToPtrInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type)
                             :ScalarConvInst(instruction_stmt, destination, value, in_type, false, false, false, false, false, std::nullopt){}
 std::shared_ptr<IR::IntTypeExpr> IntToPtrInst::get_casted_in_type() const{
     return std::dynamic_pointer_cast<IR::IntTypeExpr>(this->in_type);
@@ -274,7 +274,7 @@ std::string IntToPtrInst::to_string() const{
 }
 
 
-BitcastInst::BitcastInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type,std::optional<FastMathAttr> fast_math_attr)
+BitcastInst::BitcastInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type,std::optional<FastMathAttr> fast_math_attr)
                         :ScalarConvInst(instruction_stmt, destination, value, in_type, false, false, false, false, false, fast_math_attr){}
 std::size_t BitcastInst::get_in_type_bitwidth() const{
     return 0;
@@ -291,7 +291,7 @@ std::string BitcastInst::to_string() const{
 
 
 // --------------------------- Vector conversion operations ---------------------------
-VecConvInst::VecConvInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
+VecConvInst::VecConvInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
                    bool nuw, bool nsw, bool nsb, bool unsigned_, bool saturating, std::optional<FastMathAttr> fast_math_attr)
                    :ConvInst(instruction_stmt, destination, value, in_type, nuw, nsw, nsb, unsigned_, saturating, fast_math_attr){}
 std::shared_ptr<IR::SIMDTypeExpr> VecConvInst::get_casted_in_type() const{
@@ -305,7 +305,7 @@ std::size_t VecConvInst::get_num_elements() const{
 }
 
 
-VecIntTruncInst::VecIntTruncInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
+VecIntTruncInst::VecIntTruncInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
                     bool nuw, bool nsw, bool unsigned_, bool saturating)
                     :VecConvInst(instruction_stmt, destination, value, in_type, nuw, nsw, false, unsigned_, saturating, std::nullopt){}
 std::shared_ptr<IR::IntTypeExpr> VecIntTruncInst::get_casted_in_basetype() const{
@@ -330,7 +330,7 @@ std::string VecIntTruncInst::to_string() const{
 }
 
 
-VecFloatTruncInst::VecFloatTruncInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, FastMathAttr fast_math_attr)
+VecFloatTruncInst::VecFloatTruncInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, FastMathAttr fast_math_attr)
                     :VecConvInst(instruction_stmt, destination, value, in_type, false, false, false, false, false, fast_math_attr){
 }
 std::shared_ptr<IR::FloatTypeExpr> VecFloatTruncInst::get_casted_in_basetype() const{
@@ -363,7 +363,7 @@ std::string VecFloatTruncInst::to_string() const{
 }
 
 
-VecIntExtInst::VecIntExtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
+VecIntExtInst::VecIntExtInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
                              bool nsb, bool unsigned_)
                              :VecConvInst(instruction_stmt, destination, value, in_type, false, false, nsb, unsigned_, false, std::nullopt){}
 std::shared_ptr<IR::IntTypeExpr> VecIntExtInst::get_casted_in_basetype() const{
@@ -388,7 +388,7 @@ std::string VecIntExtInst::to_string() const{
 }
 
 
-VecFloatExtInst::VecFloatExtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, FastMathAttr fast_math_attr)
+VecFloatExtInst::VecFloatExtInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, FastMathAttr fast_math_attr)
                                  :VecConvInst(instruction_stmt, destination, value, in_type, false, false, false, false, false, fast_math_attr){}
 std::shared_ptr<IR::FloatTypeExpr> VecFloatExtInst::get_casted_in_basetype() const{
     auto simd_type = this->get_casted_in_type();
@@ -420,7 +420,7 @@ std::string VecFloatExtInst::to_string() const{
 }
 
 
-VecFloatToIntInst::VecFloatToIntInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
+VecFloatToIntInst::VecFloatToIntInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
                                  bool nsb, bool unsigned_, bool saturating, FastMathAttr fast_math_attr)
                                  :VecConvInst(instruction_stmt, destination, value, in_type, false, false, nsb, unsigned_, saturating, fast_math_attr){}
 std::shared_ptr<IR::FloatTypeExpr> VecFloatToIntInst::get_casted_in_basetype() const{
@@ -449,7 +449,7 @@ std::string VecFloatToIntInst::to_string() const{
 }
 
 
-VecIntToFloatInst::VecIntToFloatInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
+VecIntToFloatInst::VecIntToFloatInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type, 
                                      bool nsb, bool unsigned_, FastMathAttr fast_math_attr)
                                      :VecConvInst(instruction_stmt, destination, value, in_type, false, false, nsb, unsigned_, false, fast_math_attr){}
 std::shared_ptr<IR::IntTypeExpr> VecIntToFloatInst::get_casted_in_basetype() const{
@@ -478,7 +478,7 @@ std::string VecIntToFloatInst::to_string() const{
 }
 
 
-VecPtrToIntInst::VecPtrToIntInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type)
+VecPtrToIntInst::VecPtrToIntInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type)
                     :VecConvInst(instruction_stmt, destination, value, in_type, false, false, false, false, false, std::nullopt){}
 std::shared_ptr<IR::IntTypeExpr> VecPtrToIntInst::get_casted_out_basetype() const{
     auto simd_type = this->get_casted_out_type();
@@ -498,7 +498,7 @@ std::string VecPtrToIntInst::to_string() const{
 }
 
 
-VecIntToPtrInst::VecIntToPtrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type)
+VecIntToPtrInst::VecIntToPtrInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr in_type)
                                 :VecConvInst(instruction_stmt, destination, value, in_type, false, false, false, false, false, std::nullopt){}
 std::shared_ptr<IR::IntTypeExpr> VecIntToPtrInst::get_casted_in_basetype() const{
     auto simd_type = this->get_casted_in_type();

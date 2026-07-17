@@ -2,7 +2,7 @@
 
 namespace LIRA {
 namespace MIR {
-UnaryInst::UnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, std::optional<FastMathAttr> fast_math_attr)
+UnaryInst::UnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, std::optional<FastMathAttr> fast_math_attr)
                     :Inst(instruction_stmt,destination, fast_math_attr){
     this->value = value;
 }
@@ -17,7 +17,7 @@ InstType UnaryInst::get_inst_type() const{
 }
 
 // --------------------------- Int Unary operations ---------------------------
-IntUnaryInst::IntUnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, bool nuw, bool nsw, bool zero_poison)
+IntUnaryInst::IntUnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, bool nuw, bool nsw, bool zero_poison)
                     :UnaryInst(instruction_stmt, destination, value, std::nullopt){
     this->nuw = nuw;
     this->nsw = nsw;
@@ -56,7 +56,7 @@ TypeVariant IntUnaryInst::get_type_variant() const{
 }
 
 
-IntNegInst::IntNegInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, bool nsw)
+IntNegInst::IntNegInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, bool nsw)
                         :IntUnaryInst(instruction_stmt, destination, value, false, nsw, false){}
 UnaryInst::OpType IntNegInst::get_op_type() const{
     return OpType::NEG;
@@ -66,7 +66,7 @@ std::string IntNegInst::to_string() const{
 }
 
 
-IntNotInst::IntNotInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value)
+IntNotInst::IntNotInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value)
                         :IntUnaryInst(instruction_stmt, destination, value, false, false, false){}
 UnaryInst::OpType IntNotInst::get_op_type() const{
     return OpType::NOT;
@@ -75,7 +75,7 @@ std::string IntNotInst::to_string() const{
     return this->to_string_helper("int_not");
 }
 
-IntAbsInst::IntAbsInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, bool nsw)
+IntAbsInst::IntAbsInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, bool nsw)
                         :IntUnaryInst(instruction_stmt, destination, value, false, nsw, false){}
 UnaryInst::OpType IntAbsInst::get_op_type() const{
     return OpType::ABS;
@@ -85,7 +85,7 @@ std::string IntAbsInst::to_string() const{
 }
 
 
-IntPopcountInst::IntPopcountInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value)
+IntPopcountInst::IntPopcountInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value)
                                 :IntUnaryInst(instruction_stmt, destination, value, false, false, false){}
 UnaryInst::OpType IntPopcountInst::get_op_type() const{
     return OpType::POPCOUNT;
@@ -95,7 +95,7 @@ std::string IntPopcountInst::to_string() const{
 }
 
 
-IntCLZInst::IntCLZInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, bool zero_poison)
+IntCLZInst::IntCLZInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, bool zero_poison)
                     :IntUnaryInst(instruction_stmt, destination, value, false, false, zero_poison){}
 UnaryInst::OpType IntCLZInst::get_op_type() const{
     return OpType::CLZ;
@@ -105,7 +105,7 @@ std::string IntCLZInst::to_string() const{
 }
 
 
-IntCTZInst::IntCTZInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, bool zero_poison)
+IntCTZInst::IntCTZInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, bool zero_poison)
                     :IntUnaryInst(instruction_stmt, destination, value, false, false, zero_poison){}
 UnaryInst::OpType IntCTZInst::get_op_type() const{
     return OpType::CTZ;
@@ -115,7 +115,7 @@ std::string IntCTZInst::to_string() const{
 }
 
 
-IntParityInst::IntParityInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value)
+IntParityInst::IntParityInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value)
                             :IntUnaryInst(instruction_stmt, destination, value, false, false, false){}
 UnaryInst::OpType IntParityInst::get_op_type() const{
     return OpType::PARITY;
@@ -125,7 +125,7 @@ std::string IntParityInst::to_string() const{
 }
 
 
-IntBswapInst::IntBswapInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value)
+IntBswapInst::IntBswapInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value)
                             :IntUnaryInst(instruction_stmt, destination, value, false, false, false){}
 UnaryInst::OpType IntBswapInst::get_op_type() const{
     return OpType::BSWAP;
@@ -135,7 +135,7 @@ std::string IntBswapInst::to_string() const{
 }
 
 
-IntBitreverseInst::IntBitreverseInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value)
+IntBitreverseInst::IntBitreverseInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value)
                                     :IntUnaryInst(instruction_stmt, destination, value, false, false, false){}
 UnaryInst::OpType IntBitreverseInst::get_op_type() const{
     return OpType::BITREVERSE;
@@ -145,7 +145,7 @@ std::string IntBitreverseInst::to_string() const{
 }
 
 
-IntCLRSBInst::IntCLRSBInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value)
+IntCLRSBInst::IntCLRSBInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value)
                             :IntUnaryInst(instruction_stmt, destination, value, false, false, false){}
 UnaryInst::OpType IntCLRSBInst::get_op_type() const{
     return OpType::CLRSB;
@@ -155,7 +155,7 @@ std::string IntCLRSBInst::to_string() const{
 }
 
 
-IntBLSIInst::IntBLSIInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value) 
+IntBLSIInst::IntBLSIInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value) 
                             :IntUnaryInst(instruction_stmt, destination, value, false, false, false){}
 UnaryInst::OpType IntBLSIInst::get_op_type() const{
     return OpType::BLSI;
@@ -165,7 +165,7 @@ std::string IntBLSIInst::to_string() const{
 }
 
 
-IntBLSRInst::IntBLSRInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value) 
+IntBLSRInst::IntBLSRInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value) 
                             :IntUnaryInst(instruction_stmt, destination, value, false, false, false){}
 UnaryInst::OpType IntBLSRInst::get_op_type() const{
     return OpType::BLSR;
@@ -175,7 +175,7 @@ std::string IntBLSRInst::to_string() const{
 }
 
 
-IntBLSMaskInst::IntBLSMaskInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value) 
+IntBLSMaskInst::IntBLSMaskInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value) 
                             :IntUnaryInst(instruction_stmt, destination, value, false, false, false){}
 UnaryInst::OpType IntBLSMaskInst::get_op_type() const{
     return OpType::BLSMASK;
@@ -184,7 +184,7 @@ std::string IntBLSMaskInst::to_string() const{
     return this->to_string_helper("int_blsmask");
 }
 // --------------------------- Vector Int Unary operations ---------------------------
-VecIntUnaryInst::VecIntUnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, bool nuw, bool nsw, bool zero_poison)
+VecIntUnaryInst::VecIntUnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, bool nuw, bool nsw, bool zero_poison)
                                 :UnaryInst(instruction_stmt, destination, value, std::nullopt){
     this->nuw = nuw;
     this->nsw = nsw;
@@ -227,7 +227,7 @@ TypeVariant VecIntUnaryInst::get_type_variant() const{
 }
 
 
-VecIntNegInst::VecIntNegInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, bool nsw)
+VecIntNegInst::VecIntNegInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, bool nsw)
                         :VecIntUnaryInst(instruction_stmt, destination, value, false, nsw, false){}
 UnaryInst::OpType VecIntNegInst::get_op_type() const{
     return OpType::NEG;
@@ -237,7 +237,7 @@ std::string VecIntNegInst::to_string() const{
 }
 
 
-VecIntNotInst::VecIntNotInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value)
+VecIntNotInst::VecIntNotInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value)
                         :VecIntUnaryInst(instruction_stmt, destination, value, false, false, false){}
 UnaryInst::OpType VecIntNotInst::get_op_type() const{
     return OpType::NOT;
@@ -246,7 +246,7 @@ std::string VecIntNotInst::to_string() const{
     return this->to_string_helper("vec_int_not");
 }
 
-VecIntAbsInst::VecIntAbsInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, bool nsw)
+VecIntAbsInst::VecIntAbsInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, bool nsw)
                         :VecIntUnaryInst(instruction_stmt, destination, value, false, nsw, false){}
 UnaryInst::OpType VecIntAbsInst::get_op_type() const{
     return OpType::ABS;
@@ -256,7 +256,7 @@ std::string VecIntAbsInst::to_string() const{
 }
 
 
-VecIntPopcountInst::VecIntPopcountInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value)
+VecIntPopcountInst::VecIntPopcountInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value)
                                 :VecIntUnaryInst(instruction_stmt, destination, value, false, false, false){}
 UnaryInst::OpType VecIntPopcountInst::get_op_type() const{
     return OpType::POPCOUNT;
@@ -266,7 +266,7 @@ std::string VecIntPopcountInst::to_string() const{
 }
 
 
-VecIntCLZInst::VecIntCLZInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, bool zero_poison)
+VecIntCLZInst::VecIntCLZInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, bool zero_poison)
                     :VecIntUnaryInst(instruction_stmt, destination, value, false, false, zero_poison){}
 UnaryInst::OpType VecIntCLZInst::get_op_type() const{
     return OpType::CLZ;
@@ -276,7 +276,7 @@ std::string VecIntCLZInst::to_string() const{
 }
 
 
-VecIntCTZInst::VecIntCTZInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, bool zero_poison)
+VecIntCTZInst::VecIntCTZInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, bool zero_poison)
                     :VecIntUnaryInst(instruction_stmt, destination, value, false, false, zero_poison){}
 UnaryInst::OpType VecIntCTZInst::get_op_type() const{
     return OpType::CTZ;
@@ -286,7 +286,7 @@ std::string VecIntCTZInst::to_string() const{
 }
 
 
-VecIntParityInst::VecIntParityInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value)
+VecIntParityInst::VecIntParityInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value)
                             :VecIntUnaryInst(instruction_stmt, destination, value, false, false, false){}
 UnaryInst::OpType VecIntParityInst::get_op_type() const{
     return OpType::PARITY;
@@ -296,7 +296,7 @@ std::string VecIntParityInst::to_string() const{
 }
 
 
-VecIntBswapInst::VecIntBswapInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value)
+VecIntBswapInst::VecIntBswapInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value)
                             :VecIntUnaryInst(instruction_stmt, destination, value, false, false, false){}
 UnaryInst::OpType VecIntBswapInst::get_op_type() const{
     return OpType::BSWAP;
@@ -306,7 +306,7 @@ std::string VecIntBswapInst::to_string() const{
 }
 
 
-VecIntBitreverseInst::VecIntBitreverseInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value)
+VecIntBitreverseInst::VecIntBitreverseInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value)
                                     :VecIntUnaryInst(instruction_stmt, destination, value, false, false, false){}
 UnaryInst::OpType VecIntBitreverseInst::get_op_type() const{
     return OpType::BITREVERSE;
@@ -316,7 +316,7 @@ std::string VecIntBitreverseInst::to_string() const{
 }
 
 
-VecIntCLRSBInst::VecIntCLRSBInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value)
+VecIntCLRSBInst::VecIntCLRSBInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value)
                             :VecIntUnaryInst(instruction_stmt, destination, value, false, false, false){}
 UnaryInst::OpType VecIntCLRSBInst::get_op_type() const{
     return OpType::CLRSB;
@@ -327,7 +327,7 @@ std::string VecIntCLRSBInst::to_string() const{
 
 
 // --------------------------- Float Unary operations ---------------------------
-FloatUnaryInst::FloatUnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr, bool approx)
+FloatUnaryInst::FloatUnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr, bool approx)
                     :UnaryInst(instruction_stmt, destination, value, fast_math_attr){
     this->approx = approx;
 }
@@ -360,7 +360,7 @@ TypeVariant FloatUnaryInst::get_type_variant() const{
 }
 
 
-FloatNegInst::FloatNegInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
+FloatNegInst::FloatNegInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
                         :FloatUnaryInst(instruction_stmt, destination, value, fast_math_attr,false){}
 UnaryInst::OpType FloatNegInst::get_op_type() const{
     return OpType::NEG;
@@ -370,7 +370,7 @@ std::string FloatNegInst::to_string() const{
 }
 
 
-FloatAbsInst::FloatAbsInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
+FloatAbsInst::FloatAbsInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
                         :FloatUnaryInst(instruction_stmt, destination, value, fast_math_attr,false){}
 UnaryInst::OpType FloatAbsInst::get_op_type() const{
     return OpType::ABS;
@@ -380,7 +380,7 @@ std::string FloatAbsInst::to_string() const{
 }
 
 
-FloatCeilInst::FloatCeilInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
+FloatCeilInst::FloatCeilInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
                              :FloatUnaryInst(instruction_stmt, destination, value, fast_math_attr,false){}
 UnaryInst::OpType FloatCeilInst::get_op_type() const{
     return OpType::CEIL;
@@ -390,7 +390,7 @@ std::string FloatCeilInst::to_string() const{
 }
 
 
-FloatFloorInst::FloatFloorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
+FloatFloorInst::FloatFloorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
                                 :FloatUnaryInst(instruction_stmt, destination, value, fast_math_attr,false){}
 UnaryInst::OpType FloatFloorInst::get_op_type() const{
     return OpType::FLOOR;
@@ -400,7 +400,7 @@ std::string FloatFloorInst::to_string() const{
 }
 
 
-FloatIntegralPartInst::FloatIntegralPartInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
+FloatIntegralPartInst::FloatIntegralPartInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
                                               :FloatUnaryInst(instruction_stmt, destination, value, fast_math_attr,false){}
 UnaryInst::OpType FloatIntegralPartInst::get_op_type() const{
     return OpType::INTEGRAL_PART;
@@ -410,7 +410,7 @@ std::string FloatIntegralPartInst::to_string() const{
 }
 
 
-FloatFractionalPartInst::FloatFractionalPartInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
+FloatFractionalPartInst::FloatFractionalPartInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
                                                   :FloatUnaryInst(instruction_stmt, destination, value, fast_math_attr,false){}
 UnaryInst::OpType FloatFractionalPartInst::get_op_type() const{
     return OpType::FRACTIONAL_PART;
@@ -420,7 +420,7 @@ std::string FloatFractionalPartInst::to_string() const{
 }
 
 
-FloatRoundNearestInst::FloatRoundNearestInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
+FloatRoundNearestInst::FloatRoundNearestInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
                                             :FloatUnaryInst(instruction_stmt, destination, value, fast_math_attr,false){}
 UnaryInst::OpType FloatRoundNearestInst::get_op_type() const{
     return OpType::ROUND_NEAREST;
@@ -430,7 +430,7 @@ std::string FloatRoundNearestInst::to_string() const{
 }
 
 
-FloatRoundEvenInst::FloatRoundEvenInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
+FloatRoundEvenInst::FloatRoundEvenInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
                                             :FloatUnaryInst(instruction_stmt, destination, value, fast_math_attr,false){}
 UnaryInst::OpType FloatRoundEvenInst::get_op_type() const{
     return OpType::ROUND_EVEN;
@@ -440,7 +440,7 @@ std::string FloatRoundEvenInst::to_string() const{
 }
 
 
-FloatSqrtInst::FloatSqrtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
+FloatSqrtInst::FloatSqrtInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
                              :FloatUnaryInst(instruction_stmt, destination, value, fast_math_attr,false){}
 UnaryInst::OpType FloatSqrtInst::get_op_type() const{
     return OpType::SQRT;
@@ -450,7 +450,7 @@ std::string FloatSqrtInst::to_string() const{
 }
 
 
-FloatReciprocalInst::FloatReciprocalInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr, bool approx)
+FloatReciprocalInst::FloatReciprocalInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr, bool approx)
                                         :FloatUnaryInst(instruction_stmt, destination, value, fast_math_attr, approx){}
 UnaryInst::OpType FloatReciprocalInst::get_op_type() const{
     return OpType::RECIPROCAL;
@@ -460,7 +460,7 @@ std::string FloatReciprocalInst::to_string() const{
 }
 
 
-FloatRsqrtInst::FloatRsqrtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr, bool approx)
+FloatRsqrtInst::FloatRsqrtInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr, bool approx)
                                 :FloatUnaryInst(instruction_stmt, destination, value, fast_math_attr, approx){}
 UnaryInst::OpType FloatRsqrtInst::get_op_type() const{
     return OpType::RSQRT;
@@ -470,7 +470,7 @@ std::string FloatRsqrtInst::to_string() const{
 }
 
 
-FloatBswapInst::FloatBswapInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
+FloatBswapInst::FloatBswapInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
                             :FloatUnaryInst(instruction_stmt, destination, value, fast_math_attr,false){}
 UnaryInst::OpType FloatBswapInst::get_op_type() const{
     return OpType::BSWAP;
@@ -481,7 +481,7 @@ std::string FloatBswapInst::to_string() const{
 
 
 // --------------------------- Vector Float Unary operations ---------------------------
-VecFloatUnaryInst::VecFloatUnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr, bool approx)
+VecFloatUnaryInst::VecFloatUnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr, bool approx)
                                     :UnaryInst(instruction_stmt, destination, value, fast_math_attr){
     this->approx = approx;
 }
@@ -513,7 +513,7 @@ TypeVariant VecFloatUnaryInst::get_type_variant() const{
 }
 
 
-VecFloatNegInst::VecFloatNegInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
+VecFloatNegInst::VecFloatNegInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
                         :VecFloatUnaryInst(instruction_stmt, destination, value, fast_math_attr,false){}
 UnaryInst::OpType VecFloatNegInst::get_op_type() const{
     return OpType::NEG;
@@ -523,7 +523,7 @@ std::string VecFloatNegInst::to_string() const{
 }
 
 
-VecFloatAbsInst::VecFloatAbsInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
+VecFloatAbsInst::VecFloatAbsInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
                         :VecFloatUnaryInst(instruction_stmt, destination, value, fast_math_attr,false){}
 UnaryInst::OpType VecFloatAbsInst::get_op_type() const{
     return OpType::ABS;
@@ -533,7 +533,7 @@ std::string VecFloatAbsInst::to_string() const{
 }
 
 
-VecFloatCeilInst::VecFloatCeilInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
+VecFloatCeilInst::VecFloatCeilInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
                              :VecFloatUnaryInst(instruction_stmt, destination, value, fast_math_attr,false){}
 UnaryInst::OpType VecFloatCeilInst::get_op_type() const{
     return OpType::CEIL;
@@ -543,7 +543,7 @@ std::string VecFloatCeilInst::to_string() const{
 }
 
 
-VecFloatFloorInst::VecFloatFloorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
+VecFloatFloorInst::VecFloatFloorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
                                 :VecFloatUnaryInst(instruction_stmt, destination, value, fast_math_attr,false){}
 UnaryInst::OpType VecFloatFloorInst::get_op_type() const{
     return OpType::FLOOR;
@@ -553,7 +553,7 @@ std::string VecFloatFloorInst::to_string() const{
 }
 
 
-VecFloatIntegralPartInst::VecFloatIntegralPartInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
+VecFloatIntegralPartInst::VecFloatIntegralPartInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
                                               :VecFloatUnaryInst(instruction_stmt, destination, value, fast_math_attr,false){}
 UnaryInst::OpType VecFloatIntegralPartInst::get_op_type() const{
     return OpType::INTEGRAL_PART;
@@ -563,7 +563,7 @@ std::string VecFloatIntegralPartInst::to_string() const{
 }
 
 
-VecFloatFractionalPartInst::VecFloatFractionalPartInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
+VecFloatFractionalPartInst::VecFloatFractionalPartInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
                                                   :VecFloatUnaryInst(instruction_stmt, destination, value, fast_math_attr,false){}
 UnaryInst::OpType VecFloatFractionalPartInst::get_op_type() const{
     return OpType::FRACTIONAL_PART;
@@ -573,7 +573,7 @@ std::string VecFloatFractionalPartInst::to_string() const{
 }
 
 
-VecFloatRoundNearestInst::VecFloatRoundNearestInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
+VecFloatRoundNearestInst::VecFloatRoundNearestInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
                                             :VecFloatUnaryInst(instruction_stmt, destination, value, fast_math_attr,false){}
 UnaryInst::OpType VecFloatRoundNearestInst::get_op_type() const{
     return OpType::ROUND_NEAREST;
@@ -583,7 +583,7 @@ std::string VecFloatRoundNearestInst::to_string() const{
 }
 
 
-VecFloatRoundEvenInst::VecFloatRoundEvenInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
+VecFloatRoundEvenInst::VecFloatRoundEvenInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
                                             :VecFloatUnaryInst(instruction_stmt, destination, value, fast_math_attr,false){}
 UnaryInst::OpType VecFloatRoundEvenInst::get_op_type() const{
     return OpType::ROUND_EVEN;
@@ -593,7 +593,7 @@ std::string VecFloatRoundEvenInst::to_string() const{
 }
 
 
-VecFloatSqrtInst::VecFloatSqrtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
+VecFloatSqrtInst::VecFloatSqrtInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
                              :VecFloatUnaryInst(instruction_stmt, destination, value, fast_math_attr,false){}
 UnaryInst::OpType VecFloatSqrtInst::get_op_type() const{
     return OpType::SQRT;
@@ -603,7 +603,7 @@ std::string VecFloatSqrtInst::to_string() const{
 }
 
 
-VecFloatReciprocalInst::VecFloatReciprocalInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr, bool approx)
+VecFloatReciprocalInst::VecFloatReciprocalInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr, bool approx)
                                         :VecFloatUnaryInst(instruction_stmt, destination, value, fast_math_attr, approx){}
 UnaryInst::OpType VecFloatReciprocalInst::get_op_type() const{
     return OpType::RECIPROCAL;
@@ -613,7 +613,7 @@ std::string VecFloatReciprocalInst::to_string() const{
 }
 
 
-VecFloatRsqrtInst::VecFloatRsqrtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr, bool approx)
+VecFloatRsqrtInst::VecFloatRsqrtInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr, bool approx)
                                 :VecFloatUnaryInst(instruction_stmt, destination, value, fast_math_attr, approx){}
 UnaryInst::OpType VecFloatRsqrtInst::get_op_type() const{
     return OpType::RSQRT;
@@ -623,7 +623,7 @@ std::string VecFloatRsqrtInst::to_string() const{
 }
 
 
-VecFloatBswapInst::VecFloatBswapInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
+VecFloatBswapInst::VecFloatBswapInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr)
                             :VecFloatUnaryInst(instruction_stmt, destination, value, fast_math_attr,false){}
 UnaryInst::OpType VecFloatBswapInst::get_op_type() const{
     return OpType::BSWAP;

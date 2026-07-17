@@ -5,7 +5,7 @@
 
 namespace LIRA {
 namespace MIR {
-WrapBinaryInst::WrapBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+WrapBinaryInst::WrapBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                 bool unsigned_, bool saturating):Inst(instruction_stmt, destination, std::nullopt){
     this->lhs = lhs;
     this->rhs = rhs;
@@ -45,7 +45,7 @@ InstType WrapBinaryInst::get_inst_type() const{
 
 
 // ---------------------------- Integer Wrap Arithmetic Binary Operations ---------------------------
-IntWrapBinaryInst::IntWrapBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+IntWrapBinaryInst::IntWrapBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                      bool unsigned_, bool saturating):WrapBinaryInst(instruction_stmt, destination, lhs, rhs, unsigned_, saturating){}
 std::shared_ptr<IR::IntTypeExpr> IntWrapBinaryInst::get_casted_operand_type() const{
     return std::dynamic_pointer_cast<IR::IntTypeExpr>(this->get_operand_type());
@@ -58,7 +58,7 @@ TypeVariant IntWrapBinaryInst::get_operand_type_variant() const{
 }
 
 
-IntWrapAddInst::IntWrapAddInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+IntWrapAddInst::IntWrapAddInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                bool unsigned_, bool saturating):IntWrapBinaryInst(instruction_stmt, destination, lhs, rhs, unsigned_, saturating){}
 WrapBinaryInst::OpType IntWrapAddInst::get_op_type() const{
     return OpType::WRAP_ADD;
@@ -68,7 +68,7 @@ std::string IntWrapAddInst::to_string() const{
 }
 
 
-IntWrapSubInst::IntWrapSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+IntWrapSubInst::IntWrapSubInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                bool unsigned_, bool saturating):IntWrapBinaryInst(instruction_stmt, destination, lhs, rhs, unsigned_, saturating){}
 WrapBinaryInst::OpType IntWrapSubInst::get_op_type() const{
     return OpType::WRAP_SUB;
@@ -78,7 +78,7 @@ std::string IntWrapSubInst::to_string() const{
 }
 
 
-IntWrapAbsDiffInst::IntWrapAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+IntWrapAbsDiffInst::IntWrapAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                      bool unsigned_, bool saturating):IntWrapBinaryInst(instruction_stmt, destination, lhs, rhs, unsigned_, saturating){}
 WrapBinaryInst::OpType IntWrapAbsDiffInst::get_op_type() const{
     return OpType::WRAP_ABSDIFF;
@@ -88,7 +88,7 @@ std::string IntWrapAbsDiffInst::to_string() const{
 }
 
 
-IntWrapMulInst::IntWrapMulInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+IntWrapMulInst::IntWrapMulInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                bool unsigned_, bool saturating):IntWrapBinaryInst(instruction_stmt, destination, lhs, rhs, unsigned_, saturating){}
 WrapBinaryInst::OpType IntWrapMulInst::get_op_type() const{
     return OpType::WRAP_MUL;
@@ -98,7 +98,7 @@ std::string IntWrapMulInst::to_string() const{
 }
 
 
-IntWrapDivInst::IntWrapDivInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+IntWrapDivInst::IntWrapDivInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                bool unsigned_, bool saturating):IntWrapBinaryInst(instruction_stmt, destination, lhs, rhs, unsigned_, saturating){}
 WrapBinaryInst::OpType IntWrapDivInst::get_op_type() const{
     return OpType::WRAP_DIV;
@@ -108,7 +108,7 @@ std::string IntWrapDivInst::to_string() const{
 }
 
 
-IntWrapRemInst::IntWrapRemInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+IntWrapRemInst::IntWrapRemInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                bool unsigned_, bool saturating):IntWrapBinaryInst(instruction_stmt, destination, lhs, rhs, unsigned_, saturating){}
 WrapBinaryInst::OpType IntWrapRemInst::get_op_type() const{
     return OpType::WRAP_REM;
@@ -118,7 +118,7 @@ std::string IntWrapRemInst::to_string() const{
 }
 
 
-IntWrapCopysignInst::IntWrapCopysignInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+IntWrapCopysignInst::IntWrapCopysignInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                          bool unsigned_, bool saturating):IntWrapBinaryInst(instruction_stmt, destination, lhs, rhs, unsigned_, saturating){}
 WrapBinaryInst::OpType IntWrapCopysignInst::get_op_type() const{
     return OpType::WRAP_COPYSIGN;
@@ -128,7 +128,7 @@ std::string IntWrapCopysignInst::to_string() const{
 }
 
 
-IntWrapShlInst::IntWrapShlInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+IntWrapShlInst::IntWrapShlInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                bool unsigned_, bool saturating):IntWrapBinaryInst(instruction_stmt, destination, lhs, rhs, unsigned_, saturating){}
 WrapBinaryInst::OpType IntWrapShlInst::get_op_type() const{
     return OpType::WRAP_SHL;
@@ -138,7 +138,7 @@ std::string IntWrapShlInst::to_string() const{
 }
 
 
-IntWrapLshrInst::IntWrapLshrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+IntWrapLshrInst::IntWrapLshrInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                  bool unsigned_, bool saturating):IntWrapBinaryInst(instruction_stmt, destination, lhs, rhs, unsigned_, saturating){}
 WrapBinaryInst::OpType IntWrapLshrInst::get_op_type() const{
     return OpType::WRAP_LSHR;
@@ -148,7 +148,7 @@ std::string IntWrapLshrInst::to_string() const{
 }
 
 
-IntWrapAshrInst::IntWrapAshrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+IntWrapAshrInst::IntWrapAshrInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                  bool unsigned_, bool saturating):IntWrapBinaryInst(instruction_stmt, destination, lhs, rhs, unsigned_, saturating){}
 WrapBinaryInst::OpType IntWrapAshrInst::get_op_type() const{
     return OpType::WRAP_ASHR;
@@ -159,7 +159,7 @@ std::string IntWrapAshrInst::to_string() const{
 
 
 // ---------------------------- Vector Integer Wrap Arithmetic Binary Operations ---------------------------
-VecIntWrapBinaryInst::VecIntWrapBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+VecIntWrapBinaryInst::VecIntWrapBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                             bool unsigned_, bool saturating):WrapBinaryInst(instruction_stmt, destination, lhs, rhs, unsigned_, saturating){}
 std::shared_ptr<IR::SIMDTypeExpr> VecIntWrapBinaryInst::get_casted_operand_type() const{
     return std::dynamic_pointer_cast<IR::SIMDTypeExpr>(this->get_operand_type());
@@ -178,7 +178,7 @@ TypeVariant VecIntWrapBinaryInst::get_operand_type_variant() const{
 }
 
 
-VecIntWrapAddInst::VecIntWrapAddInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+VecIntWrapAddInst::VecIntWrapAddInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                      bool unsigned_, bool saturating):VecIntWrapBinaryInst(instruction_stmt, destination, lhs, rhs, unsigned_, saturating){}
 WrapBinaryInst::OpType VecIntWrapAddInst::get_op_type() const{
     return OpType::WRAP_ADD;
@@ -188,7 +188,7 @@ std::string VecIntWrapAddInst::to_string() const{
 }
 
 
-VecIntWrapSubInst::VecIntWrapSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+VecIntWrapSubInst::VecIntWrapSubInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                      bool unsigned_, bool saturating):VecIntWrapBinaryInst(instruction_stmt, destination, lhs, rhs, unsigned_, saturating){}
 WrapBinaryInst::OpType VecIntWrapSubInst::get_op_type() const{
     return OpType::WRAP_SUB;
@@ -198,7 +198,7 @@ std::string VecIntWrapSubInst::to_string() const{
 }
 
 
-VecIntWrapAbsDiffInst::VecIntWrapAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+VecIntWrapAbsDiffInst::VecIntWrapAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                              bool unsigned_, bool saturating):VecIntWrapBinaryInst(instruction_stmt, destination, lhs, rhs, unsigned_, saturating){}
 WrapBinaryInst::OpType VecIntWrapAbsDiffInst::get_op_type() const{
     return OpType::WRAP_ABSDIFF;
@@ -208,7 +208,7 @@ std::string VecIntWrapAbsDiffInst::to_string() const{
 }
 
 
-VecIntWrapMulInst::VecIntWrapMulInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+VecIntWrapMulInst::VecIntWrapMulInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                      bool unsigned_, bool saturating):VecIntWrapBinaryInst(instruction_stmt, destination, lhs, rhs, unsigned_, saturating){}
 WrapBinaryInst::OpType VecIntWrapMulInst::get_op_type() const{
     return OpType::WRAP_MUL;
@@ -218,7 +218,7 @@ std::string VecIntWrapMulInst::to_string() const{
 }
 
 
-VecIntWrapDivInst::VecIntWrapDivInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+VecIntWrapDivInst::VecIntWrapDivInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                      bool unsigned_, bool saturating):VecIntWrapBinaryInst(instruction_stmt, destination, lhs, rhs, unsigned_, saturating){}
 WrapBinaryInst::OpType VecIntWrapDivInst::get_op_type() const{
     return OpType::WRAP_DIV;
@@ -228,7 +228,7 @@ std::string VecIntWrapDivInst::to_string() const{
 }
 
 
-VecIntWrapRemInst::VecIntWrapRemInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+VecIntWrapRemInst::VecIntWrapRemInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                      bool unsigned_, bool saturating):VecIntWrapBinaryInst(instruction_stmt, destination, lhs, rhs, unsigned_, saturating){}
 WrapBinaryInst::OpType VecIntWrapRemInst::get_op_type() const{
     return OpType::WRAP_REM;
@@ -238,7 +238,7 @@ std::string VecIntWrapRemInst::to_string() const{
 }
 
 
-VecIntWrapCopysignInst::VecIntWrapCopysignInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+VecIntWrapCopysignInst::VecIntWrapCopysignInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                                 bool unsigned_, bool saturating):VecIntWrapBinaryInst(instruction_stmt, destination, lhs, rhs, unsigned_, saturating){}
 WrapBinaryInst::OpType VecIntWrapCopysignInst::get_op_type() const{
     return OpType::WRAP_COPYSIGN;
@@ -248,7 +248,7 @@ std::string VecIntWrapCopysignInst::to_string() const{
 }
 
 
-VecIntWrapShlInst::VecIntWrapShlInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+VecIntWrapShlInst::VecIntWrapShlInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                      bool unsigned_, bool saturating):VecIntWrapBinaryInst(instruction_stmt, destination, lhs, rhs, unsigned_, saturating){}
 WrapBinaryInst::OpType VecIntWrapShlInst::get_op_type() const{
     return OpType::WRAP_SHL;
@@ -258,7 +258,7 @@ std::string VecIntWrapShlInst::to_string() const{
 }
 
 
-VecIntWrapLshrInst::VecIntWrapLshrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+VecIntWrapLshrInst::VecIntWrapLshrInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                        bool unsigned_, bool saturating):VecIntWrapBinaryInst(instruction_stmt, destination, lhs, rhs, unsigned_, saturating){}
 WrapBinaryInst::OpType VecIntWrapLshrInst::get_op_type() const{
     return OpType::WRAP_LSHR;
@@ -268,7 +268,7 @@ std::string VecIntWrapLshrInst::to_string() const{
 }
 
 
-VecIntWrapAshrInst::VecIntWrapAshrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+VecIntWrapAshrInst::VecIntWrapAshrInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                        bool unsigned_, bool saturating):VecIntWrapBinaryInst(instruction_stmt, destination, lhs, rhs, unsigned_, saturating){}
 WrapBinaryInst::OpType VecIntWrapAshrInst::get_op_type() const{
     return OpType::WRAP_ASHR;

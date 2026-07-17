@@ -2,7 +2,7 @@
 
 namespace LIRA {
 namespace MIR {
-NumericalClassifyInst::NumericalClassifyInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
+NumericalClassifyInst::NumericalClassifyInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, 
                                              IR::TypeExprPtr value_type, std::optional<FastMathAttr> fast_math_attr)
                                             :Inst(instruction_stmt, destination, fast_math_attr){
     this->value = value;
@@ -20,7 +20,7 @@ InstType NumericalClassifyInst::get_inst_type() const{
 
 
 // --------------------------- Float Classification operations ---------------------------
-FloatClassifyInst::FloatClassifyInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
+FloatClassifyInst::FloatClassifyInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                                      FastMathAttr fast_math_attr):NumericalClassifyInst(instruction_stmt, destination, value, value_type, fast_math_attr){}
 std::string FloatClassifyInst::to_string_helper(const std::string op_name) const{
     std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(" + this->value_type->to_string() + ":" + this->value->to_string() + ")";
@@ -45,7 +45,7 @@ TypeVariant FloatClassifyInst::get_type_variant() const{
 }
 
 
-FloatIsNanInst::FloatIsNanInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
+FloatIsNanInst::FloatIsNanInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                                 FastMathAttr fast_math_attr):FloatClassifyInst(instruction_stmt, destination, value, value_type, fast_math_attr){}
 NumericalClassifyInst::OpType FloatIsNanInst::get_op_type() const{
     return OpType::ISNAN;
@@ -55,7 +55,7 @@ std::string FloatIsNanInst::to_string() const{
 }
 
 
-FloatIsInfInst::FloatIsInfInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
+FloatIsInfInst::FloatIsInfInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                                 FastMathAttr fast_math_attr):FloatClassifyInst(instruction_stmt, destination, value, value_type, fast_math_attr){}
 NumericalClassifyInst::OpType FloatIsInfInst::get_op_type() const{
     return OpType::ISINF;
@@ -65,7 +65,7 @@ std::string FloatIsInfInst::to_string() const{
 }
 
 
-FloatIsFiniteInst::FloatIsFiniteInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
+FloatIsFiniteInst::FloatIsFiniteInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                                      FastMathAttr fast_math_attr):FloatClassifyInst(instruction_stmt, destination, value, value_type, fast_math_attr){}
 NumericalClassifyInst::OpType FloatIsFiniteInst::get_op_type() const{
     return OpType::ISFINITE;
@@ -75,7 +75,7 @@ std::string FloatIsFiniteInst::to_string() const{
 }
 
 
-FloatIsNormalInst::FloatIsNormalInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
+FloatIsNormalInst::FloatIsNormalInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                                      FastMathAttr fast_math_attr):FloatClassifyInst(instruction_stmt, destination, value, value_type, fast_math_attr){}
 NumericalClassifyInst::OpType FloatIsNormalInst::get_op_type() const{
     return OpType::ISNORMAL;
@@ -85,7 +85,7 @@ std::string FloatIsNormalInst::to_string() const{
 }
 
 
-FloatIsSubnormalInst::FloatIsSubnormalInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
+FloatIsSubnormalInst::FloatIsSubnormalInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                                             FastMathAttr fast_math_attr):FloatClassifyInst(instruction_stmt, destination, value, value_type, fast_math_attr){}
 NumericalClassifyInst::OpType FloatIsSubnormalInst::get_op_type() const{
     return OpType::ISSUBNORMAL;
@@ -95,7 +95,7 @@ std::string FloatIsSubnormalInst::to_string() const{
 }
 
 
-FloatIsZeroInst::FloatIsZeroInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
+FloatIsZeroInst::FloatIsZeroInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                                 FastMathAttr fast_math_attr):FloatClassifyInst(instruction_stmt, destination, value, value_type, fast_math_attr){}
 NumericalClassifyInst::OpType FloatIsZeroInst::get_op_type() const{
     return OpType::ISZERO;
@@ -105,7 +105,7 @@ std::string FloatIsZeroInst::to_string() const{
 }
 
 
-FloatIsNegativeInst::FloatIsNegativeInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
+FloatIsNegativeInst::FloatIsNegativeInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                                             FastMathAttr fast_math_attr):FloatClassifyInst(instruction_stmt, destination, value, value_type, fast_math_attr){}
 NumericalClassifyInst::OpType FloatIsNegativeInst::get_op_type() const{
     return OpType::ISNEGATIVE;
@@ -115,7 +115,7 @@ std::string FloatIsNegativeInst::to_string() const{
 }
 
 
-FloatIsPositiveInst::FloatIsPositiveInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
+FloatIsPositiveInst::FloatIsPositiveInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                                          FastMathAttr fast_math_attr):FloatClassifyInst(instruction_stmt, destination, value, value_type, fast_math_attr){}
 NumericalClassifyInst::OpType FloatIsPositiveInst::get_op_type() const{
     return OpType::ISPOSITIVE;
@@ -126,7 +126,7 @@ std::string FloatIsPositiveInst::to_string() const{
 
 
 //--------------------------- Vector Float Classification operations ---------------------------
-VecFloatClassifyInst::VecFloatClassifyInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
+VecFloatClassifyInst::VecFloatClassifyInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                                            FastMathAttr fast_math_attr):NumericalClassifyInst(instruction_stmt, destination, value, value_type, fast_math_attr){}
 std::string VecFloatClassifyInst::to_string_helper(const std::string op_name) const{
     std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(" + this->value_type->to_string() + ":" + this->value->to_string() + ")";
@@ -149,7 +149,7 @@ TypeVariant VecFloatClassifyInst::get_type_variant() const{
 }
 
 
-VecFloatIsNanInst::VecFloatIsNanInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
+VecFloatIsNanInst::VecFloatIsNanInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                                 FastMathAttr fast_math_attr):VecFloatClassifyInst(instruction_stmt, destination, value, value_type, fast_math_attr){}
 NumericalClassifyInst::OpType VecFloatIsNanInst::get_op_type() const{
     return OpType::ISNAN;
@@ -159,7 +159,7 @@ std::string VecFloatIsNanInst::to_string() const{
 }
 
 
-VecFloatIsInfInst::VecFloatIsInfInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
+VecFloatIsInfInst::VecFloatIsInfInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                                 FastMathAttr fast_math_attr):VecFloatClassifyInst(instruction_stmt, destination, value, value_type, fast_math_attr){}
 NumericalClassifyInst::OpType VecFloatIsInfInst::get_op_type() const{
     return OpType::ISINF;
@@ -169,7 +169,7 @@ std::string VecFloatIsInfInst::to_string() const{
 }
 
 
-VecFloatIsFiniteInst::VecFloatIsFiniteInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
+VecFloatIsFiniteInst::VecFloatIsFiniteInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                                      FastMathAttr fast_math_attr):VecFloatClassifyInst(instruction_stmt, destination, value, value_type, fast_math_attr){}
 NumericalClassifyInst::OpType VecFloatIsFiniteInst::get_op_type() const{
     return OpType::ISFINITE;
@@ -179,7 +179,7 @@ std::string VecFloatIsFiniteInst::to_string() const{
 }
 
 
-VecFloatIsNormalInst::VecFloatIsNormalInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
+VecFloatIsNormalInst::VecFloatIsNormalInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                                      FastMathAttr fast_math_attr):VecFloatClassifyInst(instruction_stmt, destination, value, value_type, fast_math_attr){}
 NumericalClassifyInst::OpType VecFloatIsNormalInst::get_op_type() const{
     return OpType::ISNORMAL;
@@ -189,7 +189,7 @@ std::string VecFloatIsNormalInst::to_string() const{
 }
 
 
-VecFloatIsSubnormalInst::VecFloatIsSubnormalInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
+VecFloatIsSubnormalInst::VecFloatIsSubnormalInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                                             FastMathAttr fast_math_attr):VecFloatClassifyInst(instruction_stmt, destination, value, value_type, fast_math_attr){}
 NumericalClassifyInst::OpType VecFloatIsSubnormalInst::get_op_type() const{
     return OpType::ISSUBNORMAL;
@@ -199,7 +199,7 @@ std::string VecFloatIsSubnormalInst::to_string() const{
 }
 
 
-VecFloatIsZeroInst::VecFloatIsZeroInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
+VecFloatIsZeroInst::VecFloatIsZeroInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                                 FastMathAttr fast_math_attr):VecFloatClassifyInst(instruction_stmt, destination, value, value_type, fast_math_attr){}
 NumericalClassifyInst::OpType VecFloatIsZeroInst::get_op_type() const{
     return OpType::ISZERO;
@@ -209,7 +209,7 @@ std::string VecFloatIsZeroInst::to_string() const{
 }
 
 
-VecFloatIsNegativeInst::VecFloatIsNegativeInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
+VecFloatIsNegativeInst::VecFloatIsNegativeInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                                             FastMathAttr fast_math_attr):VecFloatClassifyInst(instruction_stmt, destination, value, value_type, fast_math_attr){}
 NumericalClassifyInst::OpType VecFloatIsNegativeInst::get_op_type() const{
     return OpType::ISNEGATIVE;
@@ -219,7 +219,7 @@ std::string VecFloatIsNegativeInst::to_string() const{
 }
 
 
-VecFloatIsPositiveInst::VecFloatIsPositiveInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
+VecFloatIsPositiveInst::VecFloatIsPositiveInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, IR::TypeExprPtr value_type,
                                          FastMathAttr fast_math_attr):VecFloatClassifyInst(instruction_stmt, destination, value, value_type, fast_math_attr){}
 NumericalClassifyInst::OpType VecFloatIsPositiveInst::get_op_type() const{
     return OpType::ISPOSITIVE;

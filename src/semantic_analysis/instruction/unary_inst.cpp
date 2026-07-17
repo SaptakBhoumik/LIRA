@@ -7,52 +7,52 @@
 #include <unordered_set>
 namespace LIRA {
 namespace SemanticAnalyzer {
-using DispatchFuncType = std::function<MIR::InstPtr(std::string, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value, 
+using DispatchFuncType = std::function<MIR::InstPtr(std::string, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value, 
                                                     MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt)>;
 
-MIR::InstPtr analyze_neg_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_neg_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                               MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_not_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_not_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                               MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_abs_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_abs_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                               MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_ceil_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_ceil_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                                MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_floor_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_floor_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                                 MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_integral_part_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_integral_part_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                                         MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_fractional_part_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_fractional_part_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                                           MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_roundnearest_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_roundnearest_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                                        MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_roundeven_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_roundeven_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                                     MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_sqrt_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_sqrt_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                                MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_reciprocal_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_reciprocal_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                                      MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_rsqrt_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_rsqrt_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                                 MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_popcount_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_popcount_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                                    MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_clz_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_clz_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                               MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_ctz_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_ctz_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                               MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_parity_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_parity_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                                  MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_bswap_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_bswap_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                                 MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_bitreverse_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_bitreverse_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                                      MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_clrsb_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_clrsb_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                                 MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_blsi_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_blsi_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                                MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_blsr_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_blsr_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                                MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_blsmask_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_blsmask_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                                   MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
 
 MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_unary_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt){
@@ -131,7 +131,7 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_unary_inst(IR::Token name,IR::Inst
     }
 }
 
-MIR::InstPtr analyze_neg_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_neg_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                               MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     if(MIR::is_float_typevariant(type_variant)){
@@ -159,7 +159,7 @@ MIR::InstPtr analyze_neg_inst(std::string filename, MIR::LocalDestRegisterPtr de
         }
     }
 }
-MIR::InstPtr analyze_not_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_not_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                               MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     if(attributes.size() > 0){
@@ -172,7 +172,7 @@ MIR::InstPtr analyze_not_inst(std::string filename, MIR::LocalDestRegisterPtr de
         return std::make_shared<MIR::VecIntNotInst>(inst_stmt,dest,value);
     }
 }
-MIR::InstPtr analyze_abs_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_abs_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                               MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     if(MIR::is_float_typevariant(type_variant)){
@@ -200,7 +200,7 @@ MIR::InstPtr analyze_abs_inst(std::string filename, MIR::LocalDestRegisterPtr de
         }
     }
 }
-MIR::InstPtr analyze_ceil_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_ceil_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                                MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
@@ -214,7 +214,7 @@ MIR::InstPtr analyze_ceil_inst(std::string filename, MIR::LocalDestRegisterPtr d
         return std::make_shared<MIR::VecFloatCeilInst>(inst_stmt,dest,value,fast_math_attr);
     }
 }
-MIR::InstPtr analyze_floor_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_floor_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                                 MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
@@ -228,7 +228,7 @@ MIR::InstPtr analyze_floor_inst(std::string filename, MIR::LocalDestRegisterPtr 
         return std::make_shared<MIR::VecFloatFloorInst>(inst_stmt,dest,value,fast_math_attr);
     }
 }
-MIR::InstPtr analyze_integral_part_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_integral_part_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                                         MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
@@ -242,7 +242,7 @@ MIR::InstPtr analyze_integral_part_inst(std::string filename, MIR::LocalDestRegi
         return std::make_shared<MIR::VecFloatIntegralPartInst>(inst_stmt,dest,value,fast_math_attr);
     }
 }
-MIR::InstPtr analyze_fractional_part_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_fractional_part_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                                           MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
@@ -256,7 +256,7 @@ MIR::InstPtr analyze_fractional_part_inst(std::string filename, MIR::LocalDestRe
         return std::make_shared<MIR::VecFloatFractionalPartInst>(inst_stmt,dest,value,fast_math_attr);
     }
 }
-MIR::InstPtr analyze_roundnearest_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_roundnearest_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                                        MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
@@ -270,7 +270,7 @@ MIR::InstPtr analyze_roundnearest_inst(std::string filename, MIR::LocalDestRegis
         return std::make_shared<MIR::VecFloatRoundNearestInst>(inst_stmt,dest,value,fast_math_attr);
     }
 }
-MIR::InstPtr analyze_roundeven_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_roundeven_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                                     MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
@@ -284,7 +284,7 @@ MIR::InstPtr analyze_roundeven_inst(std::string filename, MIR::LocalDestRegister
         return std::make_shared<MIR::VecFloatRoundEvenInst>(inst_stmt,dest,value,fast_math_attr);
     }
 }
-MIR::InstPtr analyze_sqrt_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_sqrt_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                                MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [fast_math_attr,remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
@@ -298,7 +298,7 @@ MIR::InstPtr analyze_sqrt_inst(std::string filename, MIR::LocalDestRegisterPtr d
         return std::make_shared<MIR::VecFloatSqrtInst>(inst_stmt,dest,value,fast_math_attr);
     }
 }
-MIR::InstPtr analyze_reciprocal_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_reciprocal_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                                      MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [fast_math_attr,_remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
@@ -313,7 +313,7 @@ MIR::InstPtr analyze_reciprocal_inst(std::string filename, MIR::LocalDestRegiste
         return std::make_shared<MIR::VecFloatReciprocalInst>(inst_stmt,dest,value,fast_math_attr,flags["approx"]);
     }
 }
-MIR::InstPtr analyze_rsqrt_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_rsqrt_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                                 MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [fast_math_attr,_remaining_attrs] = Utils::extract_fastmath_attrs(filename,attributes);
@@ -328,7 +328,7 @@ MIR::InstPtr analyze_rsqrt_inst(std::string filename, MIR::LocalDestRegisterPtr 
         return std::make_shared<MIR::VecFloatRsqrtInst>(inst_stmt,dest,value,fast_math_attr,flags["approx"]);
     }
 }
-MIR::InstPtr analyze_popcount_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_popcount_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                                    MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     if(attributes.size() > 0){
@@ -341,7 +341,7 @@ MIR::InstPtr analyze_popcount_inst(std::string filename, MIR::LocalDestRegisterP
         return std::make_shared<MIR::VecIntPopcountInst>(inst_stmt,dest,value);
     }
 }
-MIR::InstPtr analyze_clz_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_clz_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                               MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [flag_attrs,remaining_attrs] = Utils::extract_flag_attrs(filename,attributes, {"zero_poison"});
@@ -355,7 +355,7 @@ MIR::InstPtr analyze_clz_inst(std::string filename, MIR::LocalDestRegisterPtr de
         return std::make_shared<MIR::VecIntCLZInst>(inst_stmt,dest,value,flag_attrs["zero_poison"]);
     }
 }
-MIR::InstPtr analyze_ctz_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_ctz_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                               MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [flag_attrs,remaining_attrs] = Utils::extract_flag_attrs(filename,attributes, {"zero_poison"});
@@ -369,7 +369,7 @@ MIR::InstPtr analyze_ctz_inst(std::string filename, MIR::LocalDestRegisterPtr de
         return std::make_shared<MIR::VecIntCTZInst>(inst_stmt,dest,value,flag_attrs["zero_poison"]);
     }
 }
-MIR::InstPtr analyze_parity_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_parity_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                                  MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     if(attributes.size() > 0){
@@ -382,7 +382,7 @@ MIR::InstPtr analyze_parity_inst(std::string filename, MIR::LocalDestRegisterPtr
         return std::make_shared<MIR::VecIntParityInst>(inst_stmt,dest,value);
     }
 }
-MIR::InstPtr analyze_bswap_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_bswap_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                                 MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     if(MIR::is_vector_typevariant(type_variant)){
@@ -418,7 +418,7 @@ MIR::InstPtr analyze_bswap_inst(std::string filename, MIR::LocalDestRegisterPtr 
         }
     }
 }
-MIR::InstPtr analyze_bitreverse_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_bitreverse_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                                      MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     if(attributes.size() > 0){
@@ -431,7 +431,7 @@ MIR::InstPtr analyze_bitreverse_inst(std::string filename, MIR::LocalDestRegiste
         return std::make_shared<MIR::VecIntBitreverseInst>(inst_stmt,dest,value);
     }
 }
-MIR::InstPtr analyze_clrsb_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_clrsb_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                                 MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     if(attributes.size() > 0){
@@ -444,7 +444,7 @@ MIR::InstPtr analyze_clrsb_inst(std::string filename, MIR::LocalDestRegisterPtr 
         return std::make_shared<MIR::VecIntCLRSBInst>(inst_stmt,dest,value);
     }
 }
-MIR::InstPtr analyze_blsi_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_blsi_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                                MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     if(attributes.size() > 0){
@@ -457,7 +457,7 @@ MIR::InstPtr analyze_blsi_inst(std::string filename, MIR::LocalDestRegisterPtr d
         return std::make_shared<MIR::VecIntBLSIInst>(inst_stmt,dest,value);
     }
 }
-MIR::InstPtr analyze_blsr_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_blsr_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                                MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     if(attributes.size() > 0){
@@ -470,7 +470,7 @@ MIR::InstPtr analyze_blsr_inst(std::string filename, MIR::LocalDestRegisterPtr d
         return std::make_shared<MIR::VecIntBLSRInst>(inst_stmt,dest,value);
     }
 }
-MIR::InstPtr analyze_blsmask_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr value,
+MIR::InstPtr analyze_blsmask_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr value,
                                   MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     if(attributes.size() > 0){  

@@ -179,15 +179,15 @@ struct FastMathAttr {
 // Although I admit I may be wrong and it may be better to merge some of these instructions but I will keep them separate for now 
 class Inst {
     protected:
-    LocalDestRegisterPtr destination;
+    LocalRegisterPtr destination;
     IR::InstructionStmtPtr instruction_stmt;
     std::optional<FastMathAttr> fast_math_attr;//Only used for floating point instructions.
     public:
-    Inst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, std::optional<FastMathAttr> fast_math_attr);
+    Inst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, std::optional<FastMathAttr> fast_math_attr);
     
     virtual ~Inst() = default;
 
-    virtual LocalDestRegisterPtr get_destination() const final;//For faster access if needed. Return nullptr if no destination
+    virtual LocalRegisterPtr get_destination() const final;//For faster access if needed. Return nullptr if no destination
     virtual std::optional<FastMathAttr> get_fast_math_attr() const final;
     virtual InstType get_inst_type() const = 0;
     virtual IR::InstructionStmtPtr get_instruction_stmt() const final;//For error reporting

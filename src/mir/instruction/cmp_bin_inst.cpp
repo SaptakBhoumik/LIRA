@@ -2,7 +2,7 @@
 
 namespace LIRA {
 namespace MIR {
-CmpBinaryInst::CmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+CmpBinaryInst::CmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                              IR::TypeExprPtr type, std::optional<FastMathAttr> fast_math_attr):
                              Inst(instruction_stmt, destination, fast_math_attr){
     this->lhs = lhs;
@@ -24,7 +24,7 @@ InstType CmpBinaryInst::get_inst_type() const{
 
 
 // ---------------------------- Integer Comparison Binary operations ---------------------------
-IntCmpBinaryInst::IntCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+IntCmpBinaryInst::IntCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                     IR::TypeExprPtr type, bool unsigned_):CmpBinaryInst(instruction_stmt, destination, lhs, rhs, type, std::nullopt){
     this->unsigned_ = unsigned_;
 }
@@ -50,7 +50,7 @@ TypeVariant IntCmpBinaryInst::get_operand_type_variant() const{
 }
 
 
-IntEqInst::IntEqInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type):
+IntEqInst::IntEqInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type):
                 IntCmpBinaryInst(instruction_stmt, destination, lhs, rhs, type, false){}
 CmpBinaryInst::OpType IntEqInst::get_op_type() const{
     return OpType::EQ;
@@ -60,7 +60,7 @@ std::string IntEqInst::to_string() const{
 }
 
 
-IntNeqInst::IntNeqInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type):
+IntNeqInst::IntNeqInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type):
                 IntCmpBinaryInst(instruction_stmt, destination, lhs, rhs, type, false){}
 CmpBinaryInst::OpType IntNeqInst::get_op_type() const{
     return OpType::NEQ;
@@ -70,7 +70,7 @@ std::string IntNeqInst::to_string() const{
 }
 
 
-IntLtInst::IntLtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+IntLtInst::IntLtInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                      bool unsigned_):IntCmpBinaryInst(instruction_stmt, destination, lhs, rhs, type, unsigned_){}
 CmpBinaryInst::OpType IntLtInst::get_op_type() const{
     return OpType::LT;
@@ -80,7 +80,7 @@ std::string IntLtInst::to_string() const{
 }
 
 
-IntGtInst::IntGtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+IntGtInst::IntGtInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                      bool unsigned_):IntCmpBinaryInst(instruction_stmt, destination, lhs, rhs, type, unsigned_){}
 CmpBinaryInst::OpType IntGtInst::get_op_type() const{
     return OpType::GT;
@@ -90,7 +90,7 @@ std::string IntGtInst::to_string() const{
 }
 
 
-IntLeInst::IntLeInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+IntLeInst::IntLeInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                      bool unsigned_):IntCmpBinaryInst(instruction_stmt, destination, lhs, rhs, type, unsigned_){}
 CmpBinaryInst::OpType IntLeInst::get_op_type() const{
     return OpType::LE;
@@ -100,7 +100,7 @@ std::string IntLeInst::to_string() const{
 }
 
 
-IntGeInst::IntGeInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+IntGeInst::IntGeInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                      bool unsigned_):IntCmpBinaryInst(instruction_stmt, destination, lhs, rhs, type, unsigned_){}
 CmpBinaryInst::OpType IntGeInst::get_op_type() const{
     return OpType::GE;
@@ -111,7 +111,7 @@ std::string IntGeInst::to_string() const{
 
 
 // ---------------------------Vector integer Comparison Binary operations ---------------------------
-VecIntCmpBinaryInst::VecIntCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+VecIntCmpBinaryInst::VecIntCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                                             bool unsigned_):CmpBinaryInst(instruction_stmt, destination, lhs, rhs, type,std::nullopt){
     this->unsigned_ = unsigned_;
 }
@@ -143,7 +143,7 @@ TypeVariant VecIntCmpBinaryInst::get_operand_type_variant() const{
 }
 
 
-VecIntEqInst::VecIntEqInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type):
+VecIntEqInst::VecIntEqInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type):
                             VecIntCmpBinaryInst(instruction_stmt, destination, lhs, rhs, type, false){}
 CmpBinaryInst::OpType VecIntEqInst::get_op_type() const{
     return OpType::EQ;
@@ -153,7 +153,7 @@ std::string VecIntEqInst::to_string() const{
 }
 
 
-VecIntNeqInst::VecIntNeqInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type):
+VecIntNeqInst::VecIntNeqInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type):
                             VecIntCmpBinaryInst(instruction_stmt, destination, lhs, rhs, type, false){}
 CmpBinaryInst::OpType VecIntNeqInst::get_op_type() const{
     return OpType::NEQ;
@@ -163,7 +163,7 @@ std::string VecIntNeqInst::to_string() const{
 }
 
 
-VecIntLtInst::VecIntLtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+VecIntLtInst::VecIntLtInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                             bool unsigned_):VecIntCmpBinaryInst(instruction_stmt, destination, lhs, rhs, type, unsigned_){}
 CmpBinaryInst::OpType VecIntLtInst::get_op_type() const{
     return OpType::LT;
@@ -173,7 +173,7 @@ std::string VecIntLtInst::to_string() const{
 }
 
 
-VecIntGtInst::VecIntGtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+VecIntGtInst::VecIntGtInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                             bool unsigned_):VecIntCmpBinaryInst(instruction_stmt, destination, lhs, rhs, type, unsigned_){}
 CmpBinaryInst::OpType VecIntGtInst::get_op_type() const{
     return OpType::GT;
@@ -183,7 +183,7 @@ std::string VecIntGtInst::to_string() const{
 }
 
 
-VecIntLeInst::VecIntLeInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+VecIntLeInst::VecIntLeInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                             bool unsigned_):VecIntCmpBinaryInst(instruction_stmt, destination, lhs, rhs, type, unsigned_){}
 CmpBinaryInst::OpType VecIntLeInst::get_op_type() const{
     return OpType::LE;
@@ -193,7 +193,7 @@ std::string VecIntLeInst::to_string() const{
 }
 
 
-VecIntGeInst::VecIntGeInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+VecIntGeInst::VecIntGeInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                             bool unsigned_):VecIntCmpBinaryInst(instruction_stmt, destination, lhs, rhs, type, unsigned_){}
 CmpBinaryInst::OpType VecIntGeInst::get_op_type() const{
     return OpType::GE;
@@ -204,7 +204,7 @@ std::string VecIntGeInst::to_string() const{
 
 
 // ---------------------------Ptr Comparison Binary operations ---------------------------
-PtrCmpBinaryInst::PtrCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs):
+PtrCmpBinaryInst::PtrCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs):
                                     CmpBinaryInst(instruction_stmt, destination, lhs, rhs, std::make_shared<IR::PtrTypeExpr>(IR::Token{.value = "ptr"},std::vector<IR::AttributePtr>{}), std::nullopt){}
 std::string PtrCmpBinaryInst::to_string_helper(std::string op_name) const{
     std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
@@ -218,7 +218,7 @@ TypeVariant PtrCmpBinaryInst::get_operand_type_variant() const{
 }
 
 
-PtrEqInst::PtrEqInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs):
+PtrEqInst::PtrEqInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs):
                 PtrCmpBinaryInst(instruction_stmt, destination, lhs, rhs){}
 CmpBinaryInst::OpType PtrEqInst::get_op_type() const{
     return OpType::EQ;
@@ -228,7 +228,7 @@ std::string PtrEqInst::to_string() const{
 }
 
 
-PtrNeqInst::PtrNeqInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs):
+PtrNeqInst::PtrNeqInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs):
                 PtrCmpBinaryInst(instruction_stmt, destination, lhs, rhs){}
 CmpBinaryInst::OpType PtrNeqInst::get_op_type() const{
     return OpType::NEQ;
@@ -238,7 +238,7 @@ std::string PtrNeqInst::to_string() const{
 }
 
 
-PtrGtInst::PtrGtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs):
+PtrGtInst::PtrGtInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs):
                 PtrCmpBinaryInst(instruction_stmt, destination, lhs, rhs){}
 CmpBinaryInst::OpType PtrGtInst::get_op_type() const{
     return OpType::GT;
@@ -248,7 +248,7 @@ std::string PtrGtInst::to_string() const{
 }
 
 
-PtrLtInst::PtrLtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs):
+PtrLtInst::PtrLtInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs):
                 PtrCmpBinaryInst(instruction_stmt, destination, lhs, rhs){}
 CmpBinaryInst::OpType PtrLtInst::get_op_type() const{
     return OpType::LT;
@@ -258,7 +258,7 @@ std::string PtrLtInst::to_string() const{
 }
 
 
-PtrLeInst::PtrLeInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs):
+PtrLeInst::PtrLeInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs):
                 PtrCmpBinaryInst(instruction_stmt, destination, lhs, rhs){}
 CmpBinaryInst::OpType PtrLeInst::get_op_type() const{
     return OpType::LE;
@@ -268,7 +268,7 @@ std::string PtrLeInst::to_string() const{
 }
 
 
-PtrGeInst::PtrGeInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs):
+PtrGeInst::PtrGeInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs):
                 PtrCmpBinaryInst(instruction_stmt, destination, lhs, rhs){}
 CmpBinaryInst::OpType PtrGeInst::get_op_type() const{
     return OpType::GE;
@@ -279,7 +279,7 @@ std::string PtrGeInst::to_string() const{
 
 
 // ---------------------------Vector ptr Comparison Binary operations ---------------------------
-VecPtrCmpBinaryInst::VecPtrCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type):
+VecPtrCmpBinaryInst::VecPtrCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type):
                                         CmpBinaryInst(instruction_stmt, destination, lhs, rhs, type, std::nullopt){}
 std::string VecPtrCmpBinaryInst::to_string_helper(std::string op_name) const{
     std::string res = "let " + this->destination->get_dest_register_name() + " = ." + op_name + "(" + this->type->to_string() + ":" + this->lhs->to_string() + ", " + this->type->to_string() + ":" +  this->rhs->to_string() + ")";
@@ -300,7 +300,7 @@ TypeVariant VecPtrCmpBinaryInst::get_operand_type_variant() const{
 }
 
 
-VecPtrEqInst::VecPtrEqInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type):
+VecPtrEqInst::VecPtrEqInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type):
                 VecPtrCmpBinaryInst(instruction_stmt, destination, lhs, rhs, type){}
 CmpBinaryInst::OpType VecPtrEqInst::get_op_type() const{
     return OpType::EQ;
@@ -310,7 +310,7 @@ std::string VecPtrEqInst::to_string() const{
 }
 
 
-VecPtrNeqInst::VecPtrNeqInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type):
+VecPtrNeqInst::VecPtrNeqInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type):
                 VecPtrCmpBinaryInst(instruction_stmt, destination, lhs, rhs, type){}
 CmpBinaryInst::OpType VecPtrNeqInst::get_op_type() const{
     return OpType::NEQ;
@@ -320,7 +320,7 @@ std::string VecPtrNeqInst::to_string() const{
 }
 
 
-VecPtrLtInst::VecPtrLtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type):
+VecPtrLtInst::VecPtrLtInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type):
                 VecPtrCmpBinaryInst(instruction_stmt, destination, lhs, rhs, type){}
 CmpBinaryInst::OpType VecPtrLtInst::get_op_type() const{
     return OpType::LT;
@@ -330,7 +330,7 @@ std::string VecPtrLtInst::to_string() const{
 }
 
 
-VecPtrGtInst::VecPtrGtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type):
+VecPtrGtInst::VecPtrGtInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type):
                 VecPtrCmpBinaryInst(instruction_stmt, destination, lhs, rhs, type){}
 CmpBinaryInst::OpType VecPtrGtInst::get_op_type() const{
     return OpType::GT;
@@ -340,7 +340,7 @@ std::string VecPtrGtInst::to_string() const{
 }
 
 
-VecPtrLeInst::VecPtrLeInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type):
+VecPtrLeInst::VecPtrLeInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type):
                 VecPtrCmpBinaryInst(instruction_stmt, destination, lhs, rhs, type){}
 CmpBinaryInst::OpType VecPtrLeInst::get_op_type() const{
     return OpType::LE;
@@ -350,7 +350,7 @@ std::string VecPtrLeInst::to_string() const{
 }
 
 
-VecPtrGeInst::VecPtrGeInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type):
+VecPtrGeInst::VecPtrGeInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type):
                 VecPtrCmpBinaryInst(instruction_stmt, destination, lhs, rhs, type){}
 CmpBinaryInst::OpType VecPtrGeInst::get_op_type() const{
     return OpType::GE;
@@ -361,7 +361,7 @@ std::string VecPtrGeInst::to_string() const{
 
 
 // ---------------------------Float Comparison Binary operations ---------------------------
-FloatCmpBinaryInst::FloatCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+FloatCmpBinaryInst::FloatCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                                         FastMathAttr fast_math_attr, bool unordered):CmpBinaryInst(instruction_stmt, destination, lhs, rhs, type, fast_math_attr){
     this->unordered = unordered;
 }
@@ -393,7 +393,7 @@ TypeVariant FloatCmpBinaryInst::get_operand_type_variant() const{
 }
 
 
-FloatEqInst::FloatEqInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+FloatEqInst::FloatEqInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                 FastMathAttr fast_math_attr, bool unordered):FloatCmpBinaryInst(instruction_stmt, destination, lhs, rhs, type, fast_math_attr, unordered){}
 CmpBinaryInst::OpType FloatEqInst::get_op_type() const{
     return OpType::EQ;
@@ -403,7 +403,7 @@ std::string FloatEqInst::to_string() const{
 }
 
 
-FloatNeqInst::FloatNeqInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+FloatNeqInst::FloatNeqInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                 FastMathAttr fast_math_attr, bool unordered):FloatCmpBinaryInst(instruction_stmt, destination, lhs, rhs, type, fast_math_attr, unordered){}
 CmpBinaryInst::OpType FloatNeqInst::get_op_type() const{
     return OpType::NEQ;
@@ -413,7 +413,7 @@ std::string FloatNeqInst::to_string() const{
 }
 
 
-FloatLtInst::FloatLtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+FloatLtInst::FloatLtInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                 FastMathAttr fast_math_attr, bool unordered):FloatCmpBinaryInst(instruction_stmt, destination, lhs, rhs, type, fast_math_attr, unordered){}
 CmpBinaryInst::OpType FloatLtInst::get_op_type() const{
     return OpType::LT;
@@ -423,7 +423,7 @@ std::string FloatLtInst::to_string() const{
 }
 
 
-FloatGtInst::FloatGtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+FloatGtInst::FloatGtInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                 FastMathAttr fast_math_attr, bool unordered):FloatCmpBinaryInst(instruction_stmt, destination, lhs, rhs, type, fast_math_attr, unordered){}
 CmpBinaryInst::OpType FloatGtInst::get_op_type() const{
     return OpType::GT;
@@ -433,7 +433,7 @@ std::string FloatGtInst::to_string() const{
 }
 
 
-FloatLeInst::FloatLeInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+FloatLeInst::FloatLeInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                 FastMathAttr fast_math_attr, bool unordered):FloatCmpBinaryInst(instruction_stmt, destination, lhs, rhs, type, fast_math_attr, unordered){}
 CmpBinaryInst::OpType FloatLeInst::get_op_type() const{
     return OpType::LE;
@@ -443,7 +443,7 @@ std::string FloatLeInst::to_string() const{
 }
 
 
-FloatGeInst::FloatGeInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+FloatGeInst::FloatGeInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                 FastMathAttr fast_math_attr, bool unordered):FloatCmpBinaryInst(instruction_stmt, destination, lhs, rhs, type, fast_math_attr, unordered){}
 CmpBinaryInst::OpType FloatGeInst::get_op_type() const{
     return OpType::GE;
@@ -453,7 +453,7 @@ std::string FloatGeInst::to_string() const{
 }
 
 
-FloatEitherNanInst::FloatEitherNanInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+FloatEitherNanInst::FloatEitherNanInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                 FastMathAttr fast_math_attr):FloatCmpBinaryInst(instruction_stmt, destination, lhs, rhs, type, fast_math_attr, false){}
 CmpBinaryInst::OpType FloatEitherNanInst::get_op_type() const{
     return OpType::EITHER_NAN;
@@ -463,7 +463,7 @@ std::string FloatEitherNanInst::to_string() const{
 }
 
 
-FloatNeitherNanInst::FloatNeitherNanInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+FloatNeitherNanInst::FloatNeitherNanInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                                         FastMathAttr fast_math_attr):FloatCmpBinaryInst(instruction_stmt, destination, lhs, rhs, type, fast_math_attr, false){}
 CmpBinaryInst::OpType FloatNeitherNanInst::get_op_type() const{
     return OpType::NEITHER_NAN;
@@ -472,7 +472,7 @@ std::string FloatNeitherNanInst::to_string() const{
     return this->to_string_helper("float_neither_nan");
 }
 
-FloatBothNanInst::FloatBothNanInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+FloatBothNanInst::FloatBothNanInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                                         FastMathAttr fast_math_attr):FloatCmpBinaryInst(instruction_stmt, destination, lhs, rhs, type, fast_math_attr, false){}
 CmpBinaryInst::OpType FloatBothNanInst::get_op_type() const{
     return OpType::BOTH_NAN;
@@ -481,7 +481,7 @@ std::string FloatBothNanInst::to_string() const{
     return this->to_string_helper("float_both_nan");
 }
 // --------------------------- Vector Float Comparison Binary operations ---------------------------
-VecFloatCmpBinaryInst::VecFloatCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+VecFloatCmpBinaryInst::VecFloatCmpBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                                         FastMathAttr fast_math_attr, bool unordered):CmpBinaryInst(instruction_stmt, destination, lhs, rhs, type, fast_math_attr){
     this->unordered = unordered;
 }
@@ -515,7 +515,7 @@ TypeVariant VecFloatCmpBinaryInst::get_operand_type_variant() const{
 }
 
 
-VecFloatEqInst::VecFloatEqInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+VecFloatEqInst::VecFloatEqInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                 FastMathAttr fast_math_attr, bool unordered):VecFloatCmpBinaryInst(instruction_stmt, destination, lhs, rhs, type, fast_math_attr, unordered){}
 CmpBinaryInst::OpType VecFloatEqInst::get_op_type() const{
     return OpType::EQ;
@@ -525,7 +525,7 @@ std::string VecFloatEqInst::to_string() const{
 }
 
 
-VecFloatNeqInst::VecFloatNeqInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+VecFloatNeqInst::VecFloatNeqInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                 FastMathAttr fast_math_attr, bool unordered):VecFloatCmpBinaryInst(instruction_stmt, destination, lhs, rhs, type, fast_math_attr, unordered){}
 CmpBinaryInst::OpType VecFloatNeqInst::get_op_type() const{
     return OpType::NEQ;
@@ -535,7 +535,7 @@ std::string VecFloatNeqInst::to_string() const{
 }
 
 
-VecFloatLtInst::VecFloatLtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+VecFloatLtInst::VecFloatLtInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                 FastMathAttr fast_math_attr, bool unordered):VecFloatCmpBinaryInst(instruction_stmt, destination, lhs, rhs, type, fast_math_attr, unordered){}
 CmpBinaryInst::OpType VecFloatLtInst::get_op_type() const{
     return OpType::LT;
@@ -545,7 +545,7 @@ std::string VecFloatLtInst::to_string() const{
 }
 
 
-VecFloatGtInst::VecFloatGtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+VecFloatGtInst::VecFloatGtInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                 FastMathAttr fast_math_attr, bool unordered):VecFloatCmpBinaryInst(instruction_stmt, destination, lhs, rhs, type, fast_math_attr, unordered){}
 CmpBinaryInst::OpType VecFloatGtInst::get_op_type() const{
     return OpType::GT;
@@ -555,7 +555,7 @@ std::string VecFloatGtInst::to_string() const{
 }
 
 
-VecFloatLeInst::VecFloatLeInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+VecFloatLeInst::VecFloatLeInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                 FastMathAttr fast_math_attr, bool unordered):VecFloatCmpBinaryInst(instruction_stmt, destination, lhs, rhs, type, fast_math_attr, unordered){}
 CmpBinaryInst::OpType VecFloatLeInst::get_op_type() const{
     return OpType::LE;
@@ -565,7 +565,7 @@ std::string VecFloatLeInst::to_string() const{
 }
 
 
-VecFloatGeInst::VecFloatGeInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+VecFloatGeInst::VecFloatGeInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                 FastMathAttr fast_math_attr, bool unordered):VecFloatCmpBinaryInst(instruction_stmt, destination, lhs, rhs, type, fast_math_attr, unordered){}
 CmpBinaryInst::OpType VecFloatGeInst::get_op_type() const{
     return OpType::GE;
@@ -575,7 +575,7 @@ std::string VecFloatGeInst::to_string() const{
 }
 
 
-VecFloatEitherNanInst::VecFloatEitherNanInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+VecFloatEitherNanInst::VecFloatEitherNanInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                 FastMathAttr fast_math_attr):VecFloatCmpBinaryInst(instruction_stmt, destination, lhs, rhs, type, fast_math_attr, false){}
 CmpBinaryInst::OpType VecFloatEitherNanInst::get_op_type() const{
     return OpType::EITHER_NAN;
@@ -585,7 +585,7 @@ std::string VecFloatEitherNanInst::to_string() const{
 }
 
 
-VecFloatNeitherNanInst::VecFloatNeitherNanInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+VecFloatNeitherNanInst::VecFloatNeitherNanInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                                         FastMathAttr fast_math_attr):VecFloatCmpBinaryInst(instruction_stmt, destination, lhs, rhs, type, fast_math_attr, false){}
 CmpBinaryInst::OpType VecFloatNeitherNanInst::get_op_type() const{
     return OpType::NEITHER_NAN;
@@ -595,7 +595,7 @@ std::string VecFloatNeitherNanInst::to_string() const{
 }
 
 
-VecFloatBothNanInst::VecFloatBothNanInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
+VecFloatBothNanInst::VecFloatBothNanInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::TypeExprPtr type,
                                         FastMathAttr fast_math_attr):VecFloatCmpBinaryInst(instruction_stmt, destination, lhs, rhs, type, fast_math_attr, false){}
 CmpBinaryInst::OpType VecFloatBothNanInst::get_op_type() const{
     return OpType::BOTH_NAN;

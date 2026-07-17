@@ -9,7 +9,7 @@ class CpuIdInst : public Inst {
     IR::LiteralExprPtr leaf;
     IR::LiteralExprPtr subleaf;
     public:
-    CpuIdInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr leaf, IR::LiteralExprPtr subleaf);
+    CpuIdInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr leaf, IR::LiteralExprPtr subleaf);
 
     IR::LiteralExprPtr get_leaf() const;
     IR::LiteralExprPtr get_subleaf() const;
@@ -21,7 +21,7 @@ class CpuIdInst : public Inst {
 //---------------------------------Timestamp Counter Instructions---------------------------------
 class RdTscInst : public Inst {
     public:
-    RdTscInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination);
+    RdTscInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination);
 
     InstType get_inst_type() const override;
     std::string to_string() const override;
@@ -30,7 +30,7 @@ class RdTscInst : public Inst {
 
 class RdTscpInst : public Inst {
     public:
-    RdTscpInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination);
+    RdTscpInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination);
 
     InstType get_inst_type() const override;
     std::string to_string() const override;
@@ -39,7 +39,7 @@ class RdTscpInst : public Inst {
 //---------------------------------Hardware Random Number Instructions---------------------------------
 class RdrandInst : public Inst {
     public:
-    RdrandInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination);
+    RdrandInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination);
 
     InstType get_inst_type() const override;
     std::string to_string() const override;
@@ -47,7 +47,7 @@ class RdrandInst : public Inst {
 
 class RdseedInst : public Inst {
     public:
-    RdseedInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination);
+    RdseedInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination);
 
     InstType get_inst_type() const override;
     std::string to_string() const override;
@@ -57,7 +57,7 @@ class RdseedInst : public Inst {
 class GetFpEnvInst : public Inst {
     bool x87;
     public:
-    GetFpEnvInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, bool x87);
+    GetFpEnvInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, bool x87);
 
     bool is_x87() const;
     
@@ -85,7 +85,7 @@ class FpenvGetFieldInst : public Inst {
     FPEnvField field;
     bool x87;
     public:
-    FpenvGetFieldInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr env, FPEnvField field, bool x87);
+    FpenvGetFieldInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr env, FPEnvField field, bool x87);
 
     bool is_x87() const;
     IR::LiteralExprPtr get_env() const;
@@ -102,7 +102,7 @@ class FpenvSetFieldInst : public Inst {
     IR::LiteralExprPtr value;
     bool x87;
     public:
-    FpenvSetFieldInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr env, FPEnvField field, 
+    FpenvSetFieldInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr env, FPEnvField field, 
                       IR::LiteralExprPtr value, bool x87);
 
     bool is_x87() const;
@@ -118,7 +118,7 @@ class FpenvSetFieldInst : public Inst {
 class GetFpStatusInst : public Inst {
     bool x87;
     public:
-    GetFpStatusInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, bool x87);
+    GetFpStatusInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, bool x87);
 
     bool is_x87() const;
 
@@ -143,7 +143,7 @@ class AesEncInst : public Inst {
     IR::LiteralExprPtr state;
     IR::LiteralExprPtr roundkey;
     public:
-    AesEncInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+    AesEncInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination,
                IR::LiteralExprPtr state, IR::LiteralExprPtr roundkey);
 
     IR::LiteralExprPtr get_state() const;
@@ -157,7 +157,7 @@ class AesEncLastInst : public Inst {
     IR::LiteralExprPtr state;
     IR::LiteralExprPtr roundkey;
     public:
-    AesEncLastInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+    AesEncLastInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination,
                    IR::LiteralExprPtr state, IR::LiteralExprPtr roundkey);
 
     IR::LiteralExprPtr get_state() const;
@@ -171,7 +171,7 @@ class AesDecInst : public Inst {
     IR::LiteralExprPtr state;
     IR::LiteralExprPtr roundkey;
     public:
-    AesDecInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+    AesDecInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination,
                IR::LiteralExprPtr state, IR::LiteralExprPtr roundkey);
 
     IR::LiteralExprPtr get_state() const;
@@ -185,7 +185,7 @@ class AesDecLastInst : public Inst {
     IR::LiteralExprPtr state;
     IR::LiteralExprPtr roundkey;
     public:
-    AesDecLastInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+    AesDecLastInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination,
                    IR::LiteralExprPtr state, IR::LiteralExprPtr roundkey);
 
     IR::LiteralExprPtr get_state() const;
@@ -198,7 +198,7 @@ class AesDecLastInst : public Inst {
 class AesImcInst : public Inst {
     IR::LiteralExprPtr roundkey;
     public:
-    AesImcInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+    AesImcInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination,
                IR::LiteralExprPtr roundkey);
 
     IR::LiteralExprPtr get_roundkey() const;
@@ -211,7 +211,7 @@ class AesKeyGenAssistInst : public Inst {
     IR::LiteralExprPtr a;
     IR::LiteralExprPtr rcon;
     public:
-    AesKeyGenAssistInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+    AesKeyGenAssistInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination,
                         IR::LiteralExprPtr a, IR::LiteralExprPtr rcon);
 
     IR::LiteralExprPtr get_a() const;
@@ -226,7 +226,7 @@ class ClmulInst : public Inst {
     IR::LiteralExprPtr a;
     IR::LiteralExprPtr b;
     public:
-    ClmulInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+    ClmulInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination,
               IR::LiteralExprPtr a, IR::LiteralExprPtr b);
 
     IR::LiteralExprPtr get_a() const;
@@ -242,7 +242,7 @@ class Sha1Rnds4Inst : public Inst {
     IR::LiteralExprPtr msg;
     IR::LiteralExprPtr func;
     public:
-    Sha1Rnds4Inst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+    Sha1Rnds4Inst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination,
                     IR::LiteralExprPtr abcd, IR::LiteralExprPtr msg, IR::LiteralExprPtr func);
 
     IR::LiteralExprPtr get_abcd() const;
@@ -257,7 +257,7 @@ class Sha1NextEInst : public Inst {
     IR::LiteralExprPtr abcd;
     IR::LiteralExprPtr e;
     public:
-    Sha1NextEInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+    Sha1NextEInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination,
                   IR::LiteralExprPtr abcd, IR::LiteralExprPtr e);
 
     IR::LiteralExprPtr get_abcd() const;
@@ -271,7 +271,7 @@ class Sha1Msg1Inst : public Inst {
     IR::LiteralExprPtr a;
     IR::LiteralExprPtr b;
     public:
-    Sha1Msg1Inst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+    Sha1Msg1Inst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination,
                  IR::LiteralExprPtr a, IR::LiteralExprPtr b);
 
     IR::LiteralExprPtr get_a() const;
@@ -285,7 +285,7 @@ class Sha1Msg2Inst : public Inst {
     IR::LiteralExprPtr a;
     IR::LiteralExprPtr b;
     public:
-    Sha1Msg2Inst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+    Sha1Msg2Inst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination,
                  IR::LiteralExprPtr a, IR::LiteralExprPtr b);
 
     IR::LiteralExprPtr get_a() const;
@@ -300,7 +300,7 @@ class Sha256Rnds2Inst : public Inst {
     IR::LiteralExprPtr cdgh;
     IR::LiteralExprPtr wk;
     public:
-    Sha256Rnds2Inst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+    Sha256Rnds2Inst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination,
                     IR::LiteralExprPtr abef, IR::LiteralExprPtr cdgh, IR::LiteralExprPtr wk);
 
     IR::LiteralExprPtr get_abef() const;
@@ -315,7 +315,7 @@ class Sha256Msg1Inst : public Inst {
     IR::LiteralExprPtr a;
     IR::LiteralExprPtr b;
     public:
-    Sha256Msg1Inst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+    Sha256Msg1Inst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination,
                    IR::LiteralExprPtr a, IR::LiteralExprPtr b);
 
     IR::LiteralExprPtr get_a() const;
@@ -329,7 +329,7 @@ class Sha256Msg2Inst : public Inst {
     IR::LiteralExprPtr a;
     IR::LiteralExprPtr b;
     public:
-    Sha256Msg2Inst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+    Sha256Msg2Inst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination,
                    IR::LiteralExprPtr a, IR::LiteralExprPtr b);
 
     IR::LiteralExprPtr get_a() const;
@@ -346,7 +346,7 @@ class Crc32Inst : public Inst {
     IR::TypeExprPtr acc_type;
     IR::TypeExprPtr data_type;
     public:
-    Crc32Inst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+    Crc32Inst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination,
               IR::LiteralExprPtr acc, IR::LiteralExprPtr data, IR::TypeExprPtr acc_type, IR::TypeExprPtr data_type);
 
     IR::LiteralExprPtr get_acc() const;
@@ -369,7 +369,7 @@ class SyscallInst : public Inst {
     bool pure;
     public:
     //destination is nullptr if no return
-    SyscallInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination,
+    SyscallInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination,
                 IR::LiteralExprPtr nr, std::vector<IR::LiteralExprPtr> args,
                 bool noreturn_, bool nosideeffect, bool pure);
 
@@ -386,7 +386,7 @@ class SyscallInst : public Inst {
 //---------------------------------CET Shadow Stack---------------------------------
 class RdsspInst : public Inst {
     public:
-    RdsspInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination);
+    RdsspInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination);
 
     InstType get_inst_type() const override;
     std::string to_string() const override;

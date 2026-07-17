@@ -5,7 +5,7 @@
 #include "symtable/symtable.hpp"
 namespace LIRA {
 namespace MIR{
-class LocalDestRegister{
+class LocalRegister{
     std::string dest_register_name;
     IR::TypeExprPtr type;//Type of the register.
 
@@ -23,7 +23,7 @@ class LocalDestRegister{
     std::size_t dereferenceable_bytes; //If 0 means the value is not set
     std::size_t alignment;
     public:
-    LocalDestRegister(std::string dest_register_name, IR::TypeExprPtr type,bool artificial, bool synthetic, bool nonnull, bool nopoison, bool nnan, bool ninf, 
+    LocalRegister(std::string dest_register_name, IR::TypeExprPtr type,bool artificial, bool synthetic, bool nonnull, bool nopoison, bool nnan, bool ninf, 
                       bool noalias, std::string original_name, std::string scope, std::size_t dereferenceable_bytes, std::size_t alignment);
     
     void set_alignment(std::size_t alignment);
@@ -47,7 +47,7 @@ class LocalDestRegister{
     std::string to_string() const;
 };
 
-using LocalDestRegisterPtr = std::shared_ptr<LocalDestRegister>;
+using LocalRegisterPtr = std::shared_ptr<LocalRegister>;
 
 class LabelParamtRegister{};
 

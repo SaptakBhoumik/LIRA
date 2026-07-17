@@ -5,17 +5,17 @@
 #include <functional>
 namespace LIRA {
 namespace SemanticAnalyzer {
-using DispatchFuncType = std::function<MIR::InstPtr(std::string, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+using DispatchFuncType = std::function<MIR::InstPtr(std::string, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                                     IR::TypeExprPtr input_type, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt)>;
 
 //NOTE:-Dont merge them into one templated function. The attributes can change in future. It is more code but more maintainable imo+The error messages can be more specific
-MIR::InstPtr analyze_widening_add_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_widening_add_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                            IR::TypeExprPtr input_type, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_widening_sub_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_widening_sub_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                            IR::TypeExprPtr input_type, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_widening_absdiff_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_widening_absdiff_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                            IR::TypeExprPtr input_type, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_widening_mul_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_widening_mul_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                            IR::TypeExprPtr input_type, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
 
 MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_widening_bin_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt){
@@ -68,7 +68,7 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_widening_bin_inst(IR::Token name,I
     }
 }
 
-MIR::InstPtr analyze_widening_add_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_widening_add_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                            IR::TypeExprPtr input_type, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     if(MIR::is_float_typevariant(type_variant)){
@@ -96,7 +96,7 @@ MIR::InstPtr analyze_widening_add_bin_inst(std::string filename, MIR::LocalDestR
         }
     }
 }
-MIR::InstPtr analyze_widening_sub_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_widening_sub_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                            IR::TypeExprPtr input_type, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     if(MIR::is_float_typevariant(type_variant)){
@@ -124,7 +124,7 @@ MIR::InstPtr analyze_widening_sub_bin_inst(std::string filename, MIR::LocalDestR
         }
     }
 }
-MIR::InstPtr analyze_widening_absdiff_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_widening_absdiff_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                            IR::TypeExprPtr input_type, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     if(MIR::is_float_typevariant(type_variant)){
@@ -153,7 +153,7 @@ MIR::InstPtr analyze_widening_absdiff_bin_inst(std::string filename, MIR::LocalD
     }
 }
 
-MIR::InstPtr analyze_widening_mul_bin_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_widening_mul_bin_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                            IR::TypeExprPtr input_type, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     if(MIR::is_float_typevariant(type_variant)){

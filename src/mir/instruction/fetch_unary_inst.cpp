@@ -3,7 +3,7 @@
 
 namespace LIRA {
 namespace MIR {
-FetchUnaryInst::FetchUnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
+FetchUnaryInst::FetchUnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, 
                                CommonFetchInstAttrs common_fetch_inst_attrs, std::optional<FastMathAttr> fast_math_attr)
                                :Inst(instruction_stmt, destination, fast_math_attr){
     this->value = value;
@@ -22,7 +22,7 @@ InstType FetchUnaryInst::get_inst_type() const{
     return InstType::FetchUnaryInst;
 }
 // --------------------------- Int Fetch Unary operations ---------------------------
-IntFetchUnaryInst::IntFetchUnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
+IntFetchUnaryInst::IntFetchUnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, 
                                     CommonFetchInstAttrs common_fetch_inst_attrs, bool nuw, bool nsw, bool zero_poison)
                                     :FetchUnaryInst(instruction_stmt, destination, value, common_fetch_inst_attrs, std::nullopt){
     this->nuw = nuw;
@@ -63,7 +63,7 @@ TypeVariant IntFetchUnaryInst::get_type_variant() const{
 }
 
 
-IntFetchNegInst::IntFetchNegInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
+IntFetchNegInst::IntFetchNegInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, 
                                  CommonFetchInstAttrs common_fetch_inst_attrs, bool nsw)
                                  :IntFetchUnaryInst(instruction_stmt, destination, value, common_fetch_inst_attrs, false, nsw, false){}
 FetchUnaryInst::OpType IntFetchNegInst::get_op_type() const{
@@ -74,7 +74,7 @@ std::string IntFetchNegInst::to_string() const{
 }
 
 
-IntFetchNotInst::IntFetchNotInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value,
+IntFetchNotInst::IntFetchNotInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value,
                                  CommonFetchInstAttrs common_fetch_inst_attrs)
                                  :IntFetchUnaryInst(instruction_stmt, destination, value, common_fetch_inst_attrs, false, false, false){}
 FetchUnaryInst::OpType IntFetchNotInst::get_op_type() const{
@@ -85,7 +85,7 @@ std::string IntFetchNotInst::to_string() const{
 }
 
 
-IntFetchAbsInst::IntFetchAbsInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
+IntFetchAbsInst::IntFetchAbsInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, 
                                  CommonFetchInstAttrs common_fetch_inst_attrs, bool nsw)
                                  :IntFetchUnaryInst(instruction_stmt, destination, value, common_fetch_inst_attrs, false, nsw, false){}
 FetchUnaryInst::OpType IntFetchAbsInst::get_op_type() const{
@@ -96,7 +96,7 @@ std::string IntFetchAbsInst::to_string() const{
 }
 
 
-IntFetchPopcountInst::IntFetchPopcountInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value,
+IntFetchPopcountInst::IntFetchPopcountInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value,
                                            CommonFetchInstAttrs common_fetch_inst_attrs)
                                            :IntFetchUnaryInst(instruction_stmt, destination, value, common_fetch_inst_attrs, false, false, false){}
 FetchUnaryInst::OpType IntFetchPopcountInst::get_op_type() const{
@@ -107,7 +107,7 @@ std::string IntFetchPopcountInst::to_string() const{
 }
 
 
-IntFetchCLZInst::IntFetchCLZInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value,
+IntFetchCLZInst::IntFetchCLZInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value,
                                  CommonFetchInstAttrs common_fetch_inst_attrs, bool zero_poison)
                                  :IntFetchUnaryInst(instruction_stmt, destination, value, common_fetch_inst_attrs, false, false, zero_poison){}
 FetchUnaryInst::OpType IntFetchCLZInst::get_op_type() const{
@@ -118,7 +118,7 @@ std::string IntFetchCLZInst::to_string() const{
 }
 
 
-IntFetchCTZInst::IntFetchCTZInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value,
+IntFetchCTZInst::IntFetchCTZInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value,
                                  CommonFetchInstAttrs common_fetch_inst_attrs, bool zero_poison)
                                  :IntFetchUnaryInst(instruction_stmt, destination, value, common_fetch_inst_attrs, false, false, zero_poison){}
 FetchUnaryInst::OpType IntFetchCTZInst::get_op_type() const{
@@ -129,7 +129,7 @@ std::string IntFetchCTZInst::to_string() const{
 }
 
 
-IntFetchParityInst::IntFetchParityInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value,
+IntFetchParityInst::IntFetchParityInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value,
                                        CommonFetchInstAttrs common_fetch_inst_attrs)
                                        :IntFetchUnaryInst(instruction_stmt, destination, value, common_fetch_inst_attrs, false, false, false){}
 FetchUnaryInst::OpType IntFetchParityInst::get_op_type() const{
@@ -140,7 +140,7 @@ std::string IntFetchParityInst::to_string() const{
 }
 
 
-IntFetchBswapInst::IntFetchBswapInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value,
+IntFetchBswapInst::IntFetchBswapInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value,
                                      CommonFetchInstAttrs common_fetch_inst_attrs)
                                      :IntFetchUnaryInst(instruction_stmt, destination, value, common_fetch_inst_attrs, false, false, false){}
 FetchUnaryInst::OpType IntFetchBswapInst::get_op_type() const{
@@ -151,7 +151,7 @@ std::string IntFetchBswapInst::to_string() const{
 }
 
 
-IntFetchBitreverseInst::IntFetchBitreverseInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value,
+IntFetchBitreverseInst::IntFetchBitreverseInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value,
                                                CommonFetchInstAttrs common_fetch_inst_attrs )
                                                :IntFetchUnaryInst(instruction_stmt, destination, value, common_fetch_inst_attrs, false, false, false){}
 FetchUnaryInst::OpType IntFetchBitreverseInst::get_op_type() const{
@@ -162,7 +162,7 @@ std::string IntFetchBitreverseInst::to_string() const{
 }
 
 
-IntFetchCLRSBInst::IntFetchCLRSBInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value,
+IntFetchCLRSBInst::IntFetchCLRSBInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value,
                                      CommonFetchInstAttrs common_fetch_inst_attrs)
                                      :IntFetchUnaryInst(instruction_stmt, destination, value, common_fetch_inst_attrs, false, false, false){}
 FetchUnaryInst::OpType IntFetchCLRSBInst::get_op_type() const{
@@ -173,7 +173,7 @@ std::string IntFetchCLRSBInst::to_string() const{
 }
 
 
-IntFetchBLSIInst::IntFetchBLSIInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value,
+IntFetchBLSIInst::IntFetchBLSIInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value,
                                    CommonFetchInstAttrs common_fetch_inst_attrs)
                                    :IntFetchUnaryInst(instruction_stmt, destination, value, common_fetch_inst_attrs, false, false, false){}
 FetchUnaryInst::OpType IntFetchBLSIInst::get_op_type() const{
@@ -184,7 +184,7 @@ std::string IntFetchBLSIInst::to_string() const{
 }
 
 
-IntFetchBLSRInst::IntFetchBLSRInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value,
+IntFetchBLSRInst::IntFetchBLSRInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value,
                                    CommonFetchInstAttrs common_fetch_inst_attrs)
                                    :IntFetchUnaryInst(instruction_stmt, destination, value, common_fetch_inst_attrs, false, false, false){}
 FetchUnaryInst::OpType IntFetchBLSRInst::get_op_type() const{
@@ -195,7 +195,7 @@ std::string IntFetchBLSRInst::to_string() const{
 }
 
 
-IntFetchBLSMaskInst::IntFetchBLSMaskInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value,
+IntFetchBLSMaskInst::IntFetchBLSMaskInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value,
                                         CommonFetchInstAttrs common_fetch_inst_attrs)
                                         :IntFetchUnaryInst(instruction_stmt, destination, value, common_fetch_inst_attrs, false, false, false){}
 FetchUnaryInst::OpType IntFetchBLSMaskInst::get_op_type() const{
@@ -207,7 +207,7 @@ std::string IntFetchBLSMaskInst::to_string() const{
 
 
 // --------------------------- Float Fetch Unary operations ---------------------------
-FloatFetchUnaryInst::FloatFetchUnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
+FloatFetchUnaryInst::FloatFetchUnaryInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, 
                                          CommonFetchInstAttrs common_fetch_inst_attrs, FastMathAttr fast_math_attr,bool approx)
                                          :FetchUnaryInst(instruction_stmt, destination, value, common_fetch_inst_attrs, fast_math_attr){
     this->approx = approx;
@@ -240,7 +240,7 @@ TypeVariant FloatFetchUnaryInst::get_type_variant() const{
 }
 
 
-FloatFetchNegInst::FloatFetchNegInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
+FloatFetchNegInst::FloatFetchNegInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, 
                                      CommonFetchInstAttrs common_fetch_inst_attrs, FastMathAttr fast_math_attr)
                                      :FloatFetchUnaryInst(instruction_stmt, destination, value, common_fetch_inst_attrs, fast_math_attr,false){}
 FetchUnaryInst::OpType FloatFetchNegInst::get_op_type() const{
@@ -251,7 +251,7 @@ std::string FloatFetchNegInst::to_string() const{
 }
 
 
-FloatFetchAbsInst::FloatFetchAbsInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
+FloatFetchAbsInst::FloatFetchAbsInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, 
                                      CommonFetchInstAttrs common_fetch_inst_attrs, FastMathAttr fast_math_attr)
                                      :FloatFetchUnaryInst(instruction_stmt, destination, value, common_fetch_inst_attrs, fast_math_attr,false){}
 FetchUnaryInst::OpType FloatFetchAbsInst::get_op_type() const{
@@ -262,7 +262,7 @@ std::string FloatFetchAbsInst::to_string() const{
 }
 
 
-FloatFetchCeilInst::FloatFetchCeilInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
+FloatFetchCeilInst::FloatFetchCeilInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, 
                                        CommonFetchInstAttrs common_fetch_inst_attrs, FastMathAttr fast_math_attr)
                                        :FloatFetchUnaryInst(instruction_stmt, destination, value, common_fetch_inst_attrs, fast_math_attr,false){}
 FetchUnaryInst::OpType FloatFetchCeilInst::get_op_type() const{
@@ -273,7 +273,7 @@ std::string FloatFetchCeilInst::to_string() const{
 }
 
 
-FloatFetchFloorInst::FloatFetchFloorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
+FloatFetchFloorInst::FloatFetchFloorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, 
                                          CommonFetchInstAttrs common_fetch_inst_attrs, FastMathAttr fast_math_attr)
                                          :FloatFetchUnaryInst(instruction_stmt, destination, value, common_fetch_inst_attrs, fast_math_attr,false){}
 FetchUnaryInst::OpType FloatFetchFloorInst::get_op_type() const{
@@ -284,7 +284,7 @@ std::string FloatFetchFloorInst::to_string() const{
 }
 
 
-FloatFetchIntegralPartInst::FloatFetchIntegralPartInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
+FloatFetchIntegralPartInst::FloatFetchIntegralPartInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, 
                                                          CommonFetchInstAttrs common_fetch_inst_attrs, FastMathAttr fast_math_attr)
                                                          :FloatFetchUnaryInst(instruction_stmt, destination, value, common_fetch_inst_attrs, fast_math_attr,false){}
 FetchUnaryInst::OpType FloatFetchIntegralPartInst::get_op_type() const{
@@ -295,7 +295,7 @@ std::string FloatFetchIntegralPartInst::to_string() const{
 }
 
 
-FloatFetchFractionalPartInst::FloatFetchFractionalPartInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
+FloatFetchFractionalPartInst::FloatFetchFractionalPartInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, 
                                                            CommonFetchInstAttrs common_fetch_inst_attrs, FastMathAttr fast_math_attr)
                                                            :FloatFetchUnaryInst(instruction_stmt, destination, value, common_fetch_inst_attrs, fast_math_attr,false){}
 FetchUnaryInst::OpType FloatFetchFractionalPartInst::get_op_type() const{
@@ -306,7 +306,7 @@ std::string FloatFetchFractionalPartInst::to_string() const{
 }
 
 
-FloatFetchRoundNearestInst::FloatFetchRoundNearestInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
+FloatFetchRoundNearestInst::FloatFetchRoundNearestInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, 
                                                        CommonFetchInstAttrs common_fetch_inst_attrs, FastMathAttr fast_math_attr)
                                                        :FloatFetchUnaryInst(instruction_stmt, destination, value, common_fetch_inst_attrs, fast_math_attr,false){}
 FetchUnaryInst::OpType FloatFetchRoundNearestInst::get_op_type() const{
@@ -317,7 +317,7 @@ std::string FloatFetchRoundNearestInst::to_string() const{
 }
 
 
-FloatFetchRoundEvenInst::FloatFetchRoundEvenInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
+FloatFetchRoundEvenInst::FloatFetchRoundEvenInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, 
                                                 CommonFetchInstAttrs common_fetch_inst_attrs, FastMathAttr fast_math_attr)
                                                 :FloatFetchUnaryInst(instruction_stmt, destination, value, common_fetch_inst_attrs, fast_math_attr,false){}
 FetchUnaryInst::OpType FloatFetchRoundEvenInst::get_op_type() const{
@@ -328,7 +328,7 @@ std::string FloatFetchRoundEvenInst::to_string() const{
 }
 
 
-FloatFetchSqrtInst::FloatFetchSqrtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
+FloatFetchSqrtInst::FloatFetchSqrtInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, 
                                        CommonFetchInstAttrs common_fetch_inst_attrs, FastMathAttr fast_math_attr)
                                        :FloatFetchUnaryInst(instruction_stmt, destination, value, common_fetch_inst_attrs, fast_math_attr,false){}
 FetchUnaryInst::OpType FloatFetchSqrtInst::get_op_type() const{
@@ -339,7 +339,7 @@ std::string FloatFetchSqrtInst::to_string() const{
 }
 
 
-FloatFetchReciprocalInst::FloatFetchReciprocalInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
+FloatFetchReciprocalInst::FloatFetchReciprocalInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, 
                                                    CommonFetchInstAttrs common_fetch_inst_attrs, FastMathAttr fast_math_attr, bool approx)
                                                    :FloatFetchUnaryInst(instruction_stmt, destination, value, common_fetch_inst_attrs, fast_math_attr,approx){}
 FetchUnaryInst::OpType FloatFetchReciprocalInst::get_op_type() const{
@@ -350,7 +350,7 @@ std::string FloatFetchReciprocalInst::to_string() const{
 }
 
 
-FloatFetchRsqrtInst::FloatFetchRsqrtInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
+FloatFetchRsqrtInst::FloatFetchRsqrtInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, 
                                          CommonFetchInstAttrs common_fetch_inst_attrs, FastMathAttr fast_math_attr, bool approx)
                                          :FloatFetchUnaryInst(instruction_stmt, destination, value, common_fetch_inst_attrs, fast_math_attr,approx){}
 FetchUnaryInst::OpType FloatFetchRsqrtInst::get_op_type() const{
@@ -361,7 +361,7 @@ std::string FloatFetchRsqrtInst::to_string() const{
 }
 
 
-FloatFetchBswapInst::FloatFetchBswapInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, 
+FloatFetchBswapInst::FloatFetchBswapInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, 
                                          CommonFetchInstAttrs common_fetch_inst_attrs, FastMathAttr fast_math_attr)
                                          :FloatFetchUnaryInst(instruction_stmt, destination, value, common_fetch_inst_attrs, fast_math_attr,false){}
 FetchUnaryInst::OpType FloatFetchBswapInst::get_op_type() const{

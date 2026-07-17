@@ -4,28 +4,28 @@
 #include <functional>
 namespace LIRA {
 namespace SemanticAnalyzer {
-using DispatchFuncType = std::function<MIR::InstPtr(std::string, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+using DispatchFuncType = std::function<MIR::InstPtr(std::string, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                                     MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt)>;
  
-MIR::InstPtr analyze_wrap_add_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_wrap_add_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                    MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_wrap_sub_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_wrap_sub_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                    MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_wrap_absdiff_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_wrap_absdiff_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                        MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_wrap_mul_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_wrap_mul_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                    MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_wrap_div_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_wrap_div_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                    MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_wrap_rem_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_wrap_rem_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                    MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_wrap_copysign_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_wrap_copysign_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                         MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_wrap_shl_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_wrap_shl_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                    MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_wrap_lshr_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_wrap_lshr_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                     MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_wrap_ashr_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_wrap_ashr_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                     MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
 
 
@@ -110,7 +110,7 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_wrap_bin_inst(IR::Token name,IR::I
     }
 }
 
-MIR::InstPtr analyze_wrap_add_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_wrap_add_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                     MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [flag_attrs,remaining_attrs] = Utils::extract_flag_attrs(filename,attributes, { "unsigned","saturating"});
@@ -124,7 +124,7 @@ MIR::InstPtr analyze_wrap_add_inst(std::string filename, MIR::LocalDestRegisterP
         return std::make_shared<MIR::VecIntWrapAddInst>(inst_stmt,dest,lhs,rhs,flag_attrs["unsigned"],flag_attrs["saturating"]);
     }
 }
-MIR::InstPtr analyze_wrap_sub_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+MIR::InstPtr analyze_wrap_sub_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                     MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [flag_attrs,remaining_attrs] = Utils::extract_flag_attrs(filename,attributes, { "unsigned","saturating"});
@@ -138,7 +138,7 @@ MIR::InstPtr analyze_wrap_sub_inst(std::string filename, MIR::LocalDestRegisterP
         return std::make_shared<MIR::VecIntWrapSubInst>(inst_stmt,dest,lhs,rhs,flag_attrs["unsigned"],flag_attrs["saturating"]);
     }
 }
-MIR::InstPtr analyze_wrap_absdiff_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+MIR::InstPtr analyze_wrap_absdiff_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                      MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [flag_attrs,remaining_attrs] = Utils::extract_flag_attrs(filename,attributes, { "unsigned","saturating"});
@@ -152,7 +152,7 @@ MIR::InstPtr analyze_wrap_absdiff_inst(std::string filename, MIR::LocalDestRegis
         return std::make_shared<MIR::VecIntWrapAbsDiffInst>(inst_stmt,dest,lhs,rhs,flag_attrs["unsigned"],flag_attrs["saturating"]);
     }
 }
-MIR::InstPtr analyze_wrap_mul_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_wrap_mul_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                     MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [flag_attrs,remaining_attrs] = Utils::extract_flag_attrs(filename,attributes, { "unsigned","saturating"});
@@ -166,7 +166,7 @@ MIR::InstPtr analyze_wrap_mul_inst(std::string filename, MIR::LocalDestRegisterP
         return std::make_shared<MIR::VecIntWrapMulInst>(inst_stmt,dest,lhs,rhs,flag_attrs["unsigned"],flag_attrs["saturating"]);
     }
 }
-MIR::InstPtr analyze_wrap_div_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_wrap_div_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                     MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [flag_attrs,remaining_attrs] = Utils::extract_flag_attrs(filename,attributes, { "unsigned","saturating"});
@@ -180,7 +180,7 @@ MIR::InstPtr analyze_wrap_div_inst(std::string filename, MIR::LocalDestRegisterP
         return std::make_shared<MIR::VecIntWrapDivInst>(inst_stmt,dest,lhs,rhs,flag_attrs["unsigned"],flag_attrs["saturating"]);
     }
 }
-MIR::InstPtr analyze_wrap_rem_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_wrap_rem_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                     MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [flag_attrs,remaining_attrs] = Utils::extract_flag_attrs(filename,attributes, { "unsigned","saturating"});
@@ -194,7 +194,7 @@ MIR::InstPtr analyze_wrap_rem_inst(std::string filename, MIR::LocalDestRegisterP
         return std::make_shared<MIR::VecIntWrapRemInst>(inst_stmt,dest,lhs,rhs,flag_attrs["unsigned"],flag_attrs["saturating"]);
     }
 }
-MIR::InstPtr analyze_wrap_copysign_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_wrap_copysign_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                         MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [flag_attrs,remaining_attrs] = Utils::extract_flag_attrs(filename,attributes, { "saturating"});
@@ -208,7 +208,7 @@ MIR::InstPtr analyze_wrap_copysign_inst(std::string filename, MIR::LocalDestRegi
         return std::make_shared<MIR::VecIntWrapCopysignInst>(inst_stmt,dest,lhs,rhs,flag_attrs["saturating"]);
     }
 }
-MIR::InstPtr analyze_wrap_shl_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_wrap_shl_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                    MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [flag_attrs,remaining_attrs] = Utils::extract_flag_attrs(filename,attributes, { "saturating"});
@@ -222,7 +222,7 @@ MIR::InstPtr analyze_wrap_shl_inst(std::string filename, MIR::LocalDestRegisterP
         return std::make_shared<MIR::VecIntWrapShlInst>(inst_stmt,dest,lhs,rhs,flag_attrs["saturating"]);
     }
 }
-MIR::InstPtr analyze_wrap_lshr_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_wrap_lshr_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                     MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [flag_attrs,remaining_attrs] = Utils::extract_flag_attrs(filename,attributes, { "saturating"});
@@ -236,7 +236,7 @@ MIR::InstPtr analyze_wrap_lshr_inst(std::string filename, MIR::LocalDestRegister
         return std::make_shared<MIR::VecIntWrapLshrInst>(inst_stmt,dest,lhs,rhs,flag_attrs["saturating"]);
     }
 }
-MIR::InstPtr analyze_wrap_ashr_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+MIR::InstPtr analyze_wrap_ashr_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                     MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     auto [flag_attrs,remaining_attrs] = Utils::extract_flag_attrs(filename,attributes, { "saturating"});

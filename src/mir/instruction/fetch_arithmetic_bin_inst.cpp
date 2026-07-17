@@ -2,7 +2,7 @@
 
 namespace LIRA {
 namespace MIR {
-FetchArithmeticBinInst::FetchArithmeticBinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+FetchArithmeticBinInst::FetchArithmeticBinInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                            CommonFetchInstAttrs common_fetch_inst_attrs, std::optional<FastMathAttr> fast_math_attr)
                            :Inst(instruction_stmt, destination, fast_math_attr){
     this->pointer = pointer;
@@ -27,7 +27,7 @@ InstType FetchArithmeticBinInst::get_inst_type() const{
 
 
 // --------------------------- Integer read modify operations ---------------------------
-IntFetchArithmeticBinInst::IntFetchArithmeticBinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+IntFetchArithmeticBinInst::IntFetchArithmeticBinInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                      CommonFetchInstAttrs common_fetch_inst_attrs, bool nuw, bool nsw, bool saturating, bool exact, bool unsigned_, bool floor)
                      :FetchArithmeticBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, std::nullopt){
     this->nuw = nuw;
@@ -89,7 +89,7 @@ TypeVariant IntFetchArithmeticBinInst::get_type_variant() const{
 }
 
 
-IntFetchXchgInst::IntFetchXchgInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+IntFetchXchgInst::IntFetchXchgInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                          CommonFetchInstAttrs common_fetch_inst_attrs)
                         :IntFetchArithmeticBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, false, false, false, false, false, false){}
 FetchArithmeticBinInst::OpType IntFetchXchgInst::get_op_type() const{
@@ -100,7 +100,7 @@ std::string IntFetchXchgInst::to_string() const{
 }
 
 
-IntFetchAddInst::IntFetchAddInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+IntFetchAddInst::IntFetchAddInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     CommonFetchInstAttrs common_fetch_inst_attrs, bool nuw, bool nsw, bool saturating, bool unsigned_)
                     :IntFetchArithmeticBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, nuw, nsw, saturating, false, unsigned_, false){}
 FetchArithmeticBinInst::OpType IntFetchAddInst::get_op_type() const{
@@ -111,7 +111,7 @@ std::string IntFetchAddInst::to_string() const{
 }
 
 
-IntFetchSubInst::IntFetchSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+IntFetchSubInst::IntFetchSubInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     CommonFetchInstAttrs common_fetch_inst_attrs, bool nuw, bool nsw, bool saturating, bool unsigned_)
                     :IntFetchArithmeticBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, nuw, nsw, saturating, false, unsigned_, false){}
 FetchArithmeticBinInst::OpType IntFetchSubInst::get_op_type() const{
@@ -122,7 +122,7 @@ std::string IntFetchSubInst::to_string() const{
 }
 
 
-IntFetchAbsDiffInst::IntFetchAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+IntFetchAbsDiffInst::IntFetchAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     CommonFetchInstAttrs common_fetch_inst_attrs, bool nuw, bool nsw, bool saturating, bool unsigned_)
                     :IntFetchArithmeticBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, nuw, nsw, saturating, false, unsigned_, false){}
 FetchArithmeticBinInst::OpType IntFetchAbsDiffInst::get_op_type() const{
@@ -133,7 +133,7 @@ std::string IntFetchAbsDiffInst::to_string() const{
 }
 
 
-IntFetchMulInst::IntFetchMulInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+IntFetchMulInst::IntFetchMulInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     CommonFetchInstAttrs common_fetch_inst_attrs, bool nuw, bool nsw, bool saturating, bool unsigned_)
                     :IntFetchArithmeticBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, nuw, nsw, saturating, false, unsigned_, false){}
 FetchArithmeticBinInst::OpType IntFetchMulInst::get_op_type() const{
@@ -144,7 +144,7 @@ std::string IntFetchMulInst::to_string() const{
 }
 
 
-IntFetchDivInst::IntFetchDivInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+IntFetchDivInst::IntFetchDivInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     CommonFetchInstAttrs common_fetch_inst_attrs, bool unsigned_, bool exact)
                     :IntFetchArithmeticBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, false, false, false, exact, unsigned_, false){}
 FetchArithmeticBinInst::OpType IntFetchDivInst::get_op_type() const{
@@ -155,7 +155,7 @@ std::string IntFetchDivInst::to_string() const{
 }
 
 
-IntFetchRemInst::IntFetchRemInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value,
+IntFetchRemInst::IntFetchRemInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value,
                     CommonFetchInstAttrs common_fetch_inst_attrs, bool unsigned_)
                     :IntFetchArithmeticBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, false, false, false, false, unsigned_, false){}
 FetchArithmeticBinInst::OpType IntFetchRemInst::get_op_type() const{
@@ -166,7 +166,7 @@ std::string IntFetchRemInst::to_string() const{
 }
 
 
-IntFetchCopySignInst::IntFetchCopySignInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+IntFetchCopySignInst::IntFetchCopySignInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     CommonFetchInstAttrs common_fetch_inst_attrs, bool nsw)
                     :IntFetchArithmeticBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, false, nsw, false, false, false, false){}
 FetchArithmeticBinInst::OpType IntFetchCopySignInst::get_op_type() const{
@@ -177,7 +177,7 @@ std::string IntFetchCopySignInst::to_string() const{
 }
 
 
-IntFetchMaxInst::IntFetchMaxInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value,
+IntFetchMaxInst::IntFetchMaxInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value,
                     CommonFetchInstAttrs common_fetch_inst_attrs, bool unsigned_)
                     :IntFetchArithmeticBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, false, false, false, false, unsigned_, false){}
 FetchArithmeticBinInst::OpType IntFetchMaxInst::get_op_type() const{
@@ -188,7 +188,7 @@ std::string IntFetchMaxInst::to_string() const{
 }
 
 
-IntFetchMinInst::IntFetchMinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value,
+IntFetchMinInst::IntFetchMinInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value,
                     CommonFetchInstAttrs common_fetch_inst_attrs, bool unsigned_)
                     :IntFetchArithmeticBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, false, false, false, false, unsigned_, false){}
 FetchArithmeticBinInst::OpType IntFetchMinInst::get_op_type() const{
@@ -199,7 +199,7 @@ std::string IntFetchMinInst::to_string() const{
 }
 
 
-IntFetchAvgInst::IntFetchAvgInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value,
+IntFetchAvgInst::IntFetchAvgInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value,
                     CommonFetchInstAttrs common_fetch_inst_attrs, bool nuw, bool nsw, bool unsigned_, bool floor)
                     :IntFetchArithmeticBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, nuw, nsw, false, false, unsigned_, floor){}
 FetchArithmeticBinInst::OpType IntFetchAvgInst::get_op_type() const{
@@ -210,7 +210,7 @@ std::string IntFetchAvgInst::to_string() const{
 }
 
 // --------------------------- Float read modify operations ---------------------------
-FloatFetchArithmeticBinInst::FloatFetchArithmeticBinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+FloatFetchArithmeticBinInst::FloatFetchArithmeticBinInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     CommonFetchInstAttrs common_fetch_inst_attrs, FastMathAttr fast_math_attr, bool unordered, bool ieee754_2019)
                     :FetchArithmeticBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, fast_math_attr){
     this->unordered = unordered;
@@ -232,7 +232,7 @@ std::string FloatFetchArithmeticBinInst::to_string_helper(const std::string op_n
 }
 
 
-FloatFetchXchgInst::FloatFetchXchgInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+FloatFetchXchgInst::FloatFetchXchgInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     CommonFetchInstAttrs common_fetch_inst_attrs, FastMathAttr fast_math_attr)
                     :FloatFetchArithmeticBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, fast_math_attr, false, false){}
 FetchArithmeticBinInst::OpType FloatFetchXchgInst::get_op_type() const{
@@ -243,7 +243,7 @@ std::string FloatFetchXchgInst::to_string() const{
 }
 
 
-FloatFetchAddInst::FloatFetchAddInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+FloatFetchAddInst::FloatFetchAddInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     CommonFetchInstAttrs common_fetch_inst_attrs, FastMathAttr fast_math_attr)
                     :FloatFetchArithmeticBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, fast_math_attr, false, false){}
 FetchArithmeticBinInst::OpType FloatFetchAddInst::get_op_type() const{
@@ -254,7 +254,7 @@ std::string FloatFetchAddInst::to_string() const{
 }
 
 
-FloatFetchSubInst::FloatFetchSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+FloatFetchSubInst::FloatFetchSubInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     CommonFetchInstAttrs common_fetch_inst_attrs, FastMathAttr fast_math_attr)
                     :FloatFetchArithmeticBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, fast_math_attr, false, false){}
 FetchArithmeticBinInst::OpType FloatFetchSubInst::get_op_type() const{
@@ -265,7 +265,7 @@ std::string FloatFetchSubInst::to_string() const{
 }
 
 
-FloatFetchAbsDiffInst::FloatFetchAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+FloatFetchAbsDiffInst::FloatFetchAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     CommonFetchInstAttrs common_fetch_inst_attrs, FastMathAttr fast_math_attr)
                     :FloatFetchArithmeticBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, fast_math_attr, false, false){}
 FetchArithmeticBinInst::OpType FloatFetchAbsDiffInst::get_op_type() const{
@@ -276,7 +276,7 @@ std::string FloatFetchAbsDiffInst::to_string() const{
 }
 
 
-FloatFetchMulInst::FloatFetchMulInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+FloatFetchMulInst::FloatFetchMulInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     CommonFetchInstAttrs common_fetch_inst_attrs, FastMathAttr fast_math_attr)
                     :FloatFetchArithmeticBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, fast_math_attr, false, false){}
 FetchArithmeticBinInst::OpType FloatFetchMulInst::get_op_type() const{
@@ -287,7 +287,7 @@ std::string FloatFetchMulInst::to_string() const{
 }
 
 
-FloatFetchDivInst::FloatFetchDivInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
+FloatFetchDivInst::FloatFetchDivInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value, 
                     CommonFetchInstAttrs common_fetch_inst_attrs, FastMathAttr fast_math_attr)
                     :FloatFetchArithmeticBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, fast_math_attr, false, false){}
 FetchArithmeticBinInst::OpType FloatFetchDivInst::get_op_type() const{
@@ -298,7 +298,7 @@ std::string FloatFetchDivInst::to_string() const{
 }
 
 
-FloatFetchRemInst::FloatFetchRemInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value,
+FloatFetchRemInst::FloatFetchRemInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value,
                     CommonFetchInstAttrs common_fetch_inst_attrs, FastMathAttr fast_math_attr)
                     :FloatFetchArithmeticBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, fast_math_attr, false, false){}
 FetchArithmeticBinInst::OpType FloatFetchRemInst::get_op_type() const{
@@ -309,7 +309,7 @@ std::string FloatFetchRemInst::to_string() const{
 }
 
 
-FloatFetchCopySignInst::FloatFetchCopySignInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value,
+FloatFetchCopySignInst::FloatFetchCopySignInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value,
                     CommonFetchInstAttrs common_fetch_inst_attrs, FastMathAttr fast_math_attr)
                     :FloatFetchArithmeticBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, fast_math_attr, false, false){}
 FetchArithmeticBinInst::OpType FloatFetchCopySignInst::get_op_type() const{
@@ -320,7 +320,7 @@ std::string FloatFetchCopySignInst::to_string() const{
 }
 
 
-FloatFetchMinInst::FloatFetchMinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value,
+FloatFetchMinInst::FloatFetchMinInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value,
                     CommonFetchInstAttrs common_fetch_inst_attrs, FastMathAttr fast_math_attr, bool ieee754_2019, bool unordered)
                     :FloatFetchArithmeticBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, fast_math_attr, unordered, ieee754_2019){}
 FetchArithmeticBinInst::OpType FloatFetchMinInst::get_op_type() const{
@@ -331,7 +331,7 @@ std::string FloatFetchMinInst::to_string() const{
 }
 
 
-FloatFetchMaxInst::FloatFetchMaxInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value,
+FloatFetchMaxInst::FloatFetchMaxInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value,
                     CommonFetchInstAttrs common_fetch_inst_attrs, FastMathAttr fast_math_attr, bool unordered, bool ieee754_2019)
                     :FloatFetchArithmeticBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, fast_math_attr, unordered, ieee754_2019){}
 FetchArithmeticBinInst::OpType FloatFetchMaxInst::get_op_type() const{
@@ -342,7 +342,7 @@ std::string FloatFetchMaxInst::to_string() const{
 }
 
 
-FloatFetchAvgInst::FloatFetchAvgInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value,
+FloatFetchAvgInst::FloatFetchAvgInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr value,
                     CommonFetchInstAttrs common_fetch_inst_attrs,
                     FastMathAttr fast_math_attr)
                     :FloatFetchArithmeticBinInst(instruction_stmt, destination, pointer, value, common_fetch_inst_attrs, fast_math_attr, false, false){}

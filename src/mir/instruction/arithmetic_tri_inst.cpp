@@ -2,7 +2,7 @@
 
 namespace LIRA {
 namespace MIR {
-ArithmeticTrinaryInst::ArithmeticTrinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, 
+ArithmeticTrinaryInst::ArithmeticTrinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, 
                                              IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3,
                                              std::optional<FastMathAttr> fast_math_attr)
                                              :Inst(instruction_stmt, destination,fast_math_attr){
@@ -28,7 +28,7 @@ InstType ArithmeticTrinaryInst::get_inst_type() const{
 
 
 // ---------------------------- Integer Trinary operations ---------------------------
-IntArithmeticTrinaryInst::IntArithmeticTrinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
+IntArithmeticTrinaryInst::IntArithmeticTrinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                                                      IR::LiteralExprPtr arg3, bool nuw, bool nsw, bool unsigned_, bool saturating)
                                                      :ArithmeticTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3,std::nullopt){
     this->nuw = nuw;
@@ -76,7 +76,7 @@ TypeVariant IntArithmeticTrinaryInst::get_operand_type_variant() const{
 }
 
 
-IntFMAInst::IntFMAInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
+IntFMAInst::IntFMAInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                         IR::LiteralExprPtr arg3, bool nuw, bool nsw, bool unsigned_, bool saturating)
                         :IntArithmeticTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3, nuw, nsw, unsigned_, saturating){}
 IntArithmeticTrinaryInst::OpType IntFMAInst::get_op_type() const{
@@ -87,7 +87,7 @@ std::string IntFMAInst::to_string() const{
 }
 
 
-IntFMSInst::IntFMSInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
+IntFMSInst::IntFMSInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                         IR::LiteralExprPtr arg3, bool nuw, bool nsw, bool unsigned_, bool saturating)
                         :IntArithmeticTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3, nuw, nsw, unsigned_, saturating){}
 IntArithmeticTrinaryInst::OpType IntFMSInst::get_op_type() const{
@@ -98,7 +98,7 @@ std::string IntFMSInst::to_string() const{
 }
 
 
-IntFNMAInst::IntFNMAInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
+IntFNMAInst::IntFNMAInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                          IR::LiteralExprPtr arg3, bool nuw, bool nsw, bool unsigned_, bool saturating)
                          :IntArithmeticTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3, nuw, nsw, unsigned_, saturating){}
 IntArithmeticTrinaryInst::OpType IntFNMAInst::get_op_type() const{
@@ -109,7 +109,7 @@ std::string IntFNMAInst::to_string() const{
 }
 
 
-IntFNMSInst::IntFNMSInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
+IntFNMSInst::IntFNMSInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                          IR::LiteralExprPtr arg3, bool nuw, bool nsw, bool unsigned_, bool saturating)
                          :IntArithmeticTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3, nuw, nsw, unsigned_, saturating){}
 IntArithmeticTrinaryInst::OpType IntFNMSInst::get_op_type() const{
@@ -120,7 +120,7 @@ std::string IntFNMSInst::to_string() const{
 }
 
 
-IntClampInst::IntClampInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
+IntClampInst::IntClampInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                             IR::LiteralExprPtr arg3, bool unsigned_)
                             :IntArithmeticTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3, false, false, unsigned_, false){}
 IntArithmeticTrinaryInst::OpType IntClampInst::get_op_type() const{
@@ -131,7 +131,7 @@ std::string IntClampInst::to_string() const{
 }
 
 // ----------------------------- Vector integer Trinary operations ---------------------------
-VecIntArithmeticTrinaryInst::VecIntArithmeticTrinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
+VecIntArithmeticTrinaryInst::VecIntArithmeticTrinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                                                      IR::LiteralExprPtr arg3, bool nuw, bool nsw, bool unsigned_, bool saturating)
                                                      :ArithmeticTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3, std::nullopt){
     this->nuw = nuw;
@@ -184,7 +184,7 @@ TypeVariant VecIntArithmeticTrinaryInst::get_operand_type_variant() const{
 }
 
 
-VecIntFMAInst::VecIntFMAInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
+VecIntFMAInst::VecIntFMAInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                             IR::LiteralExprPtr arg3, bool nuw, bool nsw, bool unsigned_, bool saturating)
                             :VecIntArithmeticTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3, nuw, nsw, unsigned_, saturating){}
 VecIntArithmeticTrinaryInst::OpType VecIntFMAInst::get_op_type() const{
@@ -195,7 +195,7 @@ std::string VecIntFMAInst::to_string() const{
 }
 
 
-VecIntFMSInst::VecIntFMSInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
+VecIntFMSInst::VecIntFMSInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                              IR::LiteralExprPtr arg3, bool nuw, bool nsw, bool unsigned_, bool saturating)
                              :VecIntArithmeticTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3, nuw, nsw, unsigned_, saturating){}
 VecIntArithmeticTrinaryInst::OpType VecIntFMSInst::get_op_type() const{
@@ -206,7 +206,7 @@ std::string VecIntFMSInst::to_string() const{
 }
 
 
-VecIntFNMAInst::VecIntFNMAInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
+VecIntFNMAInst::VecIntFNMAInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                          IR::LiteralExprPtr arg3, bool nuw, bool nsw, bool unsigned_, bool saturating)
                          :VecIntArithmeticTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3, nuw, nsw, unsigned_, saturating){}
 VecIntArithmeticTrinaryInst::OpType VecIntFNMAInst::get_op_type() const{
@@ -217,7 +217,7 @@ std::string VecIntFNMAInst::to_string() const{
 }
 
 
-VecIntFNMSInst::VecIntFNMSInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
+VecIntFNMSInst::VecIntFNMSInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                          IR::LiteralExprPtr arg3, bool nuw, bool nsw, bool unsigned_, bool saturating)
                          :VecIntArithmeticTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3, nuw, nsw, unsigned_, saturating){}
 VecIntArithmeticTrinaryInst::OpType VecIntFNMSInst::get_op_type() const{
@@ -228,7 +228,7 @@ std::string VecIntFNMSInst::to_string() const{
 }
 
 
-VecIntClampInst::VecIntClampInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
+VecIntClampInst::VecIntClampInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                             IR::LiteralExprPtr arg3, bool unsigned_)
                             :VecIntArithmeticTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3, false, false, unsigned_, false){}
 VecIntArithmeticTrinaryInst::OpType VecIntClampInst::get_op_type() const{
@@ -238,7 +238,7 @@ std::string VecIntClampInst::to_string() const{
     return this->to_string_helper("vec_int_clamp");
 }
 // ---------------------------- Float Trinary operations ---------------------------
-FloatArithmeticTrinaryInst::FloatArithmeticTrinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
+FloatArithmeticTrinaryInst::FloatArithmeticTrinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
                                                         IR::LiteralExprPtr arg3, FastMathAttr fast_math_attr,bool ieee754_2019, bool unordered)
                                                         :ArithmeticTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3, fast_math_attr){
     this->ieee754_2019 = ieee754_2019;
@@ -279,7 +279,7 @@ TypeVariant FloatArithmeticTrinaryInst::get_operand_type_variant() const{
 }
 
 
-FloatFMAInst::FloatFMAInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
+FloatFMAInst::FloatFMAInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                   IR::LiteralExprPtr arg3, FastMathAttr fast_math_attr)
                   :FloatArithmeticTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3, fast_math_attr,false,false){}
 FloatArithmeticTrinaryInst::OpType FloatFMAInst::get_op_type() const{
@@ -290,7 +290,7 @@ std::string FloatFMAInst::to_string() const{
 }
 
 
-FloatFMSInst::FloatFMSInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
+FloatFMSInst::FloatFMSInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                   IR::LiteralExprPtr arg3, FastMathAttr fast_math_attr)
                   :FloatArithmeticTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3, fast_math_attr,false,false){}
 FloatArithmeticTrinaryInst::OpType FloatFMSInst::get_op_type() const{
@@ -301,7 +301,7 @@ std::string FloatFMSInst::to_string() const{
 }
 
 
-FloatFNMAInst::FloatFNMAInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
+FloatFNMAInst::FloatFNMAInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                    IR::LiteralExprPtr arg3, FastMathAttr fast_math_attr)
                    :FloatArithmeticTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3, fast_math_attr,false,false){}
 FloatArithmeticTrinaryInst::OpType FloatFNMAInst::get_op_type() const{
@@ -312,7 +312,7 @@ std::string FloatFNMAInst::to_string() const{
 }
 
 
-FloatFNMSInst::FloatFNMSInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
+FloatFNMSInst::FloatFNMSInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                    IR::LiteralExprPtr arg3, FastMathAttr fast_math_attr)
                    :FloatArithmeticTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3, fast_math_attr,false,false){}
 FloatArithmeticTrinaryInst::OpType FloatFNMSInst::get_op_type() const{
@@ -323,7 +323,7 @@ std::string FloatFNMSInst::to_string() const{
 }
 
 
-FloatClampInst::FloatClampInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
+FloatClampInst::FloatClampInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                     IR::LiteralExprPtr arg3, FastMathAttr fast_math_attr, bool ieee754_2019, bool unordered)
                     :FloatArithmeticTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3, fast_math_attr, ieee754_2019, unordered){}
 FloatArithmeticTrinaryInst::OpType FloatClampInst::get_op_type() const{
@@ -333,7 +333,7 @@ std::string FloatClampInst::to_string() const{
     return this->to_string_helper("float_clamp");
 }
 // ---------------------------- Vector Float Trinary operations ---------------------------
-VecFloatArithmeticTrinaryInst::VecFloatArithmeticTrinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
+VecFloatArithmeticTrinaryInst::VecFloatArithmeticTrinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
                                                         IR::LiteralExprPtr arg3, FastMathAttr fast_math_attr,bool ieee754_2019, bool unordered)
                                                         :ArithmeticTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3, fast_math_attr){
     this->ieee754_2019 = ieee754_2019;
@@ -374,7 +374,7 @@ TypeVariant VecFloatArithmeticTrinaryInst::get_operand_type_variant() const{
 }
 
 
-VecFloatFMAInst::VecFloatFMAInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
+VecFloatFMAInst::VecFloatFMAInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                   IR::LiteralExprPtr arg3, FastMathAttr fast_math_attr)
                   :VecFloatArithmeticTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3, fast_math_attr,false,false){}
 VecFloatArithmeticTrinaryInst::OpType VecFloatFMAInst::get_op_type() const{
@@ -385,7 +385,7 @@ std::string VecFloatFMAInst::to_string() const{
 }
 
 
-VecFloatFMSInst::VecFloatFMSInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
+VecFloatFMSInst::VecFloatFMSInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                   IR::LiteralExprPtr arg3, FastMathAttr fast_math_attr)
                   :VecFloatArithmeticTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3, fast_math_attr,false,false){}
 VecFloatArithmeticTrinaryInst::OpType VecFloatFMSInst::get_op_type() const{
@@ -396,7 +396,7 @@ std::string VecFloatFMSInst::to_string() const{
 }
 
 
-VecFloatFNMAInst::VecFloatFNMAInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
+VecFloatFNMAInst::VecFloatFNMAInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                    IR::LiteralExprPtr arg3, FastMathAttr fast_math_attr)
                    :VecFloatArithmeticTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3, fast_math_attr,false,false){}
 VecFloatArithmeticTrinaryInst::OpType VecFloatFNMAInst::get_op_type() const{
@@ -407,7 +407,7 @@ std::string VecFloatFNMAInst::to_string() const{
 }
 
 
-VecFloatFNMSInst::VecFloatFNMSInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
+VecFloatFNMSInst::VecFloatFNMSInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                    IR::LiteralExprPtr arg3, FastMathAttr fast_math_attr)
                    :VecFloatArithmeticTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3, fast_math_attr,false,false){}
 VecFloatArithmeticTrinaryInst::OpType VecFloatFNMSInst::get_op_type() const{
@@ -418,7 +418,7 @@ std::string VecFloatFNMSInst::to_string() const{
 }
 
 
-VecFloatClampInst::VecFloatClampInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
+VecFloatClampInst::VecFloatClampInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2,
                     IR::LiteralExprPtr arg3, FastMathAttr fast_math_attr, bool ieee754_2019, bool unordered)
                     :VecFloatArithmeticTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3, fast_math_attr, ieee754_2019, unordered){}
 VecFloatArithmeticTrinaryInst::OpType VecFloatClampInst::get_op_type() const{

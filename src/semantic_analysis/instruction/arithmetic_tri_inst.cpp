@@ -4,18 +4,18 @@
 #include <functional>
 namespace LIRA {
 namespace SemanticAnalyzer {
-using DispatchFuncType = std::function<MIR::InstPtr(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
+using DispatchFuncType = std::function<MIR::InstPtr(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
                                                     IR::LiteralExprPtr arg3, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt)>;
 
-MIR::InstPtr analyze_fma_tri_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
+MIR::InstPtr analyze_fma_tri_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
                                   IR::LiteralExprPtr arg3, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_fms_tri_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
+MIR::InstPtr analyze_fms_tri_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
                                   IR::LiteralExprPtr arg3, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_fnma_tri_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
+MIR::InstPtr analyze_fnma_tri_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
                                   IR::LiteralExprPtr arg3, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_fnms_tri_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
+MIR::InstPtr analyze_fnms_tri_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
                                    IR::LiteralExprPtr arg3, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_clamp_tri_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
+MIR::InstPtr analyze_clamp_tri_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
                                     IR::LiteralExprPtr arg3, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
 
 
@@ -65,7 +65,7 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_arithmetic_tri_inst(IR::Token name
         exit(1);
     }
 }
-MIR::InstPtr analyze_fma_tri_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
+MIR::InstPtr analyze_fma_tri_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
                                   IR::LiteralExprPtr arg3, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
 
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
@@ -94,7 +94,7 @@ MIR::InstPtr analyze_fma_tri_inst(std::string filename, MIR::LocalDestRegisterPt
         }
     }
 }
-MIR::InstPtr analyze_fms_tri_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
+MIR::InstPtr analyze_fms_tri_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
                                   IR::LiteralExprPtr arg3, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     if(MIR::is_float_typevariant(type_variant)){
@@ -122,7 +122,7 @@ MIR::InstPtr analyze_fms_tri_inst(std::string filename, MIR::LocalDestRegisterPt
         }
     }
 }
-MIR::InstPtr analyze_fnma_tri_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
+MIR::InstPtr analyze_fnma_tri_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
                                   IR::LiteralExprPtr arg3, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     if(MIR::is_float_typevariant(type_variant)){
@@ -150,7 +150,7 @@ MIR::InstPtr analyze_fnma_tri_inst(std::string filename, MIR::LocalDestRegisterP
         }
     }
 }
-MIR::InstPtr analyze_fnms_tri_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
+MIR::InstPtr analyze_fnms_tri_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
                                    IR::LiteralExprPtr arg3, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     if(MIR::is_float_typevariant(type_variant)){
@@ -178,7 +178,7 @@ MIR::InstPtr analyze_fnms_tri_inst(std::string filename, MIR::LocalDestRegisterP
         }
     }
 }
-MIR::InstPtr analyze_clamp_tri_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
+MIR::InstPtr analyze_clamp_tri_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
                                     IR::LiteralExprPtr arg3, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     if(MIR::is_float_typevariant(type_variant)){

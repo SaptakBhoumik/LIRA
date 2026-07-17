@@ -6,26 +6,26 @@
 namespace LIRA {
 namespace SemanticAnalyzer {
 //rhs is nullptr for stuff like carry_ashr,carry_lshr,carry_shl
-using DispatchFuncType = std::function<MIR::InstPtr(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+using DispatchFuncType = std::function<MIR::InstPtr(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                                     IR::LiteralExprPtr carr_borr, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt)>;
 
-MIR::InstPtr analyze_carry_add_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+MIR::InstPtr analyze_carry_add_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                     IR::LiteralExprPtr carr_borr, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_carry_sub_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+MIR::InstPtr analyze_carry_sub_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                     IR::LiteralExprPtr carr_borr, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_carry_shl_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+MIR::InstPtr analyze_carry_shl_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                     IR::LiteralExprPtr carr_borr, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_carry_lshr_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+MIR::InstPtr analyze_carry_lshr_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                      IR::LiteralExprPtr carr_borr, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_carry_ashr_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+MIR::InstPtr analyze_carry_ashr_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                      IR::LiteralExprPtr carr_borr, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_mac_wide_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+MIR::InstPtr analyze_mac_wide_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                    IR::LiteralExprPtr carr_borr, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_carry_shl_n_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+MIR::InstPtr analyze_carry_shl_n_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                       IR::LiteralExprPtr carr_borr, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_carry_lshr_n_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+MIR::InstPtr analyze_carry_lshr_n_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                        IR::LiteralExprPtr carr_borr, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_carry_ashr_n_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+MIR::InstPtr analyze_carry_ashr_n_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                        IR::LiteralExprPtr carr_borr, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
 
 MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_carry_inst(IR::Token name,IR::InstructionStmtPtr inst_stmt){
@@ -143,7 +143,7 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_carry_inst(IR::Token name,IR::Inst
     }
 }
 
-MIR::InstPtr analyze_carry_add_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+MIR::InstPtr analyze_carry_add_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                     IR::LiteralExprPtr carr_borr, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     auto [flag_attrs,remaining_attrs] = Utils::extract_flag_attrs(filename,attributes, { "unsigned"});
@@ -158,7 +158,7 @@ MIR::InstPtr analyze_carry_add_inst(std::string filename, MIR::LocalDestRegister
     }
 }
 
-MIR::InstPtr analyze_carry_sub_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+MIR::InstPtr analyze_carry_sub_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                     IR::LiteralExprPtr carr_borr, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     auto [flag_attrs,remaining_attrs] = Utils::extract_flag_attrs(filename,attributes, { "unsigned"});
@@ -173,7 +173,7 @@ MIR::InstPtr analyze_carry_sub_inst(std::string filename, MIR::LocalDestRegister
     }
 }
 
-MIR::InstPtr analyze_carry_shl_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+MIR::InstPtr analyze_carry_shl_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                     IR::LiteralExprPtr carr_borr, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     if(attributes.size() > 0){
@@ -187,7 +187,7 @@ MIR::InstPtr analyze_carry_shl_inst(std::string filename, MIR::LocalDestRegister
     }
 }
 
-MIR::InstPtr analyze_carry_lshr_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+MIR::InstPtr analyze_carry_lshr_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                      IR::LiteralExprPtr carr_borr, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     if(attributes.size() > 0){
@@ -201,7 +201,7 @@ MIR::InstPtr analyze_carry_lshr_inst(std::string filename, MIR::LocalDestRegiste
     }
 }
 
-MIR::InstPtr analyze_carry_ashr_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+MIR::InstPtr analyze_carry_ashr_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                      IR::LiteralExprPtr carr_borr, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     if(attributes.size() > 0){
@@ -215,7 +215,7 @@ MIR::InstPtr analyze_carry_ashr_inst(std::string filename, MIR::LocalDestRegiste
     }
 }
 
-MIR::InstPtr analyze_mac_wide_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+MIR::InstPtr analyze_mac_wide_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                    IR::LiteralExprPtr carr_borr, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     auto [flag_attrs,remaining_attrs] = Utils::extract_flag_attrs(filename,attributes, { "unsigned"});
@@ -230,7 +230,7 @@ MIR::InstPtr analyze_mac_wide_inst(std::string filename, MIR::LocalDestRegisterP
     }
 }
 
-MIR::InstPtr analyze_carry_shl_n_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+MIR::InstPtr analyze_carry_shl_n_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                       IR::LiteralExprPtr carr_borr, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     if(attributes.size() > 0){
@@ -244,7 +244,7 @@ MIR::InstPtr analyze_carry_shl_n_inst(std::string filename, MIR::LocalDestRegist
     }
 }
 
-MIR::InstPtr analyze_carry_lshr_n_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+MIR::InstPtr analyze_carry_lshr_n_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                        IR::LiteralExprPtr carr_borr, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     if(attributes.size() > 0){
@@ -258,7 +258,7 @@ MIR::InstPtr analyze_carry_lshr_n_inst(std::string filename, MIR::LocalDestRegis
     }
 }
 
-MIR::InstPtr analyze_carry_ashr_n_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+MIR::InstPtr analyze_carry_ashr_n_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                        IR::LiteralExprPtr carr_borr, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     auto attributes = inst_stmt->get_value()->get_attributes();
     if(attributes.size() > 0){

@@ -10,7 +10,7 @@ class ScalarSelectInst:public Inst {
     IR::LiteralExprPtr true_value;//Same type as output
     IR::LiteralExprPtr false_value;//Same type as output
     public:
-    ScalarSelectInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr condition, 
+    ScalarSelectInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr condition, 
                      IR::LiteralExprPtr true_value, IR::LiteralExprPtr false_value, std::optional<FastMathAttr> fast_math_attr);
 
     IR::LiteralExprPtr get_condition() const;
@@ -27,7 +27,7 @@ class LanewiseSelectInst:public Inst {
     IR::LiteralExprPtr true_value;//Same type as output
     IR::LiteralExprPtr false_value;//Same type as output
     public:
-    LanewiseSelectInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr condition, 
+    LanewiseSelectInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr condition, 
                        IR::LiteralExprPtr true_value, IR::LiteralExprPtr false_value, std::optional<FastMathAttr> fast_math_attr);
         
     IR::LiteralExprPtr get_condition() const;
@@ -45,7 +45,7 @@ class LanewiseSelectInst:public Inst {
 class FreezeInst:public Inst {
     IR::LiteralExprPtr value;//The value and its type to freeze
     public:
-    FreezeInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, std::optional<FastMathAttr> fast_math_attr);
+    FreezeInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, std::optional<FastMathAttr> fast_math_attr);
 
     IR::LiteralExprPtr get_value() const;
     IR::TypeExprPtr get_type() const;
@@ -93,7 +93,7 @@ class VaargInst:public Inst {
     IR::LiteralExprPtr pointer;//The pointer to the variable argument list. Must be of type ptr
     IR::TypeExprPtr type;//The type of the argument to retrieve. Can be any type
     public:
-    VaargInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, std::optional<FastMathAttr> fast_math_attr);    
+    VaargInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, std::optional<FastMathAttr> fast_math_attr);    
 
     IR::LiteralExprPtr get_pointer() const;
     IR::TypeExprPtr get_type() const;
@@ -107,7 +107,7 @@ class PtrMaskInst:public Inst {
     IR::LiteralExprPtr pointer;//The pointer to mask. Must be of type ptr
     IR::LiteralExprPtr mask;//The value and its type to mask. The type must be of integer type and must have same bit width as pointer i.e i64 for our case
     public:
-    PtrMaskInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr mask);
+    PtrMaskInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr mask);
 
     virtual IR::LiteralExprPtr get_pointer() const final;
     virtual IR::LiteralExprPtr get_mask() const final;
@@ -118,7 +118,7 @@ class PtrMaskInst:public Inst {
 
 class IntPtrMaskInst:public PtrMaskInst {
     public:
-    IntPtrMaskInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr mask);
+    IntPtrMaskInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr mask);
 
     TypeVariant get_dest_type_var() const override;
     std::string to_string() const override;
@@ -126,7 +126,7 @@ class IntPtrMaskInst:public PtrMaskInst {
 
 class VecIntPtrMaskInst:public PtrMaskInst {
     public:
-    VecIntPtrMaskInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr mask);
+    VecIntPtrMaskInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr pointer, IR::LiteralExprPtr mask);
 
     std::size_t get_vector_size() const;
 
@@ -339,7 +339,7 @@ class Endbr64Inst:public Inst {
 class LaunderInst:public Inst {
     IR::LiteralExprPtr ptr;
     public:
-    LaunderInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr ptr);
+    LaunderInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr ptr);
 
     IR::LiteralExprPtr get_ptr() const;
 
@@ -350,7 +350,7 @@ class LaunderInst:public Inst {
 class StripInvariantGroupInst:public Inst {
     IR::LiteralExprPtr ptr;
     public:
-    StripInvariantGroupInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr ptr);
+    StripInvariantGroupInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr ptr);
 
     IR::LiteralExprPtr get_ptr() const;
 

@@ -2,7 +2,7 @@
 
 namespace LIRA {
 namespace MIR {
-BitwiseTrinaryInst::BitwiseTrinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3)
+BitwiseTrinaryInst::BitwiseTrinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3)
                                         :Inst(instruction_stmt, destination, std::nullopt){
     this->arg1 = arg1;
     this->arg2 = arg2;
@@ -33,7 +33,7 @@ InstType BitwiseTrinaryInst::get_inst_type() const{
 
 
 // ---------------------------- Integer Trinary operations ---------------------------
-IntBitwiseTrinaryInst::IntBitwiseTrinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3)
+IntBitwiseTrinaryInst::IntBitwiseTrinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3)
                                         :BitwiseTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3){}
 std::shared_ptr<IR::IntTypeExpr> IntBitwiseTrinaryInst::get_casted_operand_type() const{
     return std::dynamic_pointer_cast<IR::IntTypeExpr>(this->destination->get_type());
@@ -47,7 +47,7 @@ TypeVariant IntBitwiseTrinaryInst::get_operand_type_variant() const{
 }
 
 
-IntFshlInst::IntFshlInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3)
+IntFshlInst::IntFshlInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3)
                          :IntBitwiseTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3){}
 BitwiseTrinaryInst::OpType IntFshlInst::get_op_type() const{
     return OpType::FSHL;
@@ -57,7 +57,7 @@ std::string IntFshlInst::to_string() const{
 }
 
 
-IntFshrInst::IntFshrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3)
+IntFshrInst::IntFshrInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3)
                          :IntBitwiseTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3){}
 BitwiseTrinaryInst::OpType IntFshrInst::get_op_type() const{
     return OpType::FSHR;
@@ -67,7 +67,7 @@ std::string IntFshrInst::to_string() const{
 }
 
 
-IntBitblendInst::IntBitblendInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3)
+IntBitblendInst::IntBitblendInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3)
                                  :IntBitwiseTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3){}
 BitwiseTrinaryInst::OpType IntBitblendInst::get_op_type() const{
     return OpType::BITBLEND;
@@ -77,7 +77,7 @@ std::string IntBitblendInst::to_string() const{
 }
 
 // ---------------------------- Vector Integer Trinary operations ---------------------------
-VecIntBitwiseTrinaryInst::VecIntBitwiseTrinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3)
+VecIntBitwiseTrinaryInst::VecIntBitwiseTrinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3)
                                                     :BitwiseTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3){}
 std::shared_ptr<IR::SIMDTypeExpr> VecIntBitwiseTrinaryInst::get_casted_operand_type() const{
     return std::dynamic_pointer_cast<IR::SIMDTypeExpr>(this->destination->get_type());
@@ -96,7 +96,7 @@ TypeVariant VecIntBitwiseTrinaryInst::get_operand_type_variant() const{
 }
 
 
-VecIntFshlInst::VecIntFshlInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3)
+VecIntFshlInst::VecIntFshlInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3)
                          :VecIntBitwiseTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3){}
 BitwiseTrinaryInst::OpType VecIntFshlInst::get_op_type() const{
     return OpType::FSHL;
@@ -106,7 +106,7 @@ std::string VecIntFshlInst::to_string() const{
 }
 
 
-VecIntFshrInst::VecIntFshrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3)
+VecIntFshrInst::VecIntFshrInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3)
                          :VecIntBitwiseTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3){}
 BitwiseTrinaryInst::OpType VecIntFshrInst::get_op_type() const{
     return OpType::FSHR;
@@ -116,7 +116,7 @@ std::string VecIntFshrInst::to_string() const{
 }
 
 
-VecIntBitblendInst::VecIntBitblendInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3)
+VecIntBitblendInst::VecIntBitblendInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3)
                                  :VecIntBitwiseTrinaryInst(instruction_stmt, destination, arg1, arg2, arg3){}
 BitwiseTrinaryInst::OpType VecIntBitblendInst::get_op_type() const{
     return OpType::BITBLEND;

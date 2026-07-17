@@ -17,7 +17,7 @@ class BitwiseTrinaryInst:public Inst {
         FSHR = 1 << 7,
         BITBLEND = 1 << 8
     };
-    BitwiseTrinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3);
+    BitwiseTrinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3);
 
     virtual TypeVariant get_operand_type_variant() const = 0;
     virtual IR::TypeExprPtr get_operand_type() const final;
@@ -32,7 +32,7 @@ class BitwiseTrinaryInst:public Inst {
 // ---------------------------- Integer Trinary operations ---------------------------
 class IntBitwiseTrinaryInst:public BitwiseTrinaryInst {
     public:
-    IntBitwiseTrinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3);
+    IntBitwiseTrinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3);
 
     virtual std::shared_ptr<IR::IntTypeExpr> get_casted_operand_type() const final;//Returns the operand type casted to IntTypeExpr. Just a helper function to make life easier
     virtual std::size_t get_bitwidth() const final;//Returns the bit width of the operand type. Just a helper function to make life easier
@@ -42,7 +42,7 @@ class IntBitwiseTrinaryInst:public BitwiseTrinaryInst {
 
 class IntFshlInst:public IntBitwiseTrinaryInst {
     public:
-    IntFshlInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3);
+    IntFshlInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3);
 
     OpType get_op_type() const override;
     std::string to_string() const override;
@@ -50,7 +50,7 @@ class IntFshlInst:public IntBitwiseTrinaryInst {
 
 class IntFshrInst:public IntBitwiseTrinaryInst {
     public:
-    IntFshrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3);
+    IntFshrInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3);
 
     OpType get_op_type() const override;
     std::string to_string() const override;
@@ -59,7 +59,7 @@ class IntFshrInst:public IntBitwiseTrinaryInst {
 
 class IntBitblendInst:public IntBitwiseTrinaryInst {
     public:
-    IntBitblendInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3);
+    IntBitblendInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3);
 
     OpType get_op_type() const override;
     std::string to_string() const override;
@@ -68,7 +68,7 @@ class IntBitblendInst:public IntBitwiseTrinaryInst {
 // ---------------------------- Vector Integer Trinary operations ---------------------------
 class VecIntBitwiseTrinaryInst:public BitwiseTrinaryInst {
     public:
-    VecIntBitwiseTrinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3);
+    VecIntBitwiseTrinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3);
 
     virtual std::shared_ptr<IR::SIMDTypeExpr> get_casted_operand_type() const final;//Returns the operand type casted to SIMDTypeExpr. Just a helper function to make life easier
     virtual std::size_t get_basetype_bitwidth() const final;//Returns the bit width of the operand basetype. Just a helper function to make life easier
@@ -79,7 +79,7 @@ class VecIntBitwiseTrinaryInst:public BitwiseTrinaryInst {
 
 class VecIntFshlInst:public VecIntBitwiseTrinaryInst {
     public:
-    VecIntFshlInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3);
+    VecIntFshlInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3);
 
     OpType get_op_type() const override;
     std::string to_string() const override;
@@ -87,7 +87,7 @@ class VecIntFshlInst:public VecIntBitwiseTrinaryInst {
 
 class VecIntFshrInst:public VecIntBitwiseTrinaryInst {
     public:
-    VecIntFshrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3);
+    VecIntFshrInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3);
 
     OpType get_op_type() const override;
     std::string to_string() const override;
@@ -96,7 +96,7 @@ class VecIntFshrInst:public VecIntBitwiseTrinaryInst {
 
 class VecIntBitblendInst:public VecIntBitwiseTrinaryInst {
     public:
-    VecIntBitblendInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3);
+    VecIntBitblendInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, IR::LiteralExprPtr arg3);
 
     OpType get_op_type() const override;
     std::string to_string() const override;

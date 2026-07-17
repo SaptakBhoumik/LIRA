@@ -4,14 +4,14 @@
 #include <functional>
 namespace LIRA {
 namespace SemanticAnalyzer {
-using DispatchFuncType = std::function<MIR::InstPtr(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
+using DispatchFuncType = std::function<MIR::InstPtr(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
                                                     IR::LiteralExprPtr arg3, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt)>;
 
-MIR::InstPtr analyze_fshl_tri_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
+MIR::InstPtr analyze_fshl_tri_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
                                    IR::LiteralExprPtr arg3, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_fshr_tri_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
+MIR::InstPtr analyze_fshr_tri_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
                                    IR::LiteralExprPtr arg3, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
-MIR::InstPtr analyze_bitblend_tri_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
+MIR::InstPtr analyze_bitblend_tri_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
                                        IR::LiteralExprPtr arg3, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt);
 
 
@@ -59,7 +59,7 @@ MIR::InstPtr IRToMIRSemanticAnalyzer::analyze_bitwise_tri_inst(IR::Token name,IR
         exit(1);
     }
 }
-MIR::InstPtr analyze_fshl_tri_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
+MIR::InstPtr analyze_fshl_tri_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
                                    IR::LiteralExprPtr arg3, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     if(attributes.size() > 0){
@@ -72,7 +72,7 @@ MIR::InstPtr analyze_fshl_tri_inst(std::string filename, MIR::LocalDestRegisterP
         return std::make_shared<MIR::VecIntFshlInst>(inst_stmt,dest,arg1,arg2,arg3);
     }
 }
-MIR::InstPtr analyze_fshr_tri_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
+MIR::InstPtr analyze_fshr_tri_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
                                    IR::LiteralExprPtr arg3, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     if(attributes.size() > 0){
@@ -85,7 +85,7 @@ MIR::InstPtr analyze_fshr_tri_inst(std::string filename, MIR::LocalDestRegisterP
         return std::make_shared<MIR::VecIntFshrInst>(inst_stmt,dest,arg1,arg2,arg3);
     }
 }
-MIR::InstPtr analyze_bitblend_tri_inst(std::string filename, MIR::LocalDestRegisterPtr dest, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
+MIR::InstPtr analyze_bitblend_tri_inst(std::string filename, MIR::LocalRegisterPtr dest, IR::LiteralExprPtr arg1, IR::LiteralExprPtr arg2, 
                                        IR::LiteralExprPtr arg3, MIR::TypeVariant type_variant, IR::InstructionStmtPtr inst_stmt){
     std::vector<IR::AttributePtr> attributes = inst_stmt->get_value()->get_attributes();
     if(attributes.size() > 0){

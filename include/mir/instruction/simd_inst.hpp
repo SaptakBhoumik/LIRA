@@ -15,7 +15,7 @@ class ShuffleVectorInst:public Inst {
 
     virtual std::string to_string_helper(const std::string op_name) const final;
     public:
-    ShuffleVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector1, IR::LiteralExprPtr vector2, IR::LiteralExprPtr mask, 
+    ShuffleVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector1, IR::LiteralExprPtr vector2, IR::LiteralExprPtr mask, 
                       std::size_t vec1_elm_count, std::size_t vec2_elm_count, std::optional<FastMathAttr> fast_math_attr);
 
     virtual IR::LiteralExprPtr get_vector1() const final;
@@ -34,7 +34,7 @@ class ShuffleVectorInst:public Inst {
 
 class IntShuffleVectorInst:public ShuffleVectorInst {
     public:
-    IntShuffleVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector1, IR::LiteralExprPtr vector2, IR::LiteralExprPtr mask, 
+    IntShuffleVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector1, IR::LiteralExprPtr vector2, IR::LiteralExprPtr mask, 
                            std::size_t vec1_elm_count, std::size_t vec2_elm_count);
     
     std::shared_ptr<IR::IntTypeExpr> get_casted_basetype() const;
@@ -46,7 +46,7 @@ class IntShuffleVectorInst:public ShuffleVectorInst {
 
 class PtrShuffleVectorInst:public ShuffleVectorInst {
     public:
-    PtrShuffleVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector1, IR::LiteralExprPtr vector2, IR::LiteralExprPtr mask, 
+    PtrShuffleVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector1, IR::LiteralExprPtr vector2, IR::LiteralExprPtr mask, 
                            std::size_t vec1_elm_count, std::size_t vec2_elm_count);
     
     std::size_t get_basetype_bitwidth() const;
@@ -57,7 +57,7 @@ class PtrShuffleVectorInst:public ShuffleVectorInst {
 
 class FloatShuffleVectorInst:public ShuffleVectorInst {
     public:
-    FloatShuffleVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector1, IR::LiteralExprPtr vector2, IR::LiteralExprPtr mask, 
+    FloatShuffleVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector1, IR::LiteralExprPtr vector2, IR::LiteralExprPtr mask, 
                              std::size_t vec1_elm_count, std::size_t vec2_elm_count, FastMathAttr fast_math_attr);
     
     std::shared_ptr<IR::FloatTypeExpr> get_casted_basetype() const;
@@ -75,7 +75,7 @@ class TernLogInst:public Inst {
     IR::LiteralExprPtr imm;
 
     public: 
-    TernLogInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr a, IR::LiteralExprPtr b, IR::LiteralExprPtr c, 
+    TernLogInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr a, IR::LiteralExprPtr b, IR::LiteralExprPtr c, 
                 IR::LiteralExprPtr imm);
     
     IR::LiteralExprPtr get_a() const;
@@ -95,7 +95,7 @@ class SplatInst:public Inst {
 
     virtual std::string to_string_helper(const std::string op_name) const final;
     public:
-    SplatInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, std::optional<FastMathAttr> fast_math_attr);
+    SplatInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, std::optional<FastMathAttr> fast_math_attr);
     
     virtual IR::LiteralExprPtr get_value() const final;
     virtual IR::TypeExprPtr get_element_type() const final;//From destination
@@ -107,7 +107,7 @@ class SplatInst:public Inst {
 
 class IntSplatInst:public SplatInst {
     public:
-    IntSplatInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value);
+    IntSplatInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value);
     
     std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const;
     std::size_t get_element_bitwidth() const;
@@ -118,7 +118,7 @@ class IntSplatInst:public SplatInst {
 
 class PtrSplatInst:public SplatInst {
     public:
-    PtrSplatInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value);
+    PtrSplatInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value);
     
     std::size_t get_element_bitwidth() const;
     
@@ -128,7 +128,7 @@ class PtrSplatInst:public SplatInst {
 
 class FloatSplatInst:public SplatInst {
     public:
-    FloatSplatInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr);
+    FloatSplatInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr value, FastMathAttr fast_math_attr);
     
     std::shared_ptr<IR::FloatTypeExpr> get_casted_element_type() const;
     std::size_t get_element_bitwidth() const;
@@ -145,7 +145,7 @@ class StepVectorInst:public Inst {
 
     virtual std::string to_string_helper(const std::string op_name) const final;
     public:
-    StepVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr start, IR::LiteralExprPtr step, 
+    StepVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr start, IR::LiteralExprPtr step, 
                    std::optional<FastMathAttr> fast_math_attr);
     
     virtual IR::LiteralExprPtr get_start() const final;
@@ -159,7 +159,7 @@ class StepVectorInst:public Inst {
 
 class IntStepVectorInst:public StepVectorInst {
     public:
-    IntStepVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr start, IR::LiteralExprPtr step);
+    IntStepVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr start, IR::LiteralExprPtr step);
     
     std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const;
     std::size_t get_element_bitwidth() const;
@@ -170,7 +170,7 @@ class IntStepVectorInst:public StepVectorInst {
 
 class FloatStepVectorInst:public StepVectorInst {
     public:
-    FloatStepVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr start, IR::LiteralExprPtr step, 
+    FloatStepVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr start, IR::LiteralExprPtr step, 
                         FastMathAttr fast_math_attr);
     
     std::shared_ptr<IR::FloatTypeExpr> get_casted_element_type() const;
@@ -190,7 +190,7 @@ class InsertSubVectorInst:public Inst {
 
     virtual std::string to_string_helper(const std::string op_name) const final;
     public:
-    InsertSubVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+    InsertSubVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                         IR::LiteralExprPtr subvector, IR::LiteralExprPtr index, std::size_t subvector_size, std::optional<FastMathAttr> fast_math_attr);
     
     virtual IR::LiteralExprPtr get_vector() const final;
@@ -206,7 +206,7 @@ class InsertSubVectorInst:public Inst {
 
 class IntInsertSubVectorInst:public InsertSubVectorInst {
     public:
-    IntInsertSubVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+    IntInsertSubVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                            IR::LiteralExprPtr subvector, IR::LiteralExprPtr index, std::size_t subvector_size);
     
     std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const;
@@ -218,7 +218,7 @@ class IntInsertSubVectorInst:public InsertSubVectorInst {
 
 class PtrInsertSubVectorInst:public InsertSubVectorInst {
     public:
-    PtrInsertSubVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+    PtrInsertSubVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                            IR::LiteralExprPtr subvector, IR::LiteralExprPtr index, std::size_t subvector_size);
     
     std::size_t get_element_bitwidth() const;
@@ -229,7 +229,7 @@ class PtrInsertSubVectorInst:public InsertSubVectorInst {
 
 class FloatInsertSubVectorInst:public InsertSubVectorInst {
     public:
-    FloatInsertSubVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+    FloatInsertSubVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                              IR::LiteralExprPtr subvector, IR::LiteralExprPtr index, std::size_t subvector_size, FastMathAttr fast_math_attr);
     
     std::shared_ptr<IR::FloatTypeExpr> get_casted_element_type() const;
@@ -248,7 +248,7 @@ class ExtractSubVectorInst:public Inst {
 
     virtual std::string to_string_helper(const std::string op_name) const final;
     public:
-    ExtractSubVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+    ExtractSubVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                          IR::LiteralExprPtr index, std::size_t vector_size, std::optional<FastMathAttr> fast_math_attr);
     
     virtual IR::LiteralExprPtr get_vector() const final;
@@ -263,7 +263,7 @@ class ExtractSubVectorInst:public Inst {
 
 class IntExtractSubVectorInst:public ExtractSubVectorInst {
     public:
-    IntExtractSubVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+    IntExtractSubVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                             IR::LiteralExprPtr index, std::size_t vector_size);
     
     std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const;
@@ -275,7 +275,7 @@ class IntExtractSubVectorInst:public ExtractSubVectorInst {
 
 class PtrExtractSubVectorInst:public ExtractSubVectorInst {
     public:
-    PtrExtractSubVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+    PtrExtractSubVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                             IR::LiteralExprPtr index, std::size_t vector_size);
     
     std::size_t get_element_bitwidth() const;
@@ -286,7 +286,7 @@ class PtrExtractSubVectorInst:public ExtractSubVectorInst {
 
 class FloatExtractSubVectorInst:public ExtractSubVectorInst {
     public:
-    FloatExtractSubVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+    FloatExtractSubVectorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                               IR::LiteralExprPtr index, std::size_t vector_size, FastMathAttr fast_math_attr);
     
     std::shared_ptr<IR::FloatTypeExpr> get_casted_element_type() const;
@@ -304,7 +304,7 @@ class ActiveLaneMaskInst:public Inst {
 
     bool unsigned_;
     public:
-    ActiveLaneMaskInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr base, IR::LiteralExprPtr count, 
+    ActiveLaneMaskInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr base, IR::LiteralExprPtr count, 
                        IR::TypeExprPtr type, bool unsigned_);
     
     IR::LiteralExprPtr get_base() const;
@@ -325,7 +325,7 @@ class AddSubInst:public Inst {
     IR::LiteralExprPtr rhs;
 
     public:
-    AddSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    AddSubInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                std::optional<FastMathAttr> fast_math_attr);
 
     virtual IR::LiteralExprPtr get_lhs() const final;
@@ -343,7 +343,7 @@ class IntAddSubInst:public AddSubInst{
     bool unsigned_;
     bool saturating;
     public:
-    IntAddSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    IntAddSubInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                   bool nuw, bool nsw, bool unsigned_, bool saturating);
     
     std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const;
@@ -360,7 +360,7 @@ class IntAddSubInst:public AddSubInst{
 
 class FloatAddSubInst:public AddSubInst{
     public:
-    FloatAddSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    FloatAddSubInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                     FastMathAttr fast_math_attr);
     
     std::shared_ptr<IR::FloatTypeExpr> get_casted_element_type() const;
@@ -386,7 +386,7 @@ class ReduceArithmeticSIMDInst:public Inst {
         REDUCE_MIN = 1 << 9,
         REDUCE_MAX = 1 << 10,
     };
-    ReduceArithmeticSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+    ReduceArithmeticSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                              IR::LiteralExprPtr mask, std::size_t vector_size, std::optional<FastMathAttr> fast_math_attr);
     
     virtual IR::LiteralExprPtr get_vector() const final;
@@ -410,7 +410,7 @@ class IntReduceArithmeticSIMDInst:public ReduceArithmeticSIMDInst {
 
     virtual std::string to_string_helper(const std::string op_name) const final;
     public:
-    IntReduceArithmeticSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+    IntReduceArithmeticSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                                 IR::LiteralExprPtr mask, std::size_t vector_size, bool nuw, bool nsw, bool unsigned_, bool saturating, bool floor);
     
     virtual std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const final;
@@ -427,7 +427,7 @@ class IntReduceArithmeticSIMDInst:public ReduceArithmeticSIMDInst {
 
 class IntReduceAddInst:public IntReduceArithmeticSIMDInst {
     public:
-    IntReduceAddInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+    IntReduceAddInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                       IR::LiteralExprPtr mask, std::size_t vector_size, bool nuw, bool nsw, bool unsigned_, bool saturating);
     
     OpType get_op_type() const override;
@@ -436,7 +436,7 @@ class IntReduceAddInst:public IntReduceArithmeticSIMDInst {
 
 class IntReduceMulInst:public IntReduceArithmeticSIMDInst {
     public:
-    IntReduceMulInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+    IntReduceMulInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                       IR::LiteralExprPtr mask, std::size_t vector_size, bool nuw, bool nsw, bool unsigned_, bool saturating);
     
     OpType get_op_type() const override;
@@ -445,7 +445,7 @@ class IntReduceMulInst:public IntReduceArithmeticSIMDInst {
 
 class IntReduceAvgInst:public IntReduceArithmeticSIMDInst {
     public:
-    IntReduceAvgInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+    IntReduceAvgInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                      IR::LiteralExprPtr mask, std::size_t vector_size, bool nuw, bool nsw, bool unsigned_, bool floor);
     
     OpType get_op_type() const override;
@@ -454,7 +454,7 @@ class IntReduceAvgInst:public IntReduceArithmeticSIMDInst {
 
 class IntReduceMinInst:public IntReduceArithmeticSIMDInst {
     public:
-    IntReduceMinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+    IntReduceMinInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                      IR::LiteralExprPtr mask, std::size_t vector_size, bool unsigned_);
     
     OpType get_op_type() const override;
@@ -463,7 +463,7 @@ class IntReduceMinInst:public IntReduceArithmeticSIMDInst {
 
 class IntReduceMaxInst:public IntReduceArithmeticSIMDInst {
     public:
-    IntReduceMaxInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+    IntReduceMaxInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                      IR::LiteralExprPtr mask, std::size_t vector_size, bool unsigned_);
     
     OpType get_op_type() const override;
@@ -478,7 +478,7 @@ class FloatReduceArithmeticSIMDInst:public ReduceArithmeticSIMDInst {
 
     virtual std::string to_string_helper(const std::string op_name) const final;
     public:
-    FloatReduceArithmeticSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+    FloatReduceArithmeticSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                                   IR::LiteralExprPtr mask, std::size_t vector_size, FastMathAttr fast_math_attr, bool ieee754_2019, bool unordered);
     
     virtual std::shared_ptr<IR::FloatTypeExpr> get_casted_element_type() const final;
@@ -493,7 +493,7 @@ class FloatReduceArithmeticSIMDInst:public ReduceArithmeticSIMDInst {
  
 class FloatReduceAddInst:public FloatReduceArithmeticSIMDInst {
     public:
-    FloatReduceAddInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+    FloatReduceAddInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                        IR::LiteralExprPtr mask, std::size_t vector_size, FastMathAttr fast_math_attr);
     
     OpType get_op_type() const override;
@@ -502,7 +502,7 @@ class FloatReduceAddInst:public FloatReduceArithmeticSIMDInst {
 
 class FloatReduceMulInst:public FloatReduceArithmeticSIMDInst {
     public:
-    FloatReduceMulInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+    FloatReduceMulInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                        IR::LiteralExprPtr mask, std::size_t vector_size, FastMathAttr fast_math_attr);
     
     OpType get_op_type() const override;
@@ -511,7 +511,7 @@ class FloatReduceMulInst:public FloatReduceArithmeticSIMDInst {
 
 class FloatReduceAvgInst:public FloatReduceArithmeticSIMDInst {
     public:
-    FloatReduceAvgInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+    FloatReduceAvgInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                        IR::LiteralExprPtr mask, std::size_t vector_size, FastMathAttr fast_math_attr);
     
     OpType get_op_type() const override;
@@ -520,7 +520,7 @@ class FloatReduceAvgInst:public FloatReduceArithmeticSIMDInst {
 
 class FloatReduceMinInst:public FloatReduceArithmeticSIMDInst {
     public:
-    FloatReduceMinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+    FloatReduceMinInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                        IR::LiteralExprPtr mask, std::size_t vector_size, FastMathAttr fast_math_attr, bool ieee754_2019, bool unordered);
     
     OpType get_op_type() const override;
@@ -529,7 +529,7 @@ class FloatReduceMinInst:public FloatReduceArithmeticSIMDInst {
 
 class FloatReduceMaxInst:public FloatReduceArithmeticSIMDInst {
     public:
-    FloatReduceMaxInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+    FloatReduceMaxInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                        IR::LiteralExprPtr mask, std::size_t vector_size, FastMathAttr fast_math_attr, bool ieee754_2019, bool unordered);
     
     OpType get_op_type() const override;
@@ -553,7 +553,7 @@ class IntReduceBitwiseSIMDInst:public Inst {
         REDUCE_XOR = 1 << 8,
         REDUCE_XNOR = 1 << 9,
     };
-    IntReduceBitwiseSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+    IntReduceBitwiseSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                              IR::LiteralExprPtr mask, std::size_t vector_size, bool disjoint);
     
     virtual IR::LiteralExprPtr get_vector() const final;
@@ -569,7 +569,7 @@ class IntReduceBitwiseSIMDInst:public Inst {
 
 class IntReduceAndInst:public IntReduceBitwiseSIMDInst {
     public:
-    IntReduceAndInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+    IntReduceAndInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                      IR::LiteralExprPtr mask, std::size_t vector_size);
 
     OpType get_op_type() const override;
@@ -578,7 +578,7 @@ class IntReduceAndInst:public IntReduceBitwiseSIMDInst {
 
 class IntReduceOrInst:public IntReduceBitwiseSIMDInst {
     public:
-    IntReduceOrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+    IntReduceOrInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                     IR::LiteralExprPtr mask, std::size_t vector_size, bool disjoint);
     
     OpType get_op_type() const override;
@@ -587,7 +587,7 @@ class IntReduceOrInst:public IntReduceBitwiseSIMDInst {
 
 class IntReduceXorInst:public IntReduceBitwiseSIMDInst {
     public:
-    IntReduceXorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+    IntReduceXorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                      IR::LiteralExprPtr mask, std::size_t vector_size);
     
     OpType get_op_type() const override;
@@ -596,7 +596,7 @@ class IntReduceXorInst:public IntReduceBitwiseSIMDInst {
 
 class IntReduceXnorInst:public IntReduceBitwiseSIMDInst {
     public:
-    IntReduceXnorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr vector, 
+    IntReduceXnorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr vector, 
                       IR::LiteralExprPtr mask, std::size_t vector_size);
     
     OpType get_op_type() const override;
@@ -621,7 +621,7 @@ class HArithmeticSIMDInst:public Inst {
         HMIN = 1 << 12,
         HMAX = 1 << 13,
     };
-    HArithmeticSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    HArithmeticSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                        std::optional<FastMathAttr> fast_math_attr);
     
     virtual IR::LiteralExprPtr get_lhs() const final;
@@ -645,7 +645,7 @@ class IntHArithmeticSIMDInst:public HArithmeticSIMDInst {
 
     virtual std::string to_string_helper(const std::string op_name) const final;
     public:
-    IntHArithmeticSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    IntHArithmeticSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                            bool nuw, bool nsw, bool unsigned_, bool saturating, bool floor);
     
     virtual std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const final;
@@ -662,7 +662,7 @@ class IntHArithmeticSIMDInst:public HArithmeticSIMDInst {
 
 class IntHorizontalAddInst:public IntHArithmeticSIMDInst {
     public:
-    IntHorizontalAddInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    IntHorizontalAddInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                         bool nuw, bool nsw, bool unsigned_, bool saturating);
     
     OpType get_op_type() const override;
@@ -671,7 +671,7 @@ class IntHorizontalAddInst:public IntHArithmeticSIMDInst {
 
 class IntHorizontalSubInst:public IntHArithmeticSIMDInst {
     public:
-    IntHorizontalSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    IntHorizontalSubInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                         bool nuw, bool nsw, bool unsigned_, bool saturating);
     
     OpType get_op_type() const override;
@@ -680,7 +680,7 @@ class IntHorizontalSubInst:public IntHArithmeticSIMDInst {
 
 class IntHorizontalAbsDiffInst:public IntHArithmeticSIMDInst {
     public:
-    IntHorizontalAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    IntHorizontalAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                              bool nuw, bool nsw, bool unsigned_, bool saturating);
     
     OpType get_op_type() const override;
@@ -689,7 +689,7 @@ class IntHorizontalAbsDiffInst:public IntHArithmeticSIMDInst {
 
 class IntHorizontalAddSubInst:public IntHArithmeticSIMDInst {
     public:
-    IntHorizontalAddSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    IntHorizontalAddSubInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                             bool nuw, bool nsw, bool unsigned_, bool saturating);
     
     OpType get_op_type() const override;
@@ -698,7 +698,7 @@ class IntHorizontalAddSubInst:public IntHArithmeticSIMDInst {
 
 class IntHorizontalMulInst:public IntHArithmeticSIMDInst {
     public:
-    IntHorizontalMulInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    IntHorizontalMulInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                          bool nuw, bool nsw, bool unsigned_, bool saturating);
     
     OpType get_op_type() const override;
@@ -707,7 +707,7 @@ class IntHorizontalMulInst:public IntHArithmeticSIMDInst {
 
 class IntHorizontalAvgInst:public IntHArithmeticSIMDInst {
     public:
-    IntHorizontalAvgInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    IntHorizontalAvgInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                         bool nuw, bool nsw, bool unsigned_, bool floor);
     
     OpType get_op_type() const override;
@@ -716,7 +716,7 @@ class IntHorizontalAvgInst:public IntHArithmeticSIMDInst {
 
 class IntHorizontalMinInst:public IntHArithmeticSIMDInst {
     public:
-    IntHorizontalMinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    IntHorizontalMinInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                         bool unsigned_);
     
     OpType get_op_type() const override;
@@ -725,7 +725,7 @@ class IntHorizontalMinInst:public IntHArithmeticSIMDInst {
 
 class IntHorizontalMaxInst:public IntHArithmeticSIMDInst {
     public:
-    IntHorizontalMaxInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    IntHorizontalMaxInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                         bool unsigned_);
     
     OpType get_op_type() const override;
@@ -740,7 +740,7 @@ class FloatHArithmeticSIMDInst:public HArithmeticSIMDInst {
 
     virtual std::string to_string_helper(const std::string op_name) const final;
     public:
-    FloatHArithmeticSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    FloatHArithmeticSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                              FastMathAttr fast_math_attr, bool ieee754_2019, bool unordered);
     
     virtual std::shared_ptr<IR::FloatTypeExpr> get_casted_element_type() const final;
@@ -755,7 +755,7 @@ class FloatHArithmeticSIMDInst:public HArithmeticSIMDInst {
 
 class FloatHorizontalAddInst:public FloatHArithmeticSIMDInst {
     public:
-    FloatHorizontalAddInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    FloatHorizontalAddInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                            FastMathAttr fast_math_attr);
     
     OpType get_op_type() const override;
@@ -764,7 +764,7 @@ class FloatHorizontalAddInst:public FloatHArithmeticSIMDInst {
 
 class FloatHorizontalSubInst:public FloatHArithmeticSIMDInst {
     public:
-    FloatHorizontalSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    FloatHorizontalSubInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                            FastMathAttr fast_math_attr);
     
     OpType get_op_type() const override;
@@ -773,7 +773,7 @@ class FloatHorizontalSubInst:public FloatHArithmeticSIMDInst {
 
 class FloatHorizontalAbsDiffInst:public FloatHArithmeticSIMDInst {
     public:
-    FloatHorizontalAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    FloatHorizontalAbsDiffInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                                FastMathAttr fast_math_attr);
     
     OpType get_op_type() const override;
@@ -782,7 +782,7 @@ class FloatHorizontalAbsDiffInst:public FloatHArithmeticSIMDInst {
 
 class FloatHorizontalAddSubInst:public FloatHArithmeticSIMDInst {
     public:
-    FloatHorizontalAddSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    FloatHorizontalAddSubInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                               FastMathAttr fast_math_attr);
     
     OpType get_op_type() const override;
@@ -791,7 +791,7 @@ class FloatHorizontalAddSubInst:public FloatHArithmeticSIMDInst {
 
 class FloatHorizontalMulInst:public FloatHArithmeticSIMDInst {
     public:
-    FloatHorizontalMulInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    FloatHorizontalMulInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                            FastMathAttr fast_math_attr);
     
     OpType get_op_type() const override;
@@ -800,7 +800,7 @@ class FloatHorizontalMulInst:public FloatHArithmeticSIMDInst {
 
 class FloatHorizontalAvgInst:public FloatHArithmeticSIMDInst {
     public:
-    FloatHorizontalAvgInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    FloatHorizontalAvgInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                            FastMathAttr fast_math_attr);
     
     OpType get_op_type() const override;
@@ -809,7 +809,7 @@ class FloatHorizontalAvgInst:public FloatHArithmeticSIMDInst {
 
 class FloatHorizontalMinInst:public FloatHArithmeticSIMDInst {
     public:
-    FloatHorizontalMinInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    FloatHorizontalMinInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                             FastMathAttr fast_math_attr, bool ieee754_2019, bool unordered);
     
     OpType get_op_type() const override;
@@ -818,7 +818,7 @@ class FloatHorizontalMinInst:public FloatHArithmeticSIMDInst {
 
 class FloatHorizontalMaxInst:public FloatHArithmeticSIMDInst {
     public:
-    FloatHorizontalMaxInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    FloatHorizontalMaxInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                             FastMathAttr fast_math_attr, bool ieee754_2019, bool unordered);
     
     OpType get_op_type() const override;
@@ -842,7 +842,7 @@ class IntHBitwiseSIMDInst:public Inst {
         HXOR = 1 << 10,
         HXNOR = 1 << 11,
     };
-    IntHBitwiseSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    IntHBitwiseSIMDInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                        bool disjoint);
     
     virtual IR::LiteralExprPtr get_lhs() const final;
@@ -858,7 +858,7 @@ class IntHBitwiseSIMDInst:public Inst {
 
 class IntHorizontalAndInst:public IntHBitwiseSIMDInst {
     public:
-    IntHorizontalAndInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
+    IntHorizontalAndInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
     
     OpType get_op_type() const override;
     std::string to_string() const override;
@@ -866,7 +866,7 @@ class IntHorizontalAndInst:public IntHBitwiseSIMDInst {
 
 class IntHorizontalNandInst:public IntHBitwiseSIMDInst {
     public:
-    IntHorizontalNandInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
+    IntHorizontalNandInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
     
     OpType get_op_type() const override;
     std::string to_string() const override;
@@ -874,7 +874,7 @@ class IntHorizontalNandInst:public IntHBitwiseSIMDInst {
 
 class IntHorizontalOrInst:public IntHBitwiseSIMDInst {
     public:
-    IntHorizontalOrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    IntHorizontalOrInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                         bool disjoint);
     
     OpType get_op_type() const override;
@@ -883,7 +883,7 @@ class IntHorizontalOrInst:public IntHBitwiseSIMDInst {
 
 class IntHorizontalNorInst:public IntHBitwiseSIMDInst {
     public:
-    IntHorizontalNorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    IntHorizontalNorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                          bool disjoint);
     
     OpType get_op_type() const override;
@@ -892,7 +892,7 @@ class IntHorizontalNorInst:public IntHBitwiseSIMDInst {
 
 class IntHorizontalXorInst:public IntHBitwiseSIMDInst {
     public:
-    IntHorizontalXorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
+    IntHorizontalXorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
     
     OpType get_op_type() const override;
     std::string to_string() const override;
@@ -900,7 +900,7 @@ class IntHorizontalXorInst:public IntHBitwiseSIMDInst {
 
 class IntHorizontalXnorInst:public IntHBitwiseSIMDInst {
     public:
-    IntHorizontalXnorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
+    IntHorizontalXnorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
     
     OpType get_op_type() const override;
     std::string to_string() const override;
@@ -916,7 +916,7 @@ class DotInst:public Inst {
 
     virtual std::string to_string_helper(const std::string op_name) const final;
     public:
-    DotInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::LiteralExprPtr acc,
+    DotInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::LiteralExprPtr acc,
             IR::TypeExprPtr input_vector_type, std::optional<FastMathAttr> fast_math_attr);
     
     virtual IR::LiteralExprPtr get_lhs() const final;
@@ -937,7 +937,7 @@ class IntDotInst:public DotInst {
     bool unsigned_;
     bool saturating;
     public:
-    IntDotInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::LiteralExprPtr acc, 
+    IntDotInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::LiteralExprPtr acc, 
                IR::TypeExprPtr input_vector_type, bool nuw, bool nsw, bool unsigned_, bool saturating);
 
     bool is_nuw() const;
@@ -956,7 +956,7 @@ class IntDotInst:public DotInst {
 
 class FloatDotInst:public DotInst {
     public:
-    FloatDotInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::LiteralExprPtr acc, 
+    FloatDotInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::LiteralExprPtr acc, 
                  IR::TypeExprPtr input_vector_type, FastMathAttr fast_math_attr);
 
     std::shared_ptr<IR::FloatTypeExpr> get_casted_input_basetype() const;
@@ -980,7 +980,7 @@ class SADInst:public Inst {
 
     virtual std::string to_string_helper(const std::string op_name) const final;
     public:
-    SADInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::LiteralExprPtr acc, 
+    SADInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::LiteralExprPtr acc, 
             IR::TypeExprPtr input_vector_type, std::optional<FastMathAttr> fast_math_attr);
     
     virtual IR::LiteralExprPtr get_lhs() const final;
@@ -1001,7 +1001,7 @@ class IntSADInst:public SADInst {
     bool unsigned_;
     bool saturating;
     public:
-    IntSADInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::LiteralExprPtr acc,
+    IntSADInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::LiteralExprPtr acc,
                IR::TypeExprPtr input_vector_type, bool nuw, bool nsw, bool unsigned_, bool saturating);
 
     bool is_nuw() const;
@@ -1020,7 +1020,7 @@ class IntSADInst:public SADInst {
 
 class FloatSADInst:public SADInst {
     public:
-    FloatSADInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::LiteralExprPtr acc,
+    FloatSADInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, IR::LiteralExprPtr acc,
                  IR::TypeExprPtr input_vector_type, FastMathAttr fast_math_attr);
 
     std::shared_ptr<IR::FloatTypeExpr> get_casted_input_basetype() const;
@@ -1044,7 +1044,7 @@ class PackSatInst:public Inst {
     
     bool unsigned_;
     public:
-    PackSatInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    PackSatInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                 IR::TypeExprPtr input_vector_type, bool unsigned_);
     
     bool is_unsigned() const;
@@ -1071,7 +1071,7 @@ class UnpackLoInst:public Inst {
     
     bool unsigned_;
     public:
-    UnpackLoInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    UnpackLoInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                  IR::TypeExprPtr input_vector_type, bool unsigned_);
     
     bool is_unsigned() const;
@@ -1098,7 +1098,7 @@ class UnpackHiInst:public Inst {
     
     bool unsigned_;
     public:
-    UnpackHiInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    UnpackHiInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
                  IR::TypeExprPtr input_vector_type, bool unsigned_);
     
     bool is_unsigned() const;
@@ -1125,7 +1125,7 @@ class CompressInst:public Inst {
 
     virtual std::string to_string_helper(const std::string op_name) const final;
     public:
-    CompressInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask,
+    CompressInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask,
                  bool poison_inactive, std::optional<FastMathAttr> fast_math_attr);
 
     virtual IR::LiteralExprPtr get_src() const final;
@@ -1140,7 +1140,7 @@ class CompressInst:public Inst {
 
 class IntCompressInst:public CompressInst {
     public:
-    IntCompressInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask,
+    IntCompressInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask,
                     bool poison_inactive);
 
     std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const;
@@ -1152,7 +1152,7 @@ class IntCompressInst:public CompressInst {
 
 class PtrCompressInst:public CompressInst {
     public:
-    PtrCompressInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask,
+    PtrCompressInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask,
                     bool poison_inactive);
 
     std::size_t get_element_bitwidth() const;
@@ -1163,7 +1163,7 @@ class PtrCompressInst:public CompressInst {
 
 class FloatCompressInst:public CompressInst {
     public:
-    FloatCompressInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask,
+    FloatCompressInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask,
                       bool poison_inactive, FastMathAttr fast_math_attr);
 
     std::shared_ptr<IR::FloatTypeExpr> get_casted_element_type() const;
@@ -1183,7 +1183,7 @@ class ExpandInst:public Inst {
 
     virtual std::string to_string_helper(const std::string op_name) const final;
     public:
-    ExpandInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask, IR::LiteralExprPtr passthru,
+    ExpandInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask, IR::LiteralExprPtr passthru,
                bool zeropassthru, std::optional<FastMathAttr> fast_math_attr);
 
     virtual IR::LiteralExprPtr get_src() const final;
@@ -1199,7 +1199,7 @@ class ExpandInst:public Inst {
 
 class IntExpandInst:public ExpandInst {
     public:
-    IntExpandInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask, IR::LiteralExprPtr passthru,
+    IntExpandInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask, IR::LiteralExprPtr passthru,
                   bool zeropassthru);
 
     std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const;
@@ -1211,7 +1211,7 @@ class IntExpandInst:public ExpandInst {
 
 class PtrExpandInst:public ExpandInst {
     public:
-    PtrExpandInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask, IR::LiteralExprPtr passthru,
+    PtrExpandInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask, IR::LiteralExprPtr passthru,
                   bool zeropassthru);
 
     std::size_t get_element_bitwidth() const;
@@ -1222,7 +1222,7 @@ class PtrExpandInst:public ExpandInst {
 
 class FloatExpandInst:public ExpandInst {
     public:
-    FloatExpandInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask, IR::LiteralExprPtr passthru,
+    FloatExpandInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr src, IR::LiteralExprPtr mask, IR::LiteralExprPtr passthru,
                     bool zeropassthru, FastMathAttr fast_math_attr);
 
     std::shared_ptr<IR::FloatTypeExpr> get_casted_element_type() const;
@@ -1239,7 +1239,7 @@ class InterleaveInst:public Inst {
 
     virtual std::string to_string_helper(const std::string op_name) const final;
     public:
-    InterleaveInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, std::vector<IR::LiteralExprPtr> args, 
+    InterleaveInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, std::vector<IR::LiteralExprPtr> args, 
                    std::optional<FastMathAttr> fast_math_attr);
 
     virtual std::vector<IR::LiteralExprPtr> get_args() const final;
@@ -1254,7 +1254,7 @@ class InterleaveInst:public Inst {
 
 class IntInterleaveInst:public InterleaveInst {
     public:
-    IntInterleaveInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, std::vector<IR::LiteralExprPtr> args);
+    IntInterleaveInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, std::vector<IR::LiteralExprPtr> args);
 
     std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const;
     std::size_t get_element_bitwidth() const;
@@ -1265,7 +1265,7 @@ class IntInterleaveInst:public InterleaveInst {
 
 class PtrInterleaveInst:public InterleaveInst {
     public:
-    PtrInterleaveInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, std::vector<IR::LiteralExprPtr> args);
+    PtrInterleaveInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, std::vector<IR::LiteralExprPtr> args);
 
     std::size_t get_element_bitwidth() const;
 
@@ -1275,7 +1275,7 @@ class PtrInterleaveInst:public InterleaveInst {
 
 class FloatInterleaveInst:public InterleaveInst {
     public:
-    FloatInterleaveInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, std::vector<IR::LiteralExprPtr> args, 
+    FloatInterleaveInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, std::vector<IR::LiteralExprPtr> args, 
                         FastMathAttr fast_math_attr);
 
     std::shared_ptr<IR::FloatTypeExpr> get_casted_element_type() const;
@@ -1294,7 +1294,7 @@ class DeinterleaveInst:public Inst {
     
     virtual std::string to_string_helper(const std::string op_name) const final;
     public:
-    DeinterleaveInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg, IR::TypeExprPtr arg_type, IR::LiteralExprPtr channel,
+    DeinterleaveInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg, IR::TypeExprPtr arg_type, IR::LiteralExprPtr channel,
                      std::optional<FastMathAttr> fast_math_attr);
 
     virtual IR::LiteralExprPtr get_arg() const final;
@@ -1310,7 +1310,7 @@ class DeinterleaveInst:public Inst {
 
 class IntDeinterleaveInst:public DeinterleaveInst {
     public:
-    IntDeinterleaveInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg, IR::TypeExprPtr arg_type, IR::LiteralExprPtr channel);
+    IntDeinterleaveInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg, IR::TypeExprPtr arg_type, IR::LiteralExprPtr channel);
 
     std::shared_ptr<IR::IntTypeExpr> get_casted_element_type() const;
     std::size_t get_element_bitwidth() const;
@@ -1321,7 +1321,7 @@ class IntDeinterleaveInst:public DeinterleaveInst {
 
 class PtrDeinterleaveInst:public DeinterleaveInst {
     public:
-    PtrDeinterleaveInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg, IR::TypeExprPtr arg_type, IR::LiteralExprPtr channel);
+    PtrDeinterleaveInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg, IR::TypeExprPtr arg_type, IR::LiteralExprPtr channel);
 
     std::size_t get_element_bitwidth() const;
 
@@ -1331,7 +1331,7 @@ class PtrDeinterleaveInst:public DeinterleaveInst {
 
 class FloatDeinterleaveInst:public DeinterleaveInst {
     public:
-    FloatDeinterleaveInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr arg, IR::TypeExprPtr arg_type, IR::LiteralExprPtr channel,
+    FloatDeinterleaveInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr arg, IR::TypeExprPtr arg_type, IR::LiteralExprPtr channel,
                           FastMathAttr fast_math_attr);
 
     std::shared_ptr<IR::FloatTypeExpr> get_casted_element_type() const;
@@ -1348,7 +1348,7 @@ class MaskToIntInst:public Inst {
     IR::LiteralExprPtr mask;
     IR::TypeExprPtr mask_type;
     public:
-    MaskToIntInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr mask, IR::TypeExprPtr mask_type);
+    MaskToIntInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr mask, IR::TypeExprPtr mask_type);
 
     IR::LiteralExprPtr get_mask() const;
     std::size_t get_mask_size() const;
@@ -1363,7 +1363,7 @@ class IntToMaskInst:public Inst {
     IR::LiteralExprPtr input;
     IR::TypeExprPtr input_type;
     public:
-    IntToMaskInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr input, IR::TypeExprPtr input_type);
+    IntToMaskInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr input, IR::TypeExprPtr input_type);
 
     IR::LiteralExprPtr get_input() const;
     std::size_t get_input_int_bitwidth() const;

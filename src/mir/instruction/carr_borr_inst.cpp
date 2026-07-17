@@ -3,7 +3,7 @@
 namespace LIRA {
 namespace MIR {
 // ---------------------------- Carry/Borrowing Type 1 instructions ---------------------------
-CarrBorrType1Inst::CarrBorrType1Inst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+CarrBorrType1Inst::CarrBorrType1Inst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                          IR::LiteralExprPtr carr_borr_val, bool unsigned_):Inst(instruction_stmt, destination, std::nullopt){
     this->lhs = lhs;
     this->rhs = rhs;
@@ -41,7 +41,7 @@ InstType CarrBorrType1Inst::get_inst_type() const{
 }
 
 // ---------------------------- Int Carry/Borrowing Type 1 instructions ---------------------------
-IntCarrBorrType1Inst::IntCarrBorrType1Inst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+IntCarrBorrType1Inst::IntCarrBorrType1Inst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                            IR::LiteralExprPtr carr_borr_val, bool unsigned_)
                                            :CarrBorrType1Inst(instruction_stmt, destination, lhs, rhs, carr_borr_val, unsigned_){}
 std::shared_ptr<IR::IntTypeExpr> IntCarrBorrType1Inst::get_casted_operand_type() const{
@@ -55,7 +55,7 @@ TypeVariant IntCarrBorrType1Inst::get_operand_type_variant() const{
 }
 
 
-IntCarrAddInst::IntCarrAddInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+IntCarrAddInst::IntCarrAddInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                IR::LiteralExprPtr carr_borr_val, bool unsigned_)
                                :IntCarrBorrType1Inst(instruction_stmt, destination, lhs, rhs, carr_borr_val, unsigned_){}
 CarrBorrType1Inst::OpType IntCarrAddInst::get_op_type() const{
@@ -66,7 +66,7 @@ std::string IntCarrAddInst::to_string() const{
 }
 
 
-IntCarrSubInst::IntCarrSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+IntCarrSubInst::IntCarrSubInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                IR::LiteralExprPtr carr_borr_val, bool unsigned_)
                                :IntCarrBorrType1Inst(instruction_stmt, destination, lhs, rhs, carr_borr_val, unsigned_){}
 CarrBorrType1Inst::OpType IntCarrSubInst::get_op_type() const{
@@ -77,7 +77,7 @@ std::string IntCarrSubInst::to_string() const{
 }
 
 
-IntCarrShlInst::IntCarrShlInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs,
+IntCarrShlInst::IntCarrShlInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs,
                                IR::LiteralExprPtr carr_borr_val)
                                :IntCarrBorrType1Inst(instruction_stmt, destination, lhs, nullptr, carr_borr_val, false){}
 CarrBorrType1Inst::OpType IntCarrShlInst::get_op_type() const{
@@ -88,7 +88,7 @@ std::string IntCarrShlInst::to_string() const{
 }
 
 
-IntCarrLshrInst::IntCarrLshrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs,
+IntCarrLshrInst::IntCarrLshrInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs,
                                  IR::LiteralExprPtr carr_borr_val)
                                  :IntCarrBorrType1Inst(instruction_stmt, destination, lhs, nullptr, carr_borr_val, false){}
 CarrBorrType1Inst::OpType IntCarrLshrInst::get_op_type() const{
@@ -99,7 +99,7 @@ std::string IntCarrLshrInst::to_string() const{
 }
 
 
-IntCarrAshrInst::IntCarrAshrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs,
+IntCarrAshrInst::IntCarrAshrInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs,
                                  IR::LiteralExprPtr carr_borr_val)
                                  :IntCarrBorrType1Inst(instruction_stmt, destination, lhs, nullptr, carr_borr_val, false){}
 CarrBorrType1Inst::OpType IntCarrAshrInst::get_op_type() const{
@@ -110,7 +110,7 @@ std::string IntCarrAshrInst::to_string() const{
 }
 
 // ---------------------------- Vec Int Carry/Borrowing Type 1 instructions ---------------------------
-VecIntCarrBorrType1Inst::VecIntCarrBorrType1Inst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+VecIntCarrBorrType1Inst::VecIntCarrBorrType1Inst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                                  IR::LiteralExprPtr carr_borr_val, bool unsigned_)
                                                  :CarrBorrType1Inst(instruction_stmt, destination, lhs, rhs, carr_borr_val, unsigned_){}
 std::shared_ptr<IR::SIMDTypeExpr> VecIntCarrBorrType1Inst::get_casted_operand_type() const{
@@ -130,7 +130,7 @@ TypeVariant VecIntCarrBorrType1Inst::get_operand_type_variant() const{
 }
 
 
-VecIntCarrAddInst::VecIntCarrAddInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+VecIntCarrAddInst::VecIntCarrAddInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                      IR::LiteralExprPtr carr_borr_val, bool unsigned_)
                                      :VecIntCarrBorrType1Inst(instruction_stmt, destination, lhs, rhs, carr_borr_val, unsigned_){}
 CarrBorrType1Inst::OpType VecIntCarrAddInst::get_op_type() const{
@@ -141,7 +141,7 @@ std::string VecIntCarrAddInst::to_string() const{
 }
 
 
-VecIntCarrSubInst::VecIntCarrSubInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+VecIntCarrSubInst::VecIntCarrSubInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                      IR::LiteralExprPtr carr_borr_val, bool unsigned_)
                                      :VecIntCarrBorrType1Inst(instruction_stmt, destination, lhs, rhs, carr_borr_val, unsigned_){}
 CarrBorrType1Inst::OpType VecIntCarrSubInst::get_op_type() const{
@@ -152,7 +152,7 @@ std::string VecIntCarrSubInst::to_string() const{
 }
 
 
-VecIntCarrShlInst::VecIntCarrShlInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs,
+VecIntCarrShlInst::VecIntCarrShlInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs,
                                      IR::LiteralExprPtr carr_borr_val)
                                      :VecIntCarrBorrType1Inst(instruction_stmt, destination, lhs, nullptr, carr_borr_val, false){}
 CarrBorrType1Inst::OpType VecIntCarrShlInst::get_op_type() const{
@@ -163,7 +163,7 @@ std::string VecIntCarrShlInst::to_string() const{
 }
 
 
-VecIntCarrLshrInst::VecIntCarrLshrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs,
+VecIntCarrLshrInst::VecIntCarrLshrInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs,
                                        IR::LiteralExprPtr carr_borr_val)
                                        :VecIntCarrBorrType1Inst(instruction_stmt, destination, lhs, nullptr, carr_borr_val, false){}
 CarrBorrType1Inst::OpType VecIntCarrLshrInst::get_op_type() const{
@@ -174,7 +174,7 @@ std::string VecIntCarrLshrInst::to_string() const{
 }
 
 
-VecIntCarrAshrInst::VecIntCarrAshrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs,
+VecIntCarrAshrInst::VecIntCarrAshrInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs,
                                        IR::LiteralExprPtr carr_borr_val)
                                        :VecIntCarrBorrType1Inst(instruction_stmt, destination, lhs, nullptr, carr_borr_val, false){}
 CarrBorrType1Inst::OpType VecIntCarrAshrInst::get_op_type() const{
@@ -186,7 +186,7 @@ std::string VecIntCarrAshrInst::to_string() const{
 
 
 // ---------------------------- Carry/Borrowing Type 2 instructions ---------------------------
-CarrBorrType2Inst::CarrBorrType2Inst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+CarrBorrType2Inst::CarrBorrType2Inst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                      IR::LiteralExprPtr carr_borr_val, bool unsigned_):Inst(instruction_stmt, destination, std::nullopt){
     this->lhs = lhs;
     this->rhs = rhs;
@@ -223,7 +223,7 @@ InstType CarrBorrType2Inst::get_inst_type() const{
     return InstType::CarrBorrType2Inst;
 }
 // ---------------------------- Int Carry/Borrowing Type 1 instructions ---------------------------
-IntCarrBorrType2Inst::IntCarrBorrType2Inst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+IntCarrBorrType2Inst::IntCarrBorrType2Inst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                            IR::LiteralExprPtr carr_borr_val, bool unsigned_)
                                            :CarrBorrType2Inst(instruction_stmt, destination, lhs, rhs, carr_borr_val, unsigned_){}
 std::shared_ptr<IR::IntTypeExpr> IntCarrBorrType2Inst::get_casted_operand_type() const{
@@ -237,7 +237,7 @@ TypeVariant IntCarrBorrType2Inst::get_operand_type_variant() const{
 }
 
 
-IntMacWideInst::IntMacWideInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+IntMacWideInst::IntMacWideInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                IR::LiteralExprPtr carr_borr_val, bool unsigned_)
                                :IntCarrBorrType2Inst(instruction_stmt, destination, lhs, rhs, carr_borr_val, unsigned_){}
 CarrBorrType2Inst::OpType IntMacWideInst::get_op_type() const{
@@ -248,7 +248,7 @@ std::string IntMacWideInst::to_string() const{
 }
 
 
-IntCarrShlNInst::IntCarrShlNInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+IntCarrShlNInst::IntCarrShlNInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                    IR::LiteralExprPtr carr_borr_val)
                                    :IntCarrBorrType2Inst(instruction_stmt, destination, lhs, rhs, carr_borr_val, false){}
 CarrBorrType2Inst::OpType IntCarrShlNInst::get_op_type() const{
@@ -259,7 +259,7 @@ std::string IntCarrShlNInst::to_string() const{
 }
 
 
-IntCarrLshrNInst::IntCarrLshrNInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+IntCarrLshrNInst::IntCarrLshrNInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                      IR::LiteralExprPtr carr_borr_val)
                                      :IntCarrBorrType2Inst(instruction_stmt, destination, lhs, rhs, carr_borr_val, false){}
 CarrBorrType2Inst::OpType IntCarrLshrNInst::get_op_type() const{
@@ -269,7 +269,7 @@ std::string IntCarrLshrNInst::to_string() const{
     return this->to_string_helper("int_carry_lshr_n");
 }
 
-IntCarrAshrNInst::IntCarrAshrNInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+IntCarrAshrNInst::IntCarrAshrNInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                      IR::LiteralExprPtr carr_borr_val)
                                      :IntCarrBorrType2Inst(instruction_stmt, destination, lhs, rhs, carr_borr_val, false){}
 CarrBorrType2Inst::OpType IntCarrAshrNInst::get_op_type() const{
@@ -279,7 +279,7 @@ std::string IntCarrAshrNInst::to_string() const{
     return this->to_string_helper("int_carry_ashr_n");
 }
 // ---------------------------- Vec Int Carry/Borrowing Type 1 instructions ---------------------------
-VecIntCarrBorrType2Inst::VecIntCarrBorrType2Inst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+VecIntCarrBorrType2Inst::VecIntCarrBorrType2Inst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                                  IR::LiteralExprPtr carr_borr_val, bool unsigned_)
                                                  :CarrBorrType2Inst(instruction_stmt, destination, lhs, rhs, carr_borr_val, unsigned_){}
 std::shared_ptr<IR::SIMDTypeExpr> VecIntCarrBorrType2Inst::get_casted_operand_type() const{
@@ -299,7 +299,7 @@ TypeVariant VecIntCarrBorrType2Inst::get_operand_type_variant() const{
 }
 
 
-VecIntMacWideInst::VecIntMacWideInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+VecIntMacWideInst::VecIntMacWideInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                      IR::LiteralExprPtr carr_borr_val, bool unsigned_)
                                      :VecIntCarrBorrType2Inst(instruction_stmt, destination, lhs, rhs, carr_borr_val, unsigned_){}
 CarrBorrType2Inst::OpType VecIntMacWideInst::get_op_type() const{
@@ -310,7 +310,7 @@ std::string VecIntMacWideInst::to_string() const{
 }
 
 
-VecIntCarrShlNInst::VecIntCarrShlNInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+VecIntCarrShlNInst::VecIntCarrShlNInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                          IR::LiteralExprPtr carr_borr_val)
                                          :VecIntCarrBorrType2Inst(instruction_stmt, destination, lhs, rhs, carr_borr_val, false){}
 CarrBorrType2Inst::OpType VecIntCarrShlNInst::get_op_type() const{
@@ -321,7 +321,7 @@ std::string VecIntCarrShlNInst::to_string() const{
 }
 
 
-VecIntCarrLshrNInst::VecIntCarrLshrNInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+VecIntCarrLshrNInst::VecIntCarrLshrNInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                           IR::LiteralExprPtr carr_borr_val)
                                           :VecIntCarrBorrType2Inst(instruction_stmt, destination, lhs, rhs, carr_borr_val, false){}
 CarrBorrType2Inst::OpType VecIntCarrLshrNInst::get_op_type() const{
@@ -331,7 +331,7 @@ std::string VecIntCarrLshrNInst::to_string() const{
     return this->to_string_helper("vec_int_carry_lshr_n");
 }
 
-VecIntCarrAshrNInst::VecIntCarrAshrNInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+VecIntCarrAshrNInst::VecIntCarrAshrNInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                                            IR::LiteralExprPtr carr_borr_val)
                                            :VecIntCarrBorrType2Inst(instruction_stmt, destination, lhs, rhs, carr_borr_val, false){}
 CarrBorrType2Inst::OpType VecIntCarrAshrNInst::get_op_type() const{

@@ -31,7 +31,7 @@ class BitwiseBinaryInst:public Inst {
         PEXT = 1 << 17,
         PDEP = 1 << 18
     };
-    BitwiseBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    BitwiseBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                       bool nuw, bool nsw, bool exact, bool disjoint);
 
     virtual TypeVariant get_type_variant() const = 0;
@@ -51,7 +51,7 @@ class BitwiseBinaryInst:public Inst {
 // ---------------------------Integer Binary Bitwise operations ---------------------------
 class IntBitwiseBinaryInst:public BitwiseBinaryInst {
     public:
-    IntBitwiseBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    IntBitwiseBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                          bool nuw, bool nsw, bool exact, bool disjoint);
 
     virtual std::shared_ptr<IR::IntTypeExpr> get_casted_operand_type() const final;//Returns the operand type casted to IntTypeExpr. Just a helper function to make life easier
@@ -62,7 +62,7 @@ class IntBitwiseBinaryInst:public BitwiseBinaryInst {
 
 class IntAndInst:public IntBitwiseBinaryInst {
     public:
-    IntAndInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
+    IntAndInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
 
     OpType get_op_type() const override;
     std::string to_string() const override;
@@ -70,7 +70,7 @@ class IntAndInst:public IntBitwiseBinaryInst {
 
 class IntNandInst:public IntBitwiseBinaryInst {
     public:
-    IntNandInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
+    IntNandInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
 
     OpType get_op_type() const override;
     std::string to_string() const override;
@@ -78,7 +78,7 @@ class IntNandInst:public IntBitwiseBinaryInst {
 
 class IntOrInst:public IntBitwiseBinaryInst {
     public:
-    IntOrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    IntOrInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
               bool disjoint);
 
     OpType get_op_type() const override;
@@ -87,7 +87,7 @@ class IntOrInst:public IntBitwiseBinaryInst {
 
 class IntNorInst:public IntBitwiseBinaryInst {
     public:
-    IntNorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    IntNorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
               bool disjoint);
 
     OpType get_op_type() const override;
@@ -96,7 +96,7 @@ class IntNorInst:public IntBitwiseBinaryInst {
 
 class IntXorInst:public IntBitwiseBinaryInst {
     public:
-    IntXorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
+    IntXorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
 
     OpType get_op_type() const override;
     std::string to_string() const override;
@@ -104,7 +104,7 @@ class IntXorInst:public IntBitwiseBinaryInst {
 
 class IntXnorInst:public IntBitwiseBinaryInst {
     public:
-    IntXnorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
+    IntXnorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
 
     OpType get_op_type() const override;
     std::string to_string() const override;
@@ -112,7 +112,7 @@ class IntXnorInst:public IntBitwiseBinaryInst {
 
 class IntShlInst:public IntBitwiseBinaryInst {
     public:
-    IntShlInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    IntShlInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                 bool nuw, bool nsw);
 
     OpType get_op_type() const override;
@@ -121,7 +121,7 @@ class IntShlInst:public IntBitwiseBinaryInst {
 
 class IntLshrInst:public IntBitwiseBinaryInst {
     public:
-    IntLshrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    IntLshrInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                 bool exact);
 
     OpType get_op_type() const override;
@@ -130,7 +130,7 @@ class IntLshrInst:public IntBitwiseBinaryInst {
 
 class IntAshrInst:public IntBitwiseBinaryInst {
     public:
-    IntAshrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    IntAshrInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                 bool exact);
 
     OpType get_op_type() const override;
@@ -139,7 +139,7 @@ class IntAshrInst:public IntBitwiseBinaryInst {
 
 class IntRotlInst:public IntBitwiseBinaryInst {
     public:
-    IntRotlInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
+    IntRotlInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
 
     OpType get_op_type() const override;
     std::string to_string() const override;
@@ -147,7 +147,7 @@ class IntRotlInst:public IntBitwiseBinaryInst {
 
 class IntRotrInst:public IntBitwiseBinaryInst {
     public:
-    IntRotrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
+    IntRotrInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
 
     OpType get_op_type() const override;
     std::string to_string() const override;
@@ -155,7 +155,7 @@ class IntRotrInst:public IntBitwiseBinaryInst {
 
 class IntPextInst:public IntBitwiseBinaryInst {
     public:
-    IntPextInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
+    IntPextInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
 
     OpType get_op_type() const override;
     std::string to_string() const override;
@@ -163,7 +163,7 @@ class IntPextInst:public IntBitwiseBinaryInst {
 
 class IntPdepInst:public IntBitwiseBinaryInst {
     public:
-    IntPdepInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
+    IntPdepInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
 
     OpType get_op_type() const override;
     std::string to_string() const override;
@@ -171,7 +171,7 @@ class IntPdepInst:public IntBitwiseBinaryInst {
 // ---------------------------Vector Integer Binary Bitwise operations ---------------------------
 class VecIntBitwiseBinaryInst:public BitwiseBinaryInst {
     public:
-    VecIntBitwiseBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    VecIntBitwiseBinaryInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                          bool disjoint, bool nuw, bool nsw, bool exact);
 
     virtual std::shared_ptr<IR::SIMDTypeExpr> get_casted_operand_type() const final;//Returns the operand type casted to SIMDTypeExpr. Just a helper function to make life easier
@@ -183,7 +183,7 @@ class VecIntBitwiseBinaryInst:public BitwiseBinaryInst {
 
 class VecIntAndInst:public VecIntBitwiseBinaryInst {
     public:
-    VecIntAndInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
+    VecIntAndInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
 
     OpType get_op_type() const override;
     std::string to_string() const override;
@@ -191,7 +191,7 @@ class VecIntAndInst:public VecIntBitwiseBinaryInst {
 
 class VecIntNandInst:public VecIntBitwiseBinaryInst {
     public:
-    VecIntNandInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
+    VecIntNandInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
 
     OpType get_op_type() const override;
     std::string to_string() const override;
@@ -199,7 +199,7 @@ class VecIntNandInst:public VecIntBitwiseBinaryInst {
 
 class VecIntOrInst:public VecIntBitwiseBinaryInst {
     public:
-    VecIntOrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    VecIntOrInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
               bool disjoint);
 
     OpType get_op_type() const override;
@@ -208,7 +208,7 @@ class VecIntOrInst:public VecIntBitwiseBinaryInst {
 
 class VecIntNorInst:public VecIntBitwiseBinaryInst {
     public:
-    VecIntNorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
+    VecIntNorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs, 
               bool disjoint);
 
     OpType get_op_type() const override;
@@ -217,7 +217,7 @@ class VecIntNorInst:public VecIntBitwiseBinaryInst {
 
 class VecIntXorInst:public VecIntBitwiseBinaryInst {
     public:
-    VecIntXorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
+    VecIntXorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
 
     OpType get_op_type() const override;
     std::string to_string() const override;
@@ -225,7 +225,7 @@ class VecIntXorInst:public VecIntBitwiseBinaryInst {
 
 class VecIntXnorInst:public VecIntBitwiseBinaryInst {
     public:
-    VecIntXnorInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
+    VecIntXnorInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
 
     OpType get_op_type() const override;
     std::string to_string() const override;
@@ -233,7 +233,7 @@ class VecIntXnorInst:public VecIntBitwiseBinaryInst {
 
 class VecIntShlInst:public VecIntBitwiseBinaryInst {
     public:
-    VecIntShlInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    VecIntShlInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                 bool nuw, bool nsw);
 
     OpType get_op_type() const override;
@@ -242,7 +242,7 @@ class VecIntShlInst:public VecIntBitwiseBinaryInst {
 
 class VecIntLshrInst:public VecIntBitwiseBinaryInst {
     public:
-    VecIntLshrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    VecIntLshrInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                 bool exact);
 
     OpType get_op_type() const override;
@@ -251,7 +251,7 @@ class VecIntLshrInst:public VecIntBitwiseBinaryInst {
 
 class VecIntAshrInst:public VecIntBitwiseBinaryInst {
     public:
-    VecIntAshrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
+    VecIntAshrInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs,
                 bool exact);
 
     OpType get_op_type() const override;
@@ -260,7 +260,7 @@ class VecIntAshrInst:public VecIntBitwiseBinaryInst {
 
 class VecIntRotlInst:public VecIntBitwiseBinaryInst {
     public:
-    VecIntRotlInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
+    VecIntRotlInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
 
     OpType get_op_type() const override;
     std::string to_string() const override;
@@ -268,7 +268,7 @@ class VecIntRotlInst:public VecIntBitwiseBinaryInst {
 
 class VecIntRotrInst:public VecIntBitwiseBinaryInst {
     public:
-    VecIntRotrInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
+    VecIntRotrInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
 
     OpType get_op_type() const override;
     std::string to_string() const override;
@@ -276,7 +276,7 @@ class VecIntRotrInst:public VecIntBitwiseBinaryInst {
 
 class VecIntPextInst:public VecIntBitwiseBinaryInst {
     public:
-    VecIntPextInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
+    VecIntPextInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
 
     OpType get_op_type() const override;
     std::string to_string() const override;
@@ -284,7 +284,7 @@ class VecIntPextInst:public VecIntBitwiseBinaryInst {
 
 class VecIntPdepInst:public VecIntBitwiseBinaryInst {
     public:
-    VecIntPdepInst(IR::InstructionStmtPtr instruction_stmt, LocalDestRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
+    VecIntPdepInst(IR::InstructionStmtPtr instruction_stmt, LocalRegisterPtr destination, IR::LiteralExprPtr lhs, IR::LiteralExprPtr rhs);
 
     OpType get_op_type() const override;
     std::string to_string() const override;
